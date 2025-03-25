@@ -9,28 +9,28 @@ import { decryptData } from '../utils/Secure';
 export const ProtectedLayout = () => {
   const location = useLocation();
   const { data: authData, isLoading } = useAuth();
-  const [redirectPath, setRedirectPath] = useState<string | null>(null);
+  const [redirectPath, setRedirectPath] = useState<string | null>("");
   const [fcmToken, _] = useState<string | null>(null);
   const [notificationStatus, setNotificationStatus] = useState<string>('');
 
-  useEffect(() => {
-    if (!isLoading && !authData) {
-      const path = location.pathname + location.search;
-      setRedirectPath(`/auth-login?redirect=${encodeURIComponent(path)}`);
-    }
+  // useEffect(() => {
+  //   if (!isLoading && !authData) {
+  //     const path = location.pathname + location.search;
+  //     setRedirectPath(`/auth-login?redirect=${encodeURIComponent(path)}`);
+  //   }
 
-    if (authData) {
-      const validationKey = authData?.validationKey;
-      const decrypt = decryptData(validationKey);
+  //   if (authData) {
+  //     const validationKey = authData?.validationKey;
+  //     const decrypt = decryptData(validationKey);
 
-      if (decrypt !== 'WELCOMESUPERADMIN') {
-        const path = location.pathname + location.search;
-        setRedirectPath(`/auth-login?redirect=${encodeURIComponent(path)}`);
-      } else {
-        // Initialize FCM
-      }
-    }
-  }, [isLoading, authData, location]);
+  //     if (decrypt !== 'WELCOMESUPERADMIN') {
+  //       const path = location.pathname + location.search;
+  //       setRedirectPath(`/auth-login?redirect=${encodeURIComponent(path)}`);
+  //     } else {
+  //       // Initialize FCM
+  //     }
+  //   }
+  // }, [isLoading, authData, location]);
 
   // Listen for foreground messages
   // useEffect(() => {
@@ -51,9 +51,9 @@ export const ProtectedLayout = () => {
     return <div>Loading...</div>;
   }
 
-  if (redirectPath) {
-    return <Navigate to={redirectPath} replace />;
-  }
+  // if (redirectPath) {
+    // return <Navigate to={redirectPath} replace />;
+  // }
 
-  return authData ? <Outlet /> : null;
+  return <Outlet /> 
 };

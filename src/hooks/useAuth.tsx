@@ -4,13 +4,22 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 const AUTH_QUERY_KEY = 'auth';
 
 export const initializeAuth = () => {
-  const token = localStorage.getItem('_UPLFMMATRIX');
-  const user = localStorage.getItem('user');
-  const fakeToken = localStorage.getItem('_GBLFMATRIX');
-  const secretKey = localStorage.getItem('_TFDSFUMATRIX');
-  const validationKey = localStorage.getItem('_WBMJEBUJPMMATRIX');
+//   const token = localStorage.getItem('_UPLFMMATRIX');
+//   const user = localStorage.getItem('user');
+//   const fakeToken = localStorage.getItem('_GBLFMATRIX');
+//   const secretKey = localStorage.getItem('_TFDSFUMATRIX');
+//     const validationKey = localStorage.getItem('_WBMJEBUJPMMATRIX');
+    
+    const token=""
+    const user = {
+        id:""
+    }
+    const fakeToken = ""
+    const secretKey = ""
+    const validationKey=''
+
   return token && user && fakeToken && secretKey && validationKey
-    ? { token, user: JSON.parse(user), fakeToken, secretKey, validationKey }
+    ? { token, user: user, fakeToken, secretKey, validationKey }
     : null;
 };
 
