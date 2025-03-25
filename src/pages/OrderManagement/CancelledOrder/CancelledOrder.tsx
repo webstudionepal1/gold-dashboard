@@ -126,17 +126,16 @@ const CancelledOrder: React.FC = () => {
     { header: "Customer Name", key: "customerName" },
     { header: "Order Date", key: "orderDate" },
     { header: "Cancelled Date", key: "cancelledDate" },
-    { header: "Cancellation Reason", key: "cancellationReason",
-      render: ( row) => (
-        <span
-          className={`px-2 py-1  ${(row.cancellationReason)}`}
-          style={{ wordWrap: 'break-word', whiteSpace: 'normal' }}
-        >
+    
+    {
+      header: "Cancellation Reason",
+      key: "cancellationReason",
+      render: (value, row) => (
+        <div className="break-words whitespace-normal max-w-[300px]">
           {row.cancellationReason}
-        </span>
-      ),
-
-     },
+        </div>
+      )
+    },
 
   ]
 
