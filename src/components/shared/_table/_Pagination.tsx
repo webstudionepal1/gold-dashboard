@@ -70,13 +70,12 @@ export default function Pagination({
                 key={index}
                 onClick={() => typeof page === 'number' && onPageChange?.(page)}
                 disabled={page === '...'}
-                className={`min-w-[32px] rounded-sm px-2 py-1 text-sm ${
-                  currentPage === page
+                className={`min-w-[32px] rounded-sm px-2 py-1 text-sm ${currentPage === page
                     ? 'bg-blue-500 text-white'
                     : page === '...'
                       ? 'text-gray-500'
                       : 'text-lynch-400 bg-fade-bg border rounded border-lynch-50'
-                }`}
+                  }`}
                 aria-current={currentPage === page ? 'page' : undefined}
               >
                 {page}
