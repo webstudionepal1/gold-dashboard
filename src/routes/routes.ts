@@ -8,4 +8,6 @@ export const FrontendRoutes = {
     CANCELLEDORDER : "/order/cancelled-order",
     COMPLETEDORDER : "/order/completed-order",
     ORDER :"/order/orders",
+    CUSTOMER:"/customer/customer-list",
+    CUSTOMERVIEW: "/customer-view/:id"
 };

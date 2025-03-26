@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Table, type TableData, type ColumnConfig } from "../../../components/shared/Table"
 import { Modal } from "../../../components/shared"
 import { useOutsideClick } from "../../../hooks/UseOutsideClick"
-
+import { SearchFilterSort } from "../../../components/global/SearchFilterSort"
 interface Order {
   _id: string
   orderId: string
@@ -14,15 +14,18 @@ interface Order {
   totalAmount: number
   status: "Assigned" | "Pending" | "In Progress" | "Delivered" | "Cancelled"
   isActive?: boolean
+
 }
 
-const AssignedOrder: React.FC = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const [searchQuery, setSearchQuery] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(10)
-  const ref = useOutsideClick(() => setIsModalOpen(false))
+const AssignedOrder: React.FC = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedFilter, setSelectedFilter] = useState('');
+  const [selectedSort, setSelectedSort] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const ref = useOutsideClick(() => setIsModalOpen(false));
   const [orders, setOrders] = useState<Order[]>([
     {
       _id: "1",
@@ -146,6 +149,21 @@ const AssignedOrder: React.FC = () => {
       ),
     },
   ]
+   // Filter options for the dropdown
+   const filterOptions = [
+    { value: "", label: "All Customers" },
+    { value: "active", label: "Active" },
+    { value: "inactive", label: "Inactive" },
+  ]
+
+  // Sort options for the dropdown
+  const sortOptions = [
+    { value: "", label: "Default" },
+    { value: "name-asc", label: "Name (A-Z)" },
+    { value: "name-desc", label: "Name (Z-A)" },
+    { value: "orders-high", label: "Orders (High)" },
+    { value: "orders-low", label: "Orders (Low)" },
+  ]
 
   const handleRowSelect = (selectedIds: string[]) => {
     console.log("Selected rows:", selectedIds)
@@ -159,6 +177,21 @@ const AssignedOrder: React.FC = () => {
     setItemsPerPage(limit)
     setCurrentPage(1)
   }
+  const handleSearch = (query: string) => {
+    setSearchQuery(query)
+    setCurrentPage(1)
+  }
+
+  const handleFilter = (filter: string) => {
+    setSelectedFilter(filter)
+    setCurrentPage(1)
+  }
+
+  const handleSort = (sort: string) => {
+    setSelectedSort(sort)
+    setCurrentPage(1)
+  }
+
 
   return (
     <div className="container mx-auto px-4 py-6">
@@ -166,6 +199,14 @@ const AssignedOrder: React.FC = () => {
         <h1 className="text-2xl font-bold text-gray-800">Assigned Orders</h1>
 
       </div>
+       <SearchFilterSort
+          onSearch={handleSearch}
+          onFilter={handleFilter}
+          onSort={handleSort}
+          filterOptions={filterOptions}
+          sortOptions={sortOptions}
+          placeholder="Search here..."
+       />
 
 
 
@@ -185,6 +226,7 @@ const AssignedOrder: React.FC = () => {
         onItemsPerPageChange={handleItemsPerPageChange}
         onPageChange={handlePageChange}
         showBg={true}
+        showAction={false}
       />
 
       {isModalOpen && (

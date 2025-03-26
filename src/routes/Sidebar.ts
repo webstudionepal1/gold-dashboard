@@ -67,7 +67,13 @@ export const SidebarMainRoutes = {
 
 
       ],
-    }
+    },
+    {
+      id: 4,
+      path: FrontendRoutes.CUSTOMER,
+      title: 'Customer',
+      icon: 'line-md:account-small',
+    },
 
   ],
 };

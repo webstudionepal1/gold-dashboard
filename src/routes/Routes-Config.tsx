@@ -1,10 +1,10 @@
 
 import { LoginPage } from '../pages';
+import CustomerList from '../pages/Customer/CustomerList/CustomerList';
+import CustomerDetail from '../pages/Customer/CustomerView/CustomerView';
+
 import { DashboardPage } from '../pages/Dashboard/Dashboard';
 import { NotFoundPage } from '../pages/NotFound/NotFound';
-import ProductCategory from '../pages/Product/ProductCategory/ProductCategory';
-import ProductList from '../pages/Product/ProductList/ProductList';
-import ProductSubCategory from '../pages/Product/ProductSubcategory/ProductSubCategory';
 import AssignedOrders from '../pages/OrderManagement/AssignedOrder/AssignedOrder';
 import CancelledOrder from '../pages/OrderManagement/CancelledOrder/CancelledOrder';
 import CompletedOrder from '../pages/OrderManagement/CompletedOrder/CompletedOrder';
@@ -37,6 +37,16 @@ export const routesConfig = [
     path: FrontendRoutes.COMPLETEDORDER,
     element: <CompletedOrder/>
   },
+  {
+    path: FrontendRoutes.CUSTOMER,
+    element: <CustomerList/>
+  },
+
+  {
+    path: FrontendRoutes.CUSTOMERVIEW,
+    element: <CustomerDetail/>
+  },
+
 
   {
     path: '*',
