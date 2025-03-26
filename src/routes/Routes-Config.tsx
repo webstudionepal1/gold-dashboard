@@ -34,8 +34,6 @@ export const routesConfig = [
     path: FrontendRoutes.PRODUCTSUBCATEGORY,
     element: <ProductSubCategory />,
   },
-
-
   {
     path: '*',
     element: <NotFoundPage />,
