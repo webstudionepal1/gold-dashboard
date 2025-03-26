@@ -5,6 +5,9 @@ import { NotFoundPage } from '../pages/NotFound/NotFound';
 import ProductCategory from '../pages/Product/ProductCategory/ProductCategory';
 import ProductList from '../pages/Product/ProductList/ProductList';
 import ProductSubCategory from '../pages/Product/ProductSubcategory/ProductSubCategory';
+import AssignedOrders from '../pages/OrderManagement/AssignedOrder/AssignedOrder';
+import CancelledOrder from '../pages/OrderManagement/CancelledOrder/CancelledOrder';
+import CompletedOrder from '../pages/OrderManagement/CompletedOrder/CompletedOrder';
 import { FrontendRoutes } from './routes';
 
 export const routesConfig = [
@@ -23,17 +26,18 @@ export const routesConfig = [
     element: <LoginPage />,
   },
   {
-    path: FrontendRoutes.PRODUCTLIST,
-    element: <ProductList />,
+    path: FrontendRoutes.ASSIGNEDORDER,
+    element: <AssignedOrders />
   },
   {
-    path: FrontendRoutes.PRODUCTCATEGORY,
-    element: <ProductCategory />,
+    path: FrontendRoutes.CANCELLEDORDER,
+    element: <CancelledOrder />
   },
   {
-    path: FrontendRoutes.PRODUCTSUBCATEGORY,
-    element: <ProductSubCategory />,
+    path: FrontendRoutes.COMPLETEDORDER,
+    element: <CompletedOrder />
   },
+
   {
     path: '*',
     element: <NotFoundPage />,

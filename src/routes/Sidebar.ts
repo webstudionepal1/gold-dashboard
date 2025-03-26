@@ -1,4 +1,4 @@
-import { FrontendRoutes } from "./routes";
+  import { FrontendRoutes } from "./routes";
 
 
 export const SidebarMainRoutes = {
@@ -34,6 +34,38 @@ export const SidebarMainRoutes = {
           title: "Product Sub Category",
           icon: "",
         },
+      ],
+    },
+    {
+      id: 3,
+      path: "#",
+      title: "Order",
+      icon: "lets-icons:order",
+      children: [
+        {
+          id: 34,
+          path: FrontendRoutes.ORDER,
+          title: "Orders"
+        },
+        {
+          id: 30,
+          path: FrontendRoutes.ASSIGNEDORDER,
+          title: "Assigned Order",
+          icon: "",
+        },
+        {
+          id: 32,
+          path: FrontendRoutes.COMPLETEDORDER,
+          title: "Completed Order",
+
+        },
+        {
+          id: 33,
+          path: FrontendRoutes.CANCELLEDORDER,
+          title: "Cancelled Order"
+        },
+
+
       ],
     }
 

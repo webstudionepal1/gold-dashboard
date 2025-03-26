@@ -12,6 +12,7 @@ export type ColumnConfig<T> = {
   header: string;
   width?: string;
   render?: (value: any, row: TableData<T>) => React.ReactNode;
+
 };
 
 type TableProps<T extends Record<string, any>> = {
