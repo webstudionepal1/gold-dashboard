@@ -25,6 +25,18 @@ export const routesConfig = [
     path: FrontendRoutes.LOGIN,
     element: <LoginPage />,
   },
+  {
+    path: FrontendRoutes.ASSIGNEDORDER,
+    element: <AssignedOrders/>
+  },
+  {
+    path: FrontendRoutes.CANCELLEDORDER,
+    element: <CancelledOrder/>
+  },
+  {
+    path: FrontendRoutes.COMPLETEDORDER,
+    element: <CompletedOrder/>
+  },
 
 
   {
