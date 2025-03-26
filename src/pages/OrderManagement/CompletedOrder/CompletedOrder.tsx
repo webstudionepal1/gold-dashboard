@@ -3,6 +3,7 @@ import type React from "react"
 import { useState } from "react"
 import { Modal } from "../../../components/shared"
 import { Table, type ColumnConfig, type TableData } from "../../../components/shared/Table"
+import { useOutsideClick } from "../../../hooks/UseOutsideClick"
 
 interface Order {
   _id: string
@@ -17,7 +18,7 @@ interface Order {
 
 const CompletedOrder: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
-
+  const ref = useOutsideClick(() => setIsModalOpen(false))
   const [searchQuery, setSearchQuery] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
@@ -159,9 +160,11 @@ const CompletedOrder: React.FC = () => {
   }
 
   return (
-    <div>
+    <div className="container mx-auto px-4 py-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-800">Assigned Orders</h1>
 
-
+      </div>
 
       <Table
         columns={columns}
@@ -187,7 +190,7 @@ const CompletedOrder: React.FC = () => {
       />
 
       {isModalOpen && (
-        <Modal onClose={() => setIsModalOpen(false)}>
+        <Modal ref ={ref}>
           <div className="p-6">
             <h2 className="text-xl font-semibold mb-4">Create New Order</h2>
             <div className="space-y-4">
