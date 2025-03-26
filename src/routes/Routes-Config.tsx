@@ -22,18 +22,18 @@ export const routesConfig = [
     path: FrontendRoutes.LOGIN,
     element: <LoginPage />,
   },
-  // {
-  //   path: FrontendRoutes.PRODUCTLIST,
-  //   element: <ProductList />,
-  // },
-  // {
-  //   path: FrontendRoutes.PRODUCTCATEGORY,
-  //   element: <ProductCategory />,
-  // },
-  // {
-  //   path: FrontendRoutes.PRODUCTSUBCATEGORY,
-  //   element: <ProductSubCategory />,
-  // },
+  {
+    path: FrontendRoutes.PRODUCTLIST,
+    element: <ProductList />,
+  },
+  {
+    path: FrontendRoutes.PRODUCTCATEGORY,
+    element: <ProductCategory />,
+  },
+  {
+    path: FrontendRoutes.PRODUCTSUBCATEGORY,
+    element: <ProductSubCategory />,
+  },
   {
     path: '*',
     element: <NotFoundPage />,
