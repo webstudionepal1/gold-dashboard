@@ -6,6 +6,7 @@ import { Icon } from "@iconify/react/dist/iconify.js"
 import { Table, type TableData, type ColumnConfig } from "../../../components/shared/Table"
 import { Modal } from "../../../components/shared"
 import { Search } from "lucide-react"
+import { useOutsideClick } from "../../../hooks/UseOutsideClick"
 
 interface Order {
   _id: string
@@ -24,7 +25,7 @@ const AssignedOrder: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
-
+  const ref = useOutsideClick(() => setIsModalOpen(false))
   const [orders, setOrders] = useState<Order[]>([
     {
       _id: "1",
@@ -219,7 +220,7 @@ const AssignedOrder: React.FC = () => {
       />
 
       {isModalOpen && (
-        <Modal onClose={() => setIsModalOpen(false)}>
+        <Modal ref={ref} >
           <div className="p-6">
             <h2 className="text-xl font-semibold mb-4">Create New Order</h2>
             <div className="space-y-4">
