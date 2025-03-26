@@ -38,7 +38,6 @@ export const routesConfig = [
     element: <CompletedOrder/>
   },
 
-
   {
     path: '*',
     element: <NotFoundPage />,
