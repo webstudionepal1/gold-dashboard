@@ -8,8 +8,16 @@ export const FrontendRoutes = {
     PRODUCTCATEGORY: "/product/product-category",
     PRODUCTSUBCATEGORY: "/product/sub-category",
     ASSIGNEDORDER: "/order/assigned-order",
-    CANCELLEDORDER: "/order/cancelled-order",
-    COMPLETEDORDER: "/order/completed-order",
-    ORDER: "/order/orders",
+
+    CANCELLEDORDER : "/order/cancelled-order",
+    COMPLETEDORDER : "/order/completed-order",
+    ORDER :"/order/orders",
+    CUSTOMER:"/customer/customer-list",
+    CUSTOMERVIEW: "/customer-view/:id",
+    ADDCUSTOMER:"/add-customer",
+    INVENTORY: "/inventory/inventory-overview",
+    PURCHASE: "/inventory/purchase",
+    PURCHASERETURN: "/inventory/purchase-return",
+    SUPPLIERS : "/inventory/suppliers",
 
 };

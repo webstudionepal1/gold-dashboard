@@ -3,7 +3,8 @@ import type React from "react"
 import { useState } from "react"
 import { Modal } from "../../../components/shared"
 import { Table, type ColumnConfig, type TableData } from "../../../components/shared/Table"
-
+import { useOutsideClick } from "../../../hooks/UseOutsideClick"
+import { SearchFilterSort } from "../../../components/global/SearchFilterSort"
 interface Order {
   _id: string
   orderId: string
@@ -17,10 +18,13 @@ interface Order {
 
 const CompletedOrder: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
-
+  const ref = useOutsideClick(() => setIsModalOpen(false))
+  const [selectedFilter, setSelectedFilter] = useState('');
+  const [selectedSort, setSelectedSort] = useState('');
   const [searchQuery, setSearchQuery] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
+
 
   const [orders, setOrders] = useState<Order[]>([
     {
@@ -158,10 +162,50 @@ const CompletedOrder: React.FC = () => {
     setCurrentPage(1)
   }
 
+   // Filter options for the dropdown
+   const filterOptions = [
+    { value: "", label: "All Customers" },
+    { value: "active", label: "Active" },
+    { value: "inactive", label: "Inactive" },
+  ]
+
+  // Sort options for the dropdown
+  const sortOptions = [
+    { value: "", label: "Default" },
+    { value: "name-asc", label: "Name (A-Z)" },
+    { value: "name-desc", label: "Name (Z-A)" },
+    { value: "orders-high", label: "Orders (High)" },
+    { value: "orders-low", label: "Orders (Low)" },
+  ]
+  const handleSearch = (query: string) => {
+    setSearchQuery(query)
+    setCurrentPage(1)
+  }
+
+  const handleFilter = (filter: string) => {
+    setSelectedFilter(filter)
+    setCurrentPage(1)
+  }
+
+  const handleSort = (sort: string) => {
+    setSelectedSort(sort)
+    setCurrentPage(1)
+  }
+
   return (
-    <div>
+    <div className="container mx-auto px-4 py-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-800">Assigned Orders</h1>
 
-
+      </div>
+       <SearchFilterSort
+          onSearch={handleSearch}
+          onFilter={handleFilter}
+          onSort={handleSort}
+          filterOptions={filterOptions}
+          sortOptions={sortOptions}
+          placeholder="Search here..."
+        />
 
       <Table
         columns={columns}
@@ -187,7 +231,7 @@ const CompletedOrder: React.FC = () => {
       />
 
       {isModalOpen && (
-        <Modal onClose={() => setIsModalOpen(false)}>
+        <Modal ref ={ref}>
           <div className="p-6">
             <h2 className="text-xl font-semibold mb-4">Create New Order</h2>
             <div className="space-y-4">

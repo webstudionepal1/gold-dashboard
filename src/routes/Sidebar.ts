@@ -67,7 +67,34 @@ export const SidebarMainRoutes = {
 
 
       ],
-    }
+    },
+    {
+      id: 4,
+      path: FrontendRoutes.CUSTOMER,
+      title: 'Customer',
+      icon: 'line-md:account-small',
+    },
+    {
+      id: 5,
+      path: "#",
+      title: "Inventory",
+      icon: "mingcute:inventory-line",
+      children: [
+        {
+          id: 50,
+          path: FrontendRoutes.INVENTORY,
+          title: "Inventory Overview"
+        },
+        {
+          id: 51,
+          path: FrontendRoutes.PURCHASE,
+          title: "Purchase Management",
+          icon: "",
+        },
+        
+
+      ],
+    },
 
   ],
 };

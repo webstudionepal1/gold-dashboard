@@ -1,10 +1,14 @@
 
 import { LoginPage } from '../pages';
+import AddCustomerForm from '../pages/Customer/AddCustomerForm/AddCustomerForm';
+import CustomerList from '../pages/Customer/CustomerList/CustomerList';
+import CustomerDetail from '../pages/Customer/CustomerView/CustomerView';
 import { DashboardPage } from '../pages/Dashboard/Dashboard';
+import InventoryOverview from '../pages/Inventory/InventoryOverview/InventoryOverview';
+import Purchase from '../pages/Inventory/PurchaseManagement/Purchase';
+import PurchaseReturn from '../pages/Inventory/PurchaseManagement/PurchaseReturn';
+import Suppliers from '../pages/Inventory/PurchaseManagement/Suppliers';
 import { NotFoundPage } from '../pages/NotFound/NotFound';
-import ProductCategory from '../pages/Product/ProductCategory/ProductCategory';
-import ProductList from '../pages/Product/ProductList/ProductList';
-import ProductSubCategory from '../pages/Product/ProductSubcategory/ProductSubCategory';
 import AssignedOrders from '../pages/OrderManagement/AssignedOrder/AssignedOrder';
 import CancelledOrder from '../pages/OrderManagement/CancelledOrder/CancelledOrder';
 import CompletedOrder from '../pages/OrderManagement/CompletedOrder/CompletedOrder';
@@ -54,6 +58,40 @@ export const routesConfig = [
     path: FrontendRoutes.PRODUCTSUBCATEGORY,
     element: <ProductSubCategory />,
   },
+
+  {
+    path: FrontendRoutes.CUSTOMER,
+    element: <CustomerList/>
+  },
+
+  {
+    path: FrontendRoutes.CUSTOMERVIEW,
+    element: <CustomerDetail/>
+  },
+
+  {
+    path: FrontendRoutes.ADDCUSTOMER,
+    element: <AddCustomerForm/>
+  },
+
+  {
+    path: FrontendRoutes.INVENTORY,
+    element: <InventoryOverview/>
+  },
+  {
+    path: FrontendRoutes.PURCHASE,
+    element: <Purchase/>
+  },
+  {
+    path: FrontendRoutes.PURCHASERETURN,
+    element: <PurchaseReturn/>
+  },
+  {
+    path: FrontendRoutes.SUPPLIERS,
+    element: <Suppliers/>
+  },
+
+
   {
     path: '*',
     element: <NotFoundPage />,
