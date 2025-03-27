@@ -9,6 +9,7 @@ import AssignedOrders from '../pages/OrderManagement/AssignedOrder/AssignedOrder
 import CancelledOrder from '../pages/OrderManagement/CancelledOrder/CancelledOrder';
 import CompletedOrder from '../pages/OrderManagement/CompletedOrder/CompletedOrder';
 import { FrontendRoutes } from './routes';
+import ProductDescription from '../pages/Product/ProductList/[id]/ProdectDescription';
 
 export const routesConfig = [
 
@@ -37,7 +38,22 @@ export const routesConfig = [
     path: FrontendRoutes.COMPLETEDORDER,
     element: <CompletedOrder />
   },
-
+  {
+    path: FrontendRoutes.PRODUCTLIST,
+    element: <ProductList />,
+  },
+  {
+    path: FrontendRoutes.PRODUCTDESCRIPTION,
+    element: <ProductDescription />,
+  },
+  {
+    path: FrontendRoutes.PRODUCTCATEGORY,
+    element: <ProductCategory />,
+  },
+  {
+    path: FrontendRoutes.PRODUCTSUBCATEGORY,
+    element: <ProductSubCategory />,
+  },
   {
     path: '*',
     element: <NotFoundPage />,

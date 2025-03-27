@@ -5,7 +5,7 @@ import { useState } from "react"
 import { Icon } from "@iconify/react/dist/iconify.js"
 import { Table, type TableData, type ColumnConfig } from "../../../components/shared/Table"
 import { Modal } from "../../../components/shared"
-import { Search } from "lucide-react"
+// import { Search } from "lucide-react"
 import { useOutsideClick } from "../../../hooks/UseOutsideClick"
 
 interface Order {
@@ -103,10 +103,10 @@ const AssignedOrder: React.FC = () => {
       prev.map((order) =>
         order._id === row._id
           ? {
-              ...order,
-              status: order.status === "Pending" ? "In Progress" : "Pending",
-              isActive: !order.isActive,
-            }
+            ...order,
+            status: order.status === "Pending" ? "In Progress" : "Pending",
+            isActive: !order.isActive,
+          }
           : order,
       ),
     )

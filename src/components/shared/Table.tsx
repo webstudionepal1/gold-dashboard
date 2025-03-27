@@ -233,7 +233,7 @@ export const Table = <T extends Record<string, any>>({
                                 <div
                                   className={`toggle-bg border-2 h-[18px] w-[36px] rounded-full transition-colors duration-200 ease-in-out ${row.isActive
                                     ? 'bg-[#22C55E] border-[#22C55E]'
-                                    : 'bg-gray-200 border-gray-200'
+                                    : 'bg-red border-red'
                                     }`}
                                 >
                                   <div

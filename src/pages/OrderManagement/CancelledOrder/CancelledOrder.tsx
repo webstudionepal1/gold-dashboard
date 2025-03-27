@@ -1,7 +1,7 @@
 "use client"
 
 import { Icon } from "@iconify/react/dist/iconify.js"
-import { Search } from "lucide-react"
+// import { Search } from "lucide-react"
 import type React from "react"
 import { useState } from "react"
 import { Modal } from "../../../components/shared"
@@ -98,10 +98,10 @@ const CancelledOrder: React.FC = () => {
       prev.map((order) =>
         order._id === row._id
           ? {
-              ...order,
-              status: "Assigned",
-              isActive: true,
-            }
+            ...order,
+            status: "Assigned",
+            isActive: true,
+          }
           : order,
       ),
     )
@@ -126,7 +126,7 @@ const CancelledOrder: React.FC = () => {
     { header: "Customer Name", key: "customerName" },
     { header: "Order Date", key: "orderDate" },
     { header: "Cancelled Date", key: "cancelledDate" },
-    
+
     {
       header: "Cancellation Reason",
       key: "cancellationReason",
