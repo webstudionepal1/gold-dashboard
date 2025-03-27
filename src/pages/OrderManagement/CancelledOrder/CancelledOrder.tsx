@@ -1,5 +1,6 @@
 
 import { Icon } from "@iconify/react/dist/iconify.js"
+
 import type React from "react"
 import { useState } from "react"
 import { Modal } from "../../../components/shared"
@@ -101,10 +102,10 @@ const CancelledOrder: React.FC = () => {
       prev.map((order) =>
         order._id === row._id
           ? {
-              ...order,
-              status: "Assigned",
-              isActive: true,
-            }
+            ...order,
+            status: "Assigned",
+            isActive: true,
+          }
           : order,
       ),
     )

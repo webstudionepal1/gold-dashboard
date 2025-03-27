@@ -232,11 +232,13 @@ export const Table = <T extends Record<string, any>>({
                                   onChange={() => handleToggle(row)}
                                 />
                                 <div
+
                                   className={`toggle-bg border-2 h-[18px] w-[36px] rounded-full transition-colors duration-200 ease-in-out ${
                                     row.isActive
                                       ? 'bg-blue-600 border-blue-600'
                                       : 'bg-gray-200 border-gray-200'
                                   }`}
+
                                 >
                                   <div
                                     className={`toggle-dot absolute left-0 top-1/2 -translate-y-1/2 bg-white w-4 h-4 rounded-full transition-transform duration-200 ease-in-out transform ${

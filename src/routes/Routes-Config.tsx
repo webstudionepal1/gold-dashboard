@@ -13,6 +13,7 @@ import AssignedOrders from '../pages/OrderManagement/AssignedOrder/AssignedOrder
 import CancelledOrder from '../pages/OrderManagement/CancelledOrder/CancelledOrder';
 import CompletedOrder from '../pages/OrderManagement/CompletedOrder/CompletedOrder';
 import { FrontendRoutes } from './routes';
+import ProductDescription from '../pages/Product/ProductList/[id]/ProdectDescription';
 
 export const routesConfig = [
 
@@ -31,16 +32,33 @@ export const routesConfig = [
   },
   {
     path: FrontendRoutes.ASSIGNEDORDER,
-    element: <AssignedOrders/>
+    element: <AssignedOrders />
   },
   {
     path: FrontendRoutes.CANCELLEDORDER,
-    element: <CancelledOrder/>
+    element: <CancelledOrder />
   },
   {
     path: FrontendRoutes.COMPLETEDORDER,
-    element: <CompletedOrder/>
+    element: <CompletedOrder />
   },
+  {
+    path: FrontendRoutes.PRODUCTLIST,
+    element: <ProductList />,
+  },
+  {
+    path: FrontendRoutes.PRODUCTDESCRIPTION,
+    element: <ProductDescription />,
+  },
+  {
+    path: FrontendRoutes.PRODUCTCATEGORY,
+    element: <ProductCategory />,
+  },
+  {
+    path: FrontendRoutes.PRODUCTSUBCATEGORY,
+    element: <ProductSubCategory />,
+  },
+
   {
     path: FrontendRoutes.CUSTOMER,
     element: <CustomerList/>
@@ -72,6 +90,7 @@ export const routesConfig = [
     path: FrontendRoutes.SUPPLIERS,
     element: <Suppliers/>
   },
+
 
   {
     path: '*',

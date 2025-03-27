@@ -103,10 +103,10 @@ const AssignedOrder: React.FC = () => {
       prev.map((order) =>
         order._id === row._id
           ? {
-              ...order,
-              status: order.status === "Pending" ? "In Progress" : "Pending",
-              isActive: !order.isActive,
-            }
+            ...order,
+            status: order.status === "Pending" ? "In Progress" : "Pending",
+            isActive: !order.isActive,
+          }
           : order,
       ),
     )

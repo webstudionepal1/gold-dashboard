@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Text } from '.';
 import React from 'react';
-import { SidebarMainRoutes,  } from '../../routes/Sidebar';
+import { SidebarMainRoutes, } from '../../routes/Sidebar';
 interface sidebarProps {
   miniSidebar: boolean;
   setMiniSidebar: React.Dispatch<React.SetStateAction<boolean>>;
@@ -90,9 +90,8 @@ export const SideBar = ({ miniSidebar, setMiniSidebar }: sidebarProps) => {
               <div key={route.id}>
                 <Link
                   to={route.path}
-                  className={`flex place-items-center ${miniSidebar ? 'px-6' : 'px-3'}   py-3 gap-5 justify-between hover:bg-bg hover:rounded-lg ${
-                    currentParentId === route.id ? 'bg-bg' : ''
-                  }`}
+                  className={`flex place-items-center ${miniSidebar ? 'px-6' : 'px-3'}   py-3 gap-5 justify-between hover:bg-bg hover:rounded-lg ${currentParentId === route.id ? 'bg-bg' : ''
+                    }`}
                   onClick={() => {
                     if (route.children) toggleExpand(route.id);
                     // setCurrentId(route.id);
@@ -106,11 +105,10 @@ export const SideBar = ({ miniSidebar, setMiniSidebar }: sidebarProps) => {
 
                     {miniSidebar && (
                       <Text
-                        variant={`${
-                          currentParentId === route.id
+                        variant={`${currentParentId === route.id
                             ? 'primary-blue'
                             : 'fadish-black'
-                        }`}
+                          }`}
                         size="body-sm-default"
                       >
                         {route.title}

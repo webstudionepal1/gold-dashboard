@@ -47,6 +47,8 @@ export default {
           900: '#343A46',
         },
         'primary-blue': '#2275FC',
+        brown: '#97531D',
+        lightbrown: '#AC805D'
       },
     },
   },
