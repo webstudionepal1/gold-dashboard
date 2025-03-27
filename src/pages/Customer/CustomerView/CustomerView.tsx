@@ -1,7 +1,8 @@
+import { Table, type TableData, type ColumnConfig } from "../../../components/shared/Table"
 import { Icon } from "@iconify/react/dist/iconify.js"
 import type React from "react"
 import { useState } from "react"
-import type { ColumnConfig, TableData } from "../../../components/shared/Table"
+
 
 interface Order {
   _id: string
@@ -42,6 +43,7 @@ interface CustomerDetailProps {
 }
 
 const CustomerDetail: React.FC<CustomerDetailProps> = ({ customerId, onBack, onEdit }) => {
+  // In a real app, you would fetch this data based on the customerId
   const [customer] = useState<CustomerDetail>({
     _id: customerId,
     name: "Jane Smith",
@@ -113,18 +115,17 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ customerId, onBack, onE
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Delivered":
-        return "bg-[#D1FAE5] text-[#065F46]"
+        return "bg-green-100 text-green-800"
       case "Out of Stock":
-        return "bg-[#FEE2E2] text-[#991B1B]"
+        return "bg-red-100 text-red-800"
       case "Cancelled":
-        return "bg-[#FEF3C7] text-[#92400E]"
+        return "bg-yellow-100 text-yellow-800"
       case "In Stock":
-        return "bg-[#D1FAE5] text-[#065F46]"
+        return "bg-green-100 text-green-800"
       default:
         return "bg-gray-100 text-gray-800"
     }
   }
-
   const orderColumns: ColumnConfig<Order>[] = [
     { header: "Order ID", key: "orderId" },
     { header: "Order Date", key: "orderDate" },
@@ -137,69 +138,68 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ customerId, onBack, onE
       header: "Status",
       key: "status",
       render: (value, row) => (
-        <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(row.status)}`}>
+        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(row.status)}`}>
           {row.status}
         </span>
       ),
     },
-    {
-      header: "Action",
-      key: "action",
-      render: (_, row) => (
-        <button className="p-1.5 bg-[#DF8D28] text-white rounded-lg hover:bg-[#C77E23]">
-          <Icon icon="mdi:eye-outline" width={18} height={18} />
-        </button>
-      ),
-    },
-  ]
+  ];
 
   const handleViewOrder = (order: TableData<Order>) => {
     console.log("View order:", order)
   }
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      {/* Breadcrumb Navigation */}
-      <div className="flex items-center mb-6 text-sm font-medium right-2">
-        <button onClick={onBack} className="text-[#665A48] hover:text-[#DF8D28]">
-          <Icon icon="mdi:home" className="inline mr-1 w-5 h-5" /> Dashboard
-        </button>
-        <Icon icon="mdi:chevron-right" className="mx-2 text-[#665A48]" />
-        <span className="text-[#665A48]">Products</span>
-        <Icon icon="mdi:chevron-right" className="mx-2 text-[#665A48]" />
-        <span className="text-[#DF8D28]">Customer Detail</span>
+    <div className="container mx-auto px-6 py-8">
+
+      <div className="flex items-center justify-between mb-8">
+        {/* Heading (left side) */}
+        <h1 className="text-3xl font-bold text-gray-900">Customer Details</h1>
+
+        {/* Breadcrumb (right side) */}
+        <div className="flex items-center text-sm">
+          <button onClick={onBack} className="text-gray-600 hover:text-amber-600 flex items-center">
+            <Icon fontSize={20} icon="mdi:home" className="mr-1" /> Dashboard
+          </button>
+          <Icon fontSize={24} icon="mdi:chevron-right" className="mx-2 text-gray-400" />
+          <span className="text-gray-600">Products</span>
+          <Icon fontSize={24} icon="mdi:chevron-right" className="mx-2 text-gray-400" />
+          <span className="text-amber-600 font-medium">Customer Detail</span>
+        </div>
       </div>
 
-      {/* Main Header */}
-      <h1 className="text-[28px] font-bold text-[#1A0D00] mb-6">Customer Details</h1>
-
-      {/* Profile Section */}
-      <div className="bg-white rounded-xl shadow-sm p-6 mb-6 border border-[#EFEFEF]">
-        <div className="flex justify-between items-start">
-          <div className="flex gap-4">
-            <div>
+      {/* Customer Profile Card */}
+      <div className="bg-white rounded-xl shadow-md p-8 mb-8 border border-gray-100">
+        <div className="flex justify-between">
+          <div className="flex">
+            <div className="mr-6">
               <img
                 src={customer.profileImage || "/placeholder.svg"}
                 alt={customer.name}
-                className="w-20 h-20 rounded-xl border-2 border-[#FFF5E9] object-cover"
+                className="rounded-xl bg-amber-100 object-cover border-2 border-amber-50"
               />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-[#1A0D00]">{customer.businessName}</h2>
-              <div className="space-y-2 mt-3">
-                <div className="flex items-center text-[#665A48]">
-                  <Icon icon="mdi:account" className="mr-2 w-5 h-5" />
-                  <span>{customer.extension}</span>
+              <h2 className="text-2xl font-bold text-gray-900">{customer.businessName}</h2>
+              <div className="mt-4 space-y-2">
+                {/* Flex row for account, phone, email */}
+                <div className="flex flex-row gap-4 flex-wrap">
+                  <div className="flex items-center  text-gray-600">
+                    <Icon fontSize={24} icon="material-symbols:home-outline-rounded" className="mr-2 " />
+                    <span>{customer.extension}</span>
+                  </div>
+                  <div className="flex items-center text-gray-600">
+                    <Icon fontSize={24} icon="mdi:phone" className="mr-2 " />
+                    <span>{customer.phoneNumber}</span>
+                  </div>
+                  <div className="flex items-center text-gray-600">
+                    <Icon fontSize={24} icon="mdi:email" className="mr-2 " />
+                    <span>{customer.email}</span>
+                  </div>
                 </div>
-                <div className="flex items-center text-[#665A48]">
-                  <Icon icon="mdi:phone" className="mr-2 w-5 h-5" />
-                  <span>{customer.phoneNumber}</span>
-                </div>
-                <div className="flex items-center text-[#665A48]">
-                  <Icon icon="mdi:email" className="mr-2 w-5 h-5" />
-                  <span>{customer.email}</span>
-                </div>
-                <div className="text-[#665A48]">
+
+                {/* Registered on - will automatically wrap to next line */}
+                <div className="text-gray-600">
                   Registered on: {new Date(customer.registeredOn).toLocaleDateString()}
                 </div>
               </div>
@@ -207,113 +207,89 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ customerId, onBack, onE
           </div>
           <button
             onClick={() => onEdit(customer._id)}
-            className="px-4 py-2 border border-[#DFDFDF] rounded-lg text-[#1A0D00] hover:bg-[#FFF5E9] flex items-center gap-2"
+            className="h-10 px-4 py-2 border border-gray-200 rounded-lg text-gray-700 hover:bg-amber-50 flex items-center"
           >
-            <Icon icon="mdi:pencil" className="w-5 h-5" /> Edit
+            <Icon fontSize={24} icon="uil:edit" className="mr-2" /> Edit
           </button>
         </div>
       </div>
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+
+      {/* Two Column Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Order History */}
-        <div className="bg-white rounded-xl shadow-sm border border-[#EFEFEF]">
-          <div className="p-4 border-b border-[#EFEFEF]">
-            <h3 className="font-semibold text-[#1A0D00]">Order History</h3>
+        <div className="bg-white rounded-xl shadow-md border border-gray-100">
+          <div className="p-6 border-b border-gray-100">
+            <h3 className="font-semibold text-gray-900 text-2xl border-b pb-2">Order History</h3>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full divide-y divide-[#EFEFEF]">
-              <thead className="bg-[#FFF5E9]">
-                <tr>
-                  {orderColumns.map((column, index) => (
-                    <th
-                      key={index}
-                      className="px-6 py-3 text-left text-sm font-medium text-[#665A48] uppercase tracking-wider"
-                    >
-                      {column.header}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-[#EFEFEF]">
-                {customer.orders.map((order) => (
-                  <tr key={order._id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[#1A0D00]">{order.orderId}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[#1A0D00]">{order.orderDate}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[#1A0D00]">${order.totalPrice}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>
-                        {order.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <button
-                        onClick={() => handleViewOrder(order as any)}
-                        className="p-1.5 bg-[#DF8D28] text-white rounded-lg hover:bg-[#C77E23]"
-                      >
-                        <Icon icon="mdi:eye-outline" width={18} height={18} />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <Table
+            columns={orderColumns}
+            data={customer.orders}
+            showEdit={false}
+            showDelete={false}
+            showToggle={false}
+            showSelectAll={false}
+            showView={true}
+            showAction={true}
+            showBg={true}
+            hasPadding={true}
+          />
         </div>
 
-        {/* Right Column */}
-        <div className="space-y-6">
+
+        <div className="space-y-8">
           {/* Address Book */}
-          <div className="bg-white rounded-xl shadow-sm border border-[#EFEFEF]">
-            <div className="p-4 border-b border-[#EFEFEF] flex justify-between items-center">
-              <h3 className="font-semibold text-[#1A0D00]">Address Book</h3>
-              <div className="w-6 h-6 bg-[#28A745] rounded-full flex items-center justify-center">
-                <Icon icon="mdi:check" className="text-white w-4 h-4" />
+          <div className="bg-white rounded-xl shadow-md border border-gray-100">
+            <div className="p-6  border-gray-100 flex justify-between  items-center border-b-4">
+              <h3 className="font-semibold  text-gray-900 text-2xl   ">Address Book</h3>
+              <div className="w-6 h-6 bg-green-500 rounded-md flex items-center justify-center text-white">
+                <Icon fontSize={24} icon="iconamoon:edit" />
               </div>
             </div>
-            <div className="p-4 space-y-6">
+            <div className="p-6  space-y-6">
               {customer.addresses.map((address, index) => (
                 <div key={index} className="space-y-3">
-                  <h4 className="font-medium text-[#DF8D28] text-sm">{address.type}</h4>
-                  <div className="text-[#665A48] space-y-1">
+                  <h4 className="font-medium text-amber-600">{address.type}</h4>
+                  <div className="text-gray-700 ">
+                    <div className="flex justify-between">
+                    <p>Address</p>
                     <p>{address.address}</p>
-                    <p>
+                    </div>
+                    <p className=" flex justify-end">
                       {address.city}, {address.state} {address.zip}
                     </p>
                   </div>
-                  <div className="text-[#665A48]">
-                    <p className="font-medium">Phone no.</p>
+                  <div className="text-gray-700 flex justify-between">
+
+                    <p >Phone no.</p>
                     <p>{address.phoneNo}</p>
                   </div>
-                  {index < customer.addresses.length - 1 && (
-                    <div className="pt-2">
-                      <hr className="border-[#EFEFEF]" />
-                    </div>
-                  )}
+                  {index < customer.addresses.length - 1 && <hr className="my-4 border-gray-100" />}
                 </div>
               ))}
             </div>
           </div>
 
           {/* Account Information */}
-          <div className="bg-white rounded-xl shadow-sm border border-[#EFEFEF]">
-            <div className="p-4 border-b border-[#EFEFEF] flex justify-between items-center">
-              <h3 className="font-semibold text-[#1A0D00]">Account Information</h3>
-              <div className="w-6 h-6 bg-[#28A745] rounded-full flex items-center justify-center">
-                <Icon icon="mdi:check" className="text-white w-4 h-4" />
+          <div className="bg-white rounded-xl shadow-md border border-gray-100">
+            <div className="p-6 border-b-4 border-gray-100 flex justify-between items-center">
+              <h3 className="font-semibold text-gray-900 text-2xl">Account Information</h3>
+              <div className="w-6 h-6 bg-green-500 rounded-md flex items-center justify-center text-white">
+                <Icon fontSize="20" icon="iconamoon:edit"  />
               </div>
             </div>
-            <div className="p-4 space-y-4">
-              <div>
-                <p className="text-[#665A48] text-sm mb-1">Username</p>
-                <p className="text-[#1A0D00]">{customer.username}</p>
+            <div className="p-6 space-y-4">
+              <div className="flex justify-between">
+                <p className="text-gray-600 text-sm">Username</p>
+                <p className="text-gray-900">{customer.username}</p>
               </div>
-              <div>
-                <p className="text-[#665A48] text-sm mb-1">Password</p>
-                <p className="text-[#1A0D00] flex items-center">
+              <div className="flex justify-between">
+                <p className="text-gray-600 text-sm">Password</p>
+                <p className="text-gray-900 flex items-center">
                   {customer.password}
-                  <button className="ml-2 text-[#665A48] hover:text-[#DF8D28]">
-                    <Icon icon="mdi:eye-off" width={18} height={18} />
+                  <button className="ml-2 text-gray-400 hover:text-gray-600">
+                  <Icon fontSize={16} icon="hugeicons:view" />
                   </button>
                 </p>
               </div>
@@ -326,3 +302,4 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ customerId, onBack, onE
 }
 
 export default CustomerDetail
+

@@ -6,6 +6,7 @@ import { SearchFilterSort } from "../../../components/global/SearchFilterSort"
 import { Modal } from "../../../components/shared"
 import { Table, type ColumnConfig, type TableData } from "../../../components/shared/Table"
 import { useOutsideClick } from "../../../hooks/UseOutsideClick"
+import { FrontendRoutes } from "../../../routes/routes"
 
 interface Customer {
   _id: string
@@ -213,42 +214,18 @@ const CustomerList: React.FC = () => {
     setCurrentPage(1)
   }
 
-  const handleEditCustomer = (row: TableData<Customer>) => {
-    // // if (onEditCustomer) {
-    //   // If external edit handler is provided, use it
-    //   // onEditCustomer(row._id)
-    // // } else {
-    //   // Otherwise use the internal modal
-    //   const customerToEdit = customers.find((c) => c._id === row._id)
-    //   if (customerToEdit) {
-    //     setModalMode("edit")
-    //     setEditingCustomerId(customerToEdit._id)
-    //     setNewCustomer({
-    //       customerId: customerToEdit.customerId,
-    //       customerName: customerToEdit.customerName,
-    //       email: customerToEdit.email,
-    //       address: customerToEdit.address,
-    //       contactNumber: customerToEdit.contactNumber,
-    //       totalOrder: customerToEdit.totalOrder,
-    //       isActive: customerToEdit.isActive,
-    //     })
-    //     setIsModalOpen(true)
-    //   }
-    // }
-  }
+ 
 
   const nav= useNavigate()
 
-  // const handleViewCustomer = (row: TableData<Customer>) => {
-  //   // onViewCustomer(row._id)
-  // }
+
 
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Customer list</h1>
         <button
-          onClick={handleAddCustomer}
+          onClick={()=>nav(`${FrontendRoutes.ADDCUSTOMER}`)}
           className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-white px-4 py-2 rounded-lg"
         >
           + New Customer

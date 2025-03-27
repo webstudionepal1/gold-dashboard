@@ -1,9 +1,13 @@
 
 import { LoginPage } from '../pages';
+import AddCustomerForm from '../pages/Customer/AddCustomerForm/AddCustomerForm';
 import CustomerList from '../pages/Customer/CustomerList/CustomerList';
 import CustomerDetail from '../pages/Customer/CustomerView/CustomerView';
-
 import { DashboardPage } from '../pages/Dashboard/Dashboard';
+import InventoryOverview from '../pages/Inventory/InventoryOverview/InventoryOverview';
+import Purchase from '../pages/Inventory/PurchaseManagement/Purchase';
+import PurchaseReturn from '../pages/Inventory/PurchaseManagement/PurchaseReturn';
+import Suppliers from '../pages/Inventory/PurchaseManagement/Suppliers';
 import { NotFoundPage } from '../pages/NotFound/NotFound';
 import AssignedOrders from '../pages/OrderManagement/AssignedOrder/AssignedOrder';
 import CancelledOrder from '../pages/OrderManagement/CancelledOrder/CancelledOrder';
@@ -47,6 +51,27 @@ export const routesConfig = [
     element: <CustomerDetail/>
   },
 
+  {
+    path: FrontendRoutes.ADDCUSTOMER,
+    element: <AddCustomerForm/>
+  },
+
+  {
+    path: FrontendRoutes.INVENTORY,
+    element: <InventoryOverview/>
+  },
+  {
+    path: FrontendRoutes.PURCHASE,
+    element: <Purchase/>
+  },
+  {
+    path: FrontendRoutes.PURCHASERETURN,
+    element: <PurchaseReturn/>
+  },
+  {
+    path: FrontendRoutes.SUPPLIERS,
+    element: <Suppliers/>
+  },
 
   {
     path: '*',
