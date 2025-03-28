@@ -227,37 +227,40 @@ const Productsubcategory: React.FC = () => {
                     <Icon icon="ic:outline-add" fontSize={24} />New Subcategory
                 </button>
             </div>
+            <div className='bg-white p-4'>
+                <SearchFilterSort
+                    onSearch={handleSearch}
+                    onFilter={handleFilter}
+                    onSort={handleSort}
+                    filterOptions={filterOptions}
+                    sortOptions={sortOptions}
+                    placeholder="Search here"
+                    showFilter={true}
+                    showSort={true}
+                    showView={false}
+                />
 
-            <SearchFilterSort
-                onSearch={handleSearch}
-                onFilter={handleFilter}
-                onSort={handleSort}
-                filterOptions={filterOptions}
-                sortOptions={sortOptions}
-                placeholder="Search here"
-            />
-
-            <Table
-                columns={tableColumns}
-                data={filteredData}
-                onButtonClick={setSelectedSubcategory}
-                showEdit={true}
-                editRow={handleEditSubcategory}
-                showDelete={true}
-                showToggle={true}
-                onToggle={handleToggleStatus}
-                showPagination={true}
-                paginationDetails={{
-                    currentPage: 1,
-                    limit: 10,
-                    totalCount: filteredData.length
-                }}
-                onItemsPerPageChange={() => { }}
-                onPageChange={() => { }}
-            />
-
+                <Table
+                    columns={tableColumns}
+                    data={filteredData}
+                    onButtonClick={setSelectedSubcategory}
+                    showEdit={true}
+                    editRow={handleEditSubcategory}
+                    showDelete={true}
+                    showToggle={true}
+                    onToggle={handleToggleStatus}
+                    showPagination={true}
+                    paginationDetails={{
+                        currentPage: 1,
+                        limit: 10,
+                        totalCount: filteredData.length
+                    }}
+                    onItemsPerPageChange={() => { }}
+                    onPageChange={() => { }}
+                />
+            </div>
             {isModalOpen && (
-                <Modal classname="w-[300px]" ref={modalRef}>
+                <Modal classname="w-200 h-auto" ref={modalRef}>
                     <div className="p-6">
                         <h2 className="text-xl font-semibold mb-6">
                             {isEditing ? 'Edit Subcategory' : 'Add New Subcategory'}

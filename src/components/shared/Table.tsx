@@ -12,7 +12,6 @@ export type ColumnConfig<T> = {
   header: string;
   width?: string;
   render?: (value: any, row: TableData<T>) => React.ReactNode;
-
 };
 
 type TableProps<T extends Record<string, any>> = {
@@ -158,9 +157,11 @@ export const Table = <T extends Record<string, any>>({
                     <th
                       key={`${column.key}-${index}`}
                       scope="col"
-                      className={`${hasPadding ? 'px-6' : ''
-                        } py-3 text-left text-sm font-semibold text-fade-black tracking-wider ${column.width ? `w-[${column.width}]` : ''
-                        }`}
+                      className={`${
+                        hasPadding ? 'px-6' : ''
+                      } py-3 text-left text-sm font-semibold text-fade-black tracking-wider ${
+                        column.width ? `w-[${column.width}]` : ''
+                      }`}
                     >
                       {column.header}
                     </th>
@@ -216,7 +217,7 @@ export const Table = <T extends Record<string, any>>({
                           {showToggle && (
                             <div
                               key={`toggle-${row._id}`}
-                              className="flex text-[#22C55E] cursor-pointer"
+                              className="flex text-black cursor-pointer"
                               onClick={() => handleToggle(row)}
                             >
                               <label
@@ -231,16 +232,20 @@ export const Table = <T extends Record<string, any>>({
                                   onChange={() => handleToggle(row)}
                                 />
                                 <div
-                                  className={`toggle-bg border-2 h-[18px] w-[36px] rounded-full transition-colors duration-200 ease-in-out ${row.isActive
-                                    ? 'bg-[#22C55E] border-[#22C55E]'
-                                    : 'bg-gray-200 border-gray-200'
-                                    }`}
+
+                                  className={`toggle-bg border-2 h-[18px] w-[36px] rounded-full transition-colors duration-200 ease-in-out ${
+                                    row.isActive
+                                      ? 'bg-blue-600 border-blue-600'
+                                      : 'bg-gray-200 border-gray-200'
+                                  }`}
+
                                 >
                                   <div
-                                    className={`toggle-dot absolute left-0 top-1/2 -translate-y-1/2 bg-white w-4 h-4 rounded-full transition-transform duration-200 ease-in-out transform ${row.isActive
-                                      ? 'translate-x-[19px] border-blue-600'
-                                      : 'translate-x-[1px] border-gray-200'
-                                      }`}
+                                    className={`toggle-dot absolute left-0 top-1/2 -translate-y-1/2 bg-white w-4 h-4 rounded-full transition-transform duration-200 ease-in-out transform ${
+                                      row.isActive
+                                        ? 'translate-x-[19px] border-blue-600'
+                                        : 'translate-x-[1px] border-gray-200'
+                                    }`}
                                   />
                                 </div>
                               </label>
