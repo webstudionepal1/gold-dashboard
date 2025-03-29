@@ -218,6 +218,9 @@ const CancelledOrder: React.FC = () => {
         <h1 className="text-2xl font-bold text-gray-800">Cancelled Orders</h1>
 
       </div>
+
+      <div className="bg-white p-4">
+
       <SearchFilterSort
         onSearch={handleSearch}
         onFilter={handleFilter}
@@ -250,6 +253,7 @@ const CancelledOrder: React.FC = () => {
         showBg={true}
       />
 
+      </div>
       {isModalOpen && (
         <Modal ref={ref}>
           <div className="p-6">

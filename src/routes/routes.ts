@@ -1,4 +1,4 @@
-import ProductDescription from "../pages/Product/ProductList/[id]/ProdectDescription";
+
 
 export const FrontendRoutes = {
     HOME: '/',
@@ -8,7 +8,7 @@ export const FrontendRoutes = {
     PRODUCTCATEGORY: "/product/product-category",
     PRODUCTSUBCATEGORY: "/product/sub-category",
     ASSIGNEDORDER: "/order/assigned-order",
-
+    
     CANCELLEDORDER : "/order/cancelled-order",
     COMPLETEDORDER : "/order/completed-order",
     ORDER :"/order/orders",

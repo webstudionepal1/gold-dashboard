@@ -199,6 +199,9 @@ const AssignedOrder: React.FC = () => {
         <h1 className="text-2xl font-bold text-gray-800">Assigned Orders</h1>
 
       </div>
+
+      <div className="bg-white p-4">
+
        <SearchFilterSort
           onSearch={handleSearch}
           onFilter={handleFilter}
@@ -206,6 +209,8 @@ const AssignedOrder: React.FC = () => {
           filterOptions={filterOptions}
           sortOptions={sortOptions}
           placeholder="Search here..."
+          showView={false}
+
        />
 
 
@@ -227,7 +232,9 @@ const AssignedOrder: React.FC = () => {
         onPageChange={handlePageChange}
         showBg={true}
         showAction={false}
-      />
+        />
+        
+      </div>
 
       {isModalOpen && (
         <Modal ref={ref} >

@@ -1,9 +1,9 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Modal } from '../../../components/shared';
 import { Table } from '../../../components/shared/Table';
 import { SearchFilterSort } from '../../../components/global/SearchFilterSort';
 import { Icon } from '@iconify/react/dist/iconify.js';
 import { useOutsideClick } from '../../../hooks/UseOutsideClick';
+import { AddProductCategory } from './components/AddProductCategory';
 
 interface ProductSubcategory {
     _id: string;
@@ -15,14 +15,14 @@ interface ProductSubcategory {
     isActive?: boolean;
 }
 
-const Productsubcategory: React.FC = () => {
+export const ProductCategory: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     //use ref to close the window
     const modalRef = useOutsideClick(() => setIsModalOpen(false))
 
-    const [isEditing, setIsEditing] = useState(false);
     const [selectedSubcategory, setSelectedSubcategory] = useState<ProductSubcategory | null>(null);
+    
     const [productSubcategories, setProductSubcategories] = useState<ProductSubcategory[]>([
         {
             _id: "1",
@@ -43,16 +43,10 @@ const Productsubcategory: React.FC = () => {
             isActive: false
         },
     ]);
+
+
     const [filteredData, setFilteredData] = useState<ProductSubcategory[]>(productSubcategories);
-    const [newSubcategory, setNewSubcategory] = useState<Omit<ProductSubcategory, '_id'>>({
-        category: '',
-        subcategory: '',
-        description: '',
-        totalProducts: 0,
-        status: 'Active',
-        isActive: true
-    });
-    const [formErrors, setFormErrors] = useState<{ category?: string; subcategory?: string; description?: string }>({});
+
 
     useEffect(() => {
         setFilteredData(productSubcategories);
@@ -114,75 +108,10 @@ const Productsubcategory: React.FC = () => {
         { value: 'products_desc', label: 'Products (High-Low)' }
     ];
 
-    const validateForm = () => {
-        const errors: { category?: string; subcategory?: string; description?: string } = {};
-        if (!newSubcategory.category.trim()) {
-            errors.category = 'Category is required';
-        }
-        if (!newSubcategory.subcategory.trim()) {
-            errors.subcategory = 'Subcategory is required';
-        }
-        if (!newSubcategory.description.trim()) {
-            errors.description = 'Description is required';
-        }
-        setFormErrors(errors);
-        return Object.keys(errors).length === 0;
-    };
+ 
 
-    const handleAddSubcategory = () => {
-        setNewSubcategory({
-            category: '',
-            subcategory: '',
-            description: '',
-            totalProducts: 0,
-            status: 'Active',
-            isActive: true
-        });
-        setIsEditing(false);
-        setFormErrors({});
-        setIsModalOpen(true);
-    };
+ 
 
-    const handleEditSubcategory = (row: ProductSubcategory) => {
-        setNewSubcategory({
-            category: row.category,
-            subcategory: row.subcategory,
-            description: row.description,
-            totalProducts: row.totalProducts || 0,
-            status: row.status,
-            isActive: row.isActive
-        });
-        setSelectedSubcategory(row);
-        setIsEditing(true);
-        setFormErrors({});
-        setIsModalOpen(true);
-    };
-
-    const handleSaveSubcategory = () => {
-        if (validateForm()) {
-            if (isEditing && selectedSubcategory) {
-                setProductSubcategories(prev =>
-                    prev.map(item =>
-                        item._id === selectedSubcategory._id
-                            ? { ...item, ...newSubcategory }
-                            : item
-                    )
-                );
-            } else {
-                const updatedSubcategories = [
-                    ...productSubcategories,
-                    {
-                        ...newSubcategory,
-                        _id: Date.now().toString(),
-                    },
-                ];
-                setProductSubcategories(updatedSubcategories);
-            }
-            setIsModalOpen(false);
-            setIsEditing(false);
-            setSelectedSubcategory(null);
-        }
-    };
 
     const handleToggleStatus = (row: ProductSubcategory) => {
         setProductSubcategories(prev =>
@@ -240,7 +169,7 @@ const Productsubcategory: React.FC = () => {
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold text-gray-800">Product Category</h1>
                 <button
-                    onClick={handleAddSubcategory}
+                    onClick={()=>{setIsModalOpen(true); setSelectedSubcategory(null)}}
                     className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-white px-4 py-2 flex gap-2 rounded-lg transition-colors duration-200"
                 >
                     <Icon icon="ic:outline-add" fontSize={24} />New Category
@@ -264,7 +193,10 @@ const Productsubcategory: React.FC = () => {
                     data={filteredData}
                     onButtonClick={setSelectedSubcategory}
                     showEdit={true}
-                    editRow={handleEditSubcategory}
+                    editRow={(row) => {
+                        setSelectedSubcategory(row);
+                        setIsModalOpen(true);
+                    }}
                     showDelete={true}
                     showToggle={true}
                     onToggle={handleToggleStatus}
@@ -279,80 +211,8 @@ const Productsubcategory: React.FC = () => {
                 />
             </div>
             {isModalOpen && (
-                <Modal classname="" ref={modalRef}>
-                    <div className="p-6">
-                        <h2 className="text-xl font-semibold mb-6">
-                            {isEditing ? 'Edit Category' : 'Add New Category'}
-                        </h2>
-                        <div className="space-y-6">
-                            <div>
-                                <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
-                                    Category
-                                </label>
-                                <input
-                                    id="category"
-                                    type="text"
-                                    value={newSubcategory.category}
-                                    onChange={(e) => setNewSubcategory({ ...newSubcategory, category: e.target.value })}
-                                    className={`border border-gray-300 rounded-md p-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${formErrors.category ? 'border-red-500' : ''}`}
-                                    placeholder="Enter Category name"
-                                />
-                                {formErrors.category && (
-                                    <p className="mt-1 text-sm text-red-600">{formErrors.category}</p>
-                                )}
-                            </div>
-                            <div>
-                                <label htmlFor="subcategory" className="block text-sm font-medium text-gray-700 mb-1">
-                                    Subcategory
-                                </label>
-                                <input
-                                    id="subcategory"
-                                    type="text"
-                                    value={newSubcategory.subcategory}
-                                    onChange={(e) => setNewSubcategory({ ...newSubcategory, subcategory: e.target.value })}
-                                    className={`border border-gray-300 rounded-md p-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${formErrors.subcategory ? 'border-red-500' : ''}`}
-                                    placeholder="Enter Subcategory name"
-                                />
-                                {formErrors.subcategory && (
-                                    <p className="mt-1 text-sm text-red-600">{formErrors.subcategory}</p>
-                                )}
-                            </div>
-                            <div>
-                                <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-                                    Description *
-                                </label>
-                                <textarea
-                                    id="description"
-                                    value={newSubcategory.description}
-                                    onChange={(e) => setNewSubcategory({ ...newSubcategory, description: e.target.value })}
-                                    className={`border border-gray-300 rounded-md p-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${formErrors.description ? 'border-red-500' : ''}`}
-                                    rows={3}
-                                    placeholder="Enter short description"
-                                />
-                                {formErrors.description && (
-                                    <p className="mt-1 text-sm text-red-600">{formErrors.description}</p>
-                                )}
-                            </div>
-                        </div>
-                        <div className="mt-6 flex justify-between gap-3">
-                            <button
-                                onClick={() => setIsModalOpen(false)}
-                                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleSaveSubcategory}
-                                className="px-7 py-2 bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-white rounded-md text-sm font-medium transition-colors duration-200"
-                            >
-                                {isEditing ? 'Update' : 'Add'}
-                            </button>
-                        </div>
-                    </div>
-                </Modal>
+               <AddProductCategory  modalRef={modalRef} setOpenModal={setIsModalOpen} editData={selectedSubcategory}/>
             )}
         </div>
     );
 };
-
-export default Productsubcategory;
