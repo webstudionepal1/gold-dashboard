@@ -232,6 +232,8 @@ const CustomerList: React.FC = () => {
         </button>
       </div>
 
+      <div className="bg-white p-4">
+
       <SearchFilterSort
         onSearch={handleSearch}
         onFilter={handleFilter}
@@ -239,7 +241,7 @@ const CustomerList: React.FC = () => {
         filterOptions={filterOptions}
         sortOptions={sortOptions}
         placeholder="Search here..."
-      />
+        />
 
       <div className="bg-white rounded-lg shadow">
         <Table
@@ -262,10 +264,11 @@ const CustomerList: React.FC = () => {
           showEdit={true}
           showDelete={true}
           showView={true}
-
+          
           viewRow={((row)=>nav(`/customer-view/${row?._id}`))}
-        />
+          />
       </div>
+          </div>
 
       {isModalOpen && (
         <Modal ref={ref}>

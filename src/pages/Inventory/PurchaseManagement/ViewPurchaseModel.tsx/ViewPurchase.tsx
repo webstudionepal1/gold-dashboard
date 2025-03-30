@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Table, type TableData, type ColumnConfig } from "../../../components/shared/Table";
-import { SearchFilterSort } from "../../../components/global/SearchFilterSort";
-import { FrontendRoutes } from "../../../routes/routes";
-import AddPurchaseModal from "./AddPurchaseModal/AddPurchaseModal";
+import { Table, type TableData, type ColumnConfig } from "../../../../components/shared/Table";
+import { SearchFilterSort } from "../../../../components/global/SearchFilterSort";
+import { FrontendRoutes } from "../../../../routes/routes";
+import AddPurchaseModal from "../AddPurchaseModel/AddPurchaseModel";
 
 interface PurchaseItem {
   _id: string;

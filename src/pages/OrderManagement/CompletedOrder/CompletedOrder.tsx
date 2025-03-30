@@ -198,6 +198,9 @@ const CompletedOrder: React.FC = () => {
         <h1 className="text-2xl font-bold text-gray-800">Assigned Orders</h1>
 
       </div>
+
+      <div className="bg-white p-4">
+
        <SearchFilterSort
           onSearch={handleSearch}
           onFilter={handleFilter}
@@ -205,7 +208,8 @@ const CompletedOrder: React.FC = () => {
           filterOptions={filterOptions}
           sortOptions={sortOptions}
           placeholder="Search here..."
-        />
+          showView={false}
+          />
 
       <Table
         columns={columns}
@@ -228,7 +232,8 @@ const CompletedOrder: React.FC = () => {
         onItemsPerPageChange={handleItemsPerPageChange}
         onPageChange={handlePageChange}
         showBg={true}
-      />
+        />
+        </div>
 
       {isModalOpen && (
         <Modal ref ={ref}>

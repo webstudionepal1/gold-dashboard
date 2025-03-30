@@ -235,8 +235,8 @@ export const Table = <T extends Record<string, any>>({
 
                                   className={`toggle-bg border-2 h-[18px] w-[36px] rounded-full transition-colors duration-200 ease-in-out ${
                                     row.isActive
-                                      ? 'bg-blue-600 border-blue-600'
-                                      : 'bg-gray-200 border-gray-200'
+                                      ? 'bg-[#76EE59] '
+                                      : 'bg-[#B1BAC8] '
                                   }`}
 
                                 >
@@ -265,13 +265,13 @@ export const Table = <T extends Record<string, any>>({
                           {showView && (
                             <div
                               key={`view-${row._id}`}
-                              className="text-xl text-black cursor-pointer"
+                              className="text-xl text-black cursor-pointer bg-primary-blue rounded p-1"
                               onClick={() => viewRow?.(row)}
                             >
                               <Icon
                                 icon="mdi:eye-outline"
                                 fontSize={16}
-                                color="#2275FC"
+                                color="white"
                               />
                             </div>
                           )}
@@ -279,13 +279,13 @@ export const Table = <T extends Record<string, any>>({
                           {showEdit && (
                             <div
                               key={`edit-${row._id}`}
-                              className="text-xl text-black cursor-pointer"
+                              className="text-xl text-black cursor-pointer bg-green rounded p-1"
                               onClick={() => editRow?.(row)}
                             >
                               <Icon
                                 icon="lucide:pen-line"
                                 fontSize={16}
-                                color="#F6B827"
+                                color="white"
                               />
                             </div>
                           )}
@@ -307,13 +307,13 @@ export const Table = <T extends Record<string, any>>({
                           {showDelete && (
                             <div
                               key={`delete-${row._id}`}
-                              className="text-xl text-black cursor-pointer"
+                              className="text-xl text-black cursor-pointer bg-red rounded p-1"
                               onClick={() => handleDelete(row)}
                             >
                               <Icon
                                 icon="material-symbols:delete-outline-rounded"
                                 fontSize={16}
-                                color="#FF0000"
+                                color="white"
                               />
                             </div>
                           )}

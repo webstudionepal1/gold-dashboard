@@ -90,7 +90,7 @@ export const SideBar = ({ miniSidebar, setMiniSidebar }: sidebarProps) => {
               <div key={route.id}>
                 <Link
                   to={route.path}
-                  className={`flex place-items-center ${miniSidebar ? 'px-6' : 'px-3'}   py-3 gap-5 justify-between hover:bg-bg hover:rounded-lg ${currentParentId === route.id ? 'bg-bg' : ''
+                  className={`flex place-items-center ${miniSidebar ? 'px-6' : 'px-3'}   py-3 gap-5 justify-between hover:bg-bg hover:rounded-lg ${currentParentId === route.id ? 'bg-[#FCF4EA]' : ''
                     }`}
                   onClick={() => {
                     if (route.children) toggleExpand(route.id);
@@ -106,7 +106,7 @@ export const SideBar = ({ miniSidebar, setMiniSidebar }: sidebarProps) => {
                     {miniSidebar && (
                       <Text
                         variant={`${currentParentId === route.id
-                            ? 'primary-blue'
+                            ? 'dark-yellow'
                             : 'fadish-black'
                           }`}
                         size="body-sm-default"
@@ -144,18 +144,18 @@ export const SideBar = ({ miniSidebar, setMiniSidebar }: sidebarProps) => {
                               className="flex place-items-center py-1 pl-4 relative rounded-lg"
                             >
                               {/* Dot with horizontal line */}
-                              <div className="absolute left-[0.1rem] top-1/2 -translate-y-1/2">
+                              <div className="absolute left-[0.01rem] top-1/2 -translate-y-1/2">
                                 <div
-                                  className={`h-2 w-2 rounded-full ${isActive ? '#DF8D28' : 'bg-gray-300'}`}
+                                  className={`h-[.2px] w-3  ${isActive ? 'bg-yellow' : 'bg-gray-300'}`}
                                 />
                               </div>
 
                               <Text
                                 variant={
-                                  isActive ? 'primary-blue' : 'fadish-black'
+                                  isActive ? 'yellow' : 'fadish-black'
                                 }
                                 size="body-sm-default"
-                                className={`hover:bg-gray-50 py-2 px-3 rounded ${isActive ? '#DF8D28' : ''}`}
+                                className={`hover:bg-gray-50 py-2 px-3 rounded ${isActive ? 'bg-[#FCF4EA]' : ''}`}
                               >
                                 {child.title}
                               </Text>

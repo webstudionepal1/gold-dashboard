@@ -71,7 +71,7 @@ export const SearchFilterSort: React.FC<SearchFilterSortProps> = ({
                                 value={searchQuery}
                                 onChange={handleSearchChange}
                                 placeholder={placeholder}
-                                className="pl-10 pr-4 py-3 border rounded-md w-full  text-sm  text-fade-black"
+                                className="pl-10 pr-4 py-3 border rounded-md w-full  text-sm  text-fade-black outline-none"
                             />
                         </div>
                     )}
@@ -86,7 +86,7 @@ export const SearchFilterSort: React.FC<SearchFilterSortProps> = ({
                                 id="filter-select"
                                 value={selectedFilter}
                                 onChange={handleFilterChange}
-                                className="appearance-none pl-8 pr-6  w-auto text-sm text-black"
+                                className="appearance-none pl-8 pr-6  w-auto text-sm text-black outline-none"
                             >
                                 <option value="">Filter</option>
                                 {filterOptions.map(option => (
@@ -112,7 +112,7 @@ export const SearchFilterSort: React.FC<SearchFilterSortProps> = ({
                                 id="view-select"
                                 value={view}
                                 onChange={handleViewChange}
-                                className="appearance-none pl-8 pr-6  w-auto text-sm text-black"
+                                className="appearance-none pl-8 pr-6  w-auto text-sm outline-none text-black"
                             >
                                 <option value="grid">Grid</option>
                                 <option value="column">Column</option>
@@ -138,7 +138,7 @@ export const SearchFilterSort: React.FC<SearchFilterSortProps> = ({
                                 id="sort-select"
                                 value={selectedSort}
                                 onChange={handleSortChange}
-                                className="appearance-none pl-8 pr-6  w-auto text-sm text-black"
+                                className="appearance-none pl-8 pr-6  w-auto text-sm outline-none text-black"
                             >
                                 <option value="">Sort</option>
                                 {sortOptions.map(option => (

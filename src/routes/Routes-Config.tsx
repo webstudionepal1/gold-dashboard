@@ -1,9 +1,9 @@
 
 import { LoginPage } from '../pages';
-import AddCustomerForm from '../pages/Customer/AddCustomerForm/AddCustomerForm';
 import CustomerList from '../pages/Customer/CustomerList/CustomerList';
 import CustomerDetail from '../pages/Customer/CustomerView/CustomerView';
 import { DashboardPage } from '../pages/Dashboard/Dashboard';
+import AddCustomerForm from '../pages/Customer/AddCustomerForm/AddCustomerForm'
 import InventoryOverview from '../pages/Inventory/InventoryOverview/InventoryOverview';
 import Purchase from '../pages/Inventory/PurchaseManagement/Purchase';
 import PurchaseReturn from '../pages/Inventory/PurchaseManagement/PurchaseReturn';
@@ -15,6 +15,8 @@ import CompletedOrder from '../pages/OrderManagement/CompletedOrder/CompletedOrd
 import { FrontendRoutes } from './routes';
 import ProductDescription from '../pages/Product/ProductList/[id]/ProdectDescription';
 import ProductList from '../pages/Product/ProductList/ProductList';
+import { ProductCategory } from '../pages/Product/ProductCategory/ProductCategory';
+import Productsubcategory from '../pages/Product/ProductSubcategory/ProductSubCategory';
 
 export const routesConfig = [
 
@@ -52,12 +54,12 @@ export const routesConfig = [
     element: <ProductDescription />,
   },
   {
-    // path: FrontendRoutes.PRODUCTCATEGORY,
-    // element: <ProductCategory />,
+    path: FrontendRoutes.PRODUCTCATEGORY,
+    element: <ProductCategory />,
   },
   {
-    // path: FrontendRoutes.PRODUCTSUBCATEGORY,
-    // element: <ProductSubCategory />,
+    path: FrontendRoutes.PRODUCTSUBCATEGORY,
+    element: <Productsubcategory />,
   },
 
   {
