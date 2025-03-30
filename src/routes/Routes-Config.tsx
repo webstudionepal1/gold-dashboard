@@ -14,6 +14,7 @@ import CancelledOrder from '../pages/OrderManagement/CancelledOrder/CancelledOrd
 import CompletedOrder from '../pages/OrderManagement/CompletedOrder/CompletedOrder';
 import { FrontendRoutes } from './routes';
 import ProductDescription from '../pages/Product/ProductList/[id]/ProdectDescription';
+import ProductList from '../pages/Product/ProductList/ProductList';
 
 export const routesConfig = [
 
@@ -51,12 +52,12 @@ export const routesConfig = [
     element: <ProductDescription />,
   },
   {
-    path: FrontendRoutes.PRODUCTCATEGORY,
-    element: <ProductCategory />,
+    // path: FrontendRoutes.PRODUCTCATEGORY,
+    // element: <ProductCategory />,
   },
   {
-    path: FrontendRoutes.PRODUCTSUBCATEGORY,
-    element: <ProductSubCategory />,
+    // path: FrontendRoutes.PRODUCTSUBCATEGORY,
+    // element: <ProductSubCategory />,
   },
 
   {
