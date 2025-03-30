@@ -57,7 +57,7 @@ const Button: React.FC<
 };
 
 // Main Component
-const AddCustomerForm: React.FC<AddCustomerFormProps> = ({ onSubmit }) => {
+const AddCustomerForm: React.FC = () => {
   const [formData, setFormData] = useState<CustomerFormData>({
     fullName: "",
     email: "",
@@ -94,7 +94,7 @@ const AddCustomerForm: React.FC<AddCustomerFormProps> = ({ onSubmit }) => {
   // Form submission handler
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData, profileImage);
+    // onSubmit(formData, profileImage);
   };
 
   return (

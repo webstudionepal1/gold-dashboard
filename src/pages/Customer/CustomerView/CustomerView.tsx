@@ -42,10 +42,10 @@ interface CustomerDetailProps {
   onEdit: (customerId: string) => void
 }
 
-const CustomerDetail: React.FC<CustomerDetailProps> = ({ customerId, onBack, onEdit }) => {
+const CustomerDetail: React.FC = () => {
   // In a real app, you would fetch this data based on the customerId
   const [customer] = useState<CustomerDetail>({
-    _id: customerId,
+    _id: "customerId",
     name: "Jane Smith",
     businessName: "Opulent Jewel House",
     extension: "Woman Extension 14001",
@@ -158,7 +158,7 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ customerId, onBack, onE
 
         {/* Breadcrumb (right side) */}
         <div className="flex items-center text-sm">
-          <button onClick={onBack} className="text-gray-600 hover:text-amber-600 flex items-center">
+          <button onClick={()=>{}} className="text-gray-600 hover:text-amber-600 flex items-center">
             <Icon fontSize={20} icon="mdi:home" className="mr-1" /> Dashboard
           </button>
           <Icon fontSize={24} icon="mdi:chevron-right" className="mx-2 text-gray-400" />
@@ -206,7 +206,7 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ customerId, onBack, onE
             </div>
           </div>
           <button
-            onClick={() => onEdit(customer._id)}
+            onClick={() =>{}}
             className="h-10 px-4 py-2 border border-gray-200 rounded-lg text-gray-700 hover:bg-amber-50 flex items-center"
           >
             <Icon fontSize={24} icon="uil:edit" className="mr-2" /> Edit
