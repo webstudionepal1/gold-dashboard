@@ -1,9 +1,9 @@
 
 import { LoginPage } from '../pages';
-import AddCustomerForm from '../pages/Customer/AddCustomerForm/AddCustomerForm';
 import CustomerList from '../pages/Customer/CustomerList/CustomerList';
 import CustomerDetail from '../pages/Customer/CustomerView/CustomerView';
 import { DashboardPage } from '../pages/Dashboard/Dashboard';
+import AddCustomerForm from '../pages/Customer/AddCustomerForm/AddCustomerForm'
 import InventoryOverview from '../pages/Inventory/InventoryOverview/InventoryOverview';
 import Purchase from '../pages/Inventory/PurchaseManagement/Purchase';
 import PurchaseReturn from '../pages/Inventory/PurchaseManagement/PurchaseReturn';
@@ -67,15 +67,15 @@ export const routesConfig = [
     element: <CustomerList/>
   },
 
-  // {
-  //   path: FrontendRoutes.CUSTOMERVIEW,
-  //   element: <CustomerDetail/>
-  // },
+  {
+    path: FrontendRoutes.CUSTOMERVIEW,
+    element: <CustomerDetail/>
+  },
 
-  // {
-  //   path: FrontendRoutes.ADDCUSTOMER,
-  //   element: <AddCustomerForm/>
-  // },
+  {
+    path: FrontendRoutes.ADDCUSTOMER,
+    element: <AddCustomerForm/>
+  },
 
   {
     path: FrontendRoutes.INVENTORY,
