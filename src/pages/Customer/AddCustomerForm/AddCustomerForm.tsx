@@ -159,23 +159,23 @@ const AddCustomerForm: React.FC<AddCustomerFormProps> = ({ onSubmit, onCancel })
         <h1 className="text-3xl font-bold  text-gray-800 mb-6">Add New Customer</h1>
         <div className="flex items-center mb-6 ">
           <Breadcrumb
-        className="mb-6"
-        items={[
-          {
-            label: "Dashboard",
-            href: "/dashboard",
-            icon: "mdi:home"
-          },
-          {
-            label: "Customers",
-            href: "/customer/customer-list",
-          },
-          {
-            label: "Add New Customer"
-            // Last item has no link/handler
-          }
-        ]}
-      />
+            className="mb-6"
+            items={[
+              {
+                label: "Dashboard",
+                href: "/dashboard",
+                icon: "mdi:home"
+              },
+              {
+                label: "Customers",
+                href: "/customer/customer-list",
+              },
+              {
+                label: "Add New Customer"
+                // Last item has no link/handler
+              }
+            ]}
+          />
         </div>
 
       </div>

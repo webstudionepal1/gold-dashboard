@@ -2,6 +2,7 @@ import { Table, type TableData, type ColumnConfig } from "../../../components/sh
 import { Icon } from "@iconify/react/dist/iconify.js"
 import type React from "react"
 import { useState } from "react"
+import { Breadcrumb } from "../../../components/global/Breadcrumb"
 
 
 interface Order {
@@ -158,13 +159,25 @@ const CustomerDetail: React.FC = () => {
 
         {/* Breadcrumb (right side) */}
         <div className="flex items-center text-sm">
-          <button onClick={()=>{}} className="text-gray-600 hover:text-amber-600 flex items-center">
-            <Icon fontSize={20} icon="mdi:home" className="mr-1" /> Dashboard
-          </button>
-          <Icon fontSize={24} icon="mdi:chevron-right" className="mx-2 text-gray-400" />
-          <span className="text-gray-600">Products</span>
-          <Icon fontSize={24} icon="mdi:chevron-right" className="mx-2 text-gray-400" />
-          <span className="text-amber-600 font-medium">Customer Detail</span>
+          <Breadcrumb
+            className="mb-6"
+            items={[
+              {
+                label: "Dashboard",
+                href: "/dashboard",
+                icon: "mdi:home"
+              },
+              {
+                label: "Customers",
+                href: "/customer/customer-list",
+              },
+              {
+                label: "Customer Details",
+                // Last item has no link/handler
+              }
+            ]}
+          />
+
         </div>
       </div>
 
