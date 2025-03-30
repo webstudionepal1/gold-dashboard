@@ -89,18 +89,7 @@ const CustomerList: React.FC = () => {
     setIsModalOpen(true)
   }
 
-  const handleToggleStatus = (row: TableData<Customer>) => {
-    setCustomers((prev) =>
-      prev.map((customer) =>
-        customer._id === row._id
-          ? {
-              ...customer,
-              isActive: !customer.isActive,
-            }
-          : customer,
-      ),
-    )
-  }
+
 
   const handleDeleteCustomer = (row: TableData<Customer>) => {
     setCustomers((prev) => prev.filter((o) => o._id !== row._id))
@@ -214,7 +203,7 @@ const CustomerList: React.FC = () => {
     setCurrentPage(1)
   }
 
- 
+
 
   const nav= useNavigate()
 
@@ -249,7 +238,6 @@ const CustomerList: React.FC = () => {
           data={sortedCustomers}
           showSelectAll={true}
           onRowSelect={handleRowSelect}
-          onToggle={handleToggleStatus}
           deleteRow={handleDeleteCustomer}
           showPagination={true}
           paginationDetails={{
@@ -264,7 +252,7 @@ const CustomerList: React.FC = () => {
           showEdit={true}
           showDelete={true}
           showView={true}
-          
+
           viewRow={((row)=>nav(`/customer-view/${row?._id}`))}
           />
       </div>

@@ -93,8 +93,6 @@ export const routesConfig = [
     path: FrontendRoutes.SUPPLIERS,
     element: <Suppliers/>
   },
-
-
   {
     path: '*',
     element: <NotFoundPage />,
