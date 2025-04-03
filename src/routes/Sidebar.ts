@@ -95,6 +95,27 @@ export const SidebarMainRoutes = {
 
       ],
     },
+    {
+      id: 6,
+      path: "#",
+      title: "Transaction",
+      icon: "hugeicons:bitcoin-transaction",
+      children: [
+        {
+          id: 60,
+          path: FrontendRoutes.TRANSACTION,
+          title: "Transaction"
+        },
+        {
+          id: 61,
+          path: FrontendRoutes.VERIFY_CASH,
+          title: "Verify Cash Payment",
+          icon: "",
+        },
+        
+
+      ],
+    },
 
   ],
 };

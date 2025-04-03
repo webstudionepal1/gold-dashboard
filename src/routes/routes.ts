@@ -20,4 +20,7 @@ export const FrontendRoutes = {
     PURCHASERETURN: "/inventory/purchase-return",
     SUPPLIERS : "/inventory/suppliers",
 
+    TRANSACTION: '/transaction',
+    VERIFY_CASH: '/transaction/verify-cash-payment',
+
 };
