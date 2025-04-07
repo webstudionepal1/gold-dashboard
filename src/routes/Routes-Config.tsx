@@ -17,6 +17,7 @@ import ProductList from "../pages/Product/ProductList/ProductList";
 import { ProductCategory } from "../pages/Product/ProductCategory/ProductCategory";
 import Productsubcategory from "../pages/Product/ProductSubcategory/ProductSubCategory";
 import AttributeIndex from "../pages/Attribute/AttributeIndex";
+import BannerIndex from "../pages/Banner/BannerIndex";
 
 export const routesConfig = [
   {
@@ -97,6 +98,11 @@ export const routesConfig = [
   {
     path: FrontendRoutes.ATTRIBUTES,
     element: <AttributeIndex />,
+  },
+  // Banner
+  {
+    path: FrontendRoutes.BANNER,
+    element: <BannerIndex />,
   },
 
   {

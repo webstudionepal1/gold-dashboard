@@ -77,7 +77,7 @@ export const DropdownField = React.forwardRef<
         {...other}
       >
         <option value="" disabled>
-          Select {firstInput ?? label}
+          {firstInput ?? label}
         </option>
         {options?.map((option) => (
           <option key={option.value} value={option.value}>

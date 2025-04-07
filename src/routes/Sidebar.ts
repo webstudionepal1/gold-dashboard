@@ -95,5 +95,11 @@ export const SidebarMainRoutes = {
       title: "Attributes",
       icon: "game-icons:gear-stick-pattern",
     },
+    {
+      id: 7,
+      path: FrontendRoutes.BANNER,
+      title: "Banner",
+      icon: "fluent:content-view-32-regular",
+    },
   ],
 };
