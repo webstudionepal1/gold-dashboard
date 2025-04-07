@@ -101,5 +101,17 @@ export const SidebarMainRoutes = {
       title: "Banner",
       icon: "fluent:content-view-32-regular",
     },
+    {
+      id: 8,
+      path: FrontendRoutes.NOTIFICATION,
+      title: "Notification",
+      icon: "iconamoon:notification-bold",
+    },
+    {
+      id: 9,
+      path: FrontendRoutes.MYPOSTBUSINESS,
+      title: "My Post Business",
+      icon: "mdi:truck-fast-outline",
+    },
   ],
 };

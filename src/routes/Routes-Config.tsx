@@ -18,6 +18,8 @@ import { ProductCategory } from "../pages/Product/ProductCategory/ProductCategor
 import Productsubcategory from "../pages/Product/ProductSubcategory/ProductSubCategory";
 import AttributeIndex from "../pages/Attribute/AttributeIndex";
 import BannerIndex from "../pages/Banner/BannerIndex";
+import NotificationIndex from "../pages/Notification/NotificationIndex";
+import MyPostBusinessIndex from "../pages/MyPostBusiness/MyPostBusinessIndex";
 
 export const routesConfig = [
   {
@@ -103,6 +105,14 @@ export const routesConfig = [
   {
     path: FrontendRoutes.BANNER,
     element: <BannerIndex />,
+  },
+  {
+    path: FrontendRoutes.NOTIFICATION,
+    element: <NotificationIndex />,
+  },
+  {
+    path: FrontendRoutes.MYPOSTBUSINESS,
+    element: <MyPostBusinessIndex />,
   },
 
   {
