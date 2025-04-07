@@ -1,14 +1,13 @@
-  import { FrontendRoutes } from "./routes";
-
+import { FrontendRoutes } from "./routes";
 
 export const SidebarMainRoutes = {
-  title: 'main',
+  title: "main",
   routes: [
     {
       id: 1,
       path: FrontendRoutes.HOME,
-      title: 'Dashboard',
-      icon: 'ic:outline-dashboard-customize',
+      title: "Dashboard",
+      icon: "ic:outline-dashboard-customize",
     },
     {
       id: 2,
@@ -45,7 +44,7 @@ export const SidebarMainRoutes = {
         {
           id: 34,
           path: FrontendRoutes.ORDER,
-          title: "Orders"
+          title: "Orders",
         },
         {
           id: 30,
@@ -57,22 +56,19 @@ export const SidebarMainRoutes = {
           id: 32,
           path: FrontendRoutes.COMPLETEDORDER,
           title: "Completed Order",
-
         },
         {
           id: 33,
           path: FrontendRoutes.CANCELLEDORDER,
-          title: "Cancelled Order"
+          title: "Cancelled Order",
         },
-
-
       ],
     },
     {
       id: 4,
       path: FrontendRoutes.CUSTOMER,
-      title: 'Customer',
-      icon: 'line-md:account-small',
+      title: "Customer",
+      icon: "line-md:account-small",
     },
     {
       id: 5,
@@ -83,7 +79,7 @@ export const SidebarMainRoutes = {
         {
           id: 50,
           path: FrontendRoutes.INVENTORY,
-          title: "Inventory Overview"
+          title: "Inventory Overview",
         },
         {
           id: 51,
@@ -91,12 +87,13 @@ export const SidebarMainRoutes = {
           title: "Purchase Management",
           icon: "",
         },
-        
-
       ],
     },
-
+    {
+      id: 6,
+      path: FrontendRoutes.ATTRIBUTES,
+      title: "Attributes",
+      icon: "game-icons:gear-stick-pattern",
+    },
   ],
 };
-
-

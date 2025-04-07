@@ -1,5 +1,5 @@
-import React from 'react';
-import { createPortal } from 'react-dom';
+import React from "react";
+import { createPortal } from "react-dom";
 
 interface modalProps {
   children: React.ReactNode;
@@ -11,13 +11,13 @@ export const Modal = React.memo(
     ({ children, classname }, ref) => {
       return createPortal(
         <>
-          <div className="fixed inset-0 bg-black bg-opacity-65 z-50"></div>
+          <div className="fixed  inset-0 bg-black bg-opacity-65 z-50"></div>
 
           <main
             ref={ref}
             className={`${classname} fixed top-[50%] left-[50%] z-[999] bg-white   border  outline-none rounded-lg`}
             style={{
-              transform: 'translate(-50%, -50%)',
+              transform: "translate(-50%, -50%)",
             }}
           >
             {children}
