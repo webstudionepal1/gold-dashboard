@@ -1,184 +1,527 @@
-import React, { useState } from "react";
-import { InputField } from "../../../../components/shared/form_components/InputField";
+import { useForm } from "@tanstack/react-form";
 import { DropdownField } from "../../../../components/shared/form_components/Dropdown";
+import { useEffect, useState } from "react";
 
-interface DiscountFields {
-  product: string;
-  type: string;
-  discount: string;
-  startDate: string;
-  endDate: string;
+// zod
+import { z } from "zod";
+import { InputField } from "../../../../components/shared/form_components/InputField";
+
+const emptyDiscountGroup = {
+  category: "",
+  sub_category: "",
+  type: "",
+  discount: "",
+  start_date: "",
+  end_date: "",
+};
+
+const MIN_DATE = new Date("1970-01-01");
+
+const individualDiscountSchema = z.object({
+  product: z.string().min(1, "Product is required"),
+  type: z.string().min(1, "Type is required"),
+  discount: z.string().min(1, "Discount is required"),
+  start_date: z
+    .string()
+    .min(1, "Start Date is required")
+    .refine((val) => new Date(val) >= MIN_DATE, {
+      message: "Start Date cannot be earlier than 1970-01-01",
+    }),
+  end_date: z
+    .string()
+    .min(1, "End Date is required")
+    .refine((val) => new Date(val) >= MIN_DATE, {
+      message: "End Date cannot be earlier than 1970-01-01",
+    }),
+});
+interface Iinitial {
+  product?: string;
+  type?: string;
+  discount?: string;
+  start_date?: string;
+  end_date?: string;
+  [key: string]: any;
 }
 
-interface IndividualDiscountFormProps {
+interface individualDiscountFormProps {
   closeModal: () => void;
-  initialValues?: DiscountFields[];
-  mode?: "create" | "edit";
+  initialValues?: Iinitial;
+  onSubmit: (data: Iinitial) => void;
+  mode: string;
 }
-
-export const IndividualDiscountForm = ({
+export const IndividualDiscountForm: React.FC<individualDiscountFormProps> = ({
   closeModal,
-  initialValues,
-  mode = "create",
-}: IndividualDiscountFormProps) => {
-  const [discountFields, setDiscountFields] = useState<DiscountFields[]>(
-    initialValues?.length
-      ? initialValues
-      : [
-          {
-            product: "",
-            type: "",
-            discount: "",
-            startDate: "",
-            endDate: "",
-          },
-        ]
-  );
+  initialValues = {
+    product: "",
+    type: "",
+    discount: "",
+    start_date: "",
+    end_date: "",
+  },
+  onSubmit,
+  mode,
+}) => {
+  const { product, type, discount, start_date, end_date } = initialValues;
+  const form = useForm({
+    defaultValues: initialValues,
+    validators: {
+      onSubmit: individualDiscountSchema,
+    },
+    onSubmit: async (data) => {
+      await onSubmit(data);
+      closeModal();
+    },
+  });
 
-  const updateDiscountField = (
-    index: number,
-    field: keyof DiscountFields,
-    value: string
-  ) => {
-    const updatedFields = [...discountFields];
-    updatedFields[index][field] = value;
-    setDiscountFields(updatedFields);
-  };
+  useEffect(() => {
+    form.reset();
+  }, [product, type, discount, start_date, end_date]);
 
-  const addMoreFields = () => {
-    setDiscountFields([
-      ...discountFields,
-      {
-        product: "",
-        type: "",
-        discount: "",
-        startDate: "",
-        endDate: "",
-      },
-    ]);
-  };
+  const isEditing = initialValues.product !== "" || initialValues.type !== "";
 
-  const deleteDiscountField = (index: number) => {
-    if (discountFields.length === 1) return; // Prevent deleting the last one
-    const updatedFields = discountFields.filter((_, i) => i !== index);
-    setDiscountFields(updatedFields);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Submitted Discounts:", discountFields);
-    closeModal();
-  };
-
+  const [isAddMoreClicked, setIsAddMoreClicked] = useState(false);
+  const [discountGroups, setDiscountGroups] = useState<
+    (typeof emptyDiscountGroup)[]
+  >([]);
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-      {discountFields.map((_, index) => (
-        <div
-          key={index}
-          className="relative border-b border-[#dedde2] pb-4 flex flex-col gap-4 bg-white p-4 rounded-md shadow-sm"
-        >
-          {/* Remove button */}
-          {discountFields.length > 1 && (
-            <button
-              type="button"
-              onClick={() => deleteDiscountField(index)}
-              className="absolute top-2 right-2 text-red-500 hover:underline text-sm"
-            >
-              Remove
-            </button>
-          )}
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        form.handleSubmit();
+      }}
+      className="px-10 py-6 flex flex-col gap-8"
+    >
+      <p className="text-lg font-bold text-center text-[#1a1336]">
+        {isEditing ? "Edit Attribute" : "Add Attribute"}
+      </p>
 
-          <InputField
-            label="Product"
-            value={discountFields[index].product}
-            onChange={(e) =>
-              updateDiscountField(index, "product", e.target.value)
-            }
-            placeholder="e.g. Holiday Sale"
-          />
+      <section className="flex flex-col gap-6 w-full">
+        <div>
+          <form.Field
+            name="product"
+            validators={{
+              onChange: ({ value }) => {
+                const result =
+                  individualDiscountSchema.shape.product.safeParse(value);
+                return result.success
+                  ? undefined
+                  : result.error.errors[0].message;
+              },
+            }}
+          >
+            {(field) => (
+              <div className="w-full">
+                <InputField
+                  label="Product"
+                  required
+                  placeholder="e.g Christmas Sale"
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
 
-          <div className="flex gap-4 w-full">
-            <div className="w-1/2">
-              <DropdownField
-                label="Type"
-                options={[
-                  { value: "fixed", label: "Fixed" },
-                  { value: "percentage", label: "Percentage" },
-                ]}
-                value={discountFields[index].type}
-                onChange={(e) =>
-                  updateDiscountField(index, "type", e.target.value)
-                }
-                inputClassname="w-full"
-              />
-            </div>
-
-            <div className="w-1/2">
-              <DropdownField
-                label="Discount"
-                options={[
-                  { value: "shipping", label: "Shipping" },
-                  { value: "product", label: "Product" },
-                ]}
-                value={discountFields[index].discount}
-                onChange={(e) =>
-                  updateDiscountField(index, "discount", e.target.value)
-                }
-                inputClassname="w-full"
-              />
-            </div>
-          </div>
-
-          <div className="flex gap-4 w-full">
-            <div className="w-1/2">
-              <InputField
-                label="Start Date"
-                type="date"
-                value={discountFields[index].startDate}
-                onChange={(e) =>
-                  updateDiscountField(index, "startDate", e.target.value)
-                }
-              />
-            </div>
-
-            <div className="w-1/2">
-              <InputField
-                label="End Date"
-                type="date"
-                value={discountFields[index].endDate}
-                onChange={(e) =>
-                  updateDiscountField(index, "endDate", e.target.value)
-                }
-              />
-            </div>
-          </div>
+                {field.state.meta.errors.length > 0 && (
+                  <p className="text-sm text-red  mt-1">
+                    {typeof field.state.meta.errors[0] === "string"
+                      ? field.state.meta.errors[0]
+                      : (field.state.meta.errors[0] as any)?.message}
+                  </p>
+                )}
+              </div>
+            )}
+          </form.Field>
         </div>
-      ))}
+        <div className="border-b border-[#dedde2] w-full mb-2 "></div>
 
-      <button
-        type="button"
-        onClick={addMoreFields}
-        className="bg-[#f7e8c9] px-3 py-2 rounded-lg transition-transform duration-200 ease-in-out hover:scale-105 w-fit"
-      >
-        + Add More
-      </button>
+        <div className="flex items-center gap-4 w-full">
+          <form.Field
+            name="type"
+            validators={{
+              onChange: ({ value }) => {
+                const result =
+                  individualDiscountSchema.shape.type.safeParse(value);
+                return result.success
+                  ? undefined
+                  : result.error.errors[0].message;
+              },
+            }}
+          >
+            {(field) => (
+              <div className="w-full">
+                <DropdownField
+                  label="Type"
+                  required
+                  options={[
+                    { value: "Round", label: "Round" },
+                    { value: "Square", label: "Square" },
+                    { value: "Oval", label: "Oval" },
+                  ]}
+                  firstInput="Select"
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  inputClassname="w-full"
+                />
+                {field.state.meta.errors.length > 0 && (
+                  <p className="text-sm text-red mt-1">
+                    {typeof field.state.meta.errors[0] === "string"
+                      ? field.state.meta.errors[0]
+                      : (field.state.meta.errors[0] as any)?.message}
+                  </p>
+                )}
+              </div>
+            )}
+          </form.Field>
 
-      <div className="flex items-center gap-3 pt-4">
-        <button
-          type="button"
-          onClick={closeModal}
-          className="bg-[#c9c9c9] py-2 px-6 rounded w-full text-base hover:scale-105 transition-transform"
-        >
-          Cancel
-        </button>
+          <form.Field
+            name="discount"
+            validators={{
+              onChange: ({ value }) => {
+                const result =
+                  individualDiscountSchema.shape.discount.safeParse(value);
+                return result.success
+                  ? undefined
+                  : result.error.errors[0].message;
+              },
+            }}
+          >
+            {(field) => (
+              <div className="w-full">
+                <DropdownField
+                  label="Discount"
+                  required
+                  options={[
+                    { value: "15%", label: "15%" },
+                    { value: "25%", label: "25%" },
+                    { value: "30%", label: "30%" },
+                  ]}
+                  firstInput="Enter Discount"
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  inputClassname="w-full"
+                />
+                {field.state.meta.errors.length > 0 && (
+                  <p className="text-sm text-red mt-1">
+                    {typeof field.state.meta.errors[0] === "string"
+                      ? field.state.meta.errors[0]
+                      : (field.state.meta.errors[0] as any)?.message}
+                  </p>
+                )}
+              </div>
+            )}
+          </form.Field>
+        </div>
 
-        <button
-          type="submit"
-          className="bg-[#df8d29] text-white py-2 px-6 rounded w-full text-base hover:scale-105 transition-transform"
-        >
-          {mode === "edit" ? "Update" : "Create"}
-        </button>
-      </div>
+        <div className="border-b border-[#dedde2] w-full"></div>
+
+        <div className="flex items-center gap-4">
+          <form.Field
+            name="start_date"
+            validators={{
+              onChange: ({ value }) => {
+                const result =
+                  individualDiscountSchema.shape.start_date.safeParse(value);
+                return result.success
+                  ? undefined
+                  : result.error.errors[0].message;
+              },
+            }}
+          >
+            {(field) => (
+              <div className="w-full">
+                <InputField
+                  label="Start Date"
+                  type="date"
+                  required
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+
+                {field.state.meta.errors.length > 0 && (
+                  <p className="text-sm text-red  mt-1">
+                    {typeof field.state.meta.errors[0] === "string"
+                      ? field.state.meta.errors[0]
+                      : (field.state.meta.errors[0] as any)?.message}
+                  </p>
+                )}
+              </div>
+            )}
+          </form.Field>
+
+          <form.Field
+            name="end_date"
+            validators={{
+              onChange: ({ value }) => {
+                const result =
+                  individualDiscountSchema.shape.end_date.safeParse(value);
+
+                return result.success
+                  ? undefined
+                  : result.error.errors[0].message;
+              },
+            }}
+          >
+            {(field) => (
+              <div className="w-full">
+                <InputField
+                  label="End Date"
+                  type="date"
+                  min="1970-01-01"
+                  readOnly={false}
+                  max={new Date().toISOString().split("T")[0]}
+                  required
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+
+                {field.state.meta.errors.length > 0 && (
+                  <p className="text-sm text-red  mt-1">
+                    {typeof field.state.meta.errors[0] === "string"
+                      ? field.state.meta.errors[0]
+                      : (field.state.meta.errors[0] as any)?.message}
+                  </p>
+                )}
+              </div>
+            )}
+          </form.Field>
+        </div>
+        <div className="border-b border-[#dedde2] w-full mb-2 "></div>
+
+        {discountGroups.map((group, index) => (
+          <>
+            <div key={index}>
+              <div className="flex justify-end items-center underline">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const updatedGroups = discountGroups.filter(
+                      (_, idx) => idx !== index
+                    );
+                    setDiscountGroups(updatedGroups);
+                  }}
+                  className="mt-4 text-red-600"
+                >
+                  Remove
+                </button>
+              </div>
+              <form.Field
+                name="product"
+                validators={{
+                  onChange: ({ value }) => {
+                    const result =
+                      individualDiscountSchema.shape.product.safeParse(value);
+                    return result.success
+                      ? undefined
+                      : result.error.errors[0].message;
+                  },
+                }}
+              >
+                {(field) => (
+                  <div className="w-full">
+                    <InputField
+                      label="Product"
+                      required
+                      placeholder="e.g Christmas Sale"
+                      value={field.state.value}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                    />
+
+                    {field.state.meta.errors.length > 0 && (
+                      <p className="text-sm text-red  mt-1">
+                        {typeof field.state.meta.errors[0] === "string"
+                          ? field.state.meta.errors[0]
+                          : (field.state.meta.errors[0] as any)?.message}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </form.Field>
+            </div>
+            <div className="border-b border-[#dedde2] w-full mb-2 "></div>
+
+            <div className="flex items-center gap-4 w-full">
+              <form.Field
+                name="type"
+                validators={{
+                  onChange: ({ value }) => {
+                    const result =
+                      individualDiscountSchema.shape.type.safeParse(value);
+                    return result.success
+                      ? undefined
+                      : result.error.errors[0].message;
+                  },
+                }}
+              >
+                {(field) => (
+                  <div className="w-full">
+                    <DropdownField
+                      label="Type"
+                      required
+                      options={[
+                        { value: "Round", label: "Round" },
+                        { value: "Square", label: "Square" },
+                        { value: "Oval", label: "Oval" },
+                      ]}
+                      firstInput="Select"
+                      value={field.state.value}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      inputClassname="w-full"
+                    />
+                    {field.state.meta.errors.length > 0 && (
+                      <p className="text-sm text-red mt-1">
+                        {typeof field.state.meta.errors[0] === "string"
+                          ? field.state.meta.errors[0]
+                          : (field.state.meta.errors[0] as any)?.message}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </form.Field>
+
+              <form.Field
+                name="discount"
+                validators={{
+                  onChange: ({ value }) => {
+                    const result =
+                      individualDiscountSchema.shape.discount.safeParse(value);
+                    return result.success
+                      ? undefined
+                      : result.error.errors[0].message;
+                  },
+                }}
+              >
+                {(field) => (
+                  <div className="w-full">
+                    <DropdownField
+                      label="Discount"
+                      required
+                      options={[
+                        { value: "15%", label: "15%" },
+                        { value: "25%", label: "25%" },
+                        { value: "30%", label: "30%" },
+                      ]}
+                      firstInput="Enter Discount"
+                      value={field.state.value}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      inputClassname="w-full"
+                    />
+                    {field.state.meta.errors.length > 0 && (
+                      <p className="text-sm text-red mt-1">
+                        {typeof field.state.meta.errors[0] === "string"
+                          ? field.state.meta.errors[0]
+                          : (field.state.meta.errors[0] as any)?.message}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </form.Field>
+            </div>
+
+            <div className="border-b border-[#dedde2] w-full"></div>
+
+            <div className="flex items-center gap-4">
+              <form.Field
+                name="start_date"
+                validators={{
+                  onChange: ({ value }) => {
+                    const result =
+                      individualDiscountSchema.shape.start_date.safeParse(
+                        value
+                      );
+                    return result.success
+                      ? undefined
+                      : result.error.errors[0].message;
+                  },
+                }}
+              >
+                {(field) => (
+                  <div className="w-full">
+                    <InputField
+                      label="Start Date"
+                      type="date"
+                      required
+                      value={field.state.value}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                    />
+
+                    {field.state.meta.errors.length > 0 && (
+                      <p className="text-sm text-red  mt-1">
+                        {typeof field.state.meta.errors[0] === "string"
+                          ? field.state.meta.errors[0]
+                          : (field.state.meta.errors[0] as any)?.message}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </form.Field>
+
+              <form.Field
+                name="end_date"
+                validators={{
+                  onChange: ({ value }) => {
+                    const result =
+                      individualDiscountSchema.shape.end_date.safeParse(value);
+
+                    return result.success
+                      ? undefined
+                      : result.error.errors[0].message;
+                  },
+                }}
+              >
+                {(field) => (
+                  <div className="w-full">
+                    <InputField
+                      label="End Date"
+                      type="date"
+                      min="1970-01-01"
+                      readOnly={false}
+                      max={new Date().toISOString().split("T")[0]}
+                      required
+                      value={field.state.value}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                    />
+
+                    {field.state.meta.errors.length > 0 && (
+                      <p className="text-sm text-red  mt-1">
+                        {typeof field.state.meta.errors[0] === "string"
+                          ? field.state.meta.errors[0]
+                          : (field.state.meta.errors[0] as any)?.message}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </form.Field>
+            </div>
+
+            <div className="border-b border-[#dedde2] w-full mb-2 "></div>
+          </>
+        ))}
+
+        <div>
+          <button
+            type="button"
+            onClick={() =>
+              setDiscountGroups((prev) => [...prev, { ...emptyDiscountGroup }])
+            }
+            className="px-3 py-2 bg-[#f7e8ca] rounded-lg font-semibold transition-transform duration-200 ease-in-out hover:scale-105 "
+          >
+            Add More
+          </button>
+        </div>
+        <div className="flex gap-4">
+          <button
+            type="button"
+            onClick={closeModal}
+            className="w-full bg-[#c9c9c9] text-[#1a1336] font-semibold py-2 rounded-md hover:scale-105 transition-transform"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="w-full bg-[#d49327] text-white font-semibold py-2 rounded-md hover:scale-105 transition-transform"
+          >
+            {isEditing ? "Update" : "Create"}
+          </button>
+        </div>
+      </section>
     </form>
   );
 };

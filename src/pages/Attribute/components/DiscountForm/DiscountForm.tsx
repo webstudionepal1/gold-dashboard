@@ -61,7 +61,9 @@ interface DiscountFormProps {
   mode?: "create" | "edit";
   initialValues?: {
     type: "category" | "individual";
-    data: any[];
+    data: {
+      [key: string]: any;
+    };
   };
 }
 
@@ -93,27 +95,37 @@ export const DiscountForm = ({
         </TabsList>
 
         <TabsContent value="category">
-          <CategoryDiscountForm
-            closeModal={closeModal}
-            initialValues={
-              initialValues?.type === "category"
-                ? initialValues.data
-                : undefined
-            }
-            mode={mode}
-          />
+          {initialValues?.type === "category" ? (
+            <CategoryDiscountForm
+              closeModal={closeModal}
+              initialValues={initialValues.data}
+              onSubmit={() => {}}
+              mode={mode}
+            />
+          ) : (
+            <CategoryDiscountForm
+              closeModal={closeModal}
+              onSubmit={() => {}}
+              mode={mode}
+            />
+          )}
         </TabsContent>
 
         <TabsContent value="individual">
-          <IndividualDiscountForm
-            closeModal={closeModal}
-            initialValues={
-              initialValues?.type === "individual"
-                ? initialValues.data
-                : undefined
-            }
-            mode={mode}
-          />
+          {initialValues?.type === "individual" ? (
+            <IndividualDiscountForm
+              closeModal={closeModal}
+              initialValues={initialValues.data}
+              onSubmit={() => {}}
+              mode={mode}
+            />
+          ) : (
+            <IndividualDiscountForm
+              closeModal={closeModal}
+              onSubmit={({}) => {}}
+              mode={mode}
+            />
+          )}
         </TabsContent>
       </Tabs>
     </div>

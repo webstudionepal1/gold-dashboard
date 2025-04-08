@@ -2,6 +2,14 @@ import { useForm } from "@tanstack/react-form";
 import { DropdownField } from "../../../components/shared/form_components/Dropdown";
 import { useEffect } from "react";
 
+// zod
+import { z } from "zod";
+
+const attributeSchema = z.object({
+  category: z.string().min(1, "Category is required"),
+  value: z.string().min(1, "Value is required"),
+});
+
 interface AttributeFormProps {
   closeModal: () => void;
   initialValues?: {
@@ -18,8 +26,11 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
 }) => {
   const form = useForm({
     defaultValues: initialValues,
+    validators: {
+      onSubmit: attributeSchema,
+    },
     onSubmit: async ({ value }) => {
-      await onSubmit(value); // call parent's submit logic
+      await onSubmit(value);
       closeModal();
     },
   });
@@ -29,6 +40,8 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
   }, [initialValues.category, initialValues.value]);
 
   const isEditing = initialValues.category !== "" || initialValues.value !== "";
+  const { getAllErrors } = form;
+  console.log("errors", getAllErrors);
 
   return (
     <form
@@ -44,7 +57,17 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
 
       <section className="flex flex-col gap-6 w-full">
         <div className="flex gap-4 w-full">
-          <form.Field name="category">
+          <form.Field
+            name="category"
+            validators={{
+              onChange: ({ value }) => {
+                const result = attributeSchema.shape.category.safeParse(value);
+                return result.success
+                  ? undefined
+                  : result.error.errors[0].message;
+              },
+            }}
+          >
             {(field) => (
               <div className="w-full">
                 <DropdownField
@@ -54,19 +77,39 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
                     { value: "Size", label: "Size" },
                     { value: "Color", label: "Color" },
                   ]}
+                  required
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
                   inputClassname="w-full"
                 />
+
+                {field.state.meta.errors.length > 0 && (
+                  <p className="text-sm text-red  mt-1">
+                    {typeof field.state.meta.errors[0] === "string"
+                      ? field.state.meta.errors[0]
+                      : (field.state.meta.errors[0] as any)?.message}
+                  </p>
+                )}
               </div>
             )}
           </form.Field>
 
-          <form.Field name="value">
+          <form.Field
+            name="value"
+            validators={{
+              onChange: ({ value }) => {
+                const result = attributeSchema.shape.value.safeParse(value);
+                return result.success
+                  ? undefined
+                  : result.error.errors[0].message;
+              },
+            }}
+          >
             {(field) => (
               <div className="w-full">
                 <DropdownField
                   label="Value"
+                  required
                   options={[
                     { value: "Round", label: "Round" },
                     { value: "Square", label: "Square" },
@@ -76,6 +119,13 @@ export const AttributeForm: React.FC<AttributeFormProps> = ({
                   onChange={(e) => field.handleChange(e.target.value)}
                   inputClassname="w-full"
                 />
+                {field.state.meta.errors.length > 0 && (
+                  <p className="text-sm text-red mt-1">
+                    {typeof field.state.meta.errors[0] === "string"
+                      ? field.state.meta.errors[0]
+                      : (field.state.meta.errors[0] as any)?.message}
+                  </p>
+                )}
               </div>
             )}
           </form.Field>
