@@ -17,7 +17,7 @@ export const AllNotifications = [
     time: "5 min ago",
     showCheckbox: true,
     showStatusDot: true,
-    statusColor: "#28a745", // green
+    statusColor: "#9A5000",
   },
   {
     id: 3,
@@ -26,7 +26,7 @@ export const AllNotifications = [
     time: "10 min ago",
     showCheckbox: true,
     showStatusDot: true,
-    statusColor: "#ffc107", // yellow
+    statusColor: "#9A5000",
   },
   {
     id: 4,
@@ -35,7 +35,7 @@ export const AllNotifications = [
     time: "1 hour ago",
     showCheckbox: true,
     showStatusDot: true,
-    statusColor: "#6c757d", // gray
+    statusColor: "#9A5000",
   },
   {
     id: 5,
@@ -44,7 +44,7 @@ export const AllNotifications = [
     time: "Just now",
     showCheckbox: true,
     showStatusDot: true,
-    statusColor: "#007bff", // blue
+    statusColor: "#9A5000",
   },
   {
     id: 6,
@@ -52,7 +52,7 @@ export const AllNotifications = [
     description: "$950 (Gold Pendant)",
     time: "2 hours ago",
     showCheckbox: true,
-    showStatusDot: false, // dot hidden
+    showStatusDot: false,
   },
 ];
 
@@ -73,7 +73,7 @@ export const NewNotifications = [
     time: "5 min ago",
     showCheckbox: true,
     showStatusDot: true,
-    statusColor: "#FF5733",
+    statusColor: "#9A5000",
   },
   {
     id: 3,
@@ -90,7 +90,7 @@ export const NewNotifications = [
     time: "15 min ago",
     showCheckbox: true,
     showStatusDot: true,
-    statusColor: "#FFB703",
+    statusColor: "#9A5000",
   },
   {
     id: 5,
@@ -107,7 +107,7 @@ export const NewNotifications = [
     time: "25 min ago",
     showCheckbox: true,
     showStatusDot: true,
-    statusColor: "#A020F0",
+    statusColor: "#9A5000",
   },
   {
     id: 7,
@@ -124,7 +124,7 @@ export const NewNotifications = [
     time: "45 min ago",
     showCheckbox: true,
     showStatusDot: true,
-    statusColor: "#28a745",
+    statusColor: "#9A5000",
   },
   {
     id: 9,
@@ -133,7 +133,7 @@ export const NewNotifications = [
     time: "1 hour ago",
     showCheckbox: true,
     showStatusDot: true,
-    statusColor: "#007bff",
+    statusColor: "#9A5000",
   },
   {
     id: 10,
@@ -153,7 +153,7 @@ export const AcceptedOrders = [
     time: "5 min ago",
     showCheckbox: true,
     showStatusDot: true,
-    statusColor: "#4CAF50", // green
+    statusColor: "#9A5000",
   },
   {
     id: 102,
@@ -170,7 +170,7 @@ export const AcceptedOrders = [
     time: "30 min ago",
     showCheckbox: true,
     showStatusDot: true,
-    statusColor: "#2196F3", // blue
+    statusColor: "#9A5000",
   },
   {
     id: 104,
@@ -190,7 +190,7 @@ export const AssignedOrders = [
     time: "Just now",
     showCheckbox: true,
     showStatusDot: true,
-    statusColor: "#FF9800", // orange
+    statusColor: "#9A5000",
   },
   {
     id: 202,
@@ -207,7 +207,7 @@ export const AssignedOrders = [
     time: "25 min ago",
     showCheckbox: true,
     showStatusDot: true,
-    statusColor: "#795548", // brown
+    statusColor: "#9A5000",
   },
 ];
 
@@ -219,7 +219,7 @@ export const CompletedOrders = [
     time: "Yesterday",
     showCheckbox: true,
     showStatusDot: true,
-    statusColor: "#2E7D32", // dark green
+    statusColor: "#9A5000",
   },
   {
     id: 302,
@@ -236,7 +236,7 @@ export const CompletedOrders = [
     time: "3 days ago",
     showCheckbox: true,
     showStatusDot: true,
-    statusColor: "#1E88E5", // blue
+    statusColor: "#9A5000",
   },
   {
     id: 304,
@@ -256,7 +256,7 @@ export const RegistrationNotifications = [
     time: "15 min ago",
     showCheckbox: true,
     showStatusDot: true,
-    statusColor: "#3F51B5", // indigo
+    statusColor: "#9A5000",
   },
   {
     id: 402,
