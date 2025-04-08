@@ -165,7 +165,7 @@ const Transaction: React.FC = () => {
     setCurrentPage(1);
   };
 
-  const columns: ColumnConfig<Transaction>[] = [
+  const columns: ColumnConfig<Transaction>[] = [  
     {
       header: "Customer Name",
       key: "customername",

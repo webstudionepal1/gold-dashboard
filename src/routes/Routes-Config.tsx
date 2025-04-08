@@ -18,6 +18,13 @@ import { ProductCategory } from "../pages/Product/ProductCategory/ProductCategor
 import Productsubcategory from "../pages/Product/ProductSubcategory/ProductSubCategory";
 import VerifyCashPayment from "../pages/transaction/VerifyCashPayment";
 import Transaction from "../pages/transaction/Transaction";
+import Expenses from "../pages/financeandexpenses /Expenses";
+import Cashflow from "../pages/financeandexpenses /Cashflow";
+import ProfitandLoss from "../pages/financeandexpenses /ProfitandLoss";
+import OrderReport from "../pages/analytics/OrderReport";
+import SalesReport from "../pages/analytics/SalesReport";
+import StoreReport from "../pages/analytics/StoreReport";
+import SettingForm from "../pages/settings/SettingForm";
 
 export const routesConfig = [
   {
@@ -100,6 +107,42 @@ export const routesConfig = [
   {
     path: FrontendRoutes.VERIFY_CASH,
     element: <VerifyCashPayment />,
+  },
+
+  //Finance and Expenses section
+
+  {
+    path: FrontendRoutes.EXPENSE,
+    element: <Expenses />,
+  },
+  {
+    path: FrontendRoutes.CASHFLOW,
+    element: <Cashflow />,
+  },
+  {
+    path: FrontendRoutes.PROFIT_LOSS,
+    element: <ProfitandLoss />,
+  },
+
+  //Analytics
+
+  {
+    path: FrontendRoutes.ORDER_REPORT,
+    element: <OrderReport />,
+  },
+  {
+    path: FrontendRoutes.SALES_REPORT,
+    element: <SalesReport />,
+  },
+  {
+    path: FrontendRoutes.STOCK_REPORT,
+    element: <StoreReport />,
+  },
+
+  //Setting Form
+  {
+    path: FrontendRoutes.SETTINGS,
+    element: <SettingForm />,
   },
 
   {

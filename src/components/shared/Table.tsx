@@ -1,7 +1,7 @@
-import { Icon } from '@iconify/react/dist/iconify.js';
-import React, { useState } from 'react';
-import Pagination from './_table/_Pagination';
-import { DeleteDialog } from './DeleteDialog';
+import { Icon } from "@iconify/react/dist/iconify.js";
+import React, { useState } from "react";
+import Pagination from "./_table/_Pagination";
+import { DeleteDialog } from "./DeleteDialog";
 
 export type TableData<T = Record<string, any>> = {
   _id: string;
@@ -137,7 +137,7 @@ export const Table = <T extends Record<string, any>>({
         <div className="min-w-full max-w-screen-md w-full h-fit ">
           <section className="rounded-lg w-full">
             <table className="min-w-full  w-full">
-              <thead className={showBg ? 'bg-fade-bg' : ''}>
+              <thead className={showBg ? "bg-fade-bg" : ""}>
                 <tr className="justify-between">
                   {showSelectAll && (
                     <th
@@ -158,9 +158,9 @@ export const Table = <T extends Record<string, any>>({
                       key={`${column.key}-${index}`}
                       scope="col"
                       className={`${
-                        hasPadding ? 'px-6' : ''
+                        hasPadding ? "px-6" : ""
                       } py-3 text-left text-sm font-semibold text-fade-black tracking-wider ${
-                        column.width ? `w-[${column.width}]` : ''
+                        column.width ? `w-[${column.width}]` : ""
                       }`}
                     >
                       {column.header}
@@ -182,7 +182,9 @@ export const Table = <T extends Record<string, any>>({
                   data.map((row, index) => (
                     <tr
                       key={`${row._id}-${index}`}
-                      className={`${index % 2 === 0 && showBg ? 'bg-fade-bg' : ''}`}
+                      className={` capitalize ${
+                        index % 2 === 0 && showBg ? "bg-fade-bg" : ""
+                      }`}
                     >
                       {showSelectAll && (
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -199,16 +201,18 @@ export const Table = <T extends Record<string, any>>({
                       {columns?.map((column, index) => (
                         <td
                           key={`${row._id}-${index}`}
-                          className={`${hasPadding && 'px-6 cursor-pointer'} py-4 whitespace-nowrap`}
+                          className={`${
+                            hasPadding && "px-6 cursor-pointer"
+                          } py-4 whitespace-nowrap`}
                           onClick={() => viewRow?.(row)}
                         >
                           {column.render
                             ? column.render(row[column.key], row)
-                            : typeof row[column.key] === 'boolean'
-                              ? row[column.key]
-                                ? 'Yes'
-                                : 'No'
-                              : (row[column.key] ?? 'N/A')}
+                            : typeof row[column.key] === "boolean"
+                            ? row[column.key]
+                              ? "Yes"
+                              : "No"
+                            : row[column.key] ?? "N/A"}
                         </td>
                       ))}
 
@@ -232,19 +236,17 @@ export const Table = <T extends Record<string, any>>({
                                   onChange={() => handleToggle(row)}
                                 />
                                 <div
-
                                   className={`toggle-bg border-2 h-[18px] w-[36px] rounded-full transition-colors duration-200 ease-in-out ${
                                     row.isActive
-                                      ? 'bg-[#76EE59] '
-                                      : 'bg-[#B1BAC8] '
+                                      ? "bg-[#76EE59] "
+                                      : "bg-[#B1BAC8] "
                                   }`}
-
                                 >
                                   <div
                                     className={`toggle-dot absolute left-0 top-1/2 -translate-y-1/2 bg-white w-4 h-4 rounded-full transition-transform duration-200 ease-in-out transform ${
                                       row.isActive
-                                        ? 'translate-x-[19px] border-blue-600'
-                                        : 'translate-x-[1px] border-gray-200'
+                                        ? "translate-x-[19px] border-blue-600"
+                                        : "translate-x-[1px] border-gray-200"
                                     }`}
                                   />
                                 </div>
