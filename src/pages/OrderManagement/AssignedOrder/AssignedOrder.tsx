@@ -1,28 +1,35 @@
-
-import type React from "react"
-import { useState } from "react"
-import { Table, type TableData, type ColumnConfig } from "../../../components/shared/Table"
-import { Modal } from "../../../components/shared"
-import { useOutsideClick } from "../../../hooks/UseOutsideClick"
-import { SearchFilterSort } from "../../../components/global/SearchFilterSort"
+import type React from "react";
+import { useState } from "react";
+import {
+  Table,
+  type TableData,
+  type ColumnConfig,
+} from "../../../components/shared/Table";
+import { Modal } from "../../../components/shared";
+import { useOutsideClick } from "../../../hooks/UseOutsideClick";
+import { SearchFilterSort } from "../../../components/global/SearchFilterSort";
 interface Order {
-  _id: string
-  orderId: string
-  customerName: string
-  orderDate: string
-  deliveryDate: string
-  totalAmount: number
-  status: "Assigned" | "Pending" | "In Progress" | "Delivered" | "Cancelled"
-  isActive?: boolean
-
+  _id: string;
+  orderId: string;
+  customerName: string;
+  orderDate: string;
+  deliveryDate: string;
+  totalAmount: number;
+  status:
+    | "Assigned"
+    | "Not Assigned"
+    | "Pending"
+    | "In Progress"
+    | "Delivered"
+    | "Cancelled";
+  isActive?: boolean;
 }
-
 
 const AssignedOrder: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedFilter, setSelectedFilter] = useState('');
-  const [selectedSort, setSelectedSort] = useState('');
+  const [selectedFilter, setSelectedFilter] = useState("");
+  const [selectedSort, setSelectedSort] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const ref = useOutsideClick(() => setIsModalOpen(false));
@@ -54,7 +61,7 @@ const AssignedOrder: React.FC = () => {
       orderDate: "2001-01-02 2:00 PM",
       deliveryDate: "2001-01-02 2:00 PM",
       totalAmount: 25.5,
-      status: "Assigned",
+      status: "Not Assigned",
       isActive: true,
     },
     {
@@ -67,7 +74,7 @@ const AssignedOrder: React.FC = () => {
       status: "Assigned",
       isActive: true,
     },
-  ])
+  ]);
 
   const [newOrder, setNewOrder] = useState<Omit<Order, "_id">>({
     orderId: "",
@@ -77,59 +84,62 @@ const AssignedOrder: React.FC = () => {
     totalAmount: 0,
     status: "Assigned",
     isActive: true,
-  })
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Assigned":
-        return "bg-green-100 text-green-800"
+        return "bg-[#e9fbef] text-[#6db289]";
       case "Pending":
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-yellow-100 text-yellow-800";
       case "In Progress":
-        return "bg-blue-100 text-blue-800"
+        return "bg-blue-100 text-blue-800";
       case "Delivered":
-        return "bg-green-100 text-green-800"
+        return "bg-green-100 text-green-800";
       case "Cancelled":
-        return "bg-red-100 text-red-800"
+        return "bg-red-100 text-red-800";
+      case "Not Assigned":
+        return "bg-[#f9ebea] text-[#ce8b8e]";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
-
-
+  };
 
   const handleToggleStatus = (row: TableData<Order>) => {
     setOrders((prev) =>
       prev.map((order) =>
         order._id === row._id
           ? {
-            ...order,
-            status: order.status === "Pending" ? "In Progress" : "Pending",
-            isActive: !order.isActive,
-          }
-          : order,
-      ),
-    )
-  }
+              ...order,
+              status: order.status === "Pending" ? "In Progress" : "Pending",
+              isActive: !order.isActive,
+            }
+          : order
+      )
+    );
+  };
 
   const handleDeleteOrder = (row: TableData<Order>) => {
-    setOrders((prev) => prev.filter((o) => o._id !== row._id))
-  }
+    setOrders((prev) => prev.filter((o) => o._id !== row._id));
+  };
 
   const handleSaveOrder = () => {
     if (newOrder.customerName.trim() && newOrder.orderId.trim()) {
-      setOrders((prev) => [...prev, { ...newOrder, _id: Math.random().toString() }])
-      setIsModalOpen(false)
+      setOrders((prev) => [
+        ...prev,
+        { ...newOrder, _id: Math.random().toString() },
+      ]);
+      setIsModalOpen(false);
     } else {
-      alert("Please fill required fields")
+      alert("Please fill required fields");
     }
-  }
+  };
 
   const filteredOrders = orders.filter(
     (order) =>
       order.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.orderId.toLowerCase().includes(searchQuery.toLowerCase()),
-  )
+      order.orderId.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const columns: ColumnConfig<Order>[] = [
     { header: "Order Id", key: "orderId" },
@@ -145,16 +155,22 @@ const AssignedOrder: React.FC = () => {
       header: "Status",
       key: "status",
       render: (value, row) => (
-        <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(row.status)}`}>{row.status}</span>
+        <span
+          className={`px-2 py-1 rounded-full text-xs ${getStatusColor(
+            row.status
+          )}`}
+        >
+          {row.status}
+        </span>
       ),
     },
-  ]
-   // Filter options for the dropdown
-   const filterOptions = [
+  ];
+  // Filter options for the dropdown
+  const filterOptions = [
     { value: "", label: "All Customers" },
     { value: "active", label: "Active" },
     { value: "inactive", label: "Inactive" },
-  ]
+  ];
 
   // Sort options for the dropdown
   const sortOptions = [
@@ -163,46 +179,43 @@ const AssignedOrder: React.FC = () => {
     { value: "name-desc", label: "Name (Z-A)" },
     { value: "orders-high", label: "Orders (High)" },
     { value: "orders-low", label: "Orders (Low)" },
-  ]
+  ];
 
   const handleRowSelect = (selectedIds: string[]) => {
-    console.log("Selected rows:", selectedIds)
-  }
+    console.log("Selected rows:", selectedIds);
+  };
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page)
-  }
+    setCurrentPage(page);
+  };
 
   const handleItemsPerPageChange = (limit: number) => {
-    setItemsPerPage(limit)
-    setCurrentPage(1)
-  }
+    setItemsPerPage(limit);
+    setCurrentPage(1);
+  };
   const handleSearch = (query: string) => {
-    setSearchQuery(query)
-    setCurrentPage(1)
-  }
+    setSearchQuery(query);
+    setCurrentPage(1);
+  };
 
   const handleFilter = (filter: string) => {
-    setSelectedFilter(filter)
-    setCurrentPage(1)
-  }
+    setSelectedFilter(filter);
+    setCurrentPage(1);
+  };
 
   const handleSort = (sort: string) => {
-    setSelectedSort(sort)
-    setCurrentPage(1)
-  }
-
+    setSelectedSort(sort);
+    setCurrentPage(1);
+  };
 
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Assigned Orders</h1>
-
       </div>
 
       <div className="bg-white p-4">
-
-       <SearchFilterSort
+        <SearchFilterSort
           onSearch={handleSearch}
           onFilter={handleFilter}
           onSort={handleSort}
@@ -210,89 +223,114 @@ const AssignedOrder: React.FC = () => {
           sortOptions={sortOptions}
           placeholder="Search here..."
           showView={false}
-
-       />
-
-
-
-      <Table
-        columns={columns}
-        data={filteredOrders}
-        showSelectAll={true}
-        onRowSelect={handleRowSelect}
-        onToggle={handleToggleStatus}
-        deleteRow={handleDeleteOrder}
-        showPagination={true}
-        paginationDetails={{
-          currentPage,
-          limit: itemsPerPage,
-          totalCount: filteredOrders.length,
-        }}
-        onItemsPerPageChange={handleItemsPerPageChange}
-        onPageChange={handlePageChange}
-        showBg={true}
-        showAction={false}
         />
-        
+
+        <Table
+          columns={columns}
+          data={filteredOrders}
+          showSelectAll={true}
+          onRowSelect={handleRowSelect}
+          onToggle={handleToggleStatus}
+          deleteRow={handleDeleteOrder}
+          showPagination={true}
+          paginationDetails={{
+            currentPage,
+            limit: itemsPerPage,
+            totalCount: filteredOrders.length,
+          }}
+          onItemsPerPageChange={handleItemsPerPageChange}
+          onPageChange={handlePageChange}
+          showBg={true}
+          showAction={false}
+        />
       </div>
 
       {isModalOpen && (
-        <Modal ref={ref} >
+        <Modal ref={ref}>
           <div className="p-6">
             <h2 className="text-xl font-semibold mb-4">Create New Order</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Order ID *</label>
+                <label className="block text-sm font-medium mb-1">
+                  Order ID *
+                </label>
                 <input
                   value={newOrder.orderId}
-                  onChange={(e) => setNewOrder({ ...newOrder, orderId: e.target.value })}
+                  onChange={(e) =>
+                    setNewOrder({ ...newOrder, orderId: e.target.value })
+                  }
                   className="border rounded-md p-2 w-full"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Customer Name *</label>
+                <label className="block text-sm font-medium mb-1">
+                  Customer Name *
+                </label>
                 <input
                   value={newOrder.customerName}
-                  onChange={(e) => setNewOrder({ ...newOrder, customerName: e.target.value })}
+                  onChange={(e) =>
+                    setNewOrder({ ...newOrder, customerName: e.target.value })
+                  }
                   className="border rounded-md p-2 w-full"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Order Date</label>
+                <label className="block text-sm font-medium mb-1">
+                  Order Date
+                </label>
                 <input
                   type="datetime-local"
                   value={newOrder.orderDate}
-                  onChange={(e) => setNewOrder({ ...newOrder, orderDate: e.target.value })}
+                  onChange={(e) =>
+                    setNewOrder({ ...newOrder, orderDate: e.target.value })
+                  }
                   className="border rounded-md p-2 w-full"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Delivery Date</label>
+                <label className="block text-sm font-medium mb-1">
+                  Delivery Date
+                </label>
                 <input
                   type="datetime-local"
                   value={newOrder.deliveryDate}
-                  onChange={(e) => setNewOrder({ ...newOrder, deliveryDate: e.target.value })}
+                  onChange={(e) =>
+                    setNewOrder({ ...newOrder, deliveryDate: e.target.value })
+                  }
                   className="border rounded-md p-2 w-full"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Total Amount</label>
+                <label className="block text-sm font-medium mb-1">
+                  Total Amount
+                </label>
                 <input
                   type="number"
                   step="0.01"
                   value={newOrder.totalAmount}
-                  onChange={(e) => setNewOrder({ ...newOrder, totalAmount: Number.parseFloat(e.target.value) })}
+                  onChange={(e) =>
+                    setNewOrder({
+                      ...newOrder,
+                      totalAmount: Number.parseFloat(e.target.value),
+                    })
+                  }
                   className="border rounded-md p-2 w-full"
                 />
               </div>
             </div>
             <div className="mt-6 flex justify-end gap-3">
-              <button onClick={() => setIsModalOpen(false)} className="px-4 py-2 border rounded-md">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="px-4 py-2 border rounded-md"
+              >
                 Cancel
               </button>
-              <button onClick={handleSaveOrder} className="px-4 py-2 bg-[#DF8D28] text-white rounded-md">
+              <button
+                onClick={handleSaveOrder}
+                className="px-4 py-2 bg-[#DF8D28] text-white rounded-md"
+              >
                 Create Order
               </button>
             </div>
@@ -300,8 +338,7 @@ const AssignedOrder: React.FC = () => {
         </Modal>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default AssignedOrder
-
+export default AssignedOrder;
