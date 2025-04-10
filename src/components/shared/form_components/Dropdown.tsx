@@ -1,5 +1,7 @@
 // import React from "react";
 
+import React from "react";
+
 // import { twMerge } from "tailwind-merge";
 
 // interface dropDownFieldPropTypes
@@ -44,8 +46,52 @@
 //   )
 // );
 
-import React from "react";
-import { twMerge } from "tailwind-merge";
+// import React from "react";
+// import { twMerge } from "tailwind-merge";
+
+// interface dropDownFieldPropTypes
+//   extends React.SelectHTMLAttributes<HTMLSelectElement> {
+//   label?: string;
+//   firstInput?: string;
+//   options?: { value: string; label: string }[];
+//   required?: boolean;
+//   inputClassname?: string;
+// }
+
+// export const DropdownField = React.forwardRef<
+//   HTMLSelectElement,
+//   dropDownFieldPropTypes
+// >(
+//   (
+//     { label, options, required = false, firstInput, inputClassname, ...other },
+//     ref
+//   ) => (
+//     <div className="flex flex-col gap-2">
+//       <label className="flex gap-1">
+//         <p className="text-[#95949a]">{label}</p>
+//         {required && <span className="text-red">*</span>}
+//       </label>
+//       <select
+//         ref={ref}
+//         className={twMerge(
+//           `border border-grey-200 py-3 px-4 rounded text-[#95949a] outline-none ${inputClassname}`
+//         )}
+//         {...other}
+//       >
+//         <option value="" disabled>
+//           {firstInput ?? label}
+//         </option>
+//         {options?.map((option) => (
+//           <option key={option.value} value={option.value}>
+//             {option.label}
+//           </option>
+//         ))}
+//       </select>
+//     </div>
+//   )
+// );
+
+// DropdownField.displayName = "DropdownField";
 
 interface dropDownFieldPropTypes
   extends React.SelectHTMLAttributes<HTMLSelectElement> {
@@ -63,30 +109,31 @@ export const DropdownField = React.forwardRef<
   (
     { label, options, required = false, firstInput, inputClassname, ...other },
     ref
-  ) => (
-    <div className="flex flex-col gap-2">
-      <label className="flex gap-1">
-        <p className="text-[#95949a]">{label}</p>
-        {required && <span className="text-red">*</span>}
-      </label>
-      <select
-        ref={ref}
-        className={twMerge(
-          `border border-grey-200 py-3 px-4 rounded text-[#95949a] outline-none ${inputClassname}`
-        )}
-        {...other}
-      >
-        <option value="" disabled>
-          {firstInput ?? label}
-        </option>
-        {options?.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
+  ) => {
+    return (
+      <div className="flex flex-col gap-2">
+        <label className="flex gap-1">
+          <p className="text-[#95949a]">{label}</p>
+          {required && <span className="text-red">*</span>}{" "}
+          {/* Show asterisk for required */}
+        </label>
+        <select
+          ref={ref}
+          className={`border border-grey-200 py-3 px-4 rounded text-[#95949a] outline-none ${inputClassname}`}
+          {...other}
+        >
+          <option value="" disabled>
+            {firstInput ?? label}
           </option>
-        ))}
-      </select>
-    </div>
-  )
+          {options?.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </div>
+    );
+  }
 );
 
 DropdownField.displayName = "DropdownField";
