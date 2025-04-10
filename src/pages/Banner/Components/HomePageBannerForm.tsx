@@ -78,9 +78,9 @@ export const HomePageBannerForm: React.FC<HomePageBannerFormProps> = ({
         e.preventDefault();
         form.handleSubmit();
       }}
-      className="p-10 flex flex-col gap-10"
+      className="flex flex-col gap-10 p-10"
     >
-      <p className="text-lg font-bold text-black text-center">
+      <p className="text-lg font-bold text-center text-black">
         {isEditing ? "Edit Home Page Banner" : "Add Home Page Banner"}
       </p>
 
@@ -112,7 +112,7 @@ export const HomePageBannerForm: React.FC<HomePageBannerFormProps> = ({
                 />
 
                 {field.state.meta.errors.length > 0 && (
-                  <p className="text-sm text-red  mt-1">
+                  <p className="mt-1 text-sm text-red">
                     {typeof field.state.meta.errors[0] === "string"
                       ? field.state.meta.errors[0]
                       : (field.state.meta.errors[0] as any)?.message}
@@ -145,7 +145,7 @@ export const HomePageBannerForm: React.FC<HomePageBannerFormProps> = ({
                   placeholder="Add Description"
                 />
                 {field.state.meta.errors.length > 0 && (
-                  <p className="text-sm text-red  mt-1">
+                  <p className="mt-1 text-sm text-red">
                     {typeof field.state.meta.errors[0] === "string"
                       ? field.state.meta.errors[0]
                       : (field.state.meta.errors[0] as any)?.message}
@@ -157,7 +157,7 @@ export const HomePageBannerForm: React.FC<HomePageBannerFormProps> = ({
         </div>
 
         <div>
-          {/* <form.Field
+          <form.Field
             name="select_by"
             validators={{
               onChange: ({ value }) => {
@@ -186,35 +186,7 @@ export const HomePageBannerForm: React.FC<HomePageBannerFormProps> = ({
                   inputClassname="w-full"
                 />
                 {field.state.meta.errors.length > 0 && (
-                  <p className="text-sm text-red  mt-1">
-                    {typeof field.state.meta.errors[0] === "string"
-                      ? field.state.meta.errors[0]
-                      : (field.state.meta.errors[0] as any)?.message}
-                  </p>
-                )}
-              </div>
-            )}
-          </form.Field> */}
-
-          <form.Field name="select_by">
-            {(field) => (
-              <div className="w-full">
-                <DropdownField
-                  label="Select By"
-                  options={[
-                    { value: "Shape", label: "Shape" },
-                    { value: "Size", label: "Size" },
-                    { value: "Color", label: "Color" },
-                  ]}
-                  value={field.state.value}
-                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                    field.handleChange(e.target.value)
-                  }
-                  required // Only for the asterisk in the label
-                  inputClassname="w-full"
-                />
-                {field.state.meta.errors.length > 0 && (
-                  <p className="text-sm text-red mt-1">
+                  <p className="mt-1 text-sm text-red">
                     {typeof field.state.meta.errors[0] === "string"
                       ? field.state.meta.errors[0]
                       : (field.state.meta.errors[0] as any)?.message}
@@ -223,6 +195,8 @@ export const HomePageBannerForm: React.FC<HomePageBannerFormProps> = ({
               </div>
             )}
           </form.Field>
+
+
         </div>
 
         <div className="flex flex-col gap-2">
@@ -252,7 +226,7 @@ export const HomePageBannerForm: React.FC<HomePageBannerFormProps> = ({
                 onChange={(e) => field.handleChange(e.target.value)}
               />
               {field.state.meta.errors.length > 0 && (
-                <p className="text-sm text-red  mt-1">
+                <p className="mt-1 text-sm text-red">
                   {typeof field.state.meta.errors[0] === "string"
                     ? field.state.meta.errors[0]
                     : (field.state.meta.errors[0] as any)?.message}
@@ -267,7 +241,7 @@ export const HomePageBannerForm: React.FC<HomePageBannerFormProps> = ({
         </div>
 
         {/* Image Upload */}
-        <div className="flex gap-2 items-center">
+        <div className="flex items-center gap-2">
           <form.Field
             name="web_image"
             validators={{
@@ -291,7 +265,7 @@ export const HomePageBannerForm: React.FC<HomePageBannerFormProps> = ({
                   }
                 />
                 {field.state.meta.errors.length > 0 && (
-                  <p className="text-sm text-red  mt-1">
+                  <p className="mt-1 text-sm text-red">
                     {typeof field.state.meta.errors[0] === "string"
                       ? field.state.meta.errors[0]
                       : (field.state.meta.errors[0] as any)?.message}
@@ -323,7 +297,7 @@ export const HomePageBannerForm: React.FC<HomePageBannerFormProps> = ({
                   }
                 />
                 {field.state.meta.errors.length > 0 && (
-                  <p className="text-sm text-red  mt-1">
+                  <p className="mt-1 text-sm text-red">
                     {typeof field.state.meta.errors[0] === "string"
                       ? field.state.meta.errors[0]
                       : (field.state.meta.errors[0] as any)?.message}
