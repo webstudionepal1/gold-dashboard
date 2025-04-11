@@ -232,6 +232,10 @@ const AssignedOrder: React.FC = () => {
           onRowSelect={handleRowSelect}
           onToggle={handleToggleStatus}
           deleteRow={handleDeleteOrder}
+          showView={true}
+          showEdit={false}
+          showDelete={false}
+          showToggle={false}
           showPagination={true}
           paginationDetails={{
             currentPage,
@@ -241,7 +245,7 @@ const AssignedOrder: React.FC = () => {
           onItemsPerPageChange={handleItemsPerPageChange}
           onPageChange={handlePageChange}
           showBg={true}
-          showAction={false}
+          showAction={true}
         />
       </div>
 

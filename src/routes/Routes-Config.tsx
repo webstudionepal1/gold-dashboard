@@ -20,6 +20,9 @@ import AttributeIndex from "../pages/Attribute/AttributeIndex";
 import BannerIndex from "../pages/Banner/BannerIndex";
 import NotificationIndex from "../pages/Notification/NotificationIndex";
 import MyPostBusinessIndex from "../pages/MyPostBusiness/MyPostBusinessIndex";
+import ConfirmedOrder from "../pages/OrderManagement/ConfirmedOrder/ConfirmedOrder";
+import OrderIndex from "../pages/OrderManagement/Order/OrderIndex";
+import AddOrderForm from "../pages/OrderManagement/Order/components/AddOrderPage";
 
 export const routesConfig = [
   {
@@ -36,8 +39,20 @@ export const routesConfig = [
     element: <LoginPage />,
   },
   {
+    path: FrontendRoutes.ORDER,
+    element: <OrderIndex />,
+  },
+  {
+    path: FrontendRoutes.ADDORDER,
+    element: <AddOrderForm />,
+  },
+  {
     path: FrontendRoutes.ASSIGNEDORDER,
     element: <AssignedOrders />,
+  },
+  {
+    path: FrontendRoutes.CONFIRMEDORDER,
+    element: <ConfirmedOrder />,
   },
   {
     path: FrontendRoutes.CANCELLEDORDER,

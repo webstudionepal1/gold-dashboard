@@ -46,6 +46,12 @@ export const SidebarMainRoutes = {
           path: FrontendRoutes.ORDER,
           title: "Orders",
         },
+
+        {
+          id: 38,
+          path: FrontendRoutes.CONFIRMEDORDER,
+          title: "Confirmed Order",
+        },
         {
           id: 30,
           path: FrontendRoutes.ASSIGNEDORDER,

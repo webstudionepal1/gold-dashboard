@@ -23,6 +23,11 @@ interface BannerItem {
   banner_type: string;
   web_image: string;
   mobile_image: string;
+
+  banner_title?: string;
+  description?: string;
+  select_by?: string;
+  priority?: number;
 }
 
 const BannerIndex: React.FC = () => {
@@ -293,40 +298,26 @@ const BannerIndex: React.FC = () => {
           {selectedTab === "home_page" ? (
             <HomePageBannerForm
               closeModal={handleCloseModal}
-              initialValues={
-                editingItem
-                  ? {
-                      image: editingItem.web_image, // Map to web_image
-                      title: editingItem.title,
-                      link: "", // Assuming link is not present in BannerItem, you can set it to an empty string or adjust as necessary
-                      description: "", // Similarly, adjust if description is part of your model
-                    }
-                  : {
-                      image: "",
-                      title: "",
-                      link: "",
-                      description: "",
-                    }
-              }
+              initialValues={{
+                banner_title: "",
+                description: "",
+                select_by: "",
+                priority: 0,
+                web_image: undefined,
+                mobile_image: undefined,
+              }}
               onSubmit={(data) => console.log(data)}
             />
           ) : (
             <OtherPageBannerForm
-              initialValues={
-                editingItem
-                  ? {
-                      image: editingItem.web_image,
-                      title: editingItem.title,
-                      link: "",
-                      description: "",
-                    }
-                  : {
-                      image: "",
-                      title: "",
-                      link: "",
-                      description: "",
-                    }
-              }
+              initialValues={{
+                banner_title: "",
+                description: "",
+                select_by: "",
+                priority: 0,
+                web_image: undefined,
+                mobile_image: undefined,
+              }}
               closeModal={handleCloseModal}
               onSubmit={(data) => console.log(data)}
             />
