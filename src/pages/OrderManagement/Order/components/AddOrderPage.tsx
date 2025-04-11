@@ -34,7 +34,7 @@
 
 //     return (
 //       <div className="min-h-[20px]">
-//         <span className="text-red-500 text-xs">{errorMessage}</span>
+//         <span className="text-xs text-red-500">{errorMessage}</span>
 //       </div>
 //     );
 //   }
@@ -147,7 +147,7 @@
 
 //       <button
 //         type="submit"
-//         className="self-end bg-primary text-white px-6 py-2 rounded-md"
+//         className="self-end px-6 py-2 text-white rounded-md bg-primary"
 //       >
 //         Add Order
 //       </button>
@@ -217,7 +217,7 @@ const FieldError = ({ field }: { field: any }) => {
 
     return (
       <div className="min-h-[20px]">
-        <span className="text-red text-xs">{errorMessage}</span>
+        <span className="text-xs text-red">{errorMessage}</span>
       </div>
     );
   }
@@ -276,11 +276,11 @@ export default function AddOrderForm() {
           </div>
         </div>
         <div className="bg-[#ffffff] border-[#eeeeee] border-2 shadow-lg rounded-xl ">
-          <div className="px-6 pb-2 pt-4">
+          <div className="px-6 pt-4 pb-2">
             <h1 className="text-xl font-semibold">General Information</h1>
             <div className="border-b border-[#dedde2] w-full my-2  "></div>
             <form
-              className="flex flex-col gap-4  "
+              className="flex flex-col gap-4 "
               onSubmit={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -302,7 +302,7 @@ export default function AddOrderForm() {
                 )}
               </form.Field>
 
-              <div className="flex items-center gap-4 w-full">
+              <div className="flex items-center w-full gap-4">
                 <form.Field name="email">
                   {(field) => (
                     <div className="w-full">
@@ -644,11 +644,10 @@ export default function AddOrderForm() {
                   </h1>
                   <div className="flex items-center gap-4">
                     <h1
-                      className={`text-base px-5 py-1 rounded-xl font-medium ${
-                        isEnabled
+                      className={`text-base px-5 py-1 rounded-xl font-medium ${isEnabled
                           ? "bg-[#e9fbef] text-[#67c492]"
                           : "bg-[#feeeee] text-[#dd667a]"
-                      }`}
+                        }`}
                     >
                       {isEnabled ? "Paid" : "Unpaid"}
                     </h1>
