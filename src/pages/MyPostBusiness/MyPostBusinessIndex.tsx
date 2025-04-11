@@ -1,77 +1,3 @@
-// import React, { useState } from "react";
-// import { SearchFilterSort } from "../../components/global/SearchFilterSort";
-// interface PostBusinessItem {
-//   _id: string;
-//   title: string;
-//   banner_type: string;
-//   web_image: string;
-//   mobile_image: string;
-// }
-
-// const MyPostBusinessIndex = () => {
-//   const [selectedFilter, setSelectedFilter] = useState("");
-//   console.log(selectedFilter);
-//   const [selectedSort, setSelectedSort] = useState("");
-//   console.log(selectedSort);
-
-//   const [searchQuery, setSearchQuery] = useState("");
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const [itemsPerPage, setItemsPerPage] = useState(10);
-
-//   console.log(selectedSort);
-//   const handleSearch = (query: string) => {
-//     setSearchQuery(query);
-//     setCurrentPage(1);
-//   };
-
-//   const handleFilter = (filter: string) => {
-//     setSelectedFilter(filter);
-//     setCurrentPage(1);
-//   };
-
-//   const handleSort = (sort: string) => {
-//     setSelectedSort(sort);
-//     setCurrentPage(1);
-//   };
-
-//   const filterOptions = [
-//     { value: "", label: "All Customers" },
-//     { value: "active", label: "Active" },
-//     { value: "inactive", label: "Inactive" },
-//   ];
-
-//   const sortOptions = [
-//     { value: "", label: "Default" },
-//     { value: "name-asc", label: "Name (A-Z)" },
-//     { value: "name-desc", label: "Name (Z-A)" },
-//     { value: "orders-high", label: "Orders (High)" },
-//     { value: "orders-low", label: "Orders (Low)" },
-//   ];
-//   return (
-//     <>
-//       <div className="mx-6 my-2">
-//         <h1 className="text-3xl font-semibold">Packages</h1>
-
-//         <div className="bg-[#ffffff] border-[#dcdddf] border-2 rounded-xl ">
-//           <div className="p-4">
-//             <SearchFilterSort
-//               onSearch={handleSearch}
-//               onFilter={handleFilter}
-//               onSort={handleSort}
-//               filterOptions={filterOptions}
-//               sortOptions={sortOptions}
-//               placeholder="Search here..."
-//             />
-//           </div>
-//           <h1>Table</h1>
-//         </div>
-//       </div>
-//     </>
-//   );
-// };
-
-// export default MyPostBusinessIndex;
-
 import React, { useState } from "react";
 import { SearchFilterSort } from "../../components/global/SearchFilterSort";
 import { Table, ColumnConfig, TableData } from "../../components/shared/Table";
@@ -277,7 +203,7 @@ const MyPostBusinessIndex = () => {
               </>
             )}
             <div className="flex items-center gap-2 text-sm mt-7">
-              <h1>Express Post</h1>
+              <h1 className="font-bold">Express Post</h1>
               <p>Standard</p>
             </div>
           </div>

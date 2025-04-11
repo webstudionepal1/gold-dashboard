@@ -8,18 +8,24 @@ const HomePageBannerSchema = z.object({
   banner_title: z.string().min(1, "Banner Title is required"),
   description: z.string().min(1, "Description is required"),
   select_by: z.string().min(1, "Select Category is required"),
-  priority: z.string().min(1, "Priority is required"),
-  web_image: z.string().min(1, "Web Image is required"),
-  mobile_image: z.string().min(1, "Mobile Image is required"),
+  priority: z
+    .number({ invalid_type_error: "Priority must be a positive number" })
+    .min(0, "Priority must be a positive number"),
+  web_image: z
+    .instanceof(File, { message: "Web Image is required" })
+    .refine((file) => file.size > 0, { message: "Web Image is required" }),
+  mobile_image: z
+    .instanceof(File, { message: "Mobile Image is required" })
+    .refine((file) => file.size > 0, { message: "Mobile Image is required" }),
 });
 
 interface Iinitial {
   banner_title?: string;
   description?: string;
   select_by?: string;
-  priority?: string;
-  web_image?: string;
-  mobile_image?: string;
+  priority?: number;
+  web_image?: File;
+  mobile_image?: File;
 }
 
 interface HomePageBannerFormProps {
@@ -34,9 +40,9 @@ export const HomePageBannerForm: React.FC<HomePageBannerFormProps> = ({
     banner_title: "",
     description: "",
     select_by: "",
-    priority: "",
-    web_image: "",
-    mobile_image: "",
+    priority: 0,
+    web_image: undefined,
+    mobile_image: undefined,
   },
   onSubmit,
 }) => {
@@ -50,6 +56,7 @@ export const HomePageBannerForm: React.FC<HomePageBannerFormProps> = ({
   } = initialValues;
   const form = useForm({
     defaultValues: initialValues,
+
     validators: {
       onSubmit: HomePageBannerSchema,
     },
@@ -68,9 +75,9 @@ export const HomePageBannerForm: React.FC<HomePageBannerFormProps> = ({
     initialValues.banner_title !== "" ||
     initialValues.description !== "" ||
     initialValues.select_by !== "" ||
-    initialValues.priority !== "" ||
-    initialValues.web_image !== "" ||
-    initialValues.mobile_image !== "";
+    initialValues.priority !== 0 ||
+    initialValues.web_image !== undefined ||
+    initialValues.mobile_image !== undefined;
 
   return (
     <form
@@ -194,6 +201,46 @@ export const HomePageBannerForm: React.FC<HomePageBannerFormProps> = ({
                 )}
               </div>
             )}
+          </form.Field> */}
+
+          <form.Field
+            name="select_by"
+            validators={{
+              onChange: ({ value }) => {
+                const result = HomePageBannerSchema.shape.select_by.safeParse(
+                  String(value || "")
+                );
+                return result.success
+                  ? undefined
+                  : result.error.errors[0].message;
+              },
+            }}
+          >
+            {(field) => (
+              <div className="w-full">
+                <DropdownField
+                  label="Select By"
+                  options={[
+                    { value: "Shape", label: "Shape" },
+                    { value: "Size", label: "Size" },
+                    { value: "Color", label: "Color" },
+                  ]}
+                  value={field.state.value}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                    field.handleChange(e.target.value)
+                  }
+                  required
+                  inputClassname="w-full"
+                />
+                {field.state.meta.errors.length > 0 && (
+                  <p className="mt-1 text-sm text-red">
+                    {typeof field.state.meta.errors[0] === "string"
+                      ? field.state.meta.errors[0]
+                      : (field.state.meta.errors[0] as any)?.message}
+                  </p>
+                )}
+              </div>
+            )}
           </form.Field>
 
 
@@ -207,8 +254,12 @@ export const HomePageBannerForm: React.FC<HomePageBannerFormProps> = ({
           name="priority"
           validators={{
             onChange: ({ value }) => {
+              const parsedValue =
+                typeof value === "string" ? Number(value) : value;
+
               const result =
-                HomePageBannerSchema.shape.priority.safeParse(value);
+                HomePageBannerSchema.shape.priority.safeParse(parsedValue);
+
               return result.success
                 ? undefined
                 : result.error.errors[0].message;
@@ -223,7 +274,10 @@ export const HomePageBannerForm: React.FC<HomePageBannerFormProps> = ({
                 value={field.state.value || 0}
                 required
                 min={0}
-                onChange={(e) => field.handleChange(e.target.value)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  field.handleChange(val === "" ? undefined : Number(val));
+                }}
               />
               {field.state.meta.errors.length > 0 && (
                 <p className="mt-1 text-sm text-red">
@@ -260,9 +314,12 @@ export const HomePageBannerForm: React.FC<HomePageBannerFormProps> = ({
                   label="Upload Web Image"
                   type="file"
                   required
-                  onChange={(e) =>
-                    field.handleChange(e.target.files?.[0]?.name || "")
-                  }
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      field.handleChange(file);
+                    }
+                  }}
                 />
                 {field.state.meta.errors.length > 0 && (
                   <p className="mt-1 text-sm text-red">
@@ -292,9 +349,12 @@ export const HomePageBannerForm: React.FC<HomePageBannerFormProps> = ({
                   label="Upload Mobile Image"
                   type="file"
                   required
-                  onChange={(e) =>
-                    field.handleChange(e.target.files?.[0]?.name || "")
-                  }
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      field.handleChange(file);
+                    }
+                  }}
                 />
                 {field.state.meta.errors.length > 0 && (
                   <p className="mt-1 text-sm text-red">
