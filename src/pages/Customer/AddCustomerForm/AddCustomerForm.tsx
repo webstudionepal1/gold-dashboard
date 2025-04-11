@@ -77,7 +77,7 @@ const AddCustomerForm: React.FC = () => {
   // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   // Handle image upload
@@ -106,7 +106,10 @@ const AddCustomerForm: React.FC = () => {
         </div>
 
         {/* Main Form Content */}
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 md:grid-cols-3 gap-6"
+        >
           {/* Left Column - Profile Image Upload */}
           <div className="md:col-span-1">
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
@@ -128,7 +131,10 @@ const AddCustomerForm: React.FC = () => {
               ) : (
                 <>
                   <div className="text-gray-400 mb-2">
-                    <Icon icon="mdi:cloud-upload" className="w-12 h-12 mx-auto" />
+                    <Icon
+                      icon="mdi:cloud-upload"
+                      className="w-12 h-12 mx-auto"
+                    />
                   </div>
                   <input
                     type="file"
@@ -144,7 +150,9 @@ const AddCustomerForm: React.FC = () => {
                   >
                     Upload Photo
                   </Button>
-                  <p className="text-sm text-gray-500 mt-2">JPEG or PNG, max 5MB</p>
+                  <p className="text-sm text-gray-500 mt-2">
+                    JPEG or PNG, max 5MB
+                  </p>
                 </>
               )}
             </div>
@@ -243,7 +251,12 @@ const AddCustomerForm: React.FC = () => {
                 <input
                   type="checkbox"
                   checked={formData.agreeTerms}
-                  onChange={(e) => setFormData(prev => ({ ...prev, agreeTerms: e.target.checked }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      agreeTerms: e.target.checked,
+                    }))
+                  }
                   className="h-4 w-4 text-[#DF8D28] rounded focus:ring-[#DF8D28]"
                 />
                 <label className="ml-2 text-sm text-gray-600">

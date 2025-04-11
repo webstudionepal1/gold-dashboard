@@ -1,8 +1,17 @@
 import type React from "react";
 import { useState } from "react";
 import { SearchFilterSort } from "../../../components/global/SearchFilterSort";
-import { Table, type ColumnConfig, type TableData } from "../../../components/shared/Table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/shared/tab";
+import {
+  Table,
+  type ColumnConfig,
+  type TableData,
+} from "../../../components/shared/Table";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../../../components/shared/tab";
 
 interface InventoryItem {
   _id: string;
@@ -19,8 +28,8 @@ const InventoryOverview: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [selectedFilter, setSelectedFilter] = useState('');
-  const [selectedSort, setSelectedSort] = useState('');
+  const [selectedFilter, setSelectedFilter] = useState("");
+  const [selectedSort, setSelectedSort] = useState("");
 
   // Sample inventory data for different tabs
   const [mainStockItems] = useState<InventoryItem[]>([
@@ -155,7 +164,7 @@ const InventoryOverview: React.FC = () => {
     return items.filter(
       (item) =>
         item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.ID?.toLowerCase().includes(searchQuery.toLowerCase()),
+        item.ID?.toLowerCase().includes(searchQuery.toLowerCase())
     );
   };
 
@@ -202,7 +211,9 @@ const InventoryOverview: React.FC = () => {
       render: (_, row) => (
         <div className="flex items-center">
           <img
-            src={"https://imgs.search.brave.com/N7iiPmgTwP6DQJtXQfwaAm-6xOmlKftSIdIkAcau0yk/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvMTE5/ODI1MjY3Mi9waG90/by9lbmdhZ2VtZW50/LWRpYW1vbmQtcmlu/Zy1qZXdlbHJ5LWlz/b2xhdGVkLW9uLXdo/aXQlRDElODMtYmFj/a2dyb3VuZC5qcGc_/cz02MTJ4NjEyJnc9/MCZrPTIwJmM9cDFu/Q2o0SDBkWnFURlBs/YTVxT0hMSnRDQUZJ/Y0F6NW5zeGU2UDJs/cWdXMD0"}
+            src={
+              "https://imgs.search.brave.com/N7iiPmgTwP6DQJtXQfwaAm-6xOmlKftSIdIkAcau0yk/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvMTE5/ODI1MjY3Mi9waG90/by9lbmdhZ2VtZW50/LWRpYW1vbmQtcmlu/Zy1qZXdlbHJ5LWlz/b2xhdGVkLW9uLXdo/aXQlRDElODMtYmFj/a2dyb3VuZC5qcGc_/cz02MTJ4NjEyJnc9/MCZrPTIwJmM9cDFu/Q2o0SDBkWnFURlBs/YTVxT0hMSnRDQUZJ/Y0F6NW5zeGU2UDJs/cWdXMD0"
+            }
             alt={row.name}
             className="w-10 h-10 rounded-md mr-3 object-cover"
           />
@@ -229,7 +240,11 @@ const InventoryOverview: React.FC = () => {
       header: "Status",
       key: "status",
       render: (_, row) => (
-        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(row.status)}`}>
+        <span
+          className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
+            row.status
+          )}`}
+        >
           {row.status}
         </span>
       ),
@@ -317,9 +332,6 @@ const InventoryOverview: React.FC = () => {
           </TabsContent>
         </Tabs>
       </div>
-
-
-
     </div>
   );
 };

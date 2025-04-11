@@ -6,6 +6,8 @@ export const FrontendRoutes = {
   PRODUCTCATEGORY: "/product/product-category",
   PRODUCTSUBCATEGORY: "/product/sub-category",
   ASSIGNEDORDER: "/order/assigned-order",
+  CONFIRMEDORDER: "/order/confirmed-order",
+  ADDORDER: "/order/add-order",
 
   CANCELLEDORDER: "/order/cancelled-order",
   COMPLETEDORDER: "/order/completed-order",
