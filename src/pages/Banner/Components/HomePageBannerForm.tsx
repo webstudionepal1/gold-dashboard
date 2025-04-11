@@ -201,7 +201,7 @@ export const HomePageBannerForm: React.FC<HomePageBannerFormProps> = ({
                 )}
               </div>
             )}
-          </form.Field> */}
+          </form.Field>
 
           <form.Field
             name="select_by"
