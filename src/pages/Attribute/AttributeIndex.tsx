@@ -515,17 +515,14 @@ const AttributeIndex: React.FC = () => {
   };
   return (
     <div className="container mx-auto px-4 py-3">
-      <Header
-        text="Attribute"
-        button={
-          <button
-            onClick={handleAddButtonClick}
-            className="px-3 py-2  flex items-center  text-white bg-[#d49327] transition-transform duration-200 ease-in-out hover:scale-105 rounded-lg"
-          >
-            {renderButtonText()}
-          </button>
-        }
-      />
+      <Header text="Attribute">
+        <button
+          onClick={handleAddButtonClick}
+          className="px-3 py-2  flex items-center  text-white bg-[#d49327] transition-transform duration-200 ease-in-out hover:scale-105 rounded-lg"
+        >
+          {renderButtonText()}
+        </button>
+      </Header>
       <div className="flex items-center justify-between ">
         {/* <h1 className="text-2xl font-bold text-gray-800 ">Attribute</h1>
 

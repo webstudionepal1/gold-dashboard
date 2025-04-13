@@ -232,22 +232,19 @@ const BannerIndex: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-3">
-      <Header
-        text="Banner"
-        button={
-          <button className="px-3 py-2  flex items-center  text-white bg-[#d49327] transition-transform duration-200 ease-in-out hover:scale-105 rounded-lg">
-            <Link className="flex items-center" to={FrontendRoutes.ADDBANNER}>
-              <Icon
-                icon="material-symbols-light:add-rounded"
-                width="24"
-                height="24"
-                className="fill-white"
-              />{" "}
-              Add Banner
-            </Link>
-          </button>
-        }
-      />
+      <Header text="Banner">
+        <button className="px-3 py-2  flex items-center  text-white bg-[#d49327] transition-transform duration-200 ease-in-out hover:scale-105 rounded-lg">
+          <Link className="flex items-center" to={FrontendRoutes.ADDBANNER}>
+            <Icon
+              icon="material-symbols-light:add-rounded"
+              width="24"
+              height="24"
+              className="fill-white"
+            />{" "}
+            Add Banner
+          </Link>
+        </button>
+      </Header>
       <div className="bg-white rounded-lg shadow">
         <Tabs
           defaultValue="home_page"

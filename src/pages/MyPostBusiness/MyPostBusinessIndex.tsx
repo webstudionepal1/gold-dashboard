@@ -121,7 +121,7 @@ const MyPostBusinessIndex = () => {
 
   return (
     <div className="mx-6 my-3">
-      <Header text="Packages" button={""} />
+      <Header text="Packages" />
 
       <div className="bg-[#ffffff] border-[#dcdddf] border-2 rounded-xl">
         <div className="p-4">

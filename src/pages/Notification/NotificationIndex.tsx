@@ -14,14 +14,11 @@ const NotificationIndex = () => {
           </button>
         </div> */}
 
-        <Header
-          text="Notification"
-          button={
-            <button className="px-3 py-2  flex items-center  text-white bg-[#fb4f4c] transition-transform duration-200 ease-in-out hover:scale-105 rounded-lg">
-              Delete
-            </button>
-          }
-        />
+        <Header text="Notification">
+          <button className="px-3 py-2  flex items-center  text-white bg-[#fb4f4c] transition-transform duration-200 ease-in-out hover:scale-105 rounded-lg">
+            Delete
+          </button>
+        </Header>
         <div>
           <NotificationTable />
         </div>

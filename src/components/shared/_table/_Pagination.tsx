@@ -55,7 +55,7 @@ export default function Pagination({
     <div className="flex flex-col gap-2 w-full bg-[#ffffff]">
       <div className="flex items-center justify-between">
         <div className="flex items-center justify-start">
-          <div className="flex items-center gap-2 ">
+          {/* <div className="flex items-center gap-2 ">
             <span className="text-sm text-gray-600">Result per page</span>
             <select
               value={itemsPerPage}
@@ -67,10 +67,13 @@ export default function Pagination({
               <option value={50}>50</option>
               <option value={100}>100</option>
             </select>
+          </div> */}
+          <div className="text-xs text-[#abaaae]">
+            Showing {endItem} of {totalItems} results
           </div>
-          <div className="text-sm text-gray-500 mt-[0.9rem] ml-[0.5rem] mb-4 flex justify-end">
+          {/* <div className="text-sm text-gray-500 mt-[0.9rem] ml-[0.5rem] mb-4 flex justify-end">
             {startItem}-{endItem} of {totalItems}
-          </div>
+          </div> */}
         </div>
         <div className="flex items-center gap-1">
           <button

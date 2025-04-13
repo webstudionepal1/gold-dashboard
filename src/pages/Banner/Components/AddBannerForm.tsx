@@ -57,7 +57,7 @@ const AddBannerForm = () => {
   });
   return (
     <>
-      <div className="mx-8 my-2">
+      <div className="mx-8 my-3">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-semibold">Add New Banner</h1>
           <Breadcrumbs />
@@ -182,7 +182,6 @@ const AddBannerForm = () => {
                       {(field) => (
                         <div className="w-full">
                           <FileDropInput
-                            label="Upload Web Image"
                             value={field.state.value as unknown as File}
                             onChange={(file) => {
                               field.handleChange(file); // store the file directly
@@ -217,7 +216,6 @@ const AddBannerForm = () => {
                       {(field) => (
                         <div className="w-full">
                           <FileDropInput
-                            label="Upload Mobile Image"
                             value={field.state.value as unknown as File}
                             onChange={(file) => {
                               field.handleChange(file); // store the file directly

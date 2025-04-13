@@ -459,23 +459,20 @@ const OrderIndex = () => {
         </Link>
       </div> */}
 
-      <Header
-        text="Order"
-        button={
-          <button className="px-3 py-2  flex items-center  text-white bg-[#d49327] transition-transform duration-200 ease-in-out hover:scale-105 rounded-lg">
-            <Link className="flex items-center" to={FrontendRoutes.ADDORDER}>
-              <Icon
-                icon="material-symbols-light:add-rounded"
-                width="24"
-                height="24"
-                className="fill-white"
-              />{" "}
-              Add Order
-            </Link>
-          </button>
-        }
-      />
-      <div className="bg-[#ffffff] border-[#eae9ec] border-2  rounded-xl ">
+      <Header text="Order">
+        <button className="px-3 py-2  flex items-center  text-white bg-[#d49327] transition-transform duration-200 ease-in-out hover:scale-105 rounded-lg">
+          <Link className="flex items-center" to={FrontendRoutes.ADDORDER}>
+            <Icon
+              icon="material-symbols-light:add-rounded"
+              width="24"
+              height="24"
+              className="fill-white"
+            />{" "}
+            Add Order
+          </Link>
+        </button>
+      </Header>
+      <div className="bg-[#ffffff] border-[#eae9ec] border-2 w-full pb-[2rem] rounded-xl ">
         <Tabs
           value={selectedTab}
           onValueChange={(val) => setSelectedTab(val as keyof typeof tabConfig)}

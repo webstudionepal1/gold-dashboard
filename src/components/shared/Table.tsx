@@ -338,12 +338,40 @@ export const Table = <T extends Record<string, any>>({
                   </tr>
                 )}
               </tbody>
+              {showPagination && (
+                <tfoot>
+                  <tr>
+                    <td
+                      colSpan={
+                        columns.length +
+                        (showSelectAll ? 1 : 0) +
+                        (showAction ? 1 : 0)
+                      }
+                      className="py-4"
+                    >
+                      <div className="flex justify-between items-center w-full px-6">
+                        <Pagination
+                          currentPage={paginationDetails?.currentPage ?? 1}
+                          itemsPerPage={paginationDetails?.limit ?? 10}
+                          totalItems={
+                            paginationDetails?.totalCount ?? totalCount ?? 0
+                          }
+                          onItemsPerPageChange={(page: number) =>
+                            onItemsPerPageChange?.(page)
+                          }
+                          onPageChange={(page: number) => onPageChange?.(page)}
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                </tfoot>
+              )}
             </table>
           </section>
         </div>
       </div>
 
-      {showPagination && (
+      {/* {showPagination && (
         <section className="flex flex-col bg-[#ffffff] mt-2 " id="pagination">
           <Pagination
             currentPage={paginationDetails?.currentPage ?? 1}
@@ -355,7 +383,7 @@ export const Table = <T extends Record<string, any>>({
             onPageChange={(page: number) => onPageChange?.(page)}
           />
         </section>
-      )}
+      )} */}
 
       <DeleteDialog
         confirmAction={showDeleteDialog}

@@ -204,7 +204,7 @@ const CompletedOrder: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-3">
-      <Header text="Completed Orders" button={""} />
+      <Header text="Completed Orders" />
 
       <div className="bg-[#ffffff] p-4 border-[#eae9ec] border-2  rounded-xl">
         <SearchFilterSort

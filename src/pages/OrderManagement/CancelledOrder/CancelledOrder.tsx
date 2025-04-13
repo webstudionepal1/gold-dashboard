@@ -216,7 +216,7 @@ const CancelledOrder: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-3">
-      <Header text="Cancelled Orders" button={""} />
+      <Header text="Cancelled Orders" />
 
       <div className="bg-[#ffffff] p-4 border-[#eae9ec] border-2  rounded-xl">
         <SearchFilterSort
