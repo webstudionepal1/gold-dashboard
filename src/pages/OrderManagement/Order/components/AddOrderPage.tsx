@@ -157,7 +157,7 @@
 
 // The code above works which is using @tanstack/react-form with zod
 
-import { useForm, useField } from "@tanstack/react-form";
+import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
 
 import { InputField } from "../../../../components/shared/form_components/InputField";
@@ -165,18 +165,9 @@ import { DropdownField } from "../../../../components/shared/form_components/Dro
 import Breadcrumbs from "../../../../components/shared/Breadcrumb";
 import { PriceInputField } from "./PriceInputField";
 import FileDropInput from "../../../../components/shared/form_components/FileDropInput";
-import { jsx } from "react/jsx-runtime";
+
 import ToggleSlider from "../../../../components/shared/form_components/ToggleSlider";
 import { useState } from "react";
-
-// Define categories directly here
-const categories = [
-  { value: "electronics", label: "Electronics" },
-  { value: "clothing", label: "Clothing" },
-  { value: "books", label: "Books" },
-  { value: "furniture", label: "Furniture" },
-  { value: "groceries", label: "Groceries" },
-];
 
 const AddOrderSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -203,8 +194,6 @@ const AddOrderSchema = z.object({
   category: z.string().min(1, "Select a category"),
   stock: z.coerce.number().min(0, "Stock must be a non-negative number"),
 });
-
-type AddOrderValues = z.infer<typeof AddOrderSchema>;
 
 const FieldError = ({ field }: { field: any }) => {
   if (field.state.meta.errors.length > 0) {
@@ -261,10 +250,7 @@ export default function AddOrderForm() {
 
   // Slider component
   const [isEnabled, setIsEnabled] = useState(false);
-  const paymentStatusField = useField({
-    form: form as any,
-    name: "payment_status",
-  });
+
   return (
     <>
       <div className="mx-4 my-2">
@@ -598,7 +584,7 @@ export default function AddOrderForm() {
                         required
                         value={field.state.value}
                         onChange={(e) =>
-                          field.handleChange(Number(e.target.value))
+                          field.handleChange(e.target.value as any)
                         }
                       />
                       <FieldError field={field} />
@@ -644,10 +630,11 @@ export default function AddOrderForm() {
                   </h1>
                   <div className="flex items-center gap-4">
                     <h1
-                      className={`text-base px-5 py-1 rounded-xl font-medium ${isEnabled
+                      className={`text-base px-5 py-1 rounded-xl font-medium ${
+                        isEnabled
                           ? "bg-[#e9fbef] text-[#67c492]"
                           : "bg-[#feeeee] text-[#dd667a]"
-                        }`}
+                      }`}
                     >
                       {isEnabled ? "Paid" : "Unpaid"}
                     </h1>
