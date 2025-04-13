@@ -42,6 +42,25 @@ interface VoucherFormProps {
   }) => void;
 }
 
+const FieldError = ({ field }: { field: any }) => {
+  if (field.state.meta.errors.length > 0) {
+    const error = field.state.meta.errors[0];
+
+    const errorMessage =
+      typeof error === "string"
+        ? error
+        : error.message || JSON.stringify(error);
+
+    return (
+      <div className="min-h-[20px]">
+        <span className="text-xs text-red">{errorMessage}</span>
+      </div>
+    );
+  }
+
+  return <div className="min-h-[20px]"></div>;
+};
+
 export const VoucherForm: React.FC<VoucherFormProps> = ({
   closeModal,
   initialValues = {
@@ -89,17 +108,7 @@ export const VoucherForm: React.FC<VoucherFormProps> = ({
       </p>
 
       <section className="flex flex-col gap-6">
-        <form.Field
-          name="code"
-          validators={{
-            onChange: ({ value }) => {
-              const result = voucherSchema.shape.code.safeParse(value);
-              return result.success
-                ? undefined
-                : result.error.errors[0].message;
-            },
-          }}
-        >
+        <form.Field name="code">
           {(field) => (
             <div className="w-full">
               <InputField
@@ -108,13 +117,7 @@ export const VoucherForm: React.FC<VoucherFormProps> = ({
                 onChange={(e) => field.handleChange(e.target.value)}
                 placeholder="e.g Christmas Sale"
               />
-              {field.state.meta.errors.length > 0 && (
-                <p className="text-sm text-red  mt-1">
-                  {typeof field.state.meta.errors[0] === "string"
-                    ? field.state.meta.errors[0]
-                    : (field.state.meta.errors[0] as any)?.message}
-                </p>
-              )}
+              <FieldError field={field} />
             </div>
           )}
         </form.Field>
@@ -122,17 +125,7 @@ export const VoucherForm: React.FC<VoucherFormProps> = ({
 
         {/* Dropdown Row */}
         <div className="flex gap-4 w-full">
-          <form.Field
-            name="type"
-            validators={{
-              onChange: ({ value }) => {
-                const result = voucherSchema.shape.type.safeParse(value);
-                return result.success
-                  ? undefined
-                  : result.error.errors[0].message;
-              },
-            }}
-          >
+          <form.Field name="type">
             {(field) => (
               <div className="w-1/2">
                 <DropdownField
@@ -145,28 +138,12 @@ export const VoucherForm: React.FC<VoucherFormProps> = ({
                   onChange={(e) => field.handleChange(e.target.value)}
                   inputClassname="w-full"
                 />
-                {field.state.meta.errors.length > 0 && (
-                  <p className="text-sm text-red  mt-1">
-                    {typeof field.state.meta.errors[0] === "string"
-                      ? field.state.meta.errors[0]
-                      : (field.state.meta.errors[0] as any)?.message}
-                  </p>
-                )}
+                <FieldError field={field} />
               </div>
             )}
           </form.Field>
 
-          <form.Field
-            name="discount"
-            validators={{
-              onChange: ({ value }) => {
-                const result = voucherSchema.shape.discount.safeParse(value);
-                return result.success
-                  ? undefined
-                  : result.error.errors[0].message;
-              },
-            }}
-          >
+          <form.Field name="discount">
             {(field) => (
               <div className="w-1/2">
                 <DropdownField
@@ -179,13 +156,7 @@ export const VoucherForm: React.FC<VoucherFormProps> = ({
                   onChange={(e) => field.handleChange(e.target.value)}
                   inputClassname="w-full"
                 />
-                {field.state.meta.errors.length > 0 && (
-                  <p className="text-sm text-red  mt-1">
-                    {typeof field.state.meta.errors[0] === "string"
-                      ? field.state.meta.errors[0]
-                      : (field.state.meta.errors[0] as any)?.message}
-                  </p>
-                )}
+                <FieldError field={field} />
               </div>
             )}
           </form.Field>
@@ -194,17 +165,7 @@ export const VoucherForm: React.FC<VoucherFormProps> = ({
 
         {/* Date Inputs Row */}
         <div className="flex gap-4 w-full">
-          <form.Field
-            name="startDate"
-            validators={{
-              onChange: ({ value }) => {
-                const result = voucherSchema.shape.startDate.safeParse(value);
-                return result.success
-                  ? undefined
-                  : result.error.errors[0].message;
-              },
-            }}
-          >
+          <form.Field name="startDate">
             {(field) => (
               <div className="w-1/2">
                 <InputField
@@ -213,28 +174,12 @@ export const VoucherForm: React.FC<VoucherFormProps> = ({
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
                 />
-                {field.state.meta.errors.length > 0 && (
-                  <p className="text-sm text-red  mt-1">
-                    {typeof field.state.meta.errors[0] === "string"
-                      ? field.state.meta.errors[0]
-                      : (field.state.meta.errors[0] as any)?.message}
-                  </p>
-                )}
+                <FieldError field={field} />
               </div>
             )}
           </form.Field>
 
-          <form.Field
-            name="endDate"
-            validators={{
-              onChange: ({ value }) => {
-                const result = voucherSchema.shape.endDate.safeParse(value);
-                return result.success
-                  ? undefined
-                  : result.error.errors[0].message;
-              },
-            }}
-          >
+          <form.Field name="endDate">
             {(field) => (
               <div className="w-1/2">
                 <InputField
@@ -243,13 +188,7 @@ export const VoucherForm: React.FC<VoucherFormProps> = ({
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
                 />
-                {field.state.meta.errors.length > 0 && (
-                  <p className="text-sm text-red  mt-1">
-                    {typeof field.state.meta.errors[0] === "string"
-                      ? field.state.meta.errors[0]
-                      : (field.state.meta.errors[0] as any)?.message}
-                  </p>
-                )}
+                <FieldError field={field} />
               </div>
             )}
           </form.Field>

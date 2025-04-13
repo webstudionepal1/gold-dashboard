@@ -14,8 +14,10 @@ import {
 } from "../../components/shared/tab";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Modal } from "../../components/shared";
-import { HomePageBannerForm } from "./Components/HomePageBannerForm";
-import { OtherPageBannerForm } from "./Components/OtherPageBannerForm";
+
+import { Link } from "react-router-dom";
+import { FrontendRoutes } from "../../routes/routes";
+import Header from "../../components/shared/table_heading/Header";
 
 interface BannerItem {
   _id: string;
@@ -229,24 +231,23 @@ const BannerIndex: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 ">Banner List</h1>
-        <button
-          onClick={handleAddBannerClick}
-          className="bg-[#e38b29] flex items-center transition-transform duration-200 ease-in-out hover:scale-105 text-white rounded-lg px-3 py-2"
-        >
-          <Icon
-            icon="material-symbols-light:add-rounded"
-            width="24"
-            height="24"
-            className="fill-white"
-          />{" "}
-          {selectedTab === "home_page"
-            ? "Add Home Page Banner"
-            : "Add Other Page Banner"}
-        </button>
-      </div>
+    <div className="container mx-auto px-4 py-3">
+      <Header
+        text="Banner"
+        button={
+          <button className="px-3 py-2  flex items-center  text-white bg-[#d49327] transition-transform duration-200 ease-in-out hover:scale-105 rounded-lg">
+            <Link className="flex items-center" to={FrontendRoutes.ADDBANNER}>
+              <Icon
+                icon="material-symbols-light:add-rounded"
+                width="24"
+                height="24"
+                className="fill-white"
+              />{" "}
+              Add Banner
+            </Link>
+          </button>
+        }
+      />
       <div className="bg-white rounded-lg shadow">
         <Tabs
           defaultValue="home_page"
@@ -293,37 +294,6 @@ const BannerIndex: React.FC = () => {
           </TabsContent>
         </Tabs>
       </div>
-      {isModalOpen && (
-        <Modal>
-          {selectedTab === "home_page" ? (
-            <HomePageBannerForm
-              closeModal={handleCloseModal}
-              initialValues={{
-                banner_title: "",
-                description: "",
-                select_by: "",
-                priority: 0,
-                web_image: undefined,
-                mobile_image: undefined,
-              }}
-              onSubmit={(data) => console.log(data)}
-            />
-          ) : (
-            <OtherPageBannerForm
-              initialValues={{
-                banner_title: "",
-                description: "",
-                select_by: "",
-                priority: 0,
-                web_image: undefined,
-                mobile_image: undefined,
-              }}
-              closeModal={handleCloseModal}
-              onSubmit={(data) => console.log(data)}
-            />
-          )}
-        </Modal>
-      )}
 
       {isViewModalOpen && (
         <Modal>

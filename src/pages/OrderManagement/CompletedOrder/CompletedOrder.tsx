@@ -8,6 +8,7 @@ import {
 } from "../../../components/shared/Table";
 import { useOutsideClick } from "../../../hooks/UseOutsideClick";
 import { SearchFilterSort } from "../../../components/global/SearchFilterSort";
+import Header from "../../../components/shared/table_heading/Header";
 interface Order {
   _id: string;
   orderId: string;
@@ -202,12 +203,10 @@ const CompletedOrder: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Completed Orders</h1>
-      </div>
+    <div className="container mx-auto px-4 py-3">
+      <Header text="Completed Orders" button={""} />
 
-      <div className="bg-white p-4">
+      <div className="bg-[#ffffff] p-4 border-[#eae9ec] border-2  rounded-xl">
         <SearchFilterSort
           onSearch={handleSearch}
           onFilter={handleFilter}

@@ -14,6 +14,7 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import { SearchFilterSort } from "../../../components/global/SearchFilterSort";
 import { Link } from "react-router-dom";
 import { FrontendRoutes } from "../../../routes/routes";
+import Header from "../../../components/shared/table_heading/Header";
 
 // Dummy datasets
 
@@ -441,8 +442,8 @@ const OrderIndex = () => {
   const { data, columns } = tabConfig[selectedTab];
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="mt-2 mb-6 flex items-center justify-between">
+    <div className="container mx-auto px-4 py-3 ">
+      {/* <div className="mt-2 mb-6 flex items-center justify-between">
         <h1 className="font-semibold text-3xl">Orders</h1>
         <Link
           to={FrontendRoutes.ADDORDER}
@@ -456,14 +457,31 @@ const OrderIndex = () => {
           />{" "}
           Add Orders
         </Link>
-      </div>
-      <div className="bg-[#ffffff] border-[#eae9ec] border-2 rounded-xl ">
+      </div> */}
+
+      <Header
+        text="Order"
+        button={
+          <button className="px-3 py-2  flex items-center  text-white bg-[#d49327] transition-transform duration-200 ease-in-out hover:scale-105 rounded-lg">
+            <Link className="flex items-center" to={FrontendRoutes.ADDORDER}>
+              <Icon
+                icon="material-symbols-light:add-rounded"
+                width="24"
+                height="24"
+                className="fill-white"
+              />{" "}
+              Add Order
+            </Link>
+          </button>
+        }
+      />
+      <div className="bg-[#ffffff] border-[#eae9ec] border-2  rounded-xl ">
         <Tabs
           value={selectedTab}
           onValueChange={(val) => setSelectedTab(val as keyof typeof tabConfig)}
           className="w-full"
         >
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col md:flex-row items-center justify-between w-full">
             <TabsList>
               <TabsTrigger
                 value="all"
@@ -502,7 +520,8 @@ const OrderIndex = () => {
               />
             </div>
           </div>
-          <TabsContent value={selectedTab}>
+
+          <TabsContent className="mx-3 " value={selectedTab}>
             <Table
               data={data}
               columns={columns}

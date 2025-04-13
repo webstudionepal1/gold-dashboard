@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { SearchFilterSort } from "../../components/global/SearchFilterSort";
 import { Table, ColumnConfig, TableData } from "../../components/shared/Table";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import Header from "../../components/shared/table_heading/Header";
 
 interface PostBusinessItem {
   _id: string;
@@ -119,8 +120,8 @@ const MyPostBusinessIndex = () => {
   ];
 
   return (
-    <div className="mx-6 my-2">
-      <h1 className="text-3xl font-semibold mb-8">Packages</h1>
+    <div className="mx-6 my-3">
+      <Header text="Packages" button={""} />
 
       <div className="bg-[#ffffff] border-[#dcdddf] border-2 rounded-xl">
         <div className="p-4">

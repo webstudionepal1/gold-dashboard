@@ -24,6 +24,7 @@ import { AttributeForm } from "./components/AttributeForm";
 import { VoucherForm } from "./components/VoucherForm";
 import { DiscountForm } from "./components/DiscountForm/DiscountForm";
 import { DiscountModal } from "./components/DiscountModal";
+import Header from "../../components/shared/table_heading/Header";
 
 interface GeneralItem {
   _id: string;
@@ -513,16 +514,28 @@ const AttributeIndex: React.FC = () => {
     );
   };
   return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 ">Attribute</h1>
+    <div className="container mx-auto px-4 py-3">
+      <Header
+        text="Attribute"
+        button={
+          <button
+            onClick={handleAddButtonClick}
+            className="px-3 py-2  flex items-center  text-white bg-[#d49327] transition-transform duration-200 ease-in-out hover:scale-105 rounded-lg"
+          >
+            {renderButtonText()}
+          </button>
+        }
+      />
+      <div className="flex items-center justify-between ">
+        {/* <h1 className="text-2xl font-bold text-gray-800 ">Attribute</h1>
 
         <button
           onClick={handleAddButtonClick}
           className="px-3 py-2  flex items-center  text-white bg-[#d49327] transition-transform duration-200 ease-in-out hover:scale-105 rounded-lg"
         >
           {renderButtonText()}
-        </button>
+        </button> */}
+
         {isAttributeModalOpen && (
           <Modal>
             <AttributeForm

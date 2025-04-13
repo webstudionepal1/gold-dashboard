@@ -49,6 +49,26 @@ interface individualDiscountFormProps {
   onSubmit: (data: Iinitial) => void;
   mode: string;
 }
+
+const FieldError = ({ field }: { field: any }) => {
+  if (field.state.meta.errors.length > 0) {
+    const error = field.state.meta.errors[0];
+
+    const errorMessage =
+      typeof error === "string"
+        ? error
+        : error.message || JSON.stringify(error);
+
+    return (
+      <div className="min-h-[20px]">
+        <span className="text-xs text-red">{errorMessage}</span>
+      </div>
+    );
+  }
+
+  return <div className="min-h-[20px]"></div>;
+};
+
 export const IndividualDiscountForm: React.FC<individualDiscountFormProps> = ({
   closeModal,
   initialValues = {
@@ -91,24 +111,9 @@ export const IndividualDiscountForm: React.FC<individualDiscountFormProps> = ({
       }}
       className="px-10 py-6 flex flex-col gap-8"
     >
-      <p className="text-lg font-bold text-center text-[#1a1336]">
-        {isEditing ? "Edit Attribute" : "Add Attribute"}
-      </p>
-
       <section className="flex flex-col gap-6 w-full">
         <div>
-          <form.Field
-            name="product"
-            validators={{
-              onChange: ({ value }) => {
-                const result =
-                  individualDiscountSchema.shape.product.safeParse(value);
-                return result.success
-                  ? undefined
-                  : result.error.errors[0].message;
-              },
-            }}
-          >
+          <form.Field name="product">
             {(field) => (
               <div className="w-full">
                 <InputField
@@ -119,13 +124,7 @@ export const IndividualDiscountForm: React.FC<individualDiscountFormProps> = ({
                   onChange={(e) => field.handleChange(e.target.value)}
                 />
 
-                {field.state.meta.errors.length > 0 && (
-                  <p className="text-sm text-red  mt-1">
-                    {typeof field.state.meta.errors[0] === "string"
-                      ? field.state.meta.errors[0]
-                      : (field.state.meta.errors[0] as any)?.message}
-                  </p>
-                )}
+                <FieldError field={field} />
               </div>
             )}
           </form.Field>
@@ -133,18 +132,7 @@ export const IndividualDiscountForm: React.FC<individualDiscountFormProps> = ({
         <div className="border-b border-[#dedde2] w-full mb-2 "></div>
 
         <div className="flex items-center gap-4 w-full">
-          <form.Field
-            name="type"
-            validators={{
-              onChange: ({ value }) => {
-                const result =
-                  individualDiscountSchema.shape.type.safeParse(value);
-                return result.success
-                  ? undefined
-                  : result.error.errors[0].message;
-              },
-            }}
-          >
+          <form.Field name="type">
             {(field) => (
               <div className="w-full">
                 <DropdownField
@@ -160,29 +148,12 @@ export const IndividualDiscountForm: React.FC<individualDiscountFormProps> = ({
                   onChange={(e) => field.handleChange(e.target.value)}
                   inputClassname="w-full"
                 />
-                {field.state.meta.errors.length > 0 && (
-                  <p className="text-sm text-red mt-1">
-                    {typeof field.state.meta.errors[0] === "string"
-                      ? field.state.meta.errors[0]
-                      : (field.state.meta.errors[0] as any)?.message}
-                  </p>
-                )}
+                <FieldError field={field} />
               </div>
             )}
           </form.Field>
 
-          <form.Field
-            name="discount"
-            validators={{
-              onChange: ({ value }) => {
-                const result =
-                  individualDiscountSchema.shape.discount.safeParse(value);
-                return result.success
-                  ? undefined
-                  : result.error.errors[0].message;
-              },
-            }}
-          >
+          <form.Field name="discount">
             {(field) => (
               <div className="w-full">
                 <DropdownField
@@ -198,13 +169,7 @@ export const IndividualDiscountForm: React.FC<individualDiscountFormProps> = ({
                   onChange={(e) => field.handleChange(e.target.value)}
                   inputClassname="w-full"
                 />
-                {field.state.meta.errors.length > 0 && (
-                  <p className="text-sm text-red mt-1">
-                    {typeof field.state.meta.errors[0] === "string"
-                      ? field.state.meta.errors[0]
-                      : (field.state.meta.errors[0] as any)?.message}
-                  </p>
-                )}
+                <FieldError field={field} />
               </div>
             )}
           </form.Field>
@@ -213,18 +178,7 @@ export const IndividualDiscountForm: React.FC<individualDiscountFormProps> = ({
         <div className="border-b border-[#dedde2] w-full"></div>
 
         <div className="flex items-center gap-4">
-          <form.Field
-            name="start_date"
-            validators={{
-              onChange: ({ value }) => {
-                const result =
-                  individualDiscountSchema.shape.start_date.safeParse(value);
-                return result.success
-                  ? undefined
-                  : result.error.errors[0].message;
-              },
-            }}
-          >
+          <form.Field name="start_date">
             {(field) => (
               <div className="w-full">
                 <InputField
@@ -235,30 +189,12 @@ export const IndividualDiscountForm: React.FC<individualDiscountFormProps> = ({
                   onChange={(e) => field.handleChange(e.target.value)}
                 />
 
-                {field.state.meta.errors.length > 0 && (
-                  <p className="text-sm text-red  mt-1">
-                    {typeof field.state.meta.errors[0] === "string"
-                      ? field.state.meta.errors[0]
-                      : (field.state.meta.errors[0] as any)?.message}
-                  </p>
-                )}
+                <FieldError field={field} />
               </div>
             )}
           </form.Field>
 
-          <form.Field
-            name="end_date"
-            validators={{
-              onChange: ({ value }) => {
-                const result =
-                  individualDiscountSchema.shape.end_date.safeParse(value);
-
-                return result.success
-                  ? undefined
-                  : result.error.errors[0].message;
-              },
-            }}
-          >
+          <form.Field name="end_date">
             {(field) => (
               <div className="w-full">
                 <InputField
@@ -272,13 +208,7 @@ export const IndividualDiscountForm: React.FC<individualDiscountFormProps> = ({
                   onChange={(e) => field.handleChange(e.target.value)}
                 />
 
-                {field.state.meta.errors.length > 0 && (
-                  <p className="text-sm text-red  mt-1">
-                    {typeof field.state.meta.errors[0] === "string"
-                      ? field.state.meta.errors[0]
-                      : (field.state.meta.errors[0] as any)?.message}
-                  </p>
-                )}
+                <FieldError field={field} />
               </div>
             )}
           </form.Field>
@@ -302,18 +232,7 @@ export const IndividualDiscountForm: React.FC<individualDiscountFormProps> = ({
                   Remove
                 </button>
               </div>
-              <form.Field
-                name="product"
-                validators={{
-                  onChange: ({ value }) => {
-                    const result =
-                      individualDiscountSchema.shape.product.safeParse(value);
-                    return result.success
-                      ? undefined
-                      : result.error.errors[0].message;
-                  },
-                }}
-              >
+              <form.Field name="product">
                 {(field) => (
                   <div className="w-full">
                     <InputField
@@ -324,13 +243,7 @@ export const IndividualDiscountForm: React.FC<individualDiscountFormProps> = ({
                       onChange={(e) => field.handleChange(e.target.value)}
                     />
 
-                    {field.state.meta.errors.length > 0 && (
-                      <p className="text-sm text-red  mt-1">
-                        {typeof field.state.meta.errors[0] === "string"
-                          ? field.state.meta.errors[0]
-                          : (field.state.meta.errors[0] as any)?.message}
-                      </p>
-                    )}
+                    <FieldError field={field} />
                   </div>
                 )}
               </form.Field>
@@ -338,18 +251,7 @@ export const IndividualDiscountForm: React.FC<individualDiscountFormProps> = ({
             <div className="border-b border-[#dedde2] w-full mb-2 "></div>
 
             <div className="flex items-center gap-4 w-full">
-              <form.Field
-                name="type"
-                validators={{
-                  onChange: ({ value }) => {
-                    const result =
-                      individualDiscountSchema.shape.type.safeParse(value);
-                    return result.success
-                      ? undefined
-                      : result.error.errors[0].message;
-                  },
-                }}
-              >
+              <form.Field name="type">
                 {(field) => (
                   <div className="w-full">
                     <DropdownField
@@ -365,29 +267,12 @@ export const IndividualDiscountForm: React.FC<individualDiscountFormProps> = ({
                       onChange={(e) => field.handleChange(e.target.value)}
                       inputClassname="w-full"
                     />
-                    {field.state.meta.errors.length > 0 && (
-                      <p className="text-sm text-red mt-1">
-                        {typeof field.state.meta.errors[0] === "string"
-                          ? field.state.meta.errors[0]
-                          : (field.state.meta.errors[0] as any)?.message}
-                      </p>
-                    )}
+                    <FieldError field={field} />
                   </div>
                 )}
               </form.Field>
 
-              <form.Field
-                name="discount"
-                validators={{
-                  onChange: ({ value }) => {
-                    const result =
-                      individualDiscountSchema.shape.discount.safeParse(value);
-                    return result.success
-                      ? undefined
-                      : result.error.errors[0].message;
-                  },
-                }}
-              >
+              <form.Field name="discount">
                 {(field) => (
                   <div className="w-full">
                     <DropdownField
@@ -403,13 +288,7 @@ export const IndividualDiscountForm: React.FC<individualDiscountFormProps> = ({
                       onChange={(e) => field.handleChange(e.target.value)}
                       inputClassname="w-full"
                     />
-                    {field.state.meta.errors.length > 0 && (
-                      <p className="text-sm text-red mt-1">
-                        {typeof field.state.meta.errors[0] === "string"
-                          ? field.state.meta.errors[0]
-                          : (field.state.meta.errors[0] as any)?.message}
-                      </p>
-                    )}
+                    <FieldError field={field} />
                   </div>
                 )}
               </form.Field>
@@ -418,20 +297,7 @@ export const IndividualDiscountForm: React.FC<individualDiscountFormProps> = ({
             <div className="border-b border-[#dedde2] w-full"></div>
 
             <div className="flex items-center gap-4">
-              <form.Field
-                name="start_date"
-                validators={{
-                  onChange: ({ value }) => {
-                    const result =
-                      individualDiscountSchema.shape.start_date.safeParse(
-                        value
-                      );
-                    return result.success
-                      ? undefined
-                      : result.error.errors[0].message;
-                  },
-                }}
-              >
+              <form.Field name="start_date">
                 {(field) => (
                   <div className="w-full">
                     <InputField
@@ -442,30 +308,12 @@ export const IndividualDiscountForm: React.FC<individualDiscountFormProps> = ({
                       onChange={(e) => field.handleChange(e.target.value)}
                     />
 
-                    {field.state.meta.errors.length > 0 && (
-                      <p className="text-sm text-red  mt-1">
-                        {typeof field.state.meta.errors[0] === "string"
-                          ? field.state.meta.errors[0]
-                          : (field.state.meta.errors[0] as any)?.message}
-                      </p>
-                    )}
+                    <FieldError field={field} />
                   </div>
                 )}
               </form.Field>
 
-              <form.Field
-                name="end_date"
-                validators={{
-                  onChange: ({ value }) => {
-                    const result =
-                      individualDiscountSchema.shape.end_date.safeParse(value);
-
-                    return result.success
-                      ? undefined
-                      : result.error.errors[0].message;
-                  },
-                }}
-              >
+              <form.Field name="end_date">
                 {(field) => (
                   <div className="w-full">
                     <InputField
@@ -479,13 +327,7 @@ export const IndividualDiscountForm: React.FC<individualDiscountFormProps> = ({
                       onChange={(e) => field.handleChange(e.target.value)}
                     />
 
-                    {field.state.meta.errors.length > 0 && (
-                      <p className="text-sm text-red  mt-1">
-                        {typeof field.state.meta.errors[0] === "string"
-                          ? field.state.meta.errors[0]
-                          : (field.state.meta.errors[0] as any)?.message}
-                      </p>
-                    )}
+                    <FieldError field={field} />
                   </div>
                 )}
               </form.Field>

@@ -23,6 +23,7 @@ import MyPostBusinessIndex from "../pages/MyPostBusiness/MyPostBusinessIndex";
 import ConfirmedOrder from "../pages/OrderManagement/ConfirmedOrder/ConfirmedOrder";
 import OrderIndex from "../pages/OrderManagement/Order/OrderIndex";
 import AddOrderForm from "../pages/OrderManagement/Order/components/AddOrderPage";
+import AddBannerForm from "../pages/Banner/Components/AddBannerForm";
 
 export const routesConfig = [
   {
@@ -120,6 +121,10 @@ export const routesConfig = [
   {
     path: FrontendRoutes.BANNER,
     element: <BannerIndex />,
+  },
+  {
+    path: FrontendRoutes.ADDBANNER,
+    element: <AddBannerForm />,
   },
   {
     path: FrontendRoutes.NOTIFICATION,

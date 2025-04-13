@@ -21,6 +21,7 @@ export const FrontendRoutes = {
   SUPPLIERS: "/inventory/suppliers",
   ATTRIBUTES: "/attribute",
   BANNER: "/banner",
+  ADDBANNER: "/banner/add-banner",
   NOTIFICATION: "/notification",
   MYPOSTBUSINESS: "/my-post-business",
 };
