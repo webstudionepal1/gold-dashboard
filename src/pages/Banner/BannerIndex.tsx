@@ -255,7 +255,7 @@ const BannerIndex: React.FC = () => {
           className="w-full"
         >
           {/* Container for both TabsList and SearchFilterSort */}
-          <div className="flex items-center justify-between border-b">
+          <div className="flex items-center justify-between ">
             <TabsList className="bg-transparent p-0 h-auto">
               <TabsTrigger
                 value="home_page"

@@ -310,13 +310,6 @@ const AttributeIndex: React.FC = () => {
     {
       header: "Attribute Category",
       key: "name",
-      render: (_, row) => (
-        <div className="flex items-center">
-          <div>
-            <div className="font-medium text-gray-900">{row.name}</div>
-          </div>
-        </div>
-      ),
     },
 
     {
@@ -348,7 +341,7 @@ const AttributeIndex: React.FC = () => {
         }}
         onItemsPerPageChange={handleItemsPerPageChange}
         onPageChange={handlePageChange}
-        showBg={true}
+        showBg={false}
       />
     );
   };
@@ -772,7 +765,7 @@ const AttributeIndex: React.FC = () => {
           onValueChange={handleTabChange}
           className="w-full"
         >
-          <div className="flex items-center justify-between border-b">
+          <div className="flex items-center justify-between ">
             <TabsList className="bg-transparent p-0 h-auto">
               <TabsTrigger
                 value="general"
