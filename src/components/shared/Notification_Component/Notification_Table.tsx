@@ -163,7 +163,7 @@ const NotificationTable = () => {
           </div>
           <div className="border-b border-[#dedde2] w-full my-2"></div>
 
-          <div>
+          <div className="my-2">
             <Pagination
               totalItems={totalItems}
               itemsPerPage={itemsPerPage}

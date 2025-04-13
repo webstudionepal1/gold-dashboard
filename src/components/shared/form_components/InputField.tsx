@@ -44,11 +44,11 @@ export const InputField = React.forwardRef<
         className={twMerge(
           `${border && "border"} border-grey-200 ${
             defaultPadding && "py-3 px-4"
-          } rounded ${
+          } rounded-xl ${
             readonly
               ? "placeholder:text-[#95949a] cursor-auto"
-              : "text-[#95949a]"
-          } outline-none w-full ${inputClassName} `
+              : "text-[#86878d]"
+          } outline-none w-full ${inputClassName} bg-[#f6f7f9] `
         )}
         readOnly={readonly}
         {...other}

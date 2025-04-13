@@ -123,7 +123,7 @@ const MyPostBusinessIndex = () => {
     <div className="mx-6 my-3">
       <Header text="Packages" />
 
-      <div className="bg-[#ffffff] border-[#dcdddf] border-2 rounded-xl">
+      <div className="bg-[#ffffff] border-[#dcdddf] pb-[1rem] border-2 rounded-xl">
         <div className="p-4">
           <SearchFilterSort
             onSearch={handleSearch}

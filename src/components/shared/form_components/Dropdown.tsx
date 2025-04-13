@@ -72,7 +72,7 @@ export const DropdownField = React.forwardRef<
       <select
         ref={ref}
         className={twMerge(
-          `border border-grey-200 py-3 px-4 rounded text-[#95949a] outline-none ${inputClassname}`
+          `border border-grey-200 py-3 px-4 rounded-xl text-[#95949a] bg-[#f6f8f8] outline-none ${inputClassname}`
         )}
         {...other}
       >
@@ -90,4 +90,3 @@ export const DropdownField = React.forwardRef<
 );
 
 DropdownField.displayName = "DropdownField";
-
