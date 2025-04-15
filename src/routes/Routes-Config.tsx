@@ -1,8 +1,7 @@
 import { LoginPage } from "../pages";
-import CustomerList from "../pages/Customer/CustomerList/CustomerList";
-import CustomerDetail from "../pages/Customer/CustomerView/CustomerView";
+
 import { DashboardPage } from "../pages/Dashboard/Dashboard";
-import AddCustomerForm from "../pages/Customer/AddCustomerForm/AddCustomerForm";
+
 import InventoryOverview from "../pages/Inventory/InventoryOverview/InventoryOverview";
 import Purchase from "../pages/Inventory/PurchaseManagement/Purchase";
 import PurchaseReturn from "../pages/Inventory/PurchaseManagement/PurchaseReturn";
@@ -16,15 +15,16 @@ import ProductDescription from "../pages/Product/ProductList/[id]/ProdectDescrip
 import ProductList from "../pages/Product/ProductList/ProductList";
 import { ProductCategory } from "../pages/Product/ProductCategory/ProductCategory";
 import Productsubcategory from "../pages/Product/ProductSubcategory/ProductSubCategory";
-import VerifyCashPayment from "../pages/transaction/VerifyCashPayment";
-import Transaction from "../pages/transaction/Transaction";
-import Expenses from "../pages/financeandexpenses /Expenses";
-import Cashflow from "../pages/financeandexpenses /Cashflow";
-import ProfitandLoss from "../pages/financeandexpenses /ProfitandLoss";
-import OrderReport from "../pages/analytics/OrderReport";
-import SalesReport from "../pages/analytics/SalesReport";
-import StoreReport from "../pages/analytics/StoreReport";
-import SettingForm from "../pages/settings/SettingForm";
+import AttributeIndex from "../pages/Attribute/AttributeIndex";
+import BannerIndex from "../pages/Banner/BannerIndex";
+import NotificationIndex from "../pages/Notification/NotificationIndex";
+import MyPostBusinessIndex from "../pages/MyPostBusiness/MyPostBusinessIndex";
+import ConfirmedOrder from "../pages/OrderManagement/ConfirmedOrder/ConfirmedOrder";
+import OrderIndex from "../pages/OrderManagement/Order/OrderIndex";
+import AddOrderForm from "../pages/OrderManagement/Order/components/AddOrderPage";
+import AddBannerForm from "../pages/Banner/Components/AddBannerForm";
+import CustomerIndex from "../pages/Customer/CustomerIndex";
+import AddCustomerForm from "../pages/Customer/components/AddCustomerForm";
 
 export const routesConfig = [
   {
@@ -106,10 +106,8 @@ export const routesConfig = [
     path: FrontendRoutes.SUPPLIERS,
     element: <Suppliers />,
   },
-  {
-    path: FrontendRoutes.TRANSACTION,
-    element: <Transaction />,
-  }, // Attributes
+
+  // Attributes
   {
     path: FrontendRoutes.ATTRIBUTES,
     element: <AttributeIndex />,
