@@ -46,11 +46,11 @@ const Field: React.FC<FieldProps> = ({
           {...field}
           type={type}
           placeholder={placeholder}
-          className="border border-slate-400 rounded-lg bg-[#d3dae3] opacity-30 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:font-semibold placeholder:text-slate-800"
+          className="border border-slate-400 rounded-lg bg-[#d3dae3] opacity-30 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:font-medium placeholder:text-black"
         />
       )}
       {meta.touched && meta.error && (
-        <span className="text-red-500 text-sm">{meta.error}</span>
+        <span className="text-[#e96363] text-sm">{meta.error}</span>
       )}
     </div>
   );

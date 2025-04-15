@@ -10,9 +10,13 @@ import {
 } from "../../components/shared/tab";
 
 import { useOutsideClick } from "../../hooks/UseOutsideClick";
+import InvoiceSlip from "./components/InvoiceSlip";
+import { Icon } from "@iconify/react/dist/iconify.js";
+import ExpenseForm from "./components/ExpenseForm";
+import ExpenseCategoryForm from "./components/ExpenseCategoryForm";
 
 interface Transaction {
-  _id?: string;
+  _id: string;
   date?: string;
   expensesId?: string;
   category?: string;
@@ -20,6 +24,7 @@ interface Transaction {
   description?: string;
   amount?: string;
   sn?: string;
+  image?: string;
 }
 
 const Expenses: React.FC = () => {
@@ -29,7 +34,10 @@ const Expenses: React.FC = () => {
   const [selectedFilter, setSelectedFilter] = useState("");
   const [selectedSort, setSelectedSort] = useState("");
 
+  const [selectedForm, setSelectedForm] = useState("expenses");
+
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
   const modalRef = useOutsideClick(() => setIsModalOpen(false));
 
   // Sample inventory data for different tabs
@@ -42,6 +50,7 @@ const Expenses: React.FC = () => {
       purchaseId: "#39",
       description: "Purchase of rice and lentils",
       amount: "Rs 1290",
+      image: "/invoice.png",
     },
     {
       _id: "3",
@@ -51,6 +60,7 @@ const Expenses: React.FC = () => {
       purchaseId: "#39",
       description: "Purchase of rice and lentils",
       amount: "Rs 1290",
+      image: "/invoice.png",
     },
     {
       _id: "2",
@@ -60,6 +70,7 @@ const Expenses: React.FC = () => {
       purchaseId: "#39",
       description: "Purchase of rice and lentils",
       amount: "Rs 1290",
+      image: "/invoice.png",
     },
   ]);
 
@@ -97,24 +108,22 @@ const Expenses: React.FC = () => {
     },
   ]);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "On Stock":
-        return "bg-green-100 text-green-800";
-      case "Low Stock":
-        return "bg-yellow-100 text-yellow-800";
-      case "Out of Stock":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
+  // const getStatusColor = (status: string) => {
+  //   switch (status) {
+  //     case "On Stock":
+  //       return "bg-green-100 text-green-800";
+  //     case "Low Stock":
+  //       return "bg-yellow-100 text-yellow-800";
+  //     case "Out of Stock":
+  //       return "bg-red-100 text-red-800";
+  //     default:
+  //       return "bg-gray-100 text-gray-800";
+  //   }
+  // };
 
   const filterItems = (items: Transaction[]) => {
-    return items.filter(
-      (item) =>
-        item?.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item._id?.toLowerCase().includes(searchQuery.toLowerCase())
+    return items.filter((item) =>
+      item._id?.toLowerCase().includes(searchQuery.toLowerCase())
     );
   };
 
@@ -154,7 +163,12 @@ const Expenses: React.FC = () => {
     setCurrentPage(1);
   };
 
-  const columns: ColumnConfig<Transaction>[] = [
+  const handleClick = () => {
+    console.log("clicked");
+    setIsModalOpen(true);
+  };
+
+  const columns1: ColumnConfig<Transaction>[] = [
     {
       header: "Date",
       key: "date",
@@ -179,7 +193,31 @@ const Expenses: React.FC = () => {
       header: "Amount",
       key: "amount",
     },
+    {
+      header: "Invoice",
+      key: "image",
+      render: (item) => (
+        <img
+          src={item}
+          alt="no"
+          className="w-10 h-16 rounded-sm object-cover"
+          onClick={handleClick}
+        />
+      ),
+    },
   ];
+  const columns2: ColumnConfig<Transaction>[] = [
+    {
+      header: "S.N.",
+      key: "sn",
+    },
+    {
+      header: "Category",
+      key: "category",
+    },
+  ];
+
+  const [columns, setColumns] = useState<any>(columns1);
 
   const renderInventoryTable = (items: Transaction[]) => {
     const filteredItems = filterItems(items);
@@ -211,7 +249,18 @@ const Expenses: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Expenses </h1>
+      <div className="flex justify-between items-center mb-6">
+        <p className="text-2xl font-bold text-gray-800">Expenses </p>
+        <button
+          className="flex  items-center gap-2 bg-[#df8d28] rounded-md text-white font-medium px-3 py-2"
+          onClick={() => setIsFormOpen(true)}
+        >
+          <Icon icon="material-symbols:add-2" />
+          <span>
+            {selectedForm == "expenses" ? "Add Expenses" : "Add Category"}
+          </span>
+        </button>
+      </div>
       <div className="bg-white rounded-lg shadow">
         <Tabs defaultValue="expenses" className="w-full">
           {/* Container for both TabsList and SearchFilterSort */}
@@ -219,12 +268,20 @@ const Expenses: React.FC = () => {
             <TabsList className="bg-transparent p-0 h-auto">
               <TabsTrigger
                 value="expenses"
+                onClick={() => {
+                  setColumns(columns1);
+                  setSelectedForm("expenses");
+                }}
                 className="px-4 py-3 rounded-none data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:text-[#DF8D28] data-[state=active]:border-b-2 data-[state=active]:border-[#DF8D28] text-gray-500"
               >
                 Expenses
               </TabsTrigger>
               <TabsTrigger
                 value="expensesCategory"
+                onClick={() => {
+                  setColumns(columns2);
+                  setSelectedForm("category");
+                }}
                 className="px-4 py-3 rounded-none data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:text-[#DF8D28] data-[state=active]:border-b-2 data-[state=active]:border-[#DF8D28] text-gray-500"
               >
                 Expenses Category
@@ -259,6 +316,20 @@ const Expenses: React.FC = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {isModalOpen && (
+        <InvoiceSlip modalRef={modalRef} setOpenModal={setIsModalOpen} />
+      )}
+
+      {isFormOpen &&
+        (selectedForm === "expenses" ? (
+          <ExpenseForm modalRef={modalRef} setOpenModal={setIsFormOpen} />
+        ) : (
+          <ExpenseCategoryForm
+            modalRef={modalRef}
+            setOpenModal={setIsFormOpen}
+          />
+        ))}
     </div>
   );
 };

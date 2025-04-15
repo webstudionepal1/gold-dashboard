@@ -212,7 +212,7 @@ const SettingForm = () => {
 
   return (
     <div className="m-5 ">
-      <h1 className="font-bold text-3xl my-3">Add Shop Profile</h1>
+      <h1 className="font-semibold text-3xl my-3">Add Shop Profile</h1>
       <div className="flex gap-3">
         <div className="bg-white px-5 py-7 w-[70%] shadow-xl rounded-lg">
           <FormikProvider value={formik}>
@@ -241,7 +241,7 @@ const SettingForm = () => {
 
               <button
                 type="submit"
-                className="bg-yellow text-white px-5 py-2 rounded-md w-[100px] uppercase font-medium self-end hover:text-black hover:opacity-70"
+                className="bg-[#DF8D28] text-white px-5 py-2 rounded-md w-[80px] uppercase font-semibold text-sm self-end hover:text-black hover:opacity-70"
               >
                 save
               </button>
