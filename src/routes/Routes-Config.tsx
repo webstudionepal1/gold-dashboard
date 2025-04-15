@@ -1,25 +1,32 @@
+import { LoginPage } from "../pages";
 
-import { LoginPage } from '../pages';
-import CustomerList from '../pages/Customer/CustomerList/CustomerList';
-import CustomerDetail from '../pages/Customer/CustomerView/CustomerView';
-import { DashboardPage } from '../pages/Dashboard/Dashboard';
-import AddCustomerForm from '../pages/Customer/AddCustomerForm/AddCustomerForm'
-import InventoryOverview from '../pages/Inventory/InventoryOverview/InventoryOverview';
-import Purchase from '../pages/Inventory/PurchaseManagement/Purchase';
-import PurchaseReturn from '../pages/Inventory/PurchaseManagement/PurchaseReturn';
-import Suppliers from '../pages/Inventory/PurchaseManagement/Suppliers';
-import { NotFoundPage } from '../pages/NotFound/NotFound';
-import AssignedOrders from '../pages/OrderManagement/AssignedOrder/AssignedOrder';
-import CancelledOrder from '../pages/OrderManagement/CancelledOrder/CancelledOrder';
-import CompletedOrder from '../pages/OrderManagement/CompletedOrder/CompletedOrder';
-import { FrontendRoutes } from './routes';
-import ProductDescription from '../pages/Product/ProductList/[id]/ProdectDescription';
-import ProductList from '../pages/Product/ProductList/ProductList';
-import { ProductCategory } from '../pages/Product/ProductCategory/ProductCategory';
-import Productsubcategory from '../pages/Product/ProductSubcategory/ProductSubCategory';
+import { DashboardPage } from "../pages/Dashboard/Dashboard";
+
+import InventoryOverview from "../pages/Inventory/InventoryOverview/InventoryOverview";
+import Purchase from "../pages/Inventory/PurchaseManagement/Purchase";
+import PurchaseReturn from "../pages/Inventory/PurchaseManagement/PurchaseReturn";
+import Suppliers from "../pages/Inventory/PurchaseManagement/Suppliers";
+import { NotFoundPage } from "../pages/NotFound/NotFound";
+import AssignedOrders from "../pages/OrderManagement/AssignedOrder/AssignedOrder";
+import CancelledOrder from "../pages/OrderManagement/CancelledOrder/CancelledOrder";
+import CompletedOrder from "../pages/OrderManagement/CompletedOrder/CompletedOrder";
+import { FrontendRoutes } from "./routes";
+import ProductDescription from "../pages/Product/ProductList/[id]/ProdectDescription";
+import ProductList from "../pages/Product/ProductList/ProductList";
+import { ProductCategory } from "../pages/Product/ProductCategory/ProductCategory";
+import Productsubcategory from "../pages/Product/ProductSubcategory/ProductSubCategory";
+import AttributeIndex from "../pages/Attribute/AttributeIndex";
+import BannerIndex from "../pages/Banner/BannerIndex";
+import NotificationIndex from "../pages/Notification/NotificationIndex";
+import MyPostBusinessIndex from "../pages/MyPostBusiness/MyPostBusinessIndex";
+import ConfirmedOrder from "../pages/OrderManagement/ConfirmedOrder/ConfirmedOrder";
+import OrderIndex from "../pages/OrderManagement/Order/OrderIndex";
+import AddOrderForm from "../pages/OrderManagement/Order/components/AddOrderPage";
+import AddBannerForm from "../pages/Banner/Components/AddBannerForm";
+import CustomerIndex from "../pages/Customer/CustomerIndex";
+import AddCustomerForm from "../pages/Customer/components/AddCustomerForm";
 
 export const routesConfig = [
-
   {
     //*********Add the path in frontend-routes file if required  *********//
     path: FrontendRoutes.HOME,
@@ -34,16 +41,28 @@ export const routesConfig = [
     element: <LoginPage />,
   },
   {
+    path: FrontendRoutes.ORDER,
+    element: <OrderIndex />,
+  },
+  {
+    path: FrontendRoutes.ADDORDER,
+    element: <AddOrderForm />,
+  },
+  {
     path: FrontendRoutes.ASSIGNEDORDER,
-    element: <AssignedOrders />
+    element: <AssignedOrders />,
+  },
+  {
+    path: FrontendRoutes.CONFIRMEDORDER,
+    element: <ConfirmedOrder />,
   },
   {
     path: FrontendRoutes.CANCELLEDORDER,
-    element: <CancelledOrder />
+    element: <CancelledOrder />,
   },
   {
     path: FrontendRoutes.COMPLETEDORDER,
-    element: <CompletedOrder />
+    element: <CompletedOrder />,
   },
   {
     path: FrontendRoutes.PRODUCTLIST,
@@ -64,39 +83,55 @@ export const routesConfig = [
 
   {
     path: FrontendRoutes.CUSTOMER,
-    element: <CustomerList/>
+    element: <CustomerIndex />,
   },
-
-  {
-    path: FrontendRoutes.CUSTOMERVIEW,
-    element: <CustomerDetail/>
-  },
-
   {
     path: FrontendRoutes.ADDCUSTOMER,
-    element: <AddCustomerForm/>
+    element: <AddCustomerForm />,
   },
 
   {
     path: FrontendRoutes.INVENTORY,
-    element: <InventoryOverview/>
+    element: <InventoryOverview />,
   },
   {
     path: FrontendRoutes.PURCHASE,
-    element: <Purchase/>
+    element: <Purchase />,
   },
   {
     path: FrontendRoutes.PURCHASERETURN,
-    element: <PurchaseReturn/>
+    element: <PurchaseReturn />,
   },
   {
     path: FrontendRoutes.SUPPLIERS,
-    element: <Suppliers/>
+    element: <Suppliers />,
   },
 
+  // Attributes
+  {
+    path: FrontendRoutes.ATTRIBUTES,
+    element: <AttributeIndex />,
+  },
+  // Banner
+  {
+    path: FrontendRoutes.BANNER,
+    element: <BannerIndex />,
+  },
+  {
+    path: FrontendRoutes.ADDBANNER,
+    element: <AddBannerForm />,
+  },
+  {
+    path: FrontendRoutes.NOTIFICATION,
+    element: <NotificationIndex />,
+  },
+  {
+    path: FrontendRoutes.MYPOSTBUSINESS,
+    element: <MyPostBusinessIndex />,
+  },
 
   {
-    path: '*',
+    path: "*",
     element: <NotFoundPage />,
   },
 ];

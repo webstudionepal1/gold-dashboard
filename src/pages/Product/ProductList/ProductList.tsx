@@ -4,6 +4,7 @@ import { SearchFilterSort } from '../../../components/global/SearchFilterSort';
 import { useNavigate } from 'react-router-dom';
 import { ProductGridView } from './component/GridView';
 import { filterOptions, sortOptions } from '../../../constants/DropDownOptions';
+import AddProductDialog from './component/AddproductDialog';
 
 // Updated Product interface to match ProductDescription
 interface Product {
@@ -39,6 +40,7 @@ const ProductList: React.FC = () => {
         }))
     ]);
     const [filteredData, setFilteredData] = useState<Product[]>(products);
+    const [addProductDialog, setAddProductDialog] = useState<boolean>(false);
     const [newProduct, setNewProduct] = useState<Omit<Product, 'id'>>({
         title: '',
         price: 0,
@@ -96,29 +98,37 @@ const ProductList: React.FC = () => {
         setFilteredData(dataToSort);
     }, [filteredData]);
 
- 
+
     const handleAddProduct = () => {
-        setNewProduct({
-            title: '',
-            price: 0,
-            originalPrice: 0,
-            rating: 0,
-            category: '',
-            onSale: false,
-            image: '',
-            status: '',
-            description: ''
-        });
+        // setNewProduct({
+        //     title: '',
+        //     price: 0,
+        //     originalPrice: 0,
+        //     rating: 0,
+        //     category: '',
+        //     onSale: false,
+        //     image: '',
+        //     status: '',
+        //     description: ''
+        // });
+        setAddProductDialog(true);
         setIsEditing(false);
     };
 
+    const handleDialogClose = () => {
+        setAddProductDialog(false);
+    }
+
+    const handleAddSubmit = () => {
+        console.log("submitted");
+    }
     const handleCardClick = (product: Product) => {
         navigate(`/product/${product.id}`, { state: { product } });
     };
 
     return (
-        <div className="container mx-auto pl-10 pr-4 py-auto">
-            <div className="flex justify-between items-center mb-6">
+        <div className="container pl-10 pr-4 mx-auto py-auto">
+            <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl font-bold text-gray-800">Products</h1>
                 <button
                     onClick={handleAddProduct}
@@ -128,7 +138,7 @@ const ProductList: React.FC = () => {
                 </button>
             </div>
 
-            <div className='bg-white p-4'>
+            <div className='p-4 bg-white'>
                 <SearchFilterSort
                     onSearch={handleSearch}
                     onFilter={handleFilter}
@@ -142,8 +152,11 @@ const ProductList: React.FC = () => {
                     placeholder="Search products..."
                 />
 
-               <ProductGridView filteredData={filteredData} handleCardClick={handleCardClick}/>
+                <ProductGridView filteredData={filteredData} handleCardClick={handleCardClick} />
             </div>
+            {addProductDialog &&
+                <AddProductDialog onClose={handleDialogClose} onSubmit={handleAddSubmit} />
+            }
         </div>
     );
 

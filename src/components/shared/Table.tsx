@@ -1,7 +1,7 @@
-import { Icon } from '@iconify/react/dist/iconify.js';
-import React, { useState } from 'react';
-import Pagination from './_table/_Pagination';
-import { DeleteDialog } from './DeleteDialog';
+import { Icon } from "@iconify/react/dist/iconify.js";
+import React, { useState } from "react";
+import Pagination from "./_table/_Pagination";
+import { DeleteDialog } from "./DeleteDialog";
 
 export type TableData<T = Record<string, any>> = {
   _id: string;
@@ -132,17 +132,17 @@ export const Table = <T extends Record<string, any>>({
   const [_, setToggledRows] = useState(new Set());
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full ">
       <div className="w-full overflow-auto">
         <div className="min-w-full max-w-screen-md w-full h-fit ">
-          <section className="rounded-lg w-full">
-            <table className="min-w-full  w-full">
-              <thead className={showBg ? 'bg-fade-bg' : ''}>
-                <tr className="justify-between">
+          <section className=" w-full rounded-xl overflow-hidden border border-[#e0e2e5] ">
+            <table className="min-w-full w-full    ">
+              <thead className={showBg ? "bg-fade-bg" : ""}>
+                <tr className="justify-between border border-[#e0e2e5]  bg-[#f8f9fd]">
                   {showSelectAll && (
                     <th
                       scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium"
+                      className="px-6   py-3 text-center text-xs font-medium"
                     >
                       <input
                         type="checkbox"
@@ -158,9 +158,9 @@ export const Table = <T extends Record<string, any>>({
                       key={`${column.key}-${index}`}
                       scope="col"
                       className={`${
-                        hasPadding ? 'px-6' : ''
-                      } py-3 text-left text-sm font-semibold text-fade-black tracking-wider ${
-                        column.width ? `w-[${column.width}]` : ''
+                        hasPadding ? "px-6" : ""
+                      } py-3   text-center text-sm text-nowrap font-semibold text-fade-black tracking-wider ${
+                        column.width ? `w-[${column.width}]` : ""
                       }`}
                     >
                       {column.header}
@@ -169,7 +169,7 @@ export const Table = <T extends Record<string, any>>({
                   {showAction && (
                     <th
                       scope="col"
-                      className="px-6 py-3 text-left text-sm font-semibold text-fade-black tracking-wider"
+                      className="px-6 py-3 mr-4 text-center flex justify-end text-sm font-semibold text-fade-black tracking-wider"
                     >
                       Action
                     </th>
@@ -177,15 +177,17 @@ export const Table = <T extends Record<string, any>>({
                 </tr>
               </thead>
 
-              <tbody className="bg-white">
+              <tbody className="bg-white ">
                 {data?.length ? (
                   data.map((row, index) => (
                     <tr
                       key={`${row._id}-${index}`}
-                      className={`${index % 2 === 0 && showBg ? 'bg-fade-bg' : ''}`}
+                      className={`border border-[#e0e2e5]${
+                        index % 2 === 0 && showBg ? "bg-fade-bg" : ""
+                      }`}
                     >
                       {showSelectAll && (
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-6 py-4 flex items-center justify-center whitespace-nowrap ">
                           <input
                             type="checkbox"
                             className="h-4 w-4 text-blue-600 focus:ring-blue-500 rounded"
@@ -199,21 +201,23 @@ export const Table = <T extends Record<string, any>>({
                       {columns?.map((column, index) => (
                         <td
                           key={`${row._id}-${index}`}
-                          className={`${hasPadding && 'px-6 cursor-pointer'} py-4 whitespace-nowrap`}
+                          className={`${
+                            hasPadding && "px-6  cursor-pointer"
+                          } py-4 whitespace-nowrap text-center`}
                           onClick={() => viewRow?.(row)}
                         >
                           {column.render
                             ? column.render(row[column.key], row)
-                            : typeof row[column.key] === 'boolean'
-                              ? row[column.key]
-                                ? 'Yes'
-                                : 'No'
-                              : (row[column.key] ?? 'N/A')}
+                            : typeof row[column.key] === "boolean"
+                            ? row[column.key]
+                              ? "Yes"
+                              : "No"
+                            : row[column.key] ?? "N/A"}
                         </td>
                       ))}
 
                       {showAction && (
-                        <td className="px-6 flex md:min-w-[10rem] w-full gap-3 py-8 place-items-center text-right text-sm font-medium">
+                        <td className="px-6 flex justify-end md:min-w-[10rem] w-full gap-3 py-4 place-items-center text-right text-sm font-medium ">
                           {showToggle && (
                             <div
                               key={`toggle-${row._id}`}
@@ -232,19 +236,17 @@ export const Table = <T extends Record<string, any>>({
                                   onChange={() => handleToggle(row)}
                                 />
                                 <div
-
                                   className={`toggle-bg border-2 h-[18px] w-[36px] rounded-full transition-colors duration-200 ease-in-out ${
                                     row.isActive
-                                      ? 'bg-[#76EE59] '
-                                      : 'bg-[#B1BAC8] '
+                                      ? "bg-[#76EE59] "
+                                      : "bg-[#B1BAC8] "
                                   }`}
-
                                 >
                                   <div
                                     className={`toggle-dot absolute left-0 top-1/2 -translate-y-1/2 bg-white w-4 h-4 rounded-full transition-transform duration-200 ease-in-out transform ${
                                       row.isActive
-                                        ? 'translate-x-[19px] border-blue-600'
-                                        : 'translate-x-[1px] border-gray-200'
+                                        ? "translate-x-[19px] border-blue-600"
+                                        : "translate-x-[1px] border-gray-200"
                                     }`}
                                   />
                                 </div>
@@ -336,13 +338,41 @@ export const Table = <T extends Record<string, any>>({
                   </tr>
                 )}
               </tbody>
+              {showPagination && (
+                <tfoot>
+                  <tr>
+                    <td
+                      colSpan={
+                        columns.length +
+                        (showSelectAll ? 1 : 0) +
+                        (showAction ? 1 : 0)
+                      }
+                      className="py-4"
+                    >
+                      <div className="flex justify-between items-center w-full px-6">
+                        <Pagination
+                          currentPage={paginationDetails?.currentPage ?? 1}
+                          itemsPerPage={paginationDetails?.limit ?? 10}
+                          totalItems={
+                            paginationDetails?.totalCount ?? totalCount ?? 0
+                          }
+                          onItemsPerPageChange={(page: number) =>
+                            onItemsPerPageChange?.(page)
+                          }
+                          onPageChange={(page: number) => onPageChange?.(page)}
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                </tfoot>
+              )}
             </table>
           </section>
         </div>
       </div>
 
-      {showPagination && (
-        <section className="flex flex-col bg-bg pt-6 " id="pagination">
+      {/* {showPagination && (
+        <section className="flex flex-col bg-[#ffffff] mt-2 " id="pagination">
           <Pagination
             currentPage={paginationDetails?.currentPage ?? 1}
             itemsPerPage={paginationDetails?.limit ?? 10}
@@ -353,7 +383,7 @@ export const Table = <T extends Record<string, any>>({
             onPageChange={(page: number) => onPageChange?.(page)}
           />
         </section>
-      )}
+      )} */}
 
       <DeleteDialog
         confirmAction={showDeleteDialog}
