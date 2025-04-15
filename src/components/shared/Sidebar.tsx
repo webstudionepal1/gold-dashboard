@@ -46,18 +46,18 @@ export const SideBar = ({ miniSidebar, setMiniSidebar }: sidebarProps) => {
   };
 
   return (
-    <div className="relative" id="sidebar">
+    <div className="relative " id="sidebar">
       <div
         className="absolute top-16 -right-2 text-xl z-[99999] bg-white p-1 border-border  rounded-md"
         onClick={() => setMiniSidebar((prev) => !prev)}
       >
         <Icon icon={"mdi-light:unfold-more-vertical"} />
       </div>
-      <div className="flex flex-col rounded-2xl border border-border">
+      <div className="flex flex-col border rounded-2xl border-border">
         <div className="border-b border-border h-[82px]">
           <section
             className={`flex  place-items-center text-center  justify-between ${
-              miniSidebar ? " p-2" : "h-[62px] w-[60px]"
+              miniSidebar ? "h-[48px] w-[132px]" : "h-[62px] w-[60px]"
             }`}
             id="logo-top-bar"
           >
@@ -84,7 +84,7 @@ export const SideBar = ({ miniSidebar, setMiniSidebar }: sidebarProps) => {
           </div>
 
           <div
-            className="flex flex-col  gap-2"
+            className="flex flex-col gap-2"
             id="menu"
             onClick={() => setMiniSidebar(true)}
           >
@@ -102,7 +102,7 @@ export const SideBar = ({ miniSidebar, setMiniSidebar }: sidebarProps) => {
                     // setCurrentId(route.id);
                   }}
                 >
-                  <section className="flex place-items-center gap-3">
+                  <section className="flex gap-3 place-items-center">
                     <Icon
                       icon={route.icon}
                       color={`${
@@ -134,7 +134,7 @@ export const SideBar = ({ miniSidebar, setMiniSidebar }: sidebarProps) => {
                 {miniSidebar && (
                   <div>
                     {route.children && expandedItems.includes(route.id) && (
-                      <div className="ml-8 mt-1 flex flex-col relative">
+                      <div className="relative flex flex-col mt-1 ml-8">
                         {/* Vertical line */}
                         <div className="absolute left-[0.3125rem] top-0 bottom-0 w-px #DF8D28" />
 
@@ -149,7 +149,7 @@ export const SideBar = ({ miniSidebar, setMiniSidebar }: sidebarProps) => {
                             <Link
                               to={child.path}
                               key={child.id}
-                              className="flex place-items-center py-1 pl-4 relative rounded-lg"
+                              className="relative flex py-1 pl-4 rounded-lg place-items-center"
                             >
                               {/* Dot with horizontal line */}
                               <div className="absolute left-[0.01rem] top-1/2 -translate-y-1/2">

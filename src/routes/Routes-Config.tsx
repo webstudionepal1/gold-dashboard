@@ -41,8 +41,20 @@ export const routesConfig = [
     element: <LoginPage />,
   },
   {
+    path: FrontendRoutes.ORDER,
+    element: <OrderIndex />,
+  },
+  {
+    path: FrontendRoutes.ADDORDER,
+    element: <AddOrderForm />,
+  },
+  {
     path: FrontendRoutes.ASSIGNEDORDER,
     element: <AssignedOrders />,
+  },
+  {
+    path: FrontendRoutes.CONFIRMEDORDER,
+    element: <ConfirmedOrder />,
   },
   {
     path: FrontendRoutes.CANCELLEDORDER,
@@ -71,14 +83,8 @@ export const routesConfig = [
 
   {
     path: FrontendRoutes.CUSTOMER,
-    element: <CustomerList />,
+    element: <CustomerIndex />,
   },
-
-  {
-    path: FrontendRoutes.CUSTOMERVIEW,
-    element: <CustomerDetail />,
-  },
-
   {
     path: FrontendRoutes.ADDCUSTOMER,
     element: <AddCustomerForm />,
@@ -103,46 +109,27 @@ export const routesConfig = [
   {
     path: FrontendRoutes.TRANSACTION,
     element: <Transaction />,
+  }, // Attributes
+  {
+    path: FrontendRoutes.ATTRIBUTES,
+    element: <AttributeIndex />,
+  },
+  // Banner
+  {
+    path: FrontendRoutes.BANNER,
+    element: <BannerIndex />,
   },
   {
-    path: FrontendRoutes.VERIFY_CASH,
-    element: <VerifyCashPayment />,
-  },
-
-  //Finance and Expenses section
-
-  {
-    path: FrontendRoutes.EXPENSE,
-    element: <Expenses />,
+    path: FrontendRoutes.ADDBANNER,
+    element: <AddBannerForm />,
   },
   {
-    path: FrontendRoutes.CASHFLOW,
-    element: <Cashflow />,
+    path: FrontendRoutes.NOTIFICATION,
+    element: <NotificationIndex />,
   },
   {
-    path: FrontendRoutes.PROFIT_LOSS,
-    element: <ProfitandLoss />,
-  },
-
-  //Analytics
-
-  {
-    path: FrontendRoutes.ORDER_REPORT,
-    element: <OrderReport />,
-  },
-  {
-    path: FrontendRoutes.SALES_REPORT,
-    element: <SalesReport />,
-  },
-  {
-    path: FrontendRoutes.STOCK_REPORT,
-    element: <StoreReport />,
-  },
-
-  //Setting Form
-  {
-    path: FrontendRoutes.SETTINGS,
-    element: <SettingForm />,
+    path: FrontendRoutes.MYPOSTBUSINESS,
+    element: <MyPostBusinessIndex />,
   },
 
   {

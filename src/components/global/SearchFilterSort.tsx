@@ -58,11 +58,11 @@ export const SearchFilterSort: React.FC<SearchFilterSortProps> = ({
   };
   return (
     <div className="container my-4">
-      <div className="flex  justify-between flex-row gap-x-40 md:flex-row">
+      <div className="flex  justify-between flex-row gap-4 md:flex-row ">
         {/* Search Input */}
-        <div className="flex flex-row w-full">
+        <div className="flex flex-row ">
           {showSearch && (
-            <div className="relative flex-grow ">
+            <div className="relative flex-grow w-[25rem] ">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Icon
                   icon="mynaui:search"
