@@ -24,6 +24,7 @@ export const FrontendRoutes = {
   ADDBANNER: "/banner/add-banner",
   NOTIFICATION: "/notification",
   MYPOSTBUSINESS: "/my-post-business",
+  
     TRANSACTION: '/transaction',
     VERIFY_CASH: '/transaction/verify-cash-payment',
 
