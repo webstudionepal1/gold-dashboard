@@ -4,7 +4,7 @@ import { twMerge } from "tailwind-merge";
 
 interface InputFieldPropTypes
   extends React.InputHTMLAttributes<HTMLInputElement> {
-  label: string;
+  label?: string;
   variant?: string;
   inputClassName?: string;
   defaultPadding?: boolean;

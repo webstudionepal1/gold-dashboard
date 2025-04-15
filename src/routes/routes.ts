@@ -13,8 +13,8 @@ export const FrontendRoutes = {
   COMPLETEDORDER: "/order/completed-order",
   ORDER: "/order/orders",
   CUSTOMER: "/customer/customer-list",
-  CUSTOMERVIEW: "/customer-view/:id",
-  ADDCUSTOMER: "/add-customer",
+
+  ADDCUSTOMER: "/customer/add-customer",
   INVENTORY: "/inventory/inventory-overview",
   PURCHASE: "/inventory/purchase",
   PURCHASERETURN: "/inventory/purchase-return",
