@@ -102,6 +102,87 @@ export const SidebarMainRoutes = {
       icon: "game-icons:gear-stick-pattern",
     },
     {
+      id: 6,
+      path: "#",
+      title: "Transaction",
+      icon: "hugeicons:bitcoin-transaction",
+      children: [
+        {
+          id: 60,
+          path: FrontendRoutes.TRANSACTION,
+          title: "Transaction"
+        },
+        {
+          id: 61,
+          path: FrontendRoutes.VERIFY_CASH,
+          title: "Verify Cash Payment",
+          icon: "",
+        },
+        
+
+      ],
+    },
+    {
+      id: 7,
+      path: "#",
+      title: "Finance and Expenses",
+      icon: "fluent:wallet-credit-card-24-regular",
+      children: [
+        {
+          id: 70,
+          path: FrontendRoutes.EXPENSE,
+          title: "Expenses"
+        },
+        {
+          id: 71,
+          path: FrontendRoutes.CASHFLOW,
+          title: "Cash Flow",
+          icon: "",
+        },
+        {
+          id: 72,
+          path: FrontendRoutes.PROFIT_LOSS,
+          title: "Profit & Loss",
+          icon: "",
+        },
+        
+
+      ],
+    },
+    {
+      id: 8,
+      path: "#",
+      title: "Analytics",
+      icon: "ic:sharp-query-stats",
+      children: [
+        {
+          id: 70,
+          path: FrontendRoutes.ORDER_REPORT,
+          title: "Order Report"
+        },
+        {
+          id: 71,
+          path: FrontendRoutes.SALES_REPORT,
+          title: "Sales Report",
+
+        },
+        {
+          id: 72,
+          path: FrontendRoutes.STOCK_REPORT,
+          title: "Stock Report",
+
+        },
+        
+
+      ],
+    },
+    {
+      id: 13,
+      path: "/settings",
+      title: "Settings",
+      icon: "mdi-light:settings",
+    },
+    {
       id: 7,
       path: FrontendRoutes.BANNER,
       title: "Banner",

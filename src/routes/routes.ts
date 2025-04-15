@@ -9,7 +9,7 @@ export const FrontendRoutes = {
   CONFIRMEDORDER: "/order/confirmed-order",
   ADDORDER: "/order/add-order",
 
-  CANCELLEDORDER: "/order/cancelled-order",
+  CANCELLEDORDER: "/order/cancelled-order",  
   COMPLETEDORDER: "/order/completed-order",
   ORDER: "/order/orders",
   CUSTOMER: "/customer/customer-list",
@@ -24,4 +24,18 @@ export const FrontendRoutes = {
   ADDBANNER: "/banner/add-banner",
   NOTIFICATION: "/notification",
   MYPOSTBUSINESS: "/my-post-business",
+    TRANSACTION: '/transaction',
+    VERIFY_CASH: '/transaction/verify-cash-payment',
+
+    EXPENSE: '/expenses',
+    CASHFLOW: '/cashflow',
+    PROFIT_LOSS: '/profit&loss',
+
+    ORDER_REPORT: '/order-report',
+    SALES_REPORT: '/sales-report',
+    STOCK_REPORT: '/stock-report',
+
+    SETTINGS: '/settings',
+
+
 };

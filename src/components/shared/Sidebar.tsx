@@ -56,23 +56,25 @@ export const SideBar = ({ miniSidebar, setMiniSidebar }: sidebarProps) => {
       <div className="flex flex-col border rounded-2xl border-border">
         <div className="border-b border-border h-[82px]">
           <section
-            className={`flex  place-items-center text-center  justify-between ${miniSidebar ? "h-[48px] w-[132px]" : "h-[62px] w-[60px]"
-              }`}
+            className={`flex  place-items-center text-center  justify-between ${
+              miniSidebar ? "h-[48px] w-[132px]" : "h-[62px] w-[60px]"
+            }`}
             id="logo-top-bar"
           >
             <img
               src="/companylogo.png"
               alt="company-logo"
-              className={`h-full w-full flex place-self-center border `}
+              className={`h-full w-full flex place-self-center py-3 px-6 `}
               id="logo"
             />
-            <Icon icon="flowbite:dots-vertical-outline" id="outline" />
+            {/* <Icon icon="flowbite:dots-vertical-outline" id="outline" /> */}
           </section>
         </div>
 
         <section
-          className={`flex flex-col pt-6 ${!miniSidebar ? "items-center" : ""
-            }  gap-2`}
+          className={`flex flex-col pt-6 ${
+            !miniSidebar ? "items-center" : ""
+          }  gap-2`}
           id="main-menu"
         >
           <div className={`${!miniSidebar ? "px-3 " : "px-6"}`}>
@@ -90,9 +92,11 @@ export const SideBar = ({ miniSidebar, setMiniSidebar }: sidebarProps) => {
               <div key={route.id}>
                 <Link
                   to={route.path}
-                  className={`flex place-items-center ${miniSidebar ? "px-6" : "px-3"
-                    }   py-3 gap-5 justify-between hover:bg-bg hover:rounded-lg ${currentParentId === route.id ? "bg-[#FCF4EA]" : ""
-                    }`}
+                  className={`flex place-items-center ${
+                    miniSidebar ? "px-6" : "px-3"
+                  }   py-3 gap-5 justify-between hover:bg-bg hover:rounded-lg ${
+                    currentParentId === route.id ? "bg-[#FCF4EA]" : ""
+                  }`}
                   onClick={() => {
                     if (route.children) toggleExpand(route.id);
                     // setCurrentId(route.id);
@@ -101,16 +105,18 @@ export const SideBar = ({ miniSidebar, setMiniSidebar }: sidebarProps) => {
                   <section className="flex gap-3 place-items-center">
                     <Icon
                       icon={route.icon}
-                      color={`${currentParentId === route.id ? "#DF8D28" : "#5C5E64"
-                        }`}
+                      color={`${
+                        currentParentId === route.id ? "#DF8D28" : "#5C5E64"
+                      }`}
                     />
 
                     {miniSidebar && (
                       <Text
-                        variant={`${currentParentId === route.id
+                        variant={`${
+                          currentParentId === route.id
                             ? "dark-yellow"
                             : "fadish-black"
-                          }`}
+                        }`}
                         size="body-sm-default"
                       >
                         {route.title}
@@ -148,16 +154,18 @@ export const SideBar = ({ miniSidebar, setMiniSidebar }: sidebarProps) => {
                               {/* Dot with horizontal line */}
                               <div className="absolute left-[0.01rem] top-1/2 -translate-y-1/2">
                                 <div
-                                  className={`h-[.2px] w-3  ${isActive ? "bg-yellow" : "bg-gray-300"
-                                    }`}
+                                  className={`h-[.2px] w-3  ${
+                                    isActive ? "bg-yellow" : "bg-gray-300"
+                                  }`}
                                 />
                               </div>
 
                               <Text
                                 variant={isActive ? "yellow" : "fadish-black"}
                                 size="body-sm-default"
-                                className={`hover:bg-gray-50 py-2 px-3 rounded ${isActive ? "bg-[#FCF4EA]" : ""
-                                  }`}
+                                className={`hover:bg-gray-50 py-2 px-3 rounded ${
+                                  isActive ? "bg-[#FCF4EA]" : ""
+                                }`}
                               >
                                 {child.title}
                               </Text>

@@ -21,6 +21,7 @@
     "classnames": "^2.5.1",
     "clsx": "^2.1.1",
     "crypto-js": "^4.2.0",
+    "formik": "^2.4.6",
     "graphql-request": "^7.1.2",
     "lucide-react": "^0.483.0",
     "motion": "^12.6.3",
