@@ -4,8 +4,8 @@ import { DashboardPage } from "../pages/Dashboard/Dashboard";
 
 import InventoryOverview from "../pages/Inventory/InventoryOverview/InventoryOverview";
 import Purchase from "../pages/Inventory/PurchaseManagement/Purchase";
-import PurchaseReturn from "../pages/Inventory/PurchaseManagement/PurchaseReturn";
-import Suppliers from "../pages/Inventory/PurchaseManagement/Suppliers";
+// import PurchaseReturn from "../pages/Inventory/PurchaseManagement/PurchaseReturn";
+// import Suppliers from "../pages/Inventory/PurchaseManagement/Suppliers";
 import { NotFoundPage } from "../pages/NotFound/NotFound";
 import AssignedOrders from "../pages/OrderManagement/AssignedOrder/AssignedOrder";
 import CancelledOrder from "../pages/OrderManagement/CancelledOrder/CancelledOrder";
@@ -107,14 +107,14 @@ export const routesConfig = [
     path: FrontendRoutes.PURCHASE,
     element: <Purchase />,
   },
-  {
-    path: FrontendRoutes.PURCHASERETURN,
-    element: <PurchaseReturn />,
-  },
-  {
-    path: FrontendRoutes.SUPPLIERS,
-    element: <Suppliers />,
-  },
+  // {
+  //   path: FrontendRoutes.PURCHASERETURN,
+  //   element: <PurchaseReturn />,
+  // },
+  // {
+  //   path: FrontendRoutes.SUPPLIERS,
+  //   element: <Suppliers />,
+  // },
 
   // Attributes
   {
