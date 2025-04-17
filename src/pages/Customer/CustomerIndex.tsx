@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Header from "../../components/shared/table_heading/Header";
 import { Link } from "react-router-dom";
 import { FrontendRoutes } from "../../routes/routes";
@@ -27,11 +27,18 @@ const CustomerIndex = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  const [selectedTab, setSelectedTab] = useState("home_page");
+  // const [selectedTab, setSelectedTab] = useState("home_page");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setisViewModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<CustomerItem | null>(null);
 
+  console.log(
+    isModalOpen,
+    selectedFilter,
+    selectedSort,
+    isViewModalOpen,
+    editingItem
+  );
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     setCurrentPage(1);
@@ -56,22 +63,24 @@ const CustomerIndex = () => {
   };
 
   const handleViewItem = (item: TableData<CustomerItem>) => {
-    if (selectedTab === "home_page") {
-      setEditingItem(item);
-    } else if (selectedTab === "other_page") {
-      setEditingItem(item);
-    }
+    // if (selectedTab === "home_page") {
+    //   setEditingItem(item);
+    // } else if (selectedTab === "other_page") {
+    setEditingItem(item);
+    // }
     setisViewModalOpen(true);
+    console.log(item);
   };
 
   const handleEditItem = (item: TableData<CustomerItem>) => {
-    // Check which tab is selected and set the editing item accordingly
-    if (selectedTab === "home_page") {
-      setEditingItem(item); // Set the item for the Home Page Banner
-    } else if (selectedTab === "other_page") {
-      setEditingItem(item); // Set the item for the Other Page Banner
-    }
+    // // Check which tab is selected and set the editing item accordingly
+    // if (selectedTab === "home_page") {
+    //   setEditingItem(item); // Set the item for the Home Page Banner
+    // } else if (selectedTab === "other_page") {
+    //   setEditingItem(item); // Set the item for the Other Page Banner
+    // }
     setIsModalOpen(true); // Open the modal for either banner
+    console.log(item);
   };
 
   const handleDeleteItem = (item: TableData<CustomerItem>) => {

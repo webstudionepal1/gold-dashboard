@@ -1,15 +1,11 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Tabs,
   TabsList,
   TabsTrigger,
   TabsContent,
 } from "../../../components/shared/tab";
-import {
-  Table,
-  TableData,
-  ColumnConfig,
-} from "../../../components/shared/Table";
+import { Table, TableData } from "../../../components/shared/Table";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { SearchFilterSort } from "../../../components/global/SearchFilterSort";
 import { Link } from "react-router-dom";

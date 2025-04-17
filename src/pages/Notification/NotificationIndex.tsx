@@ -1,4 +1,3 @@
-import React from "react";
 import NotificationTable from "../../components/shared/Notification_Component/Notification_Table";
 import Header from "../../components/shared/table_heading/Header";
 

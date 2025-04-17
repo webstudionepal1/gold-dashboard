@@ -54,6 +54,7 @@ const BannerIndex: React.FC = () => {
     setIsModalOpen(false);
     setEditingItem(null);
   };
+  console.log(isModalOpen, handleAddBannerClick, handleCloseModal);
 
   // Sample inventory data for different tabs
   const [bannerItems] = useState<BannerItem[]>([
