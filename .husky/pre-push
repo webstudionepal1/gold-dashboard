@@ -2,7 +2,6 @@
 . "$(dirname "$0")/_/husky.sh"
 
 echo "🚀 Running pre-push checks..."
-
 # Store the exit code
 EXIT_CODE=0
 
