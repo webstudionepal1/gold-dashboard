@@ -6,9 +6,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth, useLogout } from '../../hooks/useAuth';
 import { useOutsideClick } from '../../hooks/UseOutsideClick';
 
-
+/*eslint-disable @typescript-eslint/no-explicit-any*/
 export const Navbar = () => {
-  const userInfo = useAuth();
+  const userInfo = useAuth() as any;
   const logout = useLogout();
   const [showLogout, setShowLogout] = useState(false);
   const [toggleNotification, setToggleNotification] = useState(false);

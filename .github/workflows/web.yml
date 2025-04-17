@@ -1,0 +1,43 @@
+name: CI/CD for Web Deployment (VPS)
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Build Web Application
+        run: |
+          npm install --legacy-peer-deps
+          npm run build
+
+      - name: Create Web Production Bundle
+        run: |
+          tar -czf dist-web.tar.gz build
+
+      - name: Deploy Web to VPS
+        if: github.ref == 'refs/heads/main'
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H $VPS_HOST >> ~/.ssh/known_hosts
+
+          # Copy web bundle
+          scp -i ~/.ssh/deploy_key dist-web.tar.gz $VPS_USER@$VPS_HOST:/tmp/
+
+          ssh -i ~/.ssh/deploy_key $VPS_USER@$VPS_HOST << 'EOF'
+            # Create and extract web files
+            mkdir -p "gold"
+            tar -xzf /tmp/dist-web.tar.gz -C "gold"
+            rm /tmp/dist-web.tar.gz
+          EOF
