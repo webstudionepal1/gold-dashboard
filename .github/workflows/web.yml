@@ -18,7 +18,7 @@ jobs:
 
       - name: Create Web Production Bundle
         run: |
-          tar -czf dist-web.tar.gz build
+          tar -czf dist-web.tar.gz dist
 
       - name: Deploy Web to VPS
         if: github.ref == 'refs/heads/main'
