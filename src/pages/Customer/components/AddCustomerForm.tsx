@@ -1,11 +1,10 @@
-import React from "react";
 import Breadcrumbs from "../../../components/shared/Breadcrumb";
 import { useForm } from "@tanstack/react-form";
 import { InputField } from "../../../components/shared/form_components/InputField";
-import { DropdownField } from "../../../components/shared/form_components/Dropdown";
+
 import { z } from "zod";
 import FileDropInput from "../../../components/shared/form_components/FileDropInput";
-
+import { useStore } from "@tanstack/react-form";
 const AddCustomerSchema = z.object({
   full_name: z.string().min(1, "Full Name is required"),
   email: z.string().min(1, "Email is required"),
@@ -69,6 +68,12 @@ const AddCustomerForm = () => {
       // Submit to backend or API
     },
   });
+
+  const termsAccepted = useStore(
+    form.store,
+    (state) => state.values.terms_and_conditions
+  );
+
   return (
     <>
       <div className="mx-8 my-3">
@@ -228,14 +233,14 @@ const AddCustomerForm = () => {
                           </span>
                         </label>
                       </div>
-                      <FieldError field={field} />
                     </div>
                   )}
                 </form.Field>
               </div>
               <button
+                disabled={!termsAccepted}
                 type="submit"
-                className="self-end bg-[#df8d29] text-white px-7 py-2 rounded-xl"
+                className="self-end bg-[#df8d29] text-white px-7 py-2 rounded-xl disabled:bg-[#966830]"
               >
                 Save
               </button>
@@ -264,7 +269,7 @@ const AddCustomerForm = () => {
                           <FileDropInput
                             value={field.state.value as unknown as File}
                             onChange={(file) => {
-                              field.handleChange(file); // store the file directly
+                              field.handleChange(file);
                             }}
                           />
                           <FieldError field={field} />

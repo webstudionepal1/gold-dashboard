@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { SearchFilterSort } from "../../components/global/SearchFilterSort";
 import { Table, ColumnConfig, TableData } from "../../components/shared/Table";
 import { Icon } from "@iconify/react/dist/iconify.js";
@@ -19,7 +19,7 @@ const MyPostBusinessIndex = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-
+  console.log(selectedFilter, selectedSort, searchQuery);
   const [isactionButtonClicked, setIsActionButtonClicked] = useState(false);
 
   const handleSearch = (query: string) => {
