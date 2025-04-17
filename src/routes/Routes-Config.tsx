@@ -4,8 +4,8 @@ import { DashboardPage } from "../pages/Dashboard/Dashboard";
 
 import InventoryOverview from "../pages/Inventory/InventoryOverview/InventoryOverview";
 import Purchase from "../pages/Inventory/PurchaseManagement/Purchase";
-import PurchaseReturn from "../pages/Inventory/PurchaseManagement/PurchaseReturn";
-import Suppliers from "../pages/Inventory/PurchaseManagement/Suppliers";
+// import PurchaseReturn from "../pages/Inventory/PurchaseManagement/PurchaseReturn";
+// import Suppliers from "../pages/Inventory/PurchaseManagement/Suppliers";
 import { NotFoundPage } from "../pages/NotFound/NotFound";
 import AssignedOrders from "../pages/OrderManagement/AssignedOrder/AssignedOrder";
 import CancelledOrder from "../pages/OrderManagement/CancelledOrder/CancelledOrder";
@@ -25,6 +25,15 @@ import AddOrderForm from "../pages/OrderManagement/Order/components/AddOrderPage
 import AddBannerForm from "../pages/Banner/Components/AddBannerForm";
 import CustomerIndex from "../pages/Customer/CustomerIndex";
 import AddCustomerForm from "../pages/Customer/components/AddCustomerForm";
+import Transaction from "../pages/transaction/Transaction";
+import VerifyCashPayment from "../pages/transaction/VerifyCashPayment";
+import Expenses from "../pages/financeandexpenses /Expenses";
+import Cashflow from "../pages/financeandexpenses /Cashflow";
+import ProfitandLoss from "../pages/financeandexpenses /ProfitandLoss";
+import SettingForm from "../pages/settings/SettingForm";
+import OrderReport from "../pages/analytics/OrderReport";
+import SalesReport from "../pages/analytics/SalesReport";
+import StoreReport from "../pages/analytics/StoreReport";
 
 export const routesConfig = [
   {
@@ -98,14 +107,14 @@ export const routesConfig = [
     path: FrontendRoutes.PURCHASE,
     element: <Purchase />,
   },
-  {
-    path: FrontendRoutes.PURCHASERETURN,
-    element: <PurchaseReturn />,
-  },
-  {
-    path: FrontendRoutes.SUPPLIERS,
-    element: <Suppliers />,
-  },
+  // {
+  //   path: FrontendRoutes.PURCHASERETURN,
+  //   element: <PurchaseReturn />,
+  // },
+  // {
+  //   path: FrontendRoutes.SUPPLIERS,
+  //   element: <Suppliers />,
+  // },
 
   // Attributes
   {
@@ -130,6 +139,49 @@ export const routesConfig = [
     element: <MyPostBusinessIndex />,
   },
 
+  //Transactions
+  {
+    path: FrontendRoutes.TRANSACTION,
+    element: <Transaction />,
+  },
+  {
+    path: FrontendRoutes.VERIFY_CASH,
+    element: <VerifyCashPayment />,
+  },
+
+  //finance and expenses
+  {
+    path: FrontendRoutes.EXPENSE,
+    element: <Expenses />,
+  },
+  {
+    path: FrontendRoutes.CASHFLOW,
+    element: <Cashflow />,
+  },
+  {
+    path: FrontendRoutes.PROFIT_LOSS,
+    element: <ProfitandLoss />,
+  },
+
+  //Settings
+  {
+    path: FrontendRoutes.SETTINGS,
+    element: <SettingForm />,
+  },
+
+  //Analytics
+  {
+    path: FrontendRoutes.ORDER_REPORT,
+    element: <OrderReport />,
+  },
+  {
+    path: FrontendRoutes.SALES_REPORT,
+    element: <SalesReport />,
+  },
+  {
+    path: FrontendRoutes.STOCK_REPORT,
+    element: <StoreReport />,
+  },
   {
     path: "*",
     element: <NotFoundPage />,
