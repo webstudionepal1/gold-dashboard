@@ -1,54 +1,68 @@
-import { Icon } from "@iconify/react/dist/iconify.js"
-import ArrowIcon from "./ArrowIcon"
-
-interface propTypes{
-    filteredData: any
-    handleCardClick: (product: any) => void
+import { Icon } from "@iconify/react/dist/iconify.js";
+import ArrowIcon from "./ArrowIcon";
+import { IFetchProduct } from "../../../../server/api/productHooks";
+import get from "lodash/get";
+interface propTypes {
+  productList: IFetchProduct[];
+  handleCardClick: (product: IFetchProduct) => void;
 }
 
-export const ProductGridView = ({filteredData,handleCardClick}:propTypes) => {
-   return <div className='grid grid-cols-4 w-auto gap-3'>
-                       {filteredData.map((product:any) => (
-                           <div
-                               key={product.id}
-                               className="bg-white rounded-sm overflow-hidden h-80 flex flex-col cursor-pointer hover:shadow-md transition-shadow"
-                               onClick={() => handleCardClick(product)}
-                           >
-                               <div className='flex justify-between my-4'>
-                                   <div className="flex flex-col gap-6">
-                                       <ArrowIcon />
-                                   </div>
-                                   <span className="text-xs text-white font-medium rounded-sm bg-lightbrown py-1 px-2">Sale</span>
-                               </div>
-                               <img
-                                   src={product.image || "/placeholder.svg"}
-                                   alt={product.title}
-                                   className="object-contain w-auto h-auto"
-                               />
-                               <span className="text-sm font-medium text-brown bg-brown bg-opacity-'status bg-opacity-40 flex justify-center">
-                                   {product.category}
-                               </span>
-                               <div className="flex justify-between px-2 items-center mb-2">
-                                   <h3 className="text-md font-medium text-black">{product.title}</h3>
-                                   <div className="flex">
-                                       {[...Array(5)].map((_, i) => (
-                                           <Icon
-                                               key={i}
-                                               icon={i < product.rating ? "mdi:star" : "mdi:star-outline"}
-                                               className={`w-4 h-4 ${i < product.rating ? "text-yellow" : "text-gray-300"}`}
-                                           />
-                                       ))}
-                                   </div>
-                               </div>
-                               <div className="flex items-center gap-x-2">
-                                   <span className="text-lg font-bold">${product.price.toFixed(2)}</span>
-                                   {product.onSale && (
-                                       <span className="text-[#C2BDBA] line-through text-sm">
-                                           ${product.originalPrice.toFixed(2)}
-                                       </span>
-                                   )}
-                               </div>
-                           </div>
-                       ))}
-                   </div>
-}
+export const ProductGridView = ({
+  productList,
+  handleCardClick,
+}: propTypes) => {
+  return (
+    <div className="grid w-auto grid-cols-4 gap-3">
+      {productList.map((product) => (
+        <div
+          key={product._id}
+          className="flex flex-col overflow-hidden transition-shadow bg-white rounded-sm cursor-pointer h-80 hover:shadow-md"
+          onClick={() => handleCardClick(product)}
+        >
+          <div className="flex justify-between my-4">
+            <div className="flex flex-col gap-6">
+              <ArrowIcon />
+            </div>
+            <span className="px-2 py-1 text-xs font-medium text-white rounded-sm bg-lightbrown">
+              Sale
+            </span>
+          </div>
+          <img
+            src={get(product, "images[0]", '"/placeholder.svg"')}
+            alt={"image"}
+            className="object-contain w-auto h-auto"
+          />
+          <span className="text-sm font-medium text-brown bg-brown bg-opacity-'status bg-opacity-40 flex justify-center">
+            {get(product, "category.name", "-")}
+          </span>
+          <div className="flex items-center justify-between px-2 mb-2">
+            <h3 className="font-medium text-black text-md">
+              {get(product, "title", "-")}
+            </h3>
+            <div className="flex">
+              {[...Array(5)].map((_, i) => (
+                <Icon
+                  key={i}
+                  icon={i < product?.ratings ? "mdi:star" : "mdi:star-outline"}
+                  className={`w-4 h-4 ${
+                    i < product?.ratings ? "text-yellow" : "text-gray-300"
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+          <div className="flex items-center gap-x-2">
+            <span className="text-lg font-bold">
+              ${get(product, "price", 0).toFixed(2)}
+            </span>
+            {/* {product.onSale && (
+              <span className="text-[#C2BDBA] line-through text-sm">
+                ${product.originalPrice.toFixed(2)}
+              </span>
+            )} */}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};

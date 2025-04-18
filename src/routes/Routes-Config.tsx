@@ -13,7 +13,7 @@ import CompletedOrder from "../pages/OrderManagement/CompletedOrder/CompletedOrd
 import { FrontendRoutes } from "./routes";
 import ProductDescription from "../pages/Product/ProductList/[id]/ProdectDescription";
 import ProductList from "../pages/Product/ProductList/ProductList";
-import { ProductCategory } from "../pages/Product/ProductCategory/ProductCategory";
+import  ProductCategory  from "../pages/Product/ProductCategory/ProductCategory";
 import Productsubcategory from "../pages/Product/ProductSubcategory/ProductSubCategory";
 import AttributeIndex from "../pages/Attribute/AttributeIndex";
 import BannerIndex from "../pages/Banner/BannerIndex";
@@ -34,6 +34,7 @@ import SettingForm from "../pages/settings/SettingForm";
 import OrderReport from "../pages/analytics/OrderReport";
 import SalesReport from "../pages/analytics/SalesReport";
 import StoreReport from "../pages/analytics/StoreReport";
+import ProductForm from "../pages/Product/ProductList/component/ProductForm";
 
 export const routesConfig = [
   {
@@ -45,10 +46,10 @@ export const routesConfig = [
     element: <DashboardPage />,
     //******<Route element={element}/> *****/
   },
-  {
-    path: FrontendRoutes.LOGIN,
-    element: <LoginPage />,
-  },
+  // {
+  //   path: FrontendRoutes.LOGIN,
+  //   element: <LoginPage />,
+  // },
   {
     path: FrontendRoutes.ORDER,
     element: <OrderIndex />,
@@ -76,6 +77,10 @@ export const routesConfig = [
   {
     path: FrontendRoutes.PRODUCTLIST,
     element: <ProductList />,
+  },
+  {
+    path:"/product/:id",
+    element:<ProductForm/>
   },
   {
     path: FrontendRoutes.PRODUCTDESCRIPTION,

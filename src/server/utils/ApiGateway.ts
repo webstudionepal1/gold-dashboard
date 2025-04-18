@@ -1,5 +1,5 @@
-import axios from 'axios';
-
+import axios from "axios";
+import Cookies from "js-cookie";
 // Configure base URL from environment variables
 export const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}api/v1/en/`;
 export const API_BASE_URL_EN = `${import.meta.env.VITE_API_LOCAL_URL}`;
@@ -9,7 +9,7 @@ export const apiClient = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
@@ -20,7 +20,7 @@ const controllers = new Map<string, AbortController>();
 apiClient.interceptors.request.use(
   (config) => {
     // Get token from localStorage
-    const token = localStorage.getItem('_UPLFMMATRIX');
+    const token = Cookies.get("_UPLFMMATRIX");
 
     // Only add authorization header if token exists
     if (token) {
@@ -70,7 +70,7 @@ apiClient.interceptors.response.use(
     const errorMessage =
       error.response?.data?.message ||
       error.message ||
-      'An unexpected error occurred';
+      "An unexpected error occurred";
 
     return Promise.reject(errorMessage);
   }

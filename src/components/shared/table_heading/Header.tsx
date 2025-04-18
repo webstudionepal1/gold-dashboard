@@ -8,7 +8,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ children, text }) => {
   return (
-    <div className="flex items-center justify-between  pb-8 px-1 ">
+    <div className="flex items-center justify-between px-1 pb-8 ">
       <h2 className="text-[2.1rem] font-semibold">{text}</h2>
       {children}
     </div>
