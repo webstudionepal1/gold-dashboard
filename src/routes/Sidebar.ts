@@ -110,7 +110,7 @@ export const SidebarMainRoutes = {
         {
           id: 60,
           path: FrontendRoutes.TRANSACTION,
-          title: "Transaction"
+          title: "Transaction",
         },
         {
           id: 61,
@@ -118,8 +118,6 @@ export const SidebarMainRoutes = {
           title: "Verify Cash Payment",
           icon: "",
         },
-        
-
       ],
     },
     {
@@ -131,7 +129,7 @@ export const SidebarMainRoutes = {
         {
           id: 70,
           path: FrontendRoutes.EXPENSE,
-          title: "Expenses"
+          title: "Expenses",
         },
         {
           id: 71,
@@ -145,8 +143,6 @@ export const SidebarMainRoutes = {
           title: "Profit & Loss",
           icon: "",
         },
-        
-
       ],
     },
     {
@@ -158,22 +154,18 @@ export const SidebarMainRoutes = {
         {
           id: 70,
           path: FrontendRoutes.ORDER_REPORT,
-          title: "Order Report"
+          title: "Order Report",
         },
         {
           id: 71,
           path: FrontendRoutes.SALES_REPORT,
           title: "Sales Report",
-
         },
         {
           id: 72,
           path: FrontendRoutes.STOCK_REPORT,
           title: "Stock Report",
-
         },
-        
-
       ],
     },
     {
@@ -183,7 +175,7 @@ export const SidebarMainRoutes = {
       icon: "mdi-light:settings",
     },
     {
-      id: 7,
+      id: 15,
       path: FrontendRoutes.BANNER,
       title: "Banner",
       icon: "fluent:content-view-32-regular",

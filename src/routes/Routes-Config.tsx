@@ -34,6 +34,7 @@ import SettingForm from "../pages/settings/SettingForm";
 import OrderReport from "../pages/analytics/OrderReport";
 import SalesReport from "../pages/analytics/SalesReport";
 import StoreReport from "../pages/analytics/StoreReport";
+import CustomerDetails from "../pages/Customer/components/CustomerDetails";
 
 export const routesConfig = [
   {
@@ -93,6 +94,10 @@ export const routesConfig = [
   {
     path: FrontendRoutes.CUSTOMER,
     element: <CustomerIndex />,
+  },
+  {
+    path: FrontendRoutes.CUSTOMERDETAILS,
+    element: <CustomerDetails />,
   },
   {
     path: FrontendRoutes.ADDCUSTOMER,

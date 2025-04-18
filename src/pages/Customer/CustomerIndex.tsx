@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Header from "../../components/shared/table_heading/Header";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FrontendRoutes } from "../../routes/routes";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { SearchFilterSort } from "../../components/global/SearchFilterSort";
@@ -26,6 +26,7 @@ const CustomerIndex = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const navigate = useNavigate();
 
   // const [selectedTab, setSelectedTab] = useState("home_page");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -63,13 +64,7 @@ const CustomerIndex = () => {
   };
 
   const handleViewItem = (item: TableData<CustomerItem>) => {
-    // if (selectedTab === "home_page") {
-    //   setEditingItem(item);
-    // } else if (selectedTab === "other_page") {
-    setEditingItem(item);
-    // }
-    setisViewModalOpen(true);
-    console.log(item);
+    navigate(`${FrontendRoutes.CUSTOMERDETAILS}`);
   };
 
   const handleEditItem = (item: TableData<CustomerItem>) => {
