@@ -102,7 +102,7 @@ export const SidebarMainRoutes = {
       icon: "game-icons:gear-stick-pattern",
     },
     {
-      id: 6,
+      id: 18,
       path: "#",
       title: "Transaction",
       icon: "hugeicons:bitcoin-transaction",
@@ -181,7 +181,7 @@ export const SidebarMainRoutes = {
       icon: "fluent:content-view-32-regular",
     },
     {
-      id: 8,
+      id: 19,
       path: FrontendRoutes.NOTIFICATION,
       title: "Notification",
       icon: "iconamoon:notification-bold",

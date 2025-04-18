@@ -8,7 +8,7 @@ import {
 import { Table, TableData } from "../../../components/shared/Table";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { SearchFilterSort } from "../../../components/global/SearchFilterSort";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FrontendRoutes } from "../../../routes/routes";
 import Header from "../../../components/shared/table_heading/Header";
 
@@ -390,6 +390,8 @@ const OrderIndex = () => {
   const [selectedSort, setSelectedSort] = useState("");
   console.log(selectedSort);
 
+  const navigate = useNavigate();
+
   const filterOptions = [
     { value: "", label: "All Customers" },
     { value: "active", label: "Active" },
@@ -409,6 +411,10 @@ const OrderIndex = () => {
         item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item._id?.toLowerCase().includes(searchQuery.toLowerCase())
     );
+  };
+
+  const handleViewItem = (item: TableData<TableData>) => {
+    navigate(`${FrontendRoutes.ORDERDETAILS}`);
   };
 
   const handlePageChange = (page: number) => {
@@ -522,6 +528,7 @@ const OrderIndex = () => {
               showDelete
               showEdit
               showAction
+              viewRow={handleViewItem}
               showPagination={true}
               paginationDetails={{
                 currentPage,

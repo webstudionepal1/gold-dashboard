@@ -12,6 +12,7 @@ export const FrontendRoutes = {
   CANCELLEDORDER: "/order/cancelled-order",
   COMPLETEDORDER: "/order/completed-order",
   ORDER: "/order/orders",
+  ORDERDETAILS: "/order/order-details",
   CUSTOMER: "/customer/customer-list",
   CUSTOMERDETAILS: "/customer/customer-details",
   ADDCUSTOMER: "/customer/add-customer",

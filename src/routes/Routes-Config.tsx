@@ -35,6 +35,7 @@ import OrderReport from "../pages/analytics/OrderReport";
 import SalesReport from "../pages/analytics/SalesReport";
 import StoreReport from "../pages/analytics/StoreReport";
 import CustomerDetails from "../pages/Customer/components/CustomerDetails";
+import OrderDetails from "../pages/OrderManagement/Order/OrderDetails";
 
 export const routesConfig = [
   {
@@ -53,6 +54,10 @@ export const routesConfig = [
   {
     path: FrontendRoutes.ORDER,
     element: <OrderIndex />,
+  },
+  {
+    path: FrontendRoutes.ORDERDETAILS,
+    element: <OrderDetails />,
   },
   {
     path: FrontendRoutes.ADDORDER,
