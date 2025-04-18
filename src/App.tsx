@@ -1,8 +1,8 @@
-import { Outlet } from 'react-router-dom';
-import { Navbar, SideBar,  } from './components/shared';
-import { useEffect, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { initializeAuth } from './hooks/useAuth';
+import { Outlet } from "react-router-dom";
+import { Navbar, SideBar } from "./components/shared";
+import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { initializeAuth } from "./hooks/useAuth";
 
 export default function App() {
   const queryClient = useQueryClient();
@@ -10,14 +10,16 @@ export default function App() {
 
   useEffect(() => {
     const authData = initializeAuth();
-    queryClient.setQueryData(['auth'], authData);
+    queryClient.setQueryData(["auth"], authData);
   }, [queryClient]);
 
   return (
     <div className="flex bg-gray-50">
       {/* Sidebar */}
       <aside
-        className={`fixed left-0  bg-white ${!miniSidebar ? 'w-20' : 'w-72 z-[30]'} h-screen overflow-y-auto`}
+        className={`fixed left-0  bg-white ${
+          !miniSidebar ? "w-20" : "w-72 z-[30]"
+        } h-screen overflow-y-auto`}
       >
         <SideBar miniSidebar={miniSidebar} setMiniSidebar={setMiniSidebar} />
       </aside>
@@ -30,11 +32,13 @@ export default function App() {
 
       {/* Main Content */}
       <div
-        className={`flex-1 flex flex-col ${!miniSidebar ? 'pl-20' : 'pl-72'}`}
+        className={`flex-1 flex flex-col ${!miniSidebar ? "pl-20" : "pl-72"}`}
       >
         {/* Navbar */}
         <header
-          className={`fixed top-0 right-0 ${miniSidebar ? ' left-[286px]' : 'left-[80px]'}  bg-white z-20`}
+          className={`fixed top-0 right-0 ${
+            miniSidebar ? " left-[286px]" : "left-[80px]"
+          }  bg-white z-20`}
         >
           <Navbar />
         </header>
