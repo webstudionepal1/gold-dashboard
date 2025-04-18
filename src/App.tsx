@@ -44,7 +44,7 @@ export default function App() {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-auto mt-16 pt-4 bg-bg min-h-screen">
+        <main className="flex-1 min-h-screen pt-4 mt-16 overflow-auto bg-bg">
           <Outlet />
         </main>
       </div>
