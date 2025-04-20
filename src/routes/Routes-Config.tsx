@@ -2,8 +2,6 @@ import { LoginPage } from "../pages";
 
 import { DashboardPage } from "../pages/Dashboard/Dashboard";
 
-import InventoryOverview from "../pages/Inventory/InventoryOverview/InventoryOverview";
-import Purchase from "../pages/Inventory/PurchaseManagement/Purchase";
 // import PurchaseReturn from "../pages/Inventory/PurchaseManagement/PurchaseReturn";
 // import Suppliers from "../pages/Inventory/PurchaseManagement/Suppliers";
 import { NotFoundPage } from "../pages/NotFound/NotFound";
@@ -37,6 +35,8 @@ import StoreReport from "../pages/analytics/StoreReport";
 import ProductForm from "../pages/Product/ProductList/component/ProductForm";
 import CustomerDetails from "../pages/Customer/components/CustomerDetails";
 import OrderDetails from "../pages/OrderManagement/Order/OrderDetails";
+import InventoryIndex from "../pages/Inventory/InventoryIndex";
+import PurchaseIndex from "../pages/PurchaseManagement/PurchaseIndex";
 
 export const routesConfig = [
   {
@@ -116,11 +116,11 @@ export const routesConfig = [
 
   {
     path: FrontendRoutes.INVENTORY,
-    element: <InventoryOverview />,
+    element: <InventoryIndex />,
   },
   {
     path: FrontendRoutes.PURCHASE,
-    element: <Purchase />,
+    element: <PurchaseIndex />,
   },
   // {
   //   path: FrontendRoutes.PURCHASERETURN,
