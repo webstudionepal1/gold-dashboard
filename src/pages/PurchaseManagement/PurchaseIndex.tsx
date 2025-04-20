@@ -255,7 +255,7 @@ const PurchaseIndex = () => {
   };
 
   const handleViewItem = (item: TableData<TableData>) => {
-    navigate(`${FrontendRoutes.ORDERDETAILS}`);
+    navigate(`${FrontendRoutes.SUPPLIERDETAIL}`);
   };
 
   const handlePageChange = (page: number) => {

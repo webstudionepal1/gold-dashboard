@@ -420,7 +420,7 @@ const AddSupplierForm = () => {
                   <div className="mx-6 my-4">
                     <div>
                       <h1 className="text-xl font-semibold">Item Supplied</h1>
-                      <div className="border-b border-[#dedde2] w-full my-2  "></div>
+                      <div className="border-b border-[#dedde2] w-full mt-2 mb-4  "></div>
                     </div>
                     <form
                       onSubmit={(e) => {
@@ -429,7 +429,7 @@ const AddSupplierForm = () => {
                         form.handleSubmit();
                       }}
                     >
-                      <div className="w-full">
+                      <div className="w-full ">
                         <form.Field name="item_supplied">
                           {(field) => (
                             <div className="w-full">

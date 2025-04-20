@@ -38,6 +38,7 @@ import OrderDetails from "../pages/OrderManagement/Order/OrderDetails";
 import InventoryIndex from "../pages/Inventory/InventoryIndex";
 import PurchaseIndex from "../pages/PurchaseManagement/PurchaseIndex";
 import AddSupplierForm from "../pages/PurchaseManagement/components/AddSupplierForm";
+import SupplierDetail from "../pages/PurchaseManagement/pages/SupplierDetail";
 
 export const routesConfig = [
   {
@@ -122,6 +123,10 @@ export const routesConfig = [
   {
     path: FrontendRoutes.ADDSUPPLIERS,
     element: <AddSupplierForm />,
+  },
+  {
+    path: FrontendRoutes.SUPPLIERDETAIL,
+    element: <SupplierDetail />,
   },
   {
     path: FrontendRoutes.PURCHASE,
