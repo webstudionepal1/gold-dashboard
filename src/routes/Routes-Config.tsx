@@ -39,6 +39,7 @@ import InventoryIndex from "../pages/Inventory/InventoryIndex";
 import PurchaseIndex from "../pages/PurchaseManagement/PurchaseIndex";
 import AddSupplierForm from "../pages/PurchaseManagement/components/AddSupplierForm";
 import SupplierDetail from "../pages/PurchaseManagement/pages/SupplierDetail";
+import SupplierHistory from "../pages/PurchaseManagement/pages/SupplierHistory";
 
 export const routesConfig = [
   {
@@ -127,6 +128,10 @@ export const routesConfig = [
   {
     path: FrontendRoutes.SUPPLIERDETAIL,
     element: <SupplierDetail />,
+  },
+  {
+    path: FrontendRoutes.SUPPLIERHISTORY,
+    element: <SupplierHistory />,
   },
   {
     path: FrontendRoutes.PURCHASE,

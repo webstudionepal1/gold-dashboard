@@ -3,6 +3,8 @@ import Header from "../../../components/shared/table_heading/Header";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import SupplierCard from "../components/SupplierDetailCard";
 import ContactCard from "../components/ContactCard";
+import { useNavigate } from "react-router-dom";
+import { FrontendRoutes } from "../../../routes/routes";
 
 const itemSupplied = [
   {
@@ -63,6 +65,11 @@ const contactDataList = [
 ];
 const SupplierDetail = () => {
   const pinkItems = ["Necklaces", "Earrings", "Bracelets"];
+  const navigate = useNavigate();
+
+  const handleButtonClick = () => {
+    navigate(`${FrontendRoutes.SUPPLIERHISTORY}`);
+  };
   return (
     <>
       <div className="container mx-auto px-8 py-3">
@@ -86,6 +93,7 @@ const SupplierDetail = () => {
               "Hairpins",
             ]}
             buttonText="Purchase History"
+            buttonClick={handleButtonClick}
           />
         </div>
 
