@@ -20,6 +20,7 @@ export const FrontendRoutes = {
   PURCHASE: "/inventory/purchase",
   PURCHASERETURN: "/inventory/purchase-return",
   SUPPLIERS: "/inventory/suppliers",
+  ADDSUPPLIERS: "/inventory/suppliers/add-supplier",
   ATTRIBUTES: "/attribute",
   BANNER: "/banner",
   ADDBANNER: "/banner/add-banner",

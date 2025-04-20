@@ -320,7 +320,10 @@ const PurchaseIndex = () => {
 
         {selectedTab === "suppliers" && (
           <button className="px-3 py-2 flex items-center text-white bg-[#d49327] transition-transform duration-200 ease-in-out hover:scale-105 rounded-lg">
-            <Link className="flex items-center" to={FrontendRoutes.ADDORDER}>
+            <Link
+              className="flex items-center"
+              to={FrontendRoutes.ADDSUPPLIERS}
+            >
               <Icon
                 icon="material-symbols-light:add-rounded"
                 width="24"

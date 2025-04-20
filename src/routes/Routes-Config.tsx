@@ -37,6 +37,7 @@ import CustomerDetails from "../pages/Customer/components/CustomerDetails";
 import OrderDetails from "../pages/OrderManagement/Order/OrderDetails";
 import InventoryIndex from "../pages/Inventory/InventoryIndex";
 import PurchaseIndex from "../pages/PurchaseManagement/PurchaseIndex";
+import AddSupplierForm from "../pages/PurchaseManagement/components/AddSupplierForm";
 
 export const routesConfig = [
   {
@@ -117,6 +118,10 @@ export const routesConfig = [
   {
     path: FrontendRoutes.INVENTORY,
     element: <InventoryIndex />,
+  },
+  {
+    path: FrontendRoutes.ADDSUPPLIERS,
+    element: <AddSupplierForm />,
   },
   {
     path: FrontendRoutes.PURCHASE,
