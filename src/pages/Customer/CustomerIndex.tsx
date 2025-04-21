@@ -150,7 +150,7 @@ const CustomerIndex = () => {
       <Table
         columns={columns}
         data={filteredItems}
-        showEdit={true}
+        showEdit={false}
         showDelete={true}
         showView={true}
         showAction={true}
@@ -175,7 +175,7 @@ const CustomerIndex = () => {
     <>
       <div className="container mx-auto px-4 py-3">
         <Header text="Customer">
-          <button className="px-3 py-2  flex items-center  text-white bg-[#d49327] transition-transform duration-200 ease-in-out hover:scale-105 rounded-lg">
+          {/* <button className="px-3 py-2  flex items-center  text-white bg-[#d49327] transition-transform duration-200 ease-in-out hover:scale-105 rounded-lg">
             <Link className="flex items-center" to={FrontendRoutes.ADDCUSTOMER}>
               <Icon
                 icon="material-symbols-light:add-rounded"
@@ -185,7 +185,7 @@ const CustomerIndex = () => {
               />{" "}
               New Customer
             </Link>
-          </button>
+          </button> */}
         </Header>
 
         <div className="bg-[#ffffff] border-[#dcdddf] pb-[1rem] border rounded-xl">

@@ -60,7 +60,7 @@ const CustomerDetails = () => {
           <div className="flex items-center gap-3">
             <img src="/yellowgirl.png" />
             <div className="flex flex-col ">
-              <h1 className="font-semibold text-2xl">Opulent Jewel House</h1>
+              <h1 className="font-semibold text-2xl">Ram Bahadur </h1>
               <div className="flex items-center gap-4 my-2">
                 <div className="flex items-center gap-2">
                   <Icon
