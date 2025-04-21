@@ -21,12 +21,14 @@ type TableProps<T extends Record<string, any>> = {
   viewRow?: (row: TableData<T>) => void;
   editRow?: (row: TableData<T>) => void;
   deleteRow?: (row: TableData<T>) => void;
+  returnRow?: (row: TableData<T>) => void;
   onToggle?: (row: TableData<T>, isSingle?: boolean) => void;
   onButtonClick?: (row: TableData<T>) => void;
   buttonTitle?: string;
   showDelete?: boolean;
   showEdit?: boolean;
   showView?: boolean;
+  showReturn?: boolean;
   showButton?: boolean;
   showToggle?: boolean;
   showAction?: boolean;
@@ -55,9 +57,11 @@ export const Table = <T extends Record<string, any>>({
   editRow,
   onToggle,
   deleteRow,
+  returnRow,
   showDelete = false,
   showEdit,
   showView,
+  showReturn = false,
   showToggle,
   showAction = true,
   showSelectAll = true,
@@ -80,6 +84,7 @@ export const Table = <T extends Record<string, any>>({
   );
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [rowToDelete, setRowToDelete] = useState<TableData<T> | null>(null);
+  const [rowToReturn, setRowToReturn] = useState<TableData<T> | null>(null);
 
   const handleRowSelect = (row: TableData<T>) => {
     const newSelectedRows = new Set(selectedRows);
@@ -119,6 +124,10 @@ export const Table = <T extends Record<string, any>>({
   const handleDelete = (row: TableData<T>) => {
     setRowToDelete(row);
     setShowDeleteDialog(true);
+  };
+
+  const handleReturn = (row: TableData<T>) => {
+    setRowToReturn(row);
   };
 
   const handleDeleteConfirm = () => {
@@ -288,6 +297,21 @@ export const Table = <T extends Record<string, any>>({
                                 icon="lucide:pen-line"
                                 fontSize={16}
                                 color="white"
+                              />
+                            </div>
+                          )}
+
+                          {showReturn && (
+                            <div
+                              key={`return-${row._id}`}
+                              className="text-xl text-black cursor-pointer bg-[#df8d29] rounded p-1"
+                              onClick={() => returnRow?.(row)}
+                            >
+                              <Icon
+                                icon="carbon:return"
+                                width="16"
+                                height="16"
+                                className="text-white"
                               />
                             </div>
                           )}

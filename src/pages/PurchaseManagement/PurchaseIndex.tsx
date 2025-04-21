@@ -14,6 +14,8 @@ import Header from "../../components/shared/table_heading/Header";
 import { Modal } from "../../components/shared";
 import PurchaseForm from "./components/PurchaseForm";
 import { ScrollableModal } from "../../components/shared/ScrollableModal";
+import { PurchaseDetailsCard } from "./components/PurchaseDetailsCard";
+import PurchaseReturnForm from "./components/PurchaseReturnForm";
 
 // Dummy datasets
 
@@ -218,6 +220,12 @@ const PurchaseIndex = () => {
   const [selectedTab, setSelectedTab] = useState<keyof typeof tabConfig>("all");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const [activeModal, setActiveModal] = useState<
+    null | "purchase" | "purchaseReturn" | "supplier"
+  >(null);
 
   const ModalClose = () => {
     setIsModalOpen(false);
@@ -255,7 +263,37 @@ const PurchaseIndex = () => {
   };
 
   const handleViewItem = (item: TableData<TableData>) => {
-    navigate(`${FrontendRoutes.SUPPLIERDETAIL}`);
+    if (selectedTab === "all") {
+      setActiveModal("purchase");
+      setIsViewModalOpen(true);
+    } else if (selectedTab === "purchase_return_data") {
+      setActiveModal("purchaseReturn");
+      setIsViewModalOpen(true);
+    } else if (selectedTab === "suppliers") {
+      navigate(`${FrontendRoutes.SUPPLIERDETAIL}`);
+    }
+  };
+
+  const handleReturnItem = (item: TableData<TableData>) => {
+    if (selectedTab === "all") {
+      setActiveModal("purchase");
+      setIsEditModalOpen(true);
+    } else if (selectedTab === "purchase_return_data") {
+      setActiveModal("purchaseReturn");
+      setIsViewModalOpen(true);
+    } else if (selectedTab === "suppliers") {
+      navigate(`${FrontendRoutes.SUPPLIERDETAIL}`);
+    }
+  };
+
+  const handleEditItem = (item: TableData<TableData>) => {
+    if (selectedTab === "all") {
+      setActiveModal("purchase");
+    } else if (selectedTab === "purchase_return_data") {
+      setActiveModal("purchaseReturn");
+    } else if (selectedTab === "suppliers") {
+      navigate(`${FrontendRoutes.SUPPLIERDETAIL}`);
+    }
   };
 
   const handlePageChange = (page: number) => {
@@ -380,10 +418,13 @@ const PurchaseIndex = () => {
               data={data}
               columns={columns}
               showView
-              showDelete={selectedTab !== "purchase_return_data"}
-              showEdit
+              showDelete={selectedTab == "suppliers"}
+              showEdit={selectedTab !== "purchase_return_data"}
+              showReturn={selectedTab == "all"}
+              editRow={handleEditItem}
               showAction
               viewRow={handleViewItem}
+              returnRow={handleReturnItem}
               showPagination={true}
               paginationDetails={{
                 currentPage,
@@ -397,8 +438,80 @@ const PurchaseIndex = () => {
         </Tabs>
       </div>
       {isModalOpen && (
-        <ScrollableModal>
+        <ScrollableModal onClose={() => setIsModalOpen(!isViewModalOpen)}>
           <PurchaseForm onClose={ModalClose} />
+        </ScrollableModal>
+      )}
+
+      {activeModal === "purchase" && isViewModalOpen ? (
+        <ScrollableModal
+          onClose={() => setIsViewModalOpen(!isViewModalOpen)}
+          classname="w-[35rem]"
+        >
+          <PurchaseDetailsCard
+            billNo="inv 558855"
+            date="2082-02-25"
+            purchaseId="P-4565"
+            supplier="Gold supplier pvt ltd"
+            items={[
+              {
+                name: "gold",
+                unit: "Tola",
+                costPerUnit: 45,
+                quantity: 50,
+                total: 5000,
+              },
+              {
+                name: "silver",
+                unit: "Tola",
+                costPerUnit: 25,
+                quantity: 40,
+                total: 3000,
+              },
+            ]}
+            totalCost={8000}
+            discount={500}
+            netTotal={7500}
+            summaryType="purchase"
+          />
+        </ScrollableModal>
+      ) : null}
+
+      {activeModal === "purchaseReturn" && isViewModalOpen ? (
+        <ScrollableModal
+          classname="w-[35rem]"
+          onClose={() => setIsViewModalOpen(!isViewModalOpen)}
+        >
+          <PurchaseDetailsCard
+            billNo="inv 558855"
+            date="2082-02-25"
+            purchaseId="P-4565"
+            supplier="Gold supplier pvt ltd"
+            items={[
+              {
+                name: "gold",
+                unit: "Tola",
+                costPerUnit: 45,
+                quantity: 50,
+                total: 5000,
+              },
+              {
+                name: "silver",
+                unit: "Tola",
+                costPerUnit: 25,
+                quantity: 40,
+                total: 3000,
+              },
+            ]}
+            refundAmount={55000}
+            summaryType="refund"
+          />
+        </ScrollableModal>
+      ) : null}
+
+      {isEditModalOpen && (
+        <ScrollableModal onClose={() => setIsEditModalOpen(false)}>
+          <PurchaseReturnForm />
         </ScrollableModal>
       )}
     </div>

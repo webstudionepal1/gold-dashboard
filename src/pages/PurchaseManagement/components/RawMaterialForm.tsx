@@ -831,7 +831,7 @@ const RawMaterialForm = ({ onClose }: RawMaterialProps) => {
                   type="submit"
                   className="flex-1 bg-[#df8d29] text-white px-7 py-2 rounded-xl"
                 >
-                  Save
+                  Create
                 </button>
               </div>
             </form>
