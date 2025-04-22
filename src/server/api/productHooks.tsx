@@ -14,6 +14,7 @@ export interface IBaseProductSubCategory {
 }
 export interface IFetchSubCategory extends IBaseProductSubCategory {
   _id: string;
+  name: string;
 }
 
 export interface IProductCategory {
@@ -26,6 +27,7 @@ export interface IProductCategory {
 }
 export interface IFetchCategory extends IProductCategory {
   _id: string;
+  name: string;
 }
 export interface IBaseProduct {
   ratings: number;
@@ -51,6 +53,14 @@ export interface IBaseProduct {
 export interface IFetchProduct extends IBaseProduct {
   _id: string;
 }
+
+//clasps interfaces
+export interface IFetchClasps {
+  name: string;
+  images?: string[];
+  _id: string;
+}
+
 //Products routes
 export const useGetAllProductsQuery = (params: IParams = {}) => {
   return useQuery({
@@ -68,8 +78,12 @@ export const useCreateProductsMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ["products"],
-    mutationFn: async (body: IBaseProduct) => {
-      const res = await apiClient.post("product", body);
+    mutationFn: async (body: FormData) => {
+      const res = await apiClient.post("product", body, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       return res?.data?.data;
     },
     onSuccess() {
@@ -90,7 +104,7 @@ export const useUpdateProductsMutation = () => {
       body,
     }: {
       id: string | undefined;
-      body: IBaseProduct;
+      body: FormData;
     }) => {
       const res = await apiClient.patch(`product/${id}`, body);
       return res?.data?.data;
@@ -265,6 +279,18 @@ export const useDeleteProductSubCategoryMutation = () => {
     },
     onError(err: string) {
       toast.error(err || "Error deleting product subcategory");
+    },
+  });
+};
+// Product clasp
+export const useGetAllProductClaspsQuery = (params: IParams = {}) => {
+  return useQuery({
+    queryKey: ["clasp"],
+    queryFn: async () => {
+      const res = await apiClient.get<{ data: IFetchClasps[] }>("clasp", {
+        params,
+      });
+      return res?.data?.data;
     },
   });
 };

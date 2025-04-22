@@ -4,6 +4,7 @@ import { useGetLoginMutation } from "../../server/api/authHooks";
 import { useEffect } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { twMerge } from "tailwind-merge";
+import { useNavigate } from "react-router-dom";
 export const FieldError = ({ field }: { field: any }) => {
   if (field.state.meta.errors.length > 0) {
     const error = field.state.meta.errors[0];
@@ -24,6 +25,7 @@ export const FieldError = ({ field }: { field: any }) => {
 
 export const LoginPage = () => {
   const { mutate: doLogin, isPending, isSuccess } = useGetLoginMutation();
+  const navigate = useNavigate();
   const loginSchema = z.object({
     email: z.string().min(1, "***Email is required").email("Invalid email"),
     password: z.string().min(8, "***Password must be atleast 8 char"),
@@ -46,6 +48,7 @@ export const LoginPage = () => {
   useEffect(() => {
     if (isSuccess) {
       form.reset();
+      navigate("/", { replace: true });
     }
   }, [isSuccess]);
 

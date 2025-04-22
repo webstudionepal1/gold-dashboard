@@ -1,12 +1,15 @@
 import { useForm } from "@tanstack/react-form";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import * as z from "zod";
 import { Modal } from "../../../../components/shared";
 import {
   IFetchSubCategory,
   useCreateProductSubCategoryMutation,
-  useUpdateProductSubCategoryMutation
+  useGetAllProductCategoriesQuery,
+  useUpdateProductSubCategoryMutation,
 } from "../../../../server/api/productHooks";
+import { DropdownField } from "../../../../components/shared/form_components/Dropdown";
+import { FieldError } from "../../../auth/LoginPage";
 interface propTypes {
   modalRef: React.RefObject<HTMLDivElement | null>;
   editData?: IFetchSubCategory | null;
@@ -15,6 +18,7 @@ interface propTypes {
 
 const validationSchema = z.object({
   name: z.string().min(1, "Name is required"),
+  category: z.string().min(1, "Category is required"),
   description: z.string(),
 });
 export const AddProductSubCategory = ({
@@ -22,14 +26,25 @@ export const AddProductSubCategory = ({
   closeModal,
   editData,
 }: propTypes) => {
+  const { data: categories, isSuccess: categorySuccess } =
+    useGetAllProductCategoriesQuery();
   const { mutate: createSubCategory, isSuccess } =
     useCreateProductSubCategoryMutation();
   const { mutate: updateSubCategory, isSuccess: isUpdateSuccess } =
     useUpdateProductSubCategoryMutation();
 
+  const categoriesList = useMemo(
+    () =>
+      categorySuccess
+        ? categories?.map((item) => ({ label: item.name, value: item._id }))
+        : [],
+    [categorySuccess, categories]
+  );
+  console.log(categoriesList)
   const form = useForm({
     defaultValues: {
       name: editData?.name ?? " ",
+      category: editData?.name ?? "",
       description: editData?.description ?? " ",
     },
     validators: {
@@ -79,6 +94,21 @@ export const AddProductSubCategory = ({
               )}
             </form.Field>
           </div>
+          <form.Field name="category">
+            {(field) => (
+              <div>
+                <DropdownField
+                  label="Category"
+                  required
+                  firstInput="Select Category"
+                  options={categoriesList}
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+                <FieldError field={field} />
+              </div>
+            )}
+          </form.Field>
           <div>
             <label
               htmlFor="description"
