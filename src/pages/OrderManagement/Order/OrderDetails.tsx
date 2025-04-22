@@ -8,6 +8,7 @@ import OrderTracker from "./components/OrderTracker";
 import { CheckIcon, PackageIcon, TruckIcon } from "lucide-react";
 import { pageConfigs, PageType } from "../../../config/orderPageConfig";
 import { useParams } from "react-router-dom";
+import InfoSection from "./components/InfoSection";
 
 interface CustomerDetails {
   _id: string;
@@ -134,7 +135,7 @@ const orderCancelled = [
   {
     id: 5,
     title: "Cancelled Date",
-    date: "2051-01-11",
+    date: <div className="text-red">2051-01-11</div>,
   },
 
   {
@@ -188,7 +189,7 @@ const OrderDetails = () => {
   return (
     <div className="container mx-auto px-4 py-3">
       <div className="flex items-center justify-between mb-2 ">
-        {page === "order-details" ? (
+        {/* {page === "order-details" ? (
           <Header text="Order Details" />
         ) : page === "confirmed-order-details" ? (
           <Header text="Confirmed Orders" />
@@ -200,6 +201,14 @@ const OrderDetails = () => {
           <Header text="Cancelled Orders" />
         ) : (
           <></>
+        )} */}
+
+        {page === "order-details" ? (
+          <Header text="Order Details" />
+        ) : page === "cancelled-order-details" ? (
+          <Header text="Cancelled Orders" />
+        ) : (
+          <Header text="Order Details" />
         )}
       </div>
 
@@ -376,59 +385,21 @@ const OrderDetails = () => {
 
         <div className=" grid grid-cols-12 gap-4 h-auto mt-[2rem] mx-3   ">
           <div className="col-span-4 lg:col-span-8  bg-white border-2 rounded-xl border-[#d5d9e4] ">
-            <div className="px-3 py-2">
-              <div className="flex items-center justify-between">
-                <h1 className="text-xl font-semibold">Shipping Information</h1>
-
-                {/* <button>
-                  <div className="text-xl text-black cursor-pointer bg-green rounded p-1">
-                    <Icon icon="lucide:pen-line" fontSize={16} color="white" />
-                  </div>
-                </button> */}
-              </div>
-              <div className="border-b-2 border-[#d5d9e4] my-2"></div>
-
-              <div className=" space-y-4">
-                {shippingInformation.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center justify-between  "
-                  >
-                    <p className="text-sm min-w-[150px]">{item.title}:</p>
-                    <p className="text-sm">{item.value || item.Note}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <InfoSection
+              title="Shipping Information"
+              info={shippingInformation}
+              showEdit={false}
+              onEditClick={() => console.log("Edit clicked")}
+            />
           </div>
           {page === "cancelled-order-details" ? (
             <div className="col-span-4 lg:col-span-4  bg-white border-2 rounded-xl border-[#d5d9e4] ">
-              <div className="px-3 py-2">
-                <div className="flex items-center justify-between">
-                  <h1 className="text-xl font-semibold">Order Canceled</h1>
-
-                  {/* <button>
-                  <div className="text-xl text-black cursor-pointer bg-green rounded p-1">
-                    <Icon icon="lucide:pen-line" fontSize={16} color="white" />
-                  </div>
-                </button> */}
-                </div>
-                <div className="border-b-2 border-[#d5d9e4] my-2"></div>
-
-                <div className=" space-y-4">
-                  {orderCancelled.map((item) => (
-                    <div
-                      key={item.id}
-                      className="flex items-center justify-between  "
-                    >
-                      <p className="text-sm ">{item.title}:</p>
-                      <p className="text-sm">
-                        {item.value || item.reason || item.date}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <InfoSection
+                title="Order Cancelled"
+                info={orderCancelled}
+                showEdit={false}
+                onEditClick={() => console.log("Edit clicked")}
+              />
             </div>
           ) : (
             <div className="col-span-4 lg:col-span-4  bg-white border-2 rounded-xl border-[#d5d9e4] ">
