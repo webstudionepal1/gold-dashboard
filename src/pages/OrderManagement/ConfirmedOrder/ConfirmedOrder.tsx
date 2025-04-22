@@ -9,6 +9,7 @@ import { Modal } from "../../../components/shared";
 import { useOutsideClick } from "../../../hooks/UseOutsideClick";
 import { SearchFilterSort } from "../../../components/global/SearchFilterSort";
 import Header from "../../../components/shared/table_heading/Header";
+import { useNavigate } from "react-router-dom";
 interface Order {
   _id: string;
   orderId: string;
@@ -16,6 +17,7 @@ interface Order {
   orderDate: string;
   deliveryDate: string;
   totalAmount: number;
+  total_items: string;
   status:
     | "Confirmed"
     | "Not Confirmed"
@@ -34,14 +36,16 @@ const ConfirmedOrder: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const ref = useOutsideClick(() => setIsModalOpen(false));
+  const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([
     {
       _id: "1",
       orderId: "#12",
       customerName: "James Carder",
-      orderDate: "2001-01-02 2:00 PM",
-      deliveryDate: "2001-01-02 2:00 PM",
+      orderDate: "2001-01-02 ",
+      deliveryDate: "2001-01-02 ",
       totalAmount: 25.5,
+      total_items: "09",
       status: "Confirmed",
       isActive: true,
     },
@@ -49,9 +53,11 @@ const ConfirmedOrder: React.FC = () => {
       _id: "2",
       orderId: "#12",
       customerName: "James Carder",
-      orderDate: "2001-01-02 2:00 PM",
-      deliveryDate: "2001-01-02 2:00 PM",
+      orderDate: "2001-01-02 ",
+      deliveryDate: "2001-01-02 ",
       totalAmount: 25.5,
+      total_items: "09",
+
       status: "Confirmed",
       isActive: true,
     },
@@ -59,9 +65,11 @@ const ConfirmedOrder: React.FC = () => {
       _id: "3",
       orderId: "#12",
       customerName: "James Carder",
-      orderDate: "2001-01-02 2:00 PM",
-      deliveryDate: "2001-01-02 2:00 PM",
+      orderDate: "2001-01-02 ",
+      deliveryDate: "2001-01-02 ",
       totalAmount: 25.5,
+      total_items: "09",
+
       status: "Not Confirmed",
       isActive: true,
     },
@@ -69,9 +77,11 @@ const ConfirmedOrder: React.FC = () => {
       _id: "4",
       orderId: "#12",
       customerName: "Alfonso Dokidis",
-      orderDate: "2001-01-02 2:00 PM",
-      deliveryDate: "2001-01-02 2:00 PM",
+      orderDate: "2001-01-02 ",
+      deliveryDate: "2001-01-02 ",
       totalAmount: 25.5,
+      total_items: "09",
+
       status: "Confirmed",
       isActive: true,
     },
@@ -83,6 +93,8 @@ const ConfirmedOrder: React.FC = () => {
     orderDate: "",
     deliveryDate: "",
     totalAmount: 0,
+    total_items: "09",
+
     status: "Confirmed",
     isActive: true,
   });
@@ -144,7 +156,24 @@ const ConfirmedOrder: React.FC = () => {
 
   const columns: ColumnConfig<Order>[] = [
     { header: "Order Id", key: "orderId" },
-    { header: "Customer Name", key: "customerName" },
+    {
+      header: "Customer Name",
+      key: "customerName",
+      render: (_: any, row: any) => (
+        <div className="flex items-center justify-center">
+          <img
+            src={
+              "https://imgs.search.brave.com/N7iiPmgTwP6DQJtXQfwaAm-6xOmlKftSIdIkAcau0yk/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvMTE5/ODI1MjY3Mi9waG90/by9lbmdhZ2VtZW50/LWRpYW1vbmQtcmlu/Zy1qZXdlbHJ5LWlz/b2xhdGVkLW9uLXdo/aXQlRDElODMtYmFj/a2dyb3VuZC5qcGc_/cz02MTJ4NjEyJnc9/MCZrPTIwJmM9cDFu/Q2o0SDBkWnFURlBs/YTVxT0hMSnRDQUZJ/Y0F6NW5zeGU2UDJs/cWdXMD0"
+            }
+            alt={row.item_name}
+            className="w-10 h-10 rounded-md mr-3 object-cover"
+          />
+          <div>
+            <div className="font-medium text-gray-900">{row.customerName}</div>
+          </div>
+        </div>
+      ),
+    },
     { header: "Order Date", key: "orderDate" },
     { header: "Delivery Date", key: "deliveryDate" },
     {
@@ -153,11 +182,15 @@ const ConfirmedOrder: React.FC = () => {
       render: (value, row) => `Rs. ${row.totalAmount.toFixed(2)}`,
     },
     {
+      header: "Total Items",
+      key: "total_items",
+    },
+    {
       header: "Status",
       key: "status",
       render: (value, row) => (
         <span
-          className={`px-5 py-1 rounded-full text-xs ${getStatusColor(
+          className={`px-2 py-1 rounded-full text-xs ${getStatusColor(
             row.status
           )}`}
         >
@@ -209,6 +242,10 @@ const ConfirmedOrder: React.FC = () => {
     setCurrentPage(1);
   };
 
+  const handleViewRow = () => {
+    navigate(`/order/confirmed-order-details`);
+  };
+
   return (
     <div className="container mx-auto px-4 py-3">
       <Header text="Confirmed Orders" />
@@ -229,6 +266,7 @@ const ConfirmedOrder: React.FC = () => {
           data={filteredOrders}
           showSelectAll={true}
           onRowSelect={handleRowSelect}
+          viewRow={handleViewRow}
           onToggle={handleToggleStatus}
           deleteRow={handleDeleteOrder}
           showView={true}

@@ -11,6 +11,7 @@ import {
 import { useOutsideClick } from "../../../hooks/UseOutsideClick";
 import { SearchFilterSort } from "../../../components/global/SearchFilterSort";
 import Header from "../../../components/shared/table_heading/Header";
+import { useNavigate } from "react-router-dom";
 
 interface Order {
   _id: string;
@@ -33,6 +34,7 @@ const CancelledOrder: React.FC = () => {
   const ref = useOutsideClick(() => setIsModalOpen(false));
   const [selectedFilter, setSelectedFilter] = useState("");
   const [selectedSort, setSelectedSort] = useState("");
+  const navigate = useNavigate();
 
   const [orders, setOrders] = useState<Order[]>([
     {
@@ -129,7 +131,7 @@ const CancelledOrder: React.FC = () => {
     { header: "Order Id", key: "orderId" },
     { header: "Customer Name", key: "customerName" },
     { header: "Order Date", key: "orderDate" },
-    { header: "Cancelled Date", key: "cancelledDate" },
+    { header: "Cancellelation Date", key: "cancelledDate" },
 
     {
       header: "Cancellation Reason",
@@ -183,6 +185,10 @@ const CancelledOrder: React.FC = () => {
     setCurrentPage(1);
   };
 
+  const handleViewRow = () => {
+    navigate(`/order/cancelled-order-details`);
+  };
+
   // Custom action buttons for each row
   const renderActionButtons = (row: TableData<Order>) => (
     <div className="flex gap-2">
@@ -232,6 +238,7 @@ const CancelledOrder: React.FC = () => {
           columns={columns}
           data={filteredOrders}
           showView={true}
+          viewRow={handleViewRow}
           showSelectAll={true}
           onRowSelect={handleRowSelect}
           deleteRow={handleDeleteOrder}

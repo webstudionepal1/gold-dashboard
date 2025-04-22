@@ -60,7 +60,7 @@ export const routesConfig = [
     element: <OrderIndex />,
   },
   {
-    path: FrontendRoutes.ORDERDETAILS,
+    path: "/order/:page",
     element: <OrderDetails />,
   },
   {

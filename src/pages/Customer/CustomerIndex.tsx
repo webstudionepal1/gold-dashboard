@@ -174,7 +174,7 @@ const CustomerIndex = () => {
   return (
     <>
       <div className="container mx-auto px-4 py-3">
-        <Header text="Customer">
+        <Header text="Customer List">
           {/* <button className="px-3 py-2  flex items-center  text-white bg-[#d49327] transition-transform duration-200 ease-in-out hover:scale-105 rounded-lg">
             <Link className="flex items-center" to={FrontendRoutes.ADDCUSTOMER}>
               <Icon

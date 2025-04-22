@@ -9,6 +9,7 @@ import { Modal } from "../../../components/shared";
 import { useOutsideClick } from "../../../hooks/UseOutsideClick";
 import { SearchFilterSort } from "../../../components/global/SearchFilterSort";
 import Header from "../../../components/shared/table_heading/Header";
+import { useNavigate } from "react-router-dom";
 interface Order {
   _id: string;
   orderId: string;
@@ -34,6 +35,7 @@ const AssignedOrder: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const ref = useOutsideClick(() => setIsModalOpen(false));
+  const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([
     {
       _id: "1",
@@ -204,6 +206,10 @@ const AssignedOrder: React.FC = () => {
     setCurrentPage(1);
   };
 
+  const handleViewRow = () => {
+    navigate(`/order/assigned-order-details`);
+  };
+
   const handleSort = (sort: string) => {
     setSelectedSort(sort);
     setCurrentPage(1);
@@ -232,6 +238,7 @@ const AssignedOrder: React.FC = () => {
           onToggle={handleToggleStatus}
           deleteRow={handleDeleteOrder}
           showView={true}
+          viewRow={handleViewRow}
           showEdit={false}
           showDelete={false}
           showToggle={false}

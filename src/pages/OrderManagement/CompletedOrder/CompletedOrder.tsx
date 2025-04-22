@@ -9,6 +9,7 @@ import {
 import { useOutsideClick } from "../../../hooks/UseOutsideClick";
 import { SearchFilterSort } from "../../../components/global/SearchFilterSort";
 import Header from "../../../components/shared/table_heading/Header";
+import { useNavigate } from "react-router-dom";
 interface Order {
   _id: string;
   orderId: string;
@@ -28,7 +29,7 @@ const CompletedOrder: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-
+  const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([
     {
       _id: "1",
@@ -196,6 +197,9 @@ const CompletedOrder: React.FC = () => {
     setSelectedFilter(filter);
     setCurrentPage(1);
   };
+  const handleViewRow = () => {
+    navigate(`/order/completed-order-details`);
+  };
 
   const handleSort = (sort: string) => {
     setSelectedSort(sort);
@@ -224,6 +228,7 @@ const CompletedOrder: React.FC = () => {
           showDelete={false}
           showToggle={false}
           showView={true}
+          viewRow={handleViewRow}
           showAction={true}
           showSelectAll={true}
           onRowSelect={handleRowSelect}

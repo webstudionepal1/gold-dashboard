@@ -247,17 +247,21 @@ export function SimpleTable<T extends { [key: string]: any }>({
                       status === "out of stock" || status === "cancelled";
                     const isPositive =
                       status === "in stock" || status === "delivered";
-
+                    const isNeutral = status === "low stock";
                     const bgClass = isNegative
                       ? "bg-[#ffeceb]"
                       : isPositive
                       ? "bg-[#e9fbef]"
+                      : isNeutral
+                      ? "bg-[#fff8ea]"
                       : "bg-gray-100";
 
                     const textClass = isNegative
                       ? "text-[#ff3b2f]"
                       : isPositive
                       ? "text-[#28c260]"
+                      : isNeutral
+                      ? "text-[#f7ba1e]"
                       : "text-gray-600";
 
                     return (
