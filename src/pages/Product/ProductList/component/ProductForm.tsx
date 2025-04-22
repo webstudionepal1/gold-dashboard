@@ -1,712 +1,617 @@
-// import { useState } from "react";
-// import { useForm } from "@tanstack/react-form";
-// import { z } from "zod";
-// import { InputField } from "../../../../components/shared/form_components/InputField";
-// import { DropdownField } from "../../../../components/shared/form_components/Dropdown";
+import { useEffect, useMemo, useState } from "react";
+import { useForm, useStore } from "@tanstack/react-form";
+import { InputField } from "../../../../components/shared/form_components/InputField";
+import { DropdownField } from "../../../../components/shared/form_components/Dropdown";
+import { FieldError } from "../../../auth/LoginPage";
+import * as z from "zod";
+import {
+  useCreateProductsMutation,
+  useGetAllProductCategoriesQuery,
+  useGetAllProductClaspsQuery,
+  useGetAllProductSubCategoriesQuery,
+  useUpdateProductsMutation,
+} from "../../../../server/api/productHooks";
+import { Icon } from "@iconify/react/dist/iconify.js";
+import { PriceInputField } from "../../../OrderManagement/Order/components/PriceInputField";
+import ChipInputInside from "../../ProductCategory/components/ChipInputInside";
+import { useParams } from "react-router-dom";
+import Header from "../../../../components/shared/table_heading/Header";
+import { productStore } from "../../../../store/productStore";
+import { generateProductDefaultValue } from "./productobj";
 
-// const ProductSchema = z.object({
-//   // General Information
-//   productName: z.string().min(1, "Product name is required"),
-//   description: z.string().min(1, "Description is required"),
-//   productCategory: z.string().min(1, "Product category is required"),
-//   productSubCategory: z.string().min(1, "Product sub-category is required"),
-//   manufacturerType: z.string().min(1, "Manufacturer type is required"),
+// Define types for the form
+type VisibilityType =
+  | "featured"
+  | "bestsellers"
+  | "newarrivals"
+  | "recommended"
+  | "";
 
-//   // Pricing
-//   basePrice: z.string().min(1, "Base price is required"),
+type ProductVariant = {
+  price: number;
+  size: string;
+  unit: string;
+};
 
-//   // Product Specification
-//   length: z.string().min(1, "Length is required"),
-//   colorType: z.string().min(1, "Color type is required"),
-//   sizeWithPackagingType: z.string().min(1, "Size with packaging is required"),
-//   shoeboxFinish: z.string().min(1, "Shoebox finish is required"),
+type ProductFormValues = {
+  // General Information
+  name: string;
+  description: string;
+  category: string;
+  subCategory: string;
 
-//   // Material Information
-//   shape: z.string().min(1, "Shape is required"),
-//   quantity: z.string().min(1, "Quantity is required"),
-//   hssnCode: z.string().min(1, "HSSN code is required"),
-//   thread: z.string().min(1, "Thread is required"),
-//   clarity: z.string().min(1, "Clarity is required"),
-//   dimension: z.string().min(1, "Dimension is required"),
-//   color: z.string().min(1, "Color is required"),
+  // Price and Variants
+  variant: ProductVariant[];
 
-//   // Visibility Options
-//   visibility: z.array(z.string()).optional(),
+  // Product Specification
+  length: number; // Changed to number
+  claspType: string | undefined;
+  rhodoumFinishes: boolean; // Changed to boolean
 
-//   // Tags
-//   tags: z.array(z.string()).optional(),
-// });
+  // Material Information
+  shape: string;
+  clarity: string;
+  dimension: number; // Changed to number
 
-// const FieldError = ({ field }) => {
-//   if (field.state.meta.errors && field.state.meta.errors.length > 0) {
-//     const error = field.state.meta.errors[0];
-//     const errorMessage =
-//       typeof error === "string"
-//         ? error
-//         : error.message || JSON.stringify(error);
+  // Visibility Option (single selection)
+  visibleAs: VisibilityType;
 
-//     return (
-//       <div className="min-h-[16px]">
-//         <span className="text-xs text-red-500">{errorMessage}</span>
-//       </div>
-//     );
-//   }
-//   return <div className="min-h-[16px]"></div>;
-// };
+  // Tags
+  tags: string[];
+};
 
-// const ProductForm = () => {
-//   const [activeTab, setActiveTab] = useState("new");
-//   const [uploadedImages, setUploadedImages] = useState([]);
-//   const [selectedTags, setSelectedTags] = useState(["Featured"]);
+// Define types for image uploads
+type UploadedImage = {
+  name: string;
+  url: string;
+  file: File;
+};
+const validationSchema = z.object({
+  // General Information
+  name: z.string().min(1, "Name is required"),
+  description: z.string().min(1, "Description is required"),
+  category: z.string().min(1, "Category is required"),
+  subCategory: z.string().min(1, "Sub Category is required"),
 
-//   const form = useForm({
-//     defaultValues: {
-//       // General Information
-//       productName: "",
-//       description: "",
-//       productCategory: "",
-//       productSubCategory: "",
-//       manufacturerType: "self-manufactured",
+  // Price
+  variant: z
+    .array(
+      z.object({ price: z.number().min(1), size: z.string(), unit: z.string() })
+    )
+    .min(1, "At least one variant is required"),
 
-//       // Pricing
-//       basePrice: "",
+  // Product Specification
+  length: z.number().min(1, "Length is required"),
+  claspType: z.string().optional(),
+  rhodoumFinishes: z.boolean(),
 
-//       // Product Specification
-//       length: "",
-//       colorType: "",
-//       sizeWithPackagingType: "",
-//       shoeboxFinish: "Yes",
+  // Material Information
+  shape: z.string().min(1, "Shape is required"),
+  clarity: z.string().min(1, "Clarity is required"),
+  dimension: z.number().min(1, "Dimension is required"),
 
-//       // Material Information
-//       shape: "",
-//       quantity: "",
-//       hssnCode: "",
-//       thread: "",
-//       clarity: "",
-//       dimension: "",
-//       color: "",
+  // Visibility Option (single selection)
+  visibleAs: z.enum([
+    "",
+    "featured",
+    "bestsellers",
+    "newarrivals",
+    "recommended",
+  ]),
 
-//       // Visibility Options
-//       visibility: ["featured"],
-
-//       // Tags
-//       tags: ["Featured"],
-//     },
-//     validators: {
-//       onSubmit: ProductSchema,
-//     },
-//     onSubmit: async ({ value }) => {
-//       console.log("Product Submitted:", value);
-//       // Submit to backend or API
-//     },
-//   });
-
-//   const handleImageUpload = (e) => {
-//     if (e.target.files) {
-//       const newImages = Array.from(e.target.files).map((file) => ({
-//         name: file.name,
-//         url: URL.createObjectURL(file),
-//       }));
-//       setUploadedImages([...uploadedImages, ...newImages].slice(0, 4)); // Limit to 4 images
-//     }
-//   };
-
-//   const toggleTag = (tag) => {
-//     if (selectedTags.includes(tag)) {
-//       setSelectedTags(selectedTags.filter((t) => t !== tag));
-//     } else {
-//       setSelectedTags([...selectedTags, tag]);
-//     }
-//   };
-
-//   return (
-//     <div className="max-w-6xl p-6 mx-auto bg-white">
-//       {/* Tab Navigation */}
-//       <div className="flex mb-6 border-b">
-//         <button
-//           className={`px-4 py-2 ${
-//             activeTab === "new"
-//               ? "border-b-2 border-orange-500 text-orange-500"
-//               : "text-gray-500"
-//           }`}
-//           onClick={() => setActiveTab("new")}
-//         >
-//           New Product
-//         </button>
-//         <button
-//           className={`px-4 py-2 ${
-//             activeTab === "existing"
-//               ? "border-b-2 border-orange-500 text-orange-500"
-//               : "text-gray-500"
-//           }`}
-//           onClick={() => setActiveTab("existing")}
-//         >
-//           Existing Product
-//         </button>
-//       </div>
-
-//       <form
-//         onSubmit={(e) => {
-//           e.preventDefault();
-//           e.stopPropagation();
-//           form.handleSubmit();
-//         }}
-//         className="grid grid-cols-1 gap-6 lg:grid-cols-3"
-//       >
-//         {/* Left Column - Main Form */}
-//         <div className="col-span-2 space-y-6">
-//           {/* General Information Section */}
-//           <div className="p-4 border rounded-lg">
-//             <h2 className="mb-4 font-medium text-gray-700">
-//               General Information
-//             </h2>
-
-//             <div className="space-y-4">
-//               <form.Field name="productName">
-//                 {(field) => (
-//                   <div>
-//                     <InputField
-//                       label="Product Name"
-//                       required
-//                       placeholder="Select"
-//                       value={field.state.value}
-//                       onChange={(e) => field.handleChange(e.target.value)}
-//                     />
-//                     <FieldError field={field} />
-//                   </div>
-//                 )}
-//               </form.Field>
-
-//               <form.Field name="description">
-//                 {(field) => (
-//                   <div>
-//                     <div className="flex flex-col">
-//                       <label className="mb-1 text-sm font-medium text-gray-700">
-//                         Description <span className="text-red-500">*</span>
-//                       </label>
-//                       <textarea
-//                         placeholder="Enter short description"
-//                         className="p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-//                         value={field.state.value}
-//                         onChange={(e) => field.handleChange(e.target.value)}
-//                         rows={3}
-//                       />
-//                     </div>
-//                     <FieldError field={field} />
-//                   </div>
-//                 )}
-//               </form.Field>
-
-//               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-//                 <form.Field name="productCategory">
-//                   {(field) => (
-//                     <div>
-//                       <DropdownField
-//                         label="Product Category"
-//                         required
-//                         firstInput="Select Category"
-//                         options={[
-//                           { value: "jewelry", label: "Jewelry" },
-//                           { value: "watches", label: "Watches" },
-//                           { value: "accessories", label: "Accessories" },
-//                         ]}
-//                         value={field.state.value}
-//                         onChange={(e) => field.handleChange(e.target.value)}
-//                       />
-//                       <FieldError field={field} />
-//                     </div>
-//                   )}
-//                 </form.Field>
-
-//                 <form.Field name="productSubCategory">
-//                   {(field) => (
-//                     <div>
-//                       <DropdownField
-//                         label="Product Sub-Category"
-//                         required
-//                         firstInput="Select Sub Category"
-//                         options={[
-//                           { value: "rings", label: "Rings" },
-//                           { value: "necklaces", label: "Necklaces" },
-//                           { value: "bracelets", label: "Bracelets" },
-//                         ]}
-//                         value={field.state.value}
-//                         onChange={(e) => field.handleChange(e.target.value)}
-//                       />
-//                       <FieldError field={field} />
-//                     </div>
-//                   )}
-//                 </form.Field>
-//               </div>
-
-//               <form.Field name="manufacturerType">
-//                 {(field) => (
-//                   <div>
-//                     <label className="mb-1 text-sm font-medium text-gray-700">
-//                       Manufacturer
-//                     </label>
-//                     <div className="flex flex-col gap-2">
-//                       <div className="flex items-center">
-//                         <input
-//                           type="radio"
-//                           id="self-manufactured"
-//                           name="manufacturerType"
-//                           value="self-manufactured"
-//                           checked={field.state.value === "self-manufactured"}
-//                           onChange={() =>
-//                             field.handleChange("self-manufactured")
-//                           }
-//                           className="mr-2"
-//                         />
-//                         <label htmlFor="self-manufactured">
-//                           Self Manufactured goods
-//                         </label>
-//                       </div>
-//                       <div className="flex items-center">
-//                         <input
-//                           type="radio"
-//                           id="third-party"
-//                           name="manufacturerType"
-//                           value="third-party"
-//                           checked={field.state.value === "third-party"}
-//                           onChange={() => field.handleChange("third-party")}
-//                           className="mr-2"
-//                         />
-//                         <label htmlFor="third-party">Third-party goods</label>
-//                       </div>
-//                     </div>
-//                     <FieldError field={field} />
-//                   </div>
-//                 )}
-//               </form.Field>
-//             </div>
-//           </div>
-
-//           {/* Pricing Section */}
-//           <div className="p-4 border rounded-lg">
-//             <h2 className="mb-4 font-medium text-gray-700">Pricing</h2>
-
-//             <form.Field name="basePrice">
-//               {(field) => (
-//                 <div>
-//                   <div className="flex items-end gap-2">
-//                     <div className="w-1/6">
-//                       <label className="mb-1 text-sm font-medium text-gray-700">
-//                         Base Price <span className="text-red-500">*</span>
-//                       </label>
-//                       <div className="p-2 text-center bg-gray-100 border rounded-md">
-//                         Rs.
-//                       </div>
-//                     </div>
-//                     <div className="flex-1">
-//                       <InputField
-//                         placeholder="Enter Base Price"
-//                         value={field.state.value}
-//                         onChange={(e) => field.handleChange(e.target.value)}
-//                       />
-//                     </div>
-//                   </div>
-//                   <FieldError field={field} />
-//                 </div>
-//               )}
-//             </form.Field>
-//           </div>
-
-//           {/* Product Specification */}
-//           <div className="p-4 border rounded-lg">
-//             <h2 className="mb-4 font-medium text-gray-700">
-//               Product Specification
-//             </h2>
-
-//             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-//               <form.Field name="length">
-//                 {(field) => (
-//                   <div>
-//                     <InputField
-//                       label="Length"
-//                       required
-//                       placeholder="1000"
-//                       value={field.state.value}
-//                       onChange={(e) => field.handleChange(e.target.value)}
-//                     />
-//                     <FieldError field={field} />
-//                   </div>
-//                 )}
-//               </form.Field>
-
-//               <form.Field name="colorType">
-//                 {(field) => (
-//                   <div>
-//                     <DropdownField
-//                       label="Color Type"
-//                       required
-//                       firstInput="Size with packaging"
-//                       options={[
-//                         { value: "gold", label: "Gold" },
-//                         { value: "silver", label: "Silver" },
-//                         { value: "rose-gold", label: "Rose Gold" },
-//                       ]}
-//                       value={field.state.value}
-//                       onChange={(e) => field.handleChange(e.target.value)}
-//                     />
-//                     <FieldError field={field} />
-//                   </div>
-//                 )}
-//               </form.Field>
-
-//               <form.Field name="sizeWithPackagingType">
-//                 {(field) => (
-//                   <div>
-//                     <DropdownField
-//                       label="Size with packaging"
-//                       required
-//                       firstInput="Size with packaging"
-//                       options={[
-//                         { value: "small", label: "Small" },
-//                         { value: "medium", label: "Medium" },
-//                         { value: "large", label: "Large" },
-//                       ]}
-//                       value={field.state.value}
-//                       onChange={(e) => field.handleChange(e.target.value)}
-//                     />
-//                     <FieldError field={field} />
-//                   </div>
-//                 )}
-//               </form.Field>
-//             </div>
-
-//             <div className="mt-4">
-//               <form.Field name="shoeboxFinish">
-//                 {(field) => (
-//                   <div>
-//                     <DropdownField
-//                       label="Shoebox Finish"
-//                       required
-//                       options={[
-//                         { value: "Yes", label: "Yes" },
-//                         { value: "No", label: "No" },
-//                       ]}
-//                       value={field.state.value}
-//                       onChange={(e) => field.handleChange(e.target.value)}
-//                     />
-//                     <FieldError field={field} />
-//                   </div>
-//                 )}
-//               </form.Field>
-//             </div>
-//           </div>
-
-//           {/* Material Information */}
-//           <div className="p-4 border rounded-lg">
-//             <h2 className="mb-4 font-medium text-gray-700">
-//               Material Information
-//             </h2>
-
-//             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-//               <form.Field name="shape">
-//                 {(field) => (
-//                   <div>
-//                     <InputField
-//                       label="Shape"
-//                       required
-//                       placeholder=""
-//                       value={field.state.value}
-//                       onChange={(e) => field.handleChange(e.target.value)}
-//                     />
-//                     <FieldError field={field} />
-//                   </div>
-//                 )}
-//               </form.Field>
-
-//               <form.Field name="quantity">
-//                 {(field) => (
-//                   <div>
-//                     <InputField
-//                       label="Quantity"
-//                       required
-//                       placeholder="25"
-//                       value={field.state.value}
-//                       onChange={(e) => field.handleChange(e.target.value)}
-//                     />
-//                     <FieldError field={field} />
-//                   </div>
-//                 )}
-//               </form.Field>
-
-//               <form.Field name="hssnCode">
-//                 {(field) => (
-//                   <div>
-//                     <InputField
-//                       label="HSSN Code"
-//                       required
-//                       placeholder="52.2"
-//                       value={field.state.value}
-//                       onChange={(e) => field.handleChange(e.target.value)}
-//                     />
-//                     <FieldError field={field} />
-//                   </div>
-//                 )}
-//               </form.Field>
-
-//               <form.Field name="thread">
-//                 {(field) => (
-//                   <div>
-//                     <InputField
-//                       label="Thread"
-//                       required
-//                       placeholder=""
-//                       value={field.state.value}
-//                       onChange={(e) => field.handleChange(e.target.value)}
-//                     />
-//                     <FieldError field={field} />
-//                   </div>
-//                 )}
-//               </form.Field>
-
-//               <form.Field name="clarity">
-//                 {(field) => (
-//                   <div>
-//                     <InputField
-//                       label="Clarity"
-//                       required
-//                       placeholder=""
-//                       value={field.state.value}
-//                       onChange={(e) => field.handleChange(e.target.value)}
-//                     />
-//                     <FieldError field={field} />
-//                   </div>
-//                 )}
-//               </form.Field>
-
-//               <form.Field name="dimension">
-//                 {(field) => (
-//                   <div>
-//                     <InputField
-//                       label="Dimension"
-//                       required
-//                       placeholder=""
-//                       value={field.state.value}
-//                       onChange={(e) => field.handleChange(e.target.value)}
-//                     />
-//                     <FieldError field={field} />
-//                   </div>
-//                 )}
-//               </form.Field>
-
-//               <form.Field name="color">
-//                 {(field) => (
-//                   <div>
-//                     <InputField
-//                       label="Color"
-//                       required
-//                       placeholder=""
-//                       value={field.state.value}
-//                       onChange={(e) => field.handleChange(e.target.value)}
-//                     />
-//                     <FieldError field={field} />
-//                   </div>
-//                 )}
-//               </form.Field>
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* Right Column - Sidebar */}
-//         <div className="space-y-6">
-//           {/* Visibility Options */}
-//           <div className="p-4 border rounded-lg">
-//             <h2 className="mb-4 font-medium text-gray-700">Visible as</h2>
-
-//             <form.Field name="visibility">
-//               {(field) => (
-//                 <div className="space-y-2">
-//                   <div className="flex items-center">
-//                     <input
-//                       type="checkbox"
-//                       id="visibility-featured"
-//                       value="featured"
-//                       checked={field.state.value?.includes("featured")}
-//                       onChange={(e) => {
-//                         const newVisibility = e.target.checked
-//                           ? [...(field.state.value || []), "featured"]
-//                           : (field.state.value || []).filter(
-//                               (v) => v !== "featured"
-//                             );
-//                         field.handleChange(newVisibility);
-//                       }}
-//                       className="mr-2"
-//                     />
-//                     <label htmlFor="visibility-featured">Featured</label>
-//                   </div>
-
-//                   <div className="flex items-center">
-//                     <input
-//                       type="checkbox"
-//                       id="visibility-bestsellers"
-//                       value="bestsellers"
-//                       checked={field.state.value?.includes("bestsellers")}
-//                       onChange={(e) => {
-//                         const newVisibility = e.target.checked
-//                           ? [...(field.state.value || []), "bestsellers"]
-//                           : (field.state.value || []).filter(
-//                               (v) => v !== "bestsellers"
-//                             );
-//                         field.handleChange(newVisibility);
-//                       }}
-//                       className="mr-2"
-//                     />
-//                     <label htmlFor="visibility-bestsellers">Best Sellers</label>
-//                   </div>
-
-//                   <div className="flex items-center">
-//                     <input
-//                       type="checkbox"
-//                       id="visibility-newarrivals"
-//                       value="newarrivals"
-//                       checked={field.state.value?.includes("newarrivals")}
-//                       onChange={(e) => {
-//                         const newVisibility = e.target.checked
-//                           ? [...(field.state.value || []), "newarrivals"]
-//                           : (field.state.value || []).filter(
-//                               (v) => v !== "newarrivals"
-//                             );
-//                         field.handleChange(newVisibility);
-//                       }}
-//                       className="mr-2"
-//                     />
-//                     <label htmlFor="visibility-newarrivals">New Arrivals</label>
-//                   </div>
-
-//                   <div className="flex items-center">
-//                     <input
-//                       type="checkbox"
-//                       id="visibility-recommended"
-//                       value="recommended"
-//                       checked={field.state.value?.includes("recommended")}
-//                       onChange={(e) => {
-//                         const newVisibility = e.target.checked
-//                           ? [...(field.state.value || []), "recommended"]
-//                           : (field.state.value || []).filter(
-//                               (v) => v !== "recommended"
-//                             );
-//                         field.handleChange(newVisibility);
-//                       }}
-//                       className="mr-2"
-//                     />
-//                     <label htmlFor="visibility-recommended">
-//                       Recommended for you
-//                     </label>
-//                   </div>
-//                 </div>
-//               )}
-//             </form.Field>
-//           </div>
-
-//           {/* Product Tags */}
-//           <div className="p-4 border rounded-lg">
-//             <h2 className="mb-4 font-medium text-gray-700">Product Tags</h2>
-
-//             <form.Field name="tags">
-//               {(field) => (
-//                 <div>
-//                   <div className="flex flex-wrap gap-2">
-//                     {selectedTags.map((tag) => (
-//                       <span
-//                         key={tag}
-//                         className="px-3 py-1 text-sm text-orange-500 bg-orange-100 rounded-full"
-//                       >
-//                         {tag}
-//                       </span>
-//                     ))}
-//                   </div>
-//                 </div>
-//               )}
-//             </form.Field>
-//           </div>
-
-//           {/* Upload Photos */}
-//           <div className="p-4 border rounded-lg">
-//             <h2 className="mb-4 font-medium text-gray-700">Upload Photos</h2>
-
-//             <div className="p-8 mb-4 text-center border-2 border-dashed rounded-lg">
-//               <div className="flex justify-center">
-//                 <svg
-//                   xmlns="http://www.w3.org/2000/svg"
-//                   className="w-12 h-12 text-gray-400"
-//                   fill="none"
-//                   viewBox="0 0 24 24"
-//                   stroke="currentColor"
-//                 >
-//                   <path
-//                     strokeLinecap="round"
-//                     strokeLinejoin="round"
-//                     strokeWidth={2}
-//                     d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-//                   />
-//                 </svg>
-//               </div>
-//               <p className="mt-2 text-sm text-gray-500">
-//                 JPEG, PNG, SVG or JPG
-//               </p>
-//               <p className="mt-1 text-xs text-gray-400">
-//                 (Max file size 800 KB)
-//               </p>
-
-//               <input
-//                 type="file"
-//                 id="photo-upload"
-//                 multiple
-//                 accept="image/*"
-//                 onChange={handleImageUpload}
-//                 className="hidden"
-//               />
-//               <label
-//                 htmlFor="photo-upload"
-//                 className="inline-block px-4 py-2 mt-4 text-gray-700 bg-gray-100 rounded cursor-pointer hover:bg-gray-200"
-//               >
-//                 Browse File
-//               </label>
-//             </div>
-
-//             {/* Preview of uploaded images */}
-//             {uploadedImages.length > 0 && (
-//               <div className="grid grid-cols-4 gap-2">
-//                 {uploadedImages.map((img, index) => (
-//                   <div key={index} className="overflow-hidden border rounded">
-//                     <img
-//                       src={img.url}
-//                       alt={`Preview ${index}`}
-//                       className="object-cover w-full h-16"
-//                     />
-//                   </div>
-//                 ))}
-//               </div>
-//             )}
-//           </div>
-
-//           {/* Submit Button */}
-//           <div className="text-right">
-//             <button
-//               type="submit"
-//               className="px-6 py-2 text-white bg-orange-500 rounded-md hover:bg-orange-600"
-//             >
-//               Save Product
-//             </button>
-//           </div>
-//         </div>
-//       </form>
-//     </div>
-//   );
-// };
-
-// export default ProductForm;
-
-import React from 'react'
+  // Tags
+  tags: z.array(z.string()).min(1, "At least one tag is required"),
+});
 
 const ProductForm = () => {
-  return (
-    <div>ProductForm</div>
-  )
-}
+  const { id } = useParams();
+  const productData = useStore(productStore, (state) => state);
 
-export default ProductForm
+  const { mutate: createProduct, isPending: pendingAddition , isSuccess:productCreateSuccess} =
+    useCreateProductsMutation();
+  const { mutate: updateProduct, isPending: pendingUpdate, isSuccess:productUpdateSuccess } =
+    useUpdateProductsMutation();
+  const { data: categories, isSuccess: categorySuccess } =
+    useGetAllProductCategoriesQuery();
+  const { data: subCategories, isSuccess: subSuccess } =
+    useGetAllProductSubCategoriesQuery();
+  const { data: clasps, isSuccess: claspsSuccess } =
+    useGetAllProductClaspsQuery();
+
+  const categoriesList = useMemo(
+    () =>
+      categorySuccess
+        ? categories.map((item) => ({ label: item.name, value: item._id }))
+        : [],
+    [categorySuccess, categories]
+  );
+
+  const subCategoriesList = useMemo(
+    () =>
+      subSuccess
+        ? subCategories.map((item) => ({ label: item.name, value: item._id }))
+        : [],
+    [subSuccess, subCategories]
+  );
+
+  const claspsList = useMemo(
+    () =>
+      claspsSuccess
+        ? clasps.map((item) => ({ label: item.name, value: item._id }))
+        : [],
+    [claspsSuccess, clasps]
+  );
+
+  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
+  const visibilityOptions = [
+    { value: "featured", label: "Featured" },
+    { value: "bestsellers", label: "Best Sellers" },
+    { value: "newarrivals", label: "New Arrivals" },
+    { value: "recommended", label: "Recommended for you" },
+  ];
+const formstate = id??'add'
+  const form = useForm({
+    defaultValues: generateProductDefaultValue(formstate, productData),
+    // validators: {
+    //   onChange: validationSchema,
+    // },
+    validators:{
+      onChange:validationSchema.parse
+    },
+    onSubmit: async ({ value }) => {
+      try {
+        // Create a proper data object to send to the server (avoid FormData issues with complex objects)
+
+        const formData = new FormData();
+        formData.append("name", value.name);
+        formData.append("description", value.description);
+        formData.append("category", value.category);
+        formData.append("subCategory", value.subCategory);
+
+        value.variant.forEach((v: ProductVariant, index: number) => {
+          formData.append(`variant[${index}][price]`, String(v.price));
+          formData.append(`variant[${index}][size]`, v.size);
+          formData.append(`variant[${index}][unit]`, v.unit);
+        });
+
+        formData.append("length", String(value.length));
+        if (value.claspType) formData.append("claspType", value.claspType);
+        formData.append("rhodoumFinishes", String(value.rhodoumFinishes));
+        formData.append("shape", value.shape);
+        formData.append("clarity", value.clarity);
+        formData.append("dimension", String(value.dimension));
+        formData.append("visibleAs", value.visibleAs);
+
+        value.tags.forEach((tag: string, index: number) => {
+          formData.append(`tags[${index}]`, tag);
+        });
+
+        uploadedImages.forEach((img) => {
+          formData.append(`images`, img.file);
+        });
+        if (id == "add") createProduct(formData);
+        else updateProduct({ id: productData._id, body: formData });
+      } catch (error) {
+        console.error("Form submission error:", error);
+      }
+    },
+  });
+
+  useEffect(()=>{
+    if(productCreateSuccess || productUpdateSuccess) form.reset()
+  },[productCreateSuccess, productUpdateSuccess])
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newImages = Array.from(e.target.files).map((file: File) => ({
+        name: file.name,
+        file: file,
+        url: URL.createObjectURL(file),
+      }));
+      setUploadedImages([...uploadedImages, ...newImages].slice(0, 4));
+    }
+  };
+
+  return (
+    <div className="max-w-6xl p-2 mx-auto">
+      <Header text={id === "add" ? "Add Product" : "Edit Product"} />
+
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          form.handleSubmit();
+        }}
+        className="grid grid-cols-1 gap-4 lg:grid-cols-3"
+      >
+        <div className="col-span-2 bg-white rounded-md">
+          {/* Left Column - Main Form */}
+          <div className="col-span-2">
+            {/* General Information Section */}
+            <div className="p-4 rounded-lg">
+              <h2 className="py-2 mb-2 font-semibold text-gray-700 border-b">
+                General Information
+              </h2>
+
+              <div className="space-y-4">
+                <form.Field name="name">
+                  {(field) => (
+                    <div>
+                      <InputField
+                        label="Product Name"
+                        required
+                        placeholder="Enter product name"
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                      />
+                      <FieldError field={field} />
+                    </div>
+                  )}
+                </form.Field>
+
+                <form.Field name="description">
+                  {(field) => (
+                    <div>
+                      <div className="flex flex-col">
+                        <label className="mb-1 text-sm font-medium text-gray-700">
+                          Description <span className="text-red-500">*</span>
+                        </label>
+                        <textarea
+                          placeholder="Enter short description"
+                          className="p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                          value={field.state.value}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          rows={3}
+                        />
+                      </div>
+                      <FieldError field={field} />
+                    </div>
+                  )}
+                </form.Field>
+
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <form.Field name="category">
+                    {(field) => (
+                      <div>
+                        <DropdownField
+                          label="Product Category"
+                          required
+                          firstInput="Select Category"
+                          options={categoriesList}
+                          value={field.state.value}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                        />
+                        <FieldError field={field} />
+                      </div>
+                    )}
+                  </form.Field>
+
+                  <form.Field name="subCategory">
+                    {(field) => (
+                      <div>
+                        <DropdownField
+                          label="Product Sub-Category"
+                          required
+                          firstInput="Select Sub Category"
+                          options={subCategoriesList}
+                          value={field.state.value}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                        />
+                        <FieldError field={field} />
+                      </div>
+                    )}
+                  </form.Field>
+                </div>
+              </div>
+            </div>
+
+            {/* Pricing Section */}
+            <div className="p-4 rounded-lg">
+              <form.Field name="variant" mode="array">
+                {(field) => (
+                  <div>
+                    <div className="flex items-center justify-between w-full py-2 mb-2 text-sm border-b">
+                      <h2 className="text-base font-semibold text-gray-700 ">
+                        Pricing
+                      </h2>
+                      <button
+                        onClick={() =>
+                          field.pushValue({ price: 0, size: "", unit: "gm" })
+                        }
+                        type="button"
+                        className="flex bg-[#DF8D28] rounded-md text-white items-center gap-2 px-3 py-2"
+                      >
+                        <Icon icon="ep:plus" width="18" height="18" />
+                        Product Size
+                      </button>
+                    </div>
+                    {field.state.value.map((_:void, i:number) => (
+                      <div key={i}>
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                          <form.Field name={`variant.${i}.price`}>
+                            {(subField) => (
+                              <div>
+                                <PriceInputField
+                                  label="Base Price"
+                                  placeholder="Enter base price"
+                                  type="number"
+                                  required
+                                  value={subField.state.value as string}
+                                  onChange={(e) =>
+                                    subField.handleChange(
+                                      Number(e.target.value)
+                                    )
+                                  }
+                                />
+                                <FieldError field={subField} />
+                              </div>
+                            )}
+                          </form.Field>
+                          <form.Field name={`variant.${i}.size`}>
+                            {(subField) => (
+                              <div>
+                                <InputField
+                                  label="size"
+                                  required
+                                  placeholder="Enter in gram"
+                                  value={subField.state.value as string}
+                                  onChange={(e) =>
+                                    subField.handleChange(e.target.value)
+                                  }
+                                />
+                                <FieldError field={subField} />
+                              </div>
+                            )}
+                          </form.Field>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </form.Field>
+            </div>
+
+            {/* Product Specification */}
+            <div className="p-4 rounded-lg">
+              <h2 className="py-2 mb-2 font-semibold text-gray-700 border-b">
+                Product Specification
+              </h2>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <form.Field name="length">
+                  {(field) => (
+                    <div>
+                      <InputField
+                        label="Length"
+                        required
+                        type="number"
+                        placeholder="0"
+                        value={String(field.state.value)}
+                        onChange={(e) =>
+                          field.handleChange(Number(e.target.value))
+                        }
+                      />
+                      <FieldError field={field} />
+                    </div>
+                  )}
+                </form.Field>
+
+                <form.Field name="claspType">
+                  {(field) => (
+                    <div>
+                      <DropdownField
+                        label="Clasp Type"
+                        required
+                        firstInput="Select clasp type"
+                        options={claspsList}
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                      />
+                      <FieldError field={field} />
+                    </div>
+                  )}
+                </form.Field>
+
+                <form.Field name="rhodoumFinishes">
+                  {(field) => (
+                    <div>
+                      <DropdownField
+                        label="Rhodoum Finishes"
+                        required
+                        firstInput="Select finish"
+                        options={[
+                          { value: "true", label: "Yes" },
+                          { value: "false", label: "No" },
+                        ]}
+                        value={String(field.state.value)}
+                        onChange={(e) =>
+                          field.handleChange(e.target.value === "true")
+                        }
+                      />
+                      <FieldError field={field} />
+                    </div>
+                  )}
+                </form.Field>
+              </div>
+            </div>
+
+            {/* Material Information */}
+            <div className="p-4 rounded-lg">
+              <h2 className="py-2 mb-2 font-semibold text-gray-700 border-b">
+                Material Information
+              </h2>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <form.Field name="shape">
+                  {(field) => (
+                    <div>
+                      <InputField
+                        label="Shape"
+                        required
+                        placeholder="Enter shape"
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                      />
+                      <FieldError field={field} />
+                    </div>
+                  )}
+                </form.Field>
+
+                <form.Field name="clarity">
+                  {(field) => (
+                    <div>
+                      <InputField
+                        label="Clarity"
+                        required
+                        placeholder="Enter clarity"
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                      />
+                      <FieldError field={field} />
+                    </div>
+                  )}
+                </form.Field>
+
+                <form.Field name="dimension">
+                  {(field) => (
+                    <div>
+                      <InputField
+                        label="Dimension"
+                        required
+                        type="number"
+                        placeholder="0"
+                        value={String(field.state.value)}
+                        onChange={(e) =>
+                          field.handleChange(Number(e.target.value))
+                        }
+                      />
+                      <FieldError field={field} />
+                    </div>
+                  )}
+                </form.Field>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column - Sidebar */}
+        <div className="space-y-6 ">
+          {/* Visibility Options - Radio Buttons */}
+          <div className="p-4 bg-white border rounded-lg">
+            <h2 className="mb-4 font-medium text-gray-700">Visible as</h2>
+
+            <form.Field name="visibleAs">
+              {(field) => (
+                <div className="space-y-2">
+                  {visibilityOptions.map((option) => (
+                    <div key={option.value} className="flex items-center">
+                      <input
+                        type="radio"
+                        id={`visibility-${option.value}`}
+                        value={option.value}
+                        checked={field.state.value === option.value}
+                        onChange={() => field.handleChange(option.value)}
+                        className="mr-2"
+                      />
+                      <label htmlFor={`visibility-${option.value}`}>
+                        {option.label}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </form.Field>
+          </div>
+
+          {/* Product Tags */}
+          <div className="p-4 bg-white border rounded-lg">
+            <h2 className="mb-4 font-medium text-gray-700">Product Tags</h2>
+
+            <form.Field name="tags">
+              {(field) => (
+                <div>
+                  <ChipInputInside field={field} />
+                  {/* <div className="flex flex-wrap gap-2">
+                 
+                  </div> */}
+                </div>
+              )}
+            </form.Field>
+          </div>
+
+          {/* Upload Photos */}
+          <div className="p-4 bg-white border rounded-lg">
+            <h2 className="mb-4 font-medium text-gray-700">Upload Photos</h2>
+
+            <div className="p-8 mb-4 text-center border-2 border-dashed rounded-lg">
+              <div className="flex justify-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-12 h-12 text-gray-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                  />
+                </svg>
+              </div>
+              <p className="mt-2 text-sm text-gray-500">
+                JPEG, PNG, SVG or JPG
+              </p>
+              <p className="mt-1 text-xs text-gray-400">
+                (Max file size 800 KB)
+              </p>
+
+              <input
+                type="file"
+                id="photo-upload"
+                multiple
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+              <label
+                htmlFor="photo-upload"
+                className="inline-block px-4 py-2 mt-4 text-gray-700 bg-gray-100 rounded cursor-pointer hover:bg-gray-200"
+              >
+                Browse File
+              </label>
+            </div>
+
+            {/* Preview of uploaded images */}
+            {uploadedImages.length > 0 && (
+              <div className="grid grid-cols-4 gap-2">
+                {uploadedImages.map((img, index) => (
+                  <div key={index} className="overflow-hidden border rounded">
+                    <img
+                      src={img.url}
+                      alt={`Preview ${index}`}
+                      className="object-cover w-full h-16"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Submit Button */}
+          <div className="text-right">
+            <button
+              type="submit"
+              className="px-6 py-2 text-white rounded-md bg-orange hover:bg-orange-600"
+            >
+              Save Product
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default ProductForm;

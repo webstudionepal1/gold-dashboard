@@ -58,12 +58,12 @@ export const SearchFilterSort: React.FC<SearchFilterSortProps> = ({
   };
   return (
     <div className="container my-4">
-      <div className="flex  justify-between flex-row gap-4 md:flex-row ">
+      <div className="flex flex-row justify-between gap-4 md:flex-row ">
         {/* Search Input */}
         <div className="flex flex-row ">
           {showSearch && (
             <div className="relative flex-grow w-[25rem] ">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <Icon
                   icon="mynaui:search"
                   fontSize={16}
@@ -75,16 +75,16 @@ export const SearchFilterSort: React.FC<SearchFilterSortProps> = ({
                 value={searchQuery}
                 onChange={handleSearchChange}
                 placeholder={placeholder}
-                className="pl-10 pr-4 py-3 border rounded-md w-full  text-sm  text-fade-black outline-none"
+                className="w-full py-3 pl-10 pr-4 text-sm bg-white border rounded-md outline-none text-fade-black"
               />
             </div>
           )}
         </div>
 
-        <div className="flex items-center divide-x-2 border rounded-lg">
+        <div className="flex items-center border divide-x-2 rounded-lg">
           {/* Filter Dropdown */}
           {showFilter && filterOptions.length > 0 && (
-            <div className="relative w-auto flex justify-center">
+            <div className="relative flex justify-center w-auto">
               {" "}
               {/* Set equal width */}
               <label htmlFor="filter-select" className="sr-only">
@@ -94,7 +94,7 @@ export const SearchFilterSort: React.FC<SearchFilterSortProps> = ({
                 id="filter-select"
                 value={selectedFilter}
                 onChange={handleFilterChange}
-                className="appearance-none pl-8 pr-6  w-auto text-sm text-black outline-none"
+                className="w-auto pl-8 pr-6 text-sm text-black bg-white outline-none appearance-none"
               >
                 <option value="">Filter</option>
                 {filterOptions.map((option) => (
@@ -103,14 +103,14 @@ export const SearchFilterSort: React.FC<SearchFilterSortProps> = ({
                   </option>
                 ))}
               </select>
-              <div className="absolute inset-y-0 left-2 flex items-center pointer-events-none">
+              <div className="absolute inset-y-0 flex items-center pointer-events-none left-2">
                 <Icon
                   icon="rivet-icons:filter"
                   fontSize={16}
                   className="text-black"
                 />
               </div>
-              <div className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
+              <div className="absolute inset-y-0 flex items-center pointer-events-none right-2">
                 <Icon
                   icon="mdi:chevron-down"
                   fontSize={16}
@@ -122,7 +122,7 @@ export const SearchFilterSort: React.FC<SearchFilterSortProps> = ({
 
           {/* Grid/Column View Select */}
           {showView && (
-            <div className="relative w-auto flex justify-center">
+            <div className="relative flex justify-center w-auto">
               {" "}
               {/* Equal width */}
               <label htmlFor="view-select" className="sr-only">
@@ -132,12 +132,12 @@ export const SearchFilterSort: React.FC<SearchFilterSortProps> = ({
                 id="view-select"
                 value={view}
                 onChange={handleViewChange}
-                className="appearance-none pl-8 pr-6  w-auto text-sm outline-none text-black"
+                className="w-auto pl-8 pr-6 text-sm text-black bg-white outline-none appearance-none"
               >
                 <option value="grid">Grid</option>
                 <option value="column">Column</option>
               </select>
-              <div className="absolute inset-y-0 left-2 flex items-center pointer-events-none">
+              <div className="absolute inset-y-0 flex items-center pointer-events-none left-2">
                 <Icon
                   icon={
                     view === "grid" ? "mdi:view-grid-outline" : "mynaui:rows"
@@ -146,7 +146,7 @@ export const SearchFilterSort: React.FC<SearchFilterSortProps> = ({
                   className="text-black"
                 />
               </div>
-              <div className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
+              <div className="absolute inset-y-0 flex items-center pointer-events-none right-2">
                 <Icon
                   icon="mdi:chevron-down"
                   fontSize={16}
@@ -158,7 +158,7 @@ export const SearchFilterSort: React.FC<SearchFilterSortProps> = ({
 
           {/* Sort Dropdown */}
           {showSort && sortOptions.length > 0 && (
-            <div className="relative w-auto flex justify-center">
+            <div className="relative flex justify-center w-auto">
               {" "}
               {/* Equal width */}
               <label htmlFor="sort-select" className="sr-only">
@@ -168,7 +168,7 @@ export const SearchFilterSort: React.FC<SearchFilterSortProps> = ({
                 id="sort-select"
                 value={selectedSort}
                 onChange={handleSortChange}
-                className="appearance-none pl-8 pr-6  w-auto text-sm outline-none text-black"
+                className="w-auto pl-8 pr-6 text-sm text-black bg-white outline-none appearance-none"
               >
                 <option value="">Sort</option>
                 {sortOptions.map((option) => (
@@ -177,15 +177,15 @@ export const SearchFilterSort: React.FC<SearchFilterSortProps> = ({
                   </option>
                 ))}
               </select>
-              <div className="absolute inset-y-0 left-2 flex items-center pointer-events-none">
+              <div className="absolute inset-y-0 flex items-center pointer-events-none left-2">
                 <Icon
                   icon="lucide:sort-desc"
                   fontSize={16}
                   className="text-black"
                 />
               </div>
-              <div className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
-                <Icon icon="mdi:chevron-down" className="text-black text-lg" />
+              <div className="absolute inset-y-0 flex items-center pointer-events-none right-2">
+                <Icon icon="mdi:chevron-down" className="text-lg text-black" />
               </div>
             </div>
           )}

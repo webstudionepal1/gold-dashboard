@@ -5,9 +5,13 @@ import { SearchFilterSort } from "../../../components/global/SearchFilterSort";
 import { filterOptions, sortOptions } from "../../../constants/DropDownOptions";
 import {
   IFetchProduct,
+  useDeleteProductsMutation,
   useGetAllProductsQuery,
 } from "../../../server/api/productHooks";
 import { ProductGridView } from "./component/GridView";
+import { Table } from "../../../components/shared";
+import { updateProductState } from "../../../store/productStore";
+import { get } from "lodash";
 
 // Filter state interface
 interface FilterState {
@@ -22,6 +26,7 @@ const ProductList: React.FC = () => {
     () => (isSuccess ? productsList : []),
     [isSuccess, productsList]
   );
+  const { mutate: deleteProduct } = useDeleteProductsMutation();
   const navigate = useNavigate();
 
   // Consolidated filter state
@@ -112,12 +117,41 @@ const ProductList: React.FC = () => {
   if (isLoading) {
     return <Icon icon="svg-spinners:ring-resize" width="24" height="24" />;
   }
+  const columns = [
+    {
+      header: "Product",
+      key: "product",
+    },
+    {
+      header: "Category",
+      key: "category",
+    },
+    {
+      header: "Sub Category",
+      key: "subCategory",
+    },
+    {
+      header: "Price",
+      key: "price",
+    },
+    {
+      header: "Stock",
+      key: "stock",
+    },
+  ];
+  const tableData = filteredProducts.map((product) => ({
+    ...product,
+    product: get(product, "name", ""),
+    category: get(product, "category.name", ""),
+    subCategory: get(product, "subCategory.name", ""),
 
+    
+  }))
   return (
     <div className="container pl-10 pr-4 mx-auto py-auto">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Products</h1>
-        <Link to="/product/product-list/add">
+        <Link to="/product/add">
           <button className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-white px-4 py-2 flex rounded-lg transition-colors duration-200">
             <Icon icon="ic:outline-add" fontSize={24} />
             New Product
@@ -139,17 +173,23 @@ const ProductList: React.FC = () => {
           placeholder="Search products..."
         />
 
-        <ProductGridView
+        {/* <ProductGridView
           productList={filteredProducts}
           handleCardClick={handleCardClick}
+        /> */}
+        <Table
+          columns={columns}
+          showEdit={true}
+          editRow={(row) => {
+            updateProductState(row);
+            navigate(`/product/edit`);
+          }}
+          deleteRow={(row) => deleteProduct(row._id)}
+          showDelete={true}
+          // showView={true}
+          data={tableData}
         />
       </div>
-      {/* {addProductDialog && (
-        <AddProductDialog
-          onClose={handleDialogClose}
-          onSubmit={handleAddSubmit}
-        />
-      )} */}
     </div>
   );
 };
