@@ -1,4 +1,3 @@
-// // components/SimpleTable.tsx
 // import React from "react";
 // import { Icon } from "@iconify/react";
 
@@ -19,6 +18,7 @@
 //   showCheckbox?: boolean;
 //   showViewButton?: boolean;
 //   viewAllButton?: React.ReactNode;
+//   titlePosition?: string;
 // };
 
 // export function SimpleTable<T extends { [key: string]: any }>({
@@ -32,6 +32,7 @@
 //   showCheckbox = false,
 //   showViewButton = true,
 //   viewAllButton,
+//   titlePosition,
 // }: SimpleTableProps<T>) {
 //   const [selectedRows, setSelectedRows] = React.useState<Set<number>>(
 //     new Set()
@@ -49,16 +50,18 @@
 //   };
 
 //   return (
-//     <div className={`p-4 bg-white  rounded-xl   overflow-y-auto`}>
-//       <div className="flex items-center justify-between py-1  ">
+//     <div className={`  px-4 bg-white rounded-xl overflow-y-auto`}>
+//       <div
+//         className={`flex items-center ${titlePosition && titlePosition}   py-1`}
+//       >
 //         {title && (
 //           <h2 className="mb-4 text-xl font-semibold text-gray-700">{title}</h2>
 //         )}
 //         {/* <div className="mb-4">{viewAllButton}</div> */}
 //       </div>
 
-//       <div className="mt-3 overflow-x-auto ">
-//         <table className="w-full ">
+//       <div className=" overflow-x-auto">
+//         <table className="w-full">
 //           <thead>
 //             <tr className="text-sm text-center text-[#15112C] tracking-wide border-b">
 //               {showCheckbox && <th className="pb-2" />}
@@ -67,7 +70,9 @@
 //                   {col.header ?? String(col.key)}
 //                 </th>
 //               ))}
-//               {showViewButton && <th className="pb-2">View</th>}
+//               {(showViewButton || showDeleteButton) && (
+//                 <th className="pb-2">Actions</th>
+//               )}
 //             </tr>
 //           </thead>
 //           <tbody>
@@ -89,24 +94,29 @@
 //                 {columns.map((col, i) => {
 //                   const value = row[col.key];
 
-//                   // Built-in rendering for "status"
+//                   // Special handling for status
 //                   if (col.key === "status") {
 //                     const status = String(value).toLowerCase();
 //                     const isNegative =
 //                       status === "out of stock" || status === "cancelled";
 //                     const isPositive =
 //                       status === "in stock" || status === "delivered";
-
+//                     const isNeutral =
+//                       status === "low stock" || status === "pending";
 //                     const bgClass = isNegative
 //                       ? "bg-[#ffeceb]"
 //                       : isPositive
 //                       ? "bg-[#e9fbef]"
+//                       : isNeutral
+//                       ? "bg-[#fff8ea]"
 //                       : "bg-gray-100";
 
 //                     const textClass = isNegative
 //                       ? "text-[#ff3b2f]"
 //                       : isPositive
 //                       ? "text-[#28c260]"
+//                       : isNeutral
+//                       ? "text-[#f7ba1e]"
 //                       : "text-gray-600";
 
 //                     return (
@@ -120,7 +130,6 @@
 //                     );
 //                   }
 
-//                   // Fallback to custom render or raw value
 //                   return (
 //                     <td key={i} className="py-3 text-gray-700">
 //                       {col.render ? col.render(value, row) : value ?? "—"}
@@ -128,14 +137,39 @@
 //                   );
 //                 })}
 
-//                 {showViewButton && (
-//                   <td className="py-3">
-//                     <div
-//                       className="inline-flex items-center justify-center bg-primary-blue p-1 rounded cursor-pointer"
-//                       onClick={() => onView?.(row)}
-//                     >
-//                       <Icon icon="mdi:eye-outline" color="white" width={16} />
-//                     </div>
+//                 {(showViewButton || showDeleteButton) && (
+//                   <td className="py-3 flex items-center justify-center gap-2">
+//                     {showViewButton && (
+//                       <div
+//                         className="inline-flex items-center justify-center bg-primary-blue p-1 rounded cursor-pointer"
+//                         onClick={() => onView?.(row)}
+//                       >
+//                         <Icon icon="mdi:eye-outline" color="white" width={16} />
+//                       </div>
+//                     )}
+//                     {showDeleteButton && (
+//                       // <div
+//                       //   className="inline-flex items-center justify-center bg-red-500 p-1 rounded cursor-pointer"
+//                       //   onClick={() => onDelete?.(row)}
+//                       // >
+//                       //   <Icon
+//                       //     icon="mdi:delete-outline"
+//                       //     color="red"
+//                       //     width={16}
+//                       //   />
+//                       // </div>
+
+//                       <div
+//                         className="text-xl text-black cursor-pointer bg-red rounded p-1"
+//                         onClick={() => onDelete?.(row)}
+//                       >
+//                         <Icon
+//                           icon="material-symbols:delete-outline-rounded"
+//                           fontSize={16}
+//                           color="white"
+//                         />
+//                       </div>
+//                     )}
 //                   </td>
 //                 )}
 //               </tr>
@@ -147,7 +181,6 @@
 //   );
 // }
 
-// components/SimpleTable.tsx
 import React from "react";
 import { Icon } from "@iconify/react";
 
@@ -167,7 +200,9 @@ type SimpleTableProps<T> = {
   showDeleteButton?: boolean;
   showCheckbox?: boolean;
   showViewButton?: boolean;
+  showSerialNumber?: boolean; // <-- ✅ NEW PROP
   viewAllButton?: React.ReactNode;
+  titlePosition?: string;
 };
 
 export function SimpleTable<T extends { [key: string]: any }>({
@@ -180,7 +215,9 @@ export function SimpleTable<T extends { [key: string]: any }>({
   showDeleteButton = false,
   showCheckbox = false,
   showViewButton = true,
+  showSerialNumber = false, // <-- ✅ DEFAULT TO FALSE
   viewAllButton,
+  titlePosition,
 }: SimpleTableProps<T>) {
   const [selectedRows, setSelectedRows] = React.useState<Set<number>>(
     new Set()
@@ -188,29 +225,28 @@ export function SimpleTable<T extends { [key: string]: any }>({
 
   const handleCheckbox = (index: number) => {
     const newSelection = new Set(selectedRows);
-    if (newSelection.has(index)) {
-      newSelection.delete(index);
-    } else {
-      newSelection.add(index);
-    }
+    newSelection.has(index)
+      ? newSelection.delete(index)
+      : newSelection.add(index);
     setSelectedRows(newSelection);
     onRowSelect?.(Array.from(newSelection).map((i) => data[i]));
   };
 
   return (
     <div className="px-4 bg-white rounded-xl overflow-y-auto">
-      <div className="flex items-center justify-between py-1">
+      <div className={`flex items-center ${titlePosition || ""} py-1`}>
         {title && (
           <h2 className="mb-4 text-xl font-semibold text-gray-700">{title}</h2>
         )}
-        {/* <div className="mb-4">{viewAllButton}</div> */}
       </div>
 
-      <div className=" overflow-x-auto">
+      <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
             <tr className="text-sm text-center text-[#15112C] tracking-wide border-b">
               {showCheckbox && <th className="pb-2" />}
+              {showSerialNumber && <th className="pb-2">S.N.</th>}{" "}
+              {/* ✅ Header */}
               {columns.map((col, i) => (
                 <th key={i} className="pb-2">
                   {col.header ?? String(col.key)}
@@ -237,51 +273,17 @@ export function SimpleTable<T extends { [key: string]: any }>({
                     />
                   </td>
                 )}
-                {columns.map((col, i) => {
-                  const value = row[col.key];
-
-                  // Special handling for status
-                  if (col.key === "status") {
-                    const status = String(value).toLowerCase();
-                    const isNegative =
-                      status === "out of stock" || status === "cancelled";
-                    const isPositive =
-                      status === "in stock" || status === "delivered";
-                    const isNeutral = status === "low stock";
-                    const bgClass = isNegative
-                      ? "bg-[#ffeceb]"
-                      : isPositive
-                      ? "bg-[#e9fbef]"
-                      : isNeutral
-                      ? "bg-[#fff8ea]"
-                      : "bg-gray-100";
-
-                    const textClass = isNegative
-                      ? "text-[#ff3b2f]"
-                      : isPositive
-                      ? "text-[#28c260]"
-                      : isNeutral
-                      ? "text-[#f7ba1e]"
-                      : "text-gray-600";
-
-                    return (
-                      <td key={i} className="py-3 text-gray-700">
-                        <span
-                          className={`px-3 py-1 text-sm font-medium rounded-xl inline-block ${bgClass} ${textClass}`}
-                        >
-                          {value}
-                        </span>
-                      </td>
-                    );
-                  }
-
-                  return (
-                    <td key={i} className="py-3 text-gray-700">
-                      {col.render ? col.render(value, row) : value ?? "—"}
-                    </td>
-                  );
-                })}
-
+                {showSerialNumber && (
+                  <td className="py-3 text-gray-700">{index + 1}</td>
+                )}{" "}
+                {/* ✅ S.N. */}
+                {columns.map((col, i) => (
+                  <td key={i} className="py-3 text-gray-700">
+                    {col.render
+                      ? col.render(row[col.key], row)
+                      : row[col.key] ?? "—"}
+                  </td>
+                ))}
                 {(showViewButton || showDeleteButton) && (
                   <td className="py-3 flex items-center justify-center gap-2">
                     {showViewButton && (
@@ -293,17 +295,6 @@ export function SimpleTable<T extends { [key: string]: any }>({
                       </div>
                     )}
                     {showDeleteButton && (
-                      // <div
-                      //   className="inline-flex items-center justify-center bg-red-500 p-1 rounded cursor-pointer"
-                      //   onClick={() => onDelete?.(row)}
-                      // >
-                      //   <Icon
-                      //     icon="mdi:delete-outline"
-                      //     color="red"
-                      //     width={16}
-                      //   />
-                      // </div>
-
                       <div
                         className="text-xl text-black cursor-pointer bg-red rounded p-1"
                         onClick={() => onDelete?.(row)}

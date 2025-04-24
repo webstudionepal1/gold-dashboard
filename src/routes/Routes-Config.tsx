@@ -109,7 +109,9 @@ export const routesConfig = [
     element: <CustomerIndex />,
   },
   {
+    // path: "/customer/customer-details/:id",
     path: FrontendRoutes.CUSTOMERDETAILS,
+
     element: <CustomerDetails />,
   },
   {
@@ -147,10 +149,10 @@ export const routesConfig = [
   // },
 
   // Attributes
-  {
-    path: FrontendRoutes.ATTRIBUTES,
-    element: <AttributeIndex />,
-  },
+  // {
+  //   path: FrontendRoutes.ATTRIBUTES,
+  //   element: <AttributeIndex />,
+  // },
   // Banner
   {
     path: FrontendRoutes.BANNER,

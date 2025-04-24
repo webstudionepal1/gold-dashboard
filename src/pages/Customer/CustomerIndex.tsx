@@ -9,10 +9,13 @@ import {
   Table,
   type TableData,
 } from "../../components/shared/Table";
+import {
+  useDeleteCustomerMutation,
+  useGetCustomerQuery,
+} from "../../server/api/customerHook";
 
 interface CustomerItem {
   _id: string;
-  CId: string;
   customer_name: string;
   email: string;
   address: string;
@@ -26,20 +29,36 @@ const CustomerIndex = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const {
+    data: customers = [],
+    isLoading,
+    error,
+  } = useGetCustomerQuery({ role: "customer" });
+
+  console.log("customer data", customers);
+
+  const customerTableData: CustomerItem[] = customers.map(
+    (customer, index) => ({
+      _id: customer._id,
+      customer_name: customer.name,
+      email: customer.email,
+      address: customer.address,
+      contact_number: customer.phone,
+      total_order: customer.orders?.length?.toString() ?? "0",
+    })
+  );
+  const { mutate: deleteCustomer } = useDeleteCustomerMutation();
+
+  const handleDeleteItem = (item: TableData<CustomerItem>) => {
+    deleteCustomer(item._id);
+  };
+
   const navigate = useNavigate();
 
-  // const [selectedTab, setSelectedTab] = useState("home_page");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setisViewModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<CustomerItem | null>(null);
 
-  console.log(
-    isModalOpen,
-    selectedFilter,
-    selectedSort,
-    isViewModalOpen,
-    editingItem
-  );
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     setCurrentPage(1);
@@ -64,22 +83,7 @@ const CustomerIndex = () => {
   };
 
   const handleViewItem = (item: TableData<CustomerItem>) => {
-    navigate(`${FrontendRoutes.CUSTOMERDETAILS}`);
-  };
-
-  const handleEditItem = (item: TableData<CustomerItem>) => {
-    // // Check which tab is selected and set the editing item accordingly
-    // if (selectedTab === "home_page") {
-    //   setEditingItem(item); // Set the item for the Home Page Banner
-    // } else if (selectedTab === "other_page") {
-    //   setEditingItem(item); // Set the item for the Other Page Banner
-    // }
-    setIsModalOpen(true); // Open the modal for either banner
-    console.log(item);
-  };
-
-  const handleDeleteItem = (item: TableData<CustomerItem>) => {
-    console.log("Delete item:", item);
+    navigate(`/customer/customer-details/${item._id}`);
   };
 
   const handlePageChange = (page: number) => {
@@ -105,38 +109,7 @@ const CustomerIndex = () => {
     { value: "orders-low", label: "Orders (Low)" },
   ];
 
-  const [customerItems] = useState<CustomerItem[]>([
-    {
-      _id: "1",
-      CId: "#12",
-      customer_name: "Olivia Bennett",
-      email: "info@techworld.net",
-      address: "321 Terai Lane, Biratnagar",
-      contact_number: "+9438743778",
-      total_order: "00",
-    },
-    {
-      _id: "2",
-      CId: "#12",
-      customer_name: "Ethan Rivers",
-      email: "hello@creativeminds.org",
-      address: "456 Everest Avenue",
-      contact_number: "+9438743778",
-      total_order: "00",
-    },
-    {
-      _id: "3",
-      CId: "#12",
-      customer_name: "Sophia Langley",
-      email: "contact@sunshinehub.com",
-      address: "789 Himalayan Road",
-      contact_number: "+9438743778",
-      total_order: "00",
-    },
-  ]);
-
   const columns: ColumnConfig<CustomerItem>[] = [
-    { header: "CId", key: "CId" },
     { header: "Customer Name", key: "customer_name" },
     { header: "Email", key: "email" },
     { header: "Address", key: "address" },
@@ -146,17 +119,22 @@ const CustomerIndex = () => {
 
   const renderCustomerTable = (items: CustomerItem[]) => {
     const filteredItems = filterItems(items);
+    const paginatedItems = filteredItems.slice(
+      (currentPage - 1) * itemsPerPage,
+      currentPage * itemsPerPage
+    );
+    if (isLoading) return <div>Loading...</div>;
+    if (error) return <div>Something went wrong</div>;
     return (
       <Table
         columns={columns}
-        data={filteredItems}
+        data={paginatedItems}
         showEdit={false}
         showDelete={true}
         showView={true}
         showAction={true}
         showSelectAll={true}
         viewRow={handleViewItem}
-        editRow={handleEditItem}
         deleteRow={handleDeleteItem}
         showPagination={true}
         paginationDetails={{
@@ -199,7 +177,7 @@ const CustomerIndex = () => {
               placeholder="Search here..."
             />
           </div>
-          <div className="mx-2">{renderCustomerTable(customerItems)}</div>
+          <div className="mx-2">{renderCustomerTable(customerTableData)}</div>
         </div>
       </div>
     </>

@@ -10,6 +10,13 @@ interface ShippingAddress {
   email: string;
 }
 
+export interface IOrderSummary {
+  _id: string; // optional but usually needed for view actions
+  createdAt: string;
+  totalAmount: number;
+  orderStatus: string;
+}
+
 interface BillingAddress {
   fullname: string;
   address: string;
@@ -60,7 +67,7 @@ interface OrderedProduct {
   product: string;
 }
 
-interface IFetchOrder {
+export interface IFetchOrder {
   shippingAddress: ShippingAddress;
   billingAddress: BillingAddress;
   billDetails: BillDetails;
@@ -81,9 +88,9 @@ export interface IParams {
   id: string;
   body: any;
 }
-const useGetAllOrdersQuery = (params = {}) => {
+export const useGetAllOrdersQuery = (params = {}) => {
   return useQuery({
-    queryKey: ["orders"],
+    queryKey: ["orders", params],
     queryFn: async () => {
       const res = await apiClient.get<{ data: IFetchOrder[] }>("order", {
         params,
