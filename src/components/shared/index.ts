@@ -1,6 +1,5 @@
 export {DeleteDialog} from './DeleteDialog'
 export {Modal} from './Modal'
 export {Table} from './Table'
-export { SideBar } from './Sidebar'
 export { Text } from './Text'
 export {Navbar} from './Navbar'

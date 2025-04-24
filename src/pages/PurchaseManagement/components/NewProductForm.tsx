@@ -4,26 +4,28 @@ import { InputField } from "../../../components/shared/form_components/InputFiel
 import { DropdownField } from "../../../components/shared/form_components/Dropdown";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { z } from "zod";
+import { FieldError } from "../../auth/LoginPage";
+import { useCreatePurchaseMutation } from "../../../server/api/purchaseHooks";
+import { useGetSupplierQuery } from "../../../server/api/supplierHooks";
+import { useGetAllProductsQuery } from "../../../server/api/productHooks";
 
 interface NewProductProps {
   onClose: () => void;
 }
 const NewProductForm = ({ onClose }: NewProductProps) => {
-  const FieldError = ({ field }: { field: any }) => {
-    if (field.state.meta.errors.length > 0) {
-      const error = field.state.meta.errors[0];
-      const errorMessage =
-        typeof error === "string"
-          ? error
-          : error.message || JSON.stringify(error);
-      return (
-        <div className="min-h-[20px]">
-          <span className="text-xs text-red">{errorMessage}</span>
-        </div>
-      );
-    }
-    return <div className="min-h-[20px]"></div>;
-  };
+  const { mutate: createPurchase } = useCreatePurchaseMutation();
+  const { data: suppliers, isSuccess } = useGetSupplierQuery();
+  const { data: products, isSuccess: productSuccess } =
+    useGetAllProductsQuery();
+  const suppliersList = isSuccess
+    ? suppliers?.map((item) => ({
+        label: item.name,
+        value: item._id,
+      }))
+    : [];
+  const productList = productSuccess
+    ? products?.map((item) => ({ label: item.name, value: item._id }))
+    : [];
   const AddNewProductSchema = z.object({
     bill_no: z.string().min(1, "Bill No is required"),
     supplier_name: z.string().min(1, "Supplier name is required"),
@@ -39,39 +41,20 @@ const NewProductForm = ({ onClose }: NewProductProps) => {
     ),
   });
 
-  const [products, setProducts] = useState([
-    {
-      product_name: "",
-      material: "",
-      units: "",
-      quantity: 1,
-      paid_price: "",
-    },
-  ]);
-
-  const addProduct = () => {
-    setProducts((prev) => [
-      ...prev,
-      {
-        product_name: "",
-        material: "",
-        units: "",
-        quantity: 1,
-        paid_price: "",
-      },
-    ]);
-  };
-
-  const removeProduct = (index: number) => {
-    setProducts((prev) => prev.filter((_, i) => i !== index));
-  };
-
   const form = useForm({
     defaultValues: {
       bill_no: "",
       supplier_name: "",
       phone_no: "",
-      products,
+      products: [
+        {
+          product_name: "",
+          material: "",
+          units: "",
+          quantity: 1,
+          paid_price: "",
+        },
+      ],
     },
     validators: {
       onSubmit: AddNewProductSchema,
@@ -86,7 +69,7 @@ const NewProductForm = ({ onClose }: NewProductProps) => {
   return (
     <>
       <div className="my-3">
-        <div className="flex items-center justify-between my-2 gap-4">
+        <div className="flex items-center justify-between gap-4 my-2">
           <div className="bg-[#ffffff]">
             <form
               className="flex flex-col gap-4 mx-4 my-6"
@@ -117,14 +100,8 @@ const NewProductForm = ({ onClose }: NewProductProps) => {
                       <DropdownField
                         label="Suppliers Name"
                         required
-                        firstInput="Gold supplier pvt ltd   "
-                        options={[
-                          {
-                            value: "gold-supplier-pvt-ltd",
-                            label: "Gold supplier pvt ltd",
-                          },
-                          { value: "cash", label: "Cash" },
-                        ]}
+                        firstInput="Select Supplier "
+                        options={suppliersList}
                         value={field.state.value}
                         onChange={(e) => field.handleChange(e.target.value)}
                       />
@@ -134,125 +111,151 @@ const NewProductForm = ({ onClose }: NewProductProps) => {
                 </form.Field>
               </div>
 
-              <div className="flex items-center justify-between">
-                <h1 className="text-xl font-semibold">Product Information</h1>
-                <button
-                  type="button"
-                  onClick={addProduct}
-                  className="px-3 py-2 flex items-center text-white bg-[#d49327] transition-transform duration-200 ease-in-out hover:scale-105 rounded-lg"
-                >
-                  <Icon
-                    icon="material-symbols-light:add-rounded"
-                    width="24"
-                    height="24"
-                    className="fill-white"
-                  />
-                  Product
-                </button>
-              </div>
+              <div className="p-4 rounded-lg">
+                <form.Field name="products" mode="array">
+                  {(field) => (
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <h1 className="text-xl font-semibold">
+                          Product Information
+                        </h1>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            field.pushValue({
+                              product_name: "",
+                              material: "",
+                              units: "",
+                              quantity: 1,
+                              paid_price: "",
+                            })
+                          }
+                          className="px-3 py-2 flex items-center text-white bg-[#d49327] transition-transform duration-200 ease-in-out hover:scale-105 rounded-lg"
+                        >
+                          <Icon
+                            icon="material-symbols-light:add-rounded"
+                            width="24"
+                            height="24"
+                            className="fill-white"
+                          />
+                          Product
+                        </button>
+                      </div>
+                      {field.state.value.map((_, index: number) => (
+                        <div
+                          key={index.toString()}
+                          className="bg-[#ffffff] border-[#e7e7e7] border-2 rounded-xl"
+                        >
+                          <div className="flex items-center justify-between gap-4 px-3 py-2">
+                            <form.Field
+                              name={`products[${index}].product_name`}
+                            >
+                              {(field) => (
+                                <div className="w-full">
+                                  <DropdownField
+                                    label="Product Name"
+                                    required
+                                    value={field.state.value}
+                                    onChange={(e) =>
+                                      field.handleChange(e.target.value)
+                                    }
+                                    options={[
+                                      { value: "gold", label: "Gold" },
+                                      { value: "silver", label: "Silver" },
+                                    ]}
+                                  />
+                                  <FieldError field={field} />
+                                </div>
+                              )}
+                            </form.Field>
 
-              {products.map((_, index) => (
-                <div
-                  key={index}
-                  className="bg-[#ffffff] border-[#e7e7e7] border-2 rounded-xl"
-                >
-                  <div className="flex items-center gap-4 justify-between px-3 py-2">
-                    <form.Field name={`products[${index}].product_name`}>
-                      {(field) => (
-                        <div className="w-full">
-                          <DropdownField
-                            label="Product Name"
-                            required
-                            value={field.state.value}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                            options={[
-                              { value: "gold", label: "Gold" },
-                              { value: "silver", label: "Silver" },
-                            ]}
-                          />
-                          <FieldError field={field} />
-                        </div>
-                      )}
-                    </form.Field>
+                            <form.Field name={`products[${index}].material`}>
+                              {(field) => (
+                                <div className="w-full">
+                                  <InputField
+                                    label="Material"
+                                    required
+                                    placeholder="Gold"
+                                    value={field.state.value}
+                                    onChange={(e) =>
+                                      field.handleChange(e.target.value)
+                                    }
+                                  />
+                                  <FieldError field={field} />
+                                </div>
+                              )}
+                            </form.Field>
+                          </div>
 
-                    <form.Field name={`products[${index}].material`}>
-                      {(field) => (
-                        <div className="w-full">
-                          <InputField
-                            label="Material"
-                            required
-                            placeholder="Gold"
-                            value={field.state.value}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                          />
-                          <FieldError field={field} />
-                        </div>
-                      )}
-                    </form.Field>
-                  </div>
+                          <div className="flex items-center justify-between gap-4 px-3 py-2">
+                            <form.Field name={`products[${index}].units`}>
+                              {(field) => (
+                                <div className="w-full">
+                                  <InputField
+                                    label="Units"
+                                    placeholder="Tola"
+                                    required
+                                    value={field.state.value}
+                                    onChange={(e) =>
+                                      field.handleChange(e.target.value)
+                                    }
+                                  />
+                                  <FieldError field={field} />
+                                </div>
+                              )}
+                            </form.Field>
+                            <form.Field name={`products[${index}].quantity`}>
+                              {(field) => (
+                                <div className="w-full">
+                                  <InputField
+                                    label="Quantity"
+                                    type="number"
+                                    required
+                                    value={field.state.value}
+                                    onChange={(e) =>
+                                      field.handleChange(Number(e.target.value))
+                                    }
+                                  />
+                                  <FieldError field={field} />
+                                </div>
+                              )}
+                            </form.Field>
+                            <form.Field name={`products[${index}].paid_price`}>
+                              {(field) => (
+                                <div className="w-full">
+                                  <InputField
+                                    label="Paid Price (Rs.)"
+                                    required
+                                    placeholder="176,000"
+                                    value={field.state.value}
+                                    onChange={(e) =>
+                                      field.handleChange(e.target.value)
+                                    }
+                                  />
+                                  <FieldError field={field} />
+                                </div>
+                              )}
+                            </form.Field>
+                          </div>
 
-                  <div className="flex items-center gap-4 justify-between px-3 py-2">
-                    {" "}
-                    <form.Field name={`products[${index}].units`}>
-                      {(field) => (
-                        <div className="w-full">
-                          <InputField
-                            label="Units"
-                            placeholder="Tola"
-                            required
-                            value={field.state.value}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                          />
-                          <FieldError field={field} />
+                          {/* Remove Button */}
+                          {index > 0 && (
+                            <div className="flex items-center justify-end px-2 py-2">
+                              <button
+                                type="button"
+                                onClick={() => {}}
+                                className="px-3 py-1 border-[#de8d28] border-2 text-[#de8d28] rounded-xl"
+                              >
+                                Remove
+                              </button>
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </form.Field>
-                    <form.Field name={`products[${index}].quantity`}>
-                      {(field) => (
-                        <div className="w-full">
-                          <InputField
-                            label="Quantity"
-                            type="number"
-                            required
-                            value={field.state.value}
-                            onChange={(e) =>
-                              field.handleChange(Number(e.target.value))
-                            }
-                          />
-                          <FieldError field={field} />
-                        </div>
-                      )}
-                    </form.Field>
-                    <form.Field name={`products[${index}].paid_price`}>
-                      {(field) => (
-                        <div className="w-full">
-                          <InputField
-                            label="Paid Price (Rs.)"
-                            required
-                            placeholder="176,000"
-                            value={field.state.value}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                          />
-                          <FieldError field={field} />
-                        </div>
-                      )}
-                    </form.Field>
-                  </div>
-
-                  {/* Remove Button */}
-                  {index > 0 && (
-                    <div className="flex items-center justify-end px-2 py-2">
-                      <button
-                        type="button"
-                        onClick={() => removeProduct(index)}
-                        className="px-3 py-1 border-[#de8d28] border-2 text-[#de8d28] rounded-xl"
-                      >
-                        Remove
-                      </button>
+                      ))}
                     </div>
                   )}
-                </div>
-              ))}
+                </form.Field>
+              </div>
 
               <div className="flex flex-col">
                 <label className="text-[#98999e] font-semibold mb-2">

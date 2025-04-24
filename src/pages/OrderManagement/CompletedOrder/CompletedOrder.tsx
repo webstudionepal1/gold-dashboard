@@ -1,343 +1,234 @@
-import type React from "react";
-import { useState } from "react";
-import { Modal } from "../../../components/shared";
-import {
-  Table,
-  type ColumnConfig,
-  type TableData,
-} from "../../../components/shared/Table";
-import { useOutsideClick } from "../../../hooks/UseOutsideClick";
-import { SearchFilterSort } from "../../../components/global/SearchFilterSort";
-import Header from "../../../components/shared/table_heading/Header";
+import dayjs from "dayjs";
+import { get, invoke, map, size } from "lodash";
+import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-interface Order {
-  _id: string;
-  orderId: string;
-  customerName: string;
-  orderDate: string;
-  deliveryDate: string;
-  totalAmount: number;
-  status: "Assigned" | "Completed" | "In Progress" | "Delivered" | "Cancelled";
-  isActive?: boolean;
+import MasterTable from "../../../components/shared/MasterTable";
+import Header from "../../../components/shared/table_heading/Header";
+import {
+  useGetAllOrdersQuery
+} from "../../../server/api/orderHooks";
+import { confirmedColumns } from "../Order/orderObj";
+
+// Filter state interface
+interface FilterState {
+  searchQuery: string;
+  currentPage: number;
+  itemsPerPage: number;
+  filter: string;
+  sort: string;
 }
 
-const CompletedOrder: React.FC = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const ref = useOutsideClick(() => setIsModalOpen(false));
-  const [selectedFilter, setSelectedFilter] = useState("");
-  const [selectedSort, setSelectedSort] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const navigate = useNavigate();
-  const [orders, setOrders] = useState<Order[]>([
-    {
-      _id: "1",
-      orderId: "#15",
-      customerName: "Emily Johnson",
-      orderDate: "2001-01-05 3:30 PM",
-      deliveryDate: "2001-01-10 2:00 PM",
-      totalAmount: 125.75,
-      status: "Completed",
-      isActive: true,
-    },
-    {
-      _id: "2",
-      orderId: "#18",
-      customerName: "Michael Smith",
-      orderDate: "2001-01-07 10:15 AM",
-      deliveryDate: "2001-01-12 1:45 PM",
-      totalAmount: 89.99,
-      status: "Completed",
-      isActive: true,
-    },
-    {
-      _id: "3",
-      orderId: "#22",
-      customerName: "Sarah Williams",
-      orderDate: "2001-01-10 9:20 AM",
-      deliveryDate: "2001-01-15 11:30 AM",
-      totalAmount: 45.5,
-      status: "Completed",
-      isActive: true,
-    },
-    {
-      _id: "4",
-      orderId: "#25",
-      customerName: "David Brown",
-      orderDate: "2001-01-12 4:45 PM",
-      deliveryDate: "2001-01-17 3:15 PM",
-      totalAmount: 199.99,
-      status: "Completed",
-      isActive: true,
-    },
-  ]);
 
-  const [newOrder, setNewOrder] = useState<Omit<Order, "_id">>({
-    orderId: "",
-    customerName: "",
-    orderDate: "",
-    deliveryDate: "",
-    totalAmount: 0,
-    status: "Completed",
-    isActive: true,
+const CompletedOrder = () => {
+  const { data: orders, isSuccess, isLoading } = useGetAllOrdersQuery({
+    orderStatus: "completed",
   });
+  const navigate = useNavigate();
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Assigned":
-        return "bg-yellow-100 text-yellow-800";
-      case "Completed":
-        return "bg-blue-100 text-blue-800";
-      case "In Progress":
-        return "bg-purple-100 text-purple-800";
-      case "Delivered":
-        return "bg-green-100 text-green-800";
-      case "Cancelled":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const handleToggleStatus = (row: TableData<Order>) => {
-    setOrders((prev) =>
-      prev.map((order) =>
-        order._id === row._id
-          ? {
-              ...order,
-              isActive: !order.isActive,
-            }
-          : order
-      )
-    );
-  };
-
-  const handleDeleteOrder = (row: TableData<Order>) => {
-    setOrders((prev) => prev.filter((o) => o._id !== row._id));
-  };
-
-  const handleSaveOrder = () => {
-    if (newOrder.customerName.trim() && newOrder.orderId.trim()) {
-      setOrders((prev) => [
-        ...prev,
-        { ...newOrder, _id: Math.random().toString() },
-      ]);
-      setIsModalOpen(false);
-    } else {
-      alert("Please fill required fields");
-    }
-  };
-
-  const filteredOrders = orders.filter(
-    (order) =>
-      order.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.orderId.toLowerCase().includes(searchQuery.toLowerCase())
+  const orderList = useMemo(
+    () =>
+      isSuccess
+        ? map(orders, (item) => ({
+            ...item,
+            orderedProducts: size(item.orderedProducts),
+            orderStatus: (
+              <div className="px-2 py-1 text-xs text-white rounded-full bg-green">
+                {item.orderStatus}
+              </div>
+            ),
+            customer: get(item, "customer.name", "-"),
+            createdAt: (
+              <div className="text-center">
+                {invoke(dayjs(item.createdAt), "format", "MMMM D, YYYY")}
+                <br />
+                {invoke(dayjs(item.createdAt), "format", "h:mm A")}
+              </div>
+            ),
+          }))
+        : [],
+    [isSuccess, orders]
   );
 
-  const columns: ColumnConfig<Order>[] = [
-    { header: "Order Id", key: "orderId" },
-    { header: "Customer Name", key: "customerName" },
-    { header: "Order Date", key: "orderDate" },
-    { header: "Delivery Date", key: "deliveryDate" },
-    {
-      header: "Total Amount",
-      key: "totalAmount",
-      render: (value, row) => `Rs. ${row.totalAmount.toFixed(2)}`,
-    },
-    // {
-    //   header: "Status",
-    //   key: "status",
-    //   render: (value, row) => (
-    //     <span
-    //       className={`px-2 py-1 rounded-full text-xs ${getStatusColor(
-    //         row.status
-    //       )}`}
-    //     >
-    //       {row.status}
-    //     </span>
-    //   ),
-    // },
-  ];
+  // // Consolidated filter state
+  // const [filterState, setFilterState] = useState<FilterState>({
+  //   searchQuery: "",
+  //   currentPage: 1,
+  //   itemsPerPage: 10,
+  //   filter: "",
+  //   sort: "",
+  // });
 
-  const handleRowSelect = (selectedIds: string[]) => {
-    console.log("Selected rows:", selectedIds);
-  };
+  // const navigate = useNavigate();
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
+  // const filterOptions = [
+  //   { value: "", label: "All Orders" },
+  //   { value: "pending", label: "Pending" },
+  //   { value: "completed", label: "Completed" },
+  //   { value: "delivered", label: "Delivered" },
+  //   { value: "cancelled", label: "Cancelled" },
+  // ];
 
-  const handleItemsPerPageChange = (limit: number) => {
-    setItemsPerPage(limit);
-    setCurrentPage(1);
-  };
+  // const sortOptions = [
+  //   { value: "", label: "Default" },
+  //   { value: "name-asc", label: "Customer Name (A-Z)" },
+  //   { value: "name-desc", label: "Customer Name (Z-A)" },
+  //   { value: "date-newest", label: "Newest First" },
+  //   { value: "date-oldest", label: "Oldest First" },
+  //   { value: "amount-high", label: "Amount (High to Low)" },
+  //   { value: "amount-low", label: "Amount (Low to High)" },
+  // ];
 
-  // Filter options for the dropdown
-  const filterOptions = [
-    { value: "", label: "All Customers" },
-    { value: "active", label: "Active" },
-    { value: "inactive", label: "Inactive" },
-  ];
+  // const filterItems = (items: IFetchOrder[]) => {
+  //   if (!items || items.length === 0) return [];
 
-  // Sort options for the dropdown
-  const sortOptions = [
-    { value: "", label: "Default" },
-    { value: "name-asc", label: "Name (A-Z)" },
-    { value: "name-desc", label: "Name (Z-A)" },
-    { value: "orders-high", label: "Orders (High)" },
-    { value: "orders-low", label: "Orders (Low)" },
-  ];
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    setCurrentPage(1);
-  };
+  //   let filteredItems = [...items];
 
-  const handleFilter = (filter: string) => {
-    setSelectedFilter(filter);
-    setCurrentPage(1);
-  };
-  const handleViewRow = () => {
-    navigate(`/order/completed-order-details`);
-  };
+  //   // Apply search filter
+  //   if (filterState.searchQuery) {
+  //     filteredItems = filteredItems.filter((item) => {
+  //       const customerName = item.customer?.name?.toLowerCase() || "";
+  //       const orderId = item._id?.toLowerCase() || "";
+  //       const email = item.customer?.email?.toLowerCase() || "";
 
-  const handleSort = (sort: string) => {
-    setSelectedSort(sort);
-    setCurrentPage(1);
-  };
+  //       return (
+  //         customerName.includes(filterState.searchQuery.toLowerCase()) ||
+  //         orderId.includes(filterState.searchQuery.toLowerCase()) ||
+  //         email.includes(filterState.searchQuery.toLowerCase())
+  //       );
+  //     });
+  //   }
+
+  //   // Apply status filter
+  //   if (filterState.filter) {
+  //     filteredItems = filteredItems.filter((item) => {
+  //       return (
+  //         item.orderStatus.toLowerCase() === filterState.filter.toLowerCase()
+  //       );
+  //     });
+  //   }
+
+  //   // Apply sorting
+  //   if (filterState.sort) {
+  //     filteredItems = [...filteredItems].sort((a, b) => {
+  //       switch (filterState.sort) {
+  //         case "name-asc":
+  //           return (a.customer?.name || "").localeCompare(
+  //             b.customer?.name || ""
+  //           );
+  //         case "name-desc":
+  //           return (b.customer?.name || "").localeCompare(
+  //             a.customer?.name || ""
+  //           );
+  //         case "date-newest":
+  //           return (
+  //             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  //           );
+  //         case "date-oldest":
+  //           return (
+  //             new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+  //           );
+  //         case "amount-high":
+  //           return b.totalAmount - a.totalAmount;
+  //         case "amount-low":
+  //           return a.totalAmount - b.totalAmount;
+  //         default:
+  //           return 0;
+  //       }
+  //     });
+  //   }
+
+  //   return filteredItems;
+  // };
+
+  // // Get filtered items
+  // const filteredItems = useMemo(
+  //   () => filterItems(orderList),
+  //   [orderList, filterState]
+  // );
+
+  // // Calculate pagination
+  // const paginatedItems = useMemo(() => {
+  //   if (!filteredItems.length) return [];
+
+  //   const startIndex = (filterState.currentPage - 1) * filterState.itemsPerPage;
+  //   return filteredItems.slice(
+  //     startIndex,
+  //     startIndex + filterState.itemsPerPage
+  //   );
+  // }, [filteredItems, filterState.currentPage, filterState.itemsPerPage]);
+
+  // const handleViewItem = (item: IFetchOrder) => {
+  //   navigate(`/order/confirmed-order-details/${item._id}`);
+  // };
+
+  // // Updated handlers using the setter function
+  // const handlePageChange = (page: number) => {
+  //   setFilterState((prev) => ({ ...prev, currentPage: page }));
+  // };
+
+  // const handleItemsPerPageChange = (limit: number) => {
+  //   setFilterState((prev) => ({
+  //     ...prev,
+  //     itemsPerPage: limit,
+  //     currentPage: 1,
+  //   }));
+  // };
+
+  // const handleSearch = (query: string) => {
+  //   setFilterState((prev) => ({ ...prev, searchQuery: query, currentPage: 1 }));
+  // };
+
+  // const handleFilter = (filter: string) => {
+  //   setFilterState((prev) => ({ ...prev, filter, currentPage: 1 }));
+  // };
+
+  // const handleSort = (sort: string) => {
+  //   setFilterState((prev) => ({ ...prev, sort, currentPage: 1 }));
+  // };
 
   return (
-    <div className="container mx-auto px-4 py-3">
-      <Header text="Completed Orders" />
-
-      <div className="bg-[#ffffff] p-4 border-[#eae9ec] border-2  rounded-xl">
-        <SearchFilterSort
-          onSearch={handleSearch}
-          onFilter={handleFilter}
-          onSort={handleSort}
-          filterOptions={filterOptions}
-          sortOptions={sortOptions}
-          placeholder="Search here..."
-          showView={false}
-        />
-
-        <Table
-          columns={columns}
-          data={filteredOrders}
-          showEdit={false}
-          showDelete={false}
-          showToggle={false}
-          showView={true}
-          viewRow={handleViewRow}
-          showAction={true}
-          showSelectAll={true}
-          onRowSelect={handleRowSelect}
-          onToggle={handleToggleStatus}
-          deleteRow={handleDeleteOrder}
-          showPagination={true}
-          paginationDetails={{
-            currentPage,
-            limit: itemsPerPage,
-            totalCount: filteredOrders.length,
-          }}
-          onItemsPerPageChange={handleItemsPerPageChange}
-          onPageChange={handlePageChange}
-          showBg={true}
-        />
+    <div className="container px-4 py-3 mx-auto">
+      <Header text="Orders"></Header>
+      <div className="bg-white border-[#eae9ec] border-2 w-full pb-8 rounded-xl">
+        {/* <div className="px-2">
+          <SearchFilterSort
+            onSearch={handleSearch}
+            onFilter={handleFilter}
+            onSort={handleSort}
+            filterOptions={filterOptions}
+            sortOptions={sortOptions}
+            placeholder="Search by customer name, ID or email..."
+          />
+        </div> */}
+        <div className="mx-3">
+          {/* <Table
+            data={paginatedItems}
+            columns={columns}
+            showView
+            showDelete={false}
+            showEdit={false}
+            showAction
+            viewRow={handleViewItem}
+            showPagination={true}
+            paginationDetails={{
+              currentPage: filterState.currentPage,
+              limit: filterState.itemsPerPage,
+              totalCount: filteredItems.length,
+            }}
+            onItemsPerPageChange={handleItemsPerPageChange}
+            onPageChange={handlePageChange}
+          /> */}
+          <MasterTable
+            showAction
+            loading={isLoading}
+            viewAction={(row) =>
+              navigate(`/order/assigned-order-details/${row._id}`)
+            }
+            columns={confirmedColumns}
+            rows={orderList}
+          />
+        </div>
       </div>
-
-      {isModalOpen && (
-        <Modal ref={ref}>
-          <div className="p-6">
-            <h2 className="text-xl font-semibold mb-4">Create New Order</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Order ID *
-                </label>
-                <input
-                  value={newOrder.orderId}
-                  onChange={(e) =>
-                    setNewOrder({ ...newOrder, orderId: e.target.value })
-                  }
-                  className="border rounded-md p-2 w-full"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Customer Name *
-                </label>
-                <input
-                  value={newOrder.customerName}
-                  onChange={(e) =>
-                    setNewOrder({ ...newOrder, customerName: e.target.value })
-                  }
-                  className="border rounded-md p-2 w-full"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Order Date
-                </label>
-                <input
-                  type="datetime-local"
-                  value={newOrder.orderDate}
-                  onChange={(e) =>
-                    setNewOrder({ ...newOrder, orderDate: e.target.value })
-                  }
-                  className="border rounded-md p-2 w-full"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Delivery Date
-                </label>
-                <input
-                  type="datetime-local"
-                  value={newOrder.deliveryDate}
-                  onChange={(e) =>
-                    setNewOrder({ ...newOrder, deliveryDate: e.target.value })
-                  }
-                  className="border rounded-md p-2 w-full"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Total Amount
-                </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={newOrder.totalAmount}
-                  onChange={(e) =>
-                    setNewOrder({
-                      ...newOrder,
-                      totalAmount: Number.parseFloat(e.target.value),
-                    })
-                  }
-                  className="border rounded-md p-2 w-full"
-                />
-              </div>
-            </div>
-            <div className="mt-6 flex justify-end gap-3">
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="px-4 py-2 border rounded-md"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveOrder}
-                className="px-4 py-2 bg-[#DF8D28] text-white rounded-md"
-              >
-                Create Order
-              </button>
-            </div>
-          </div>
-        </Modal>
-      )}
     </div>
   );
 };

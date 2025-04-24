@@ -12,6 +12,7 @@ import { routesConfig } from "./routes/Routes-Config.tsx";
 import { ProtectedLoginPage } from "./routes/RedirectFromLoginRoutes.tsx";
 import { LoginPage } from "./pages/index.ts";
 import { PublicLayout } from "./routes/PublicLayout.tsx";
+import { SidebarProvider } from "./components/shared/sidebar/SidebarContext.tsx";
 
 const renderRoutes = (routes: any[]) =>
   routes.map(({ path, element, children }) => (
@@ -24,19 +25,6 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ReactQueryProvider>
       <ErrorBoundary>
-        <ToastContainer
-          position="top-left"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          draggable
-          pauseOnHover={false}
-          toastClassName="font-semibold"
-          theme="colored"
-          className="z-[999999999999999999]"
-        />
         <BrowserRouter>
           <Routes>
             {/* Protected Routes */}
@@ -57,6 +45,19 @@ createRoot(document.getElementById("root")!).render(
             </Route>
           </Routes>
         </BrowserRouter>
+        <ToastContainer
+          position="top-left"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          draggable
+          pauseOnHover={false}
+          toastClassName="font-semibold"
+          theme="colored"
+          className="z-[999999999999999999]"
+        />
       </ErrorBoundary>
     </ReactQueryProvider>
   </StrictMode>

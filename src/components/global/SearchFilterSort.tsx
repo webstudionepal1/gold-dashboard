@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { memo, useState } from "react";
 import { Icon } from "@iconify/react";
 
 interface SearchFilterSortProps {
@@ -15,7 +15,7 @@ interface SearchFilterSortProps {
   showSort?: boolean; // Control sort dropdown visibility
 }
 
-export const SearchFilterSort: React.FC<SearchFilterSortProps> = ({
+export const SearchFilterSort: React.FC<SearchFilterSortProps> = memo(({
   onSearch,
   onFilter,
   onSort,
@@ -58,29 +58,7 @@ export const SearchFilterSort: React.FC<SearchFilterSortProps> = ({
   };
   return (
     <div className="container my-4">
-      <div className="flex flex-row justify-between gap-4 md:flex-row ">
-        {/* Search Input */}
-        <div className="flex flex-row ">
-          {showSearch && (
-            <div className="relative flex-grow w-[25rem] ">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <Icon
-                  icon="mynaui:search"
-                  fontSize={16}
-                  className="text-gray-400 size-auto"
-                />
-              </div>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={handleSearchChange}
-                placeholder={placeholder}
-                className="w-full py-3 pl-10 pr-4 text-sm bg-white border rounded-md outline-none text-fade-black"
-              />
-            </div>
-          )}
-        </div>
-
+      <div className="flex flex-row justify-between gap-4 text-sm md:flex-row ">
         <div className="flex items-center border divide-x-2 rounded-lg">
           {/* Filter Dropdown */}
           {showFilter && filterOptions.length > 0 && (
@@ -94,7 +72,7 @@ export const SearchFilterSort: React.FC<SearchFilterSortProps> = ({
                 id="filter-select"
                 value={selectedFilter}
                 onChange={handleFilterChange}
-                className="w-auto pl-8 pr-6 text-sm text-black bg-white outline-none appearance-none"
+                className="w-auto px-3 py-2 pl-8 pr-6 text-sm text-black bg-white outline-none appearance-none"
               >
                 <option value="">Filter</option>
                 {filterOptions.map((option) => (
@@ -123,7 +101,6 @@ export const SearchFilterSort: React.FC<SearchFilterSortProps> = ({
           {/* Grid/Column View Select */}
           {showView && (
             <div className="relative flex justify-center w-auto">
-              {" "}
               {/* Equal width */}
               <label htmlFor="view-select" className="sr-only">
                 View
@@ -132,7 +109,7 @@ export const SearchFilterSort: React.FC<SearchFilterSortProps> = ({
                 id="view-select"
                 value={view}
                 onChange={handleViewChange}
-                className="w-auto pl-8 pr-6 text-sm text-black bg-white outline-none appearance-none"
+                className="w-auto px-3 py-2 pl-8 pr-6 text-sm text-black bg-white outline-none appearance-none"
               >
                 <option value="grid">Grid</option>
                 <option value="column">Column</option>
@@ -168,7 +145,7 @@ export const SearchFilterSort: React.FC<SearchFilterSortProps> = ({
                 id="sort-select"
                 value={selectedSort}
                 onChange={handleSortChange}
-                className="w-auto pl-8 pr-6 text-sm text-black bg-white outline-none appearance-none"
+                className="w-auto px-3 py-2 pl-8 pr-6 text-sm text-black bg-white outline-none appearance-none"
               >
                 <option value="">Sort</option>
                 {sortOptions.map((option) => (
@@ -193,4 +170,4 @@ export const SearchFilterSort: React.FC<SearchFilterSortProps> = ({
       </div>
     </div>
   );
-};
+});

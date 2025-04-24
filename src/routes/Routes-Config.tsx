@@ -40,6 +40,7 @@ import PurchaseIndex from "../pages/PurchaseManagement/PurchaseIndex";
 import AddSupplierForm from "../pages/PurchaseManagement/components/AddSupplierForm";
 import SupplierDetail from "../pages/PurchaseManagement/pages/SupplierDetail";
 import SupplierHistory from "../pages/PurchaseManagement/pages/SupplierHistory";
+import AttribConfig from "../pages/settings/components/AttribConfig";
 
 export const routesConfig = [
   {
@@ -60,7 +61,27 @@ export const routesConfig = [
     element: <OrderIndex />,
   },
   {
-    path: "/order/:page",
+    path: "/order/order-details/:id",
+    element: <OrderDetails />,
+  },
+  {
+    path: "/order/confirmed-order-details/:id",
+    element: <OrderDetails />,
+  },
+  {
+    path:"/attribs",
+    element:<AttribConfig/>
+  },
+  {
+    path: "/order/assigned-order-details/:id",
+    element: <OrderDetails />,
+  },
+  {
+    path: "/order/completed-order-details/:id",
+    element: <OrderDetails />,
+  },
+  {
+    path: "/order/cancelled-order-details/:id",
     element: <OrderDetails />,
   },
   {
