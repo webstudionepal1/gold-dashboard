@@ -95,12 +95,12 @@ export const SidebarMainRoutes = {
         },
       ],
     },
-    {
-      id: 6,
-      path: FrontendRoutes.ATTRIBUTES,
-      title: "Attributes",
-      icon: "game-icons:gear-stick-pattern",
-    },
+    // {
+    //   id: 6,
+    //   path: FrontendRoutes.ATTRIBUTES,
+    //   title: "Attributes",
+    //   icon: "game-icons:gear-stick-pattern",
+    // },
     {
       id: 18,
       path: "#",
