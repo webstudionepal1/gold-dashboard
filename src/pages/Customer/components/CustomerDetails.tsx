@@ -713,7 +713,7 @@ const CustomerDetails = () => {
                 customerPhone: selectedOrder.shippingAddress.phone,
                 customerAddress: customer?.address,
                 items: selectedOrder.orderedProducts.map((orderedProduct) => ({
-                  name: orderedProduct.product,
+                  name: orderedProduct.product.name,
                   weight: orderedProduct.selectedVariant.wt,
                   purity: "",
                   makingCharge: 0,
