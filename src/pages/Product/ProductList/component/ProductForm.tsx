@@ -107,10 +107,16 @@ const ProductForm = () => {
   const { id } = useParams();
   const productData = useStore(productStore, (state) => state);
 
-  const { mutate: createProduct, isPending: pendingAddition , isSuccess:productCreateSuccess} =
-    useCreateProductsMutation();
-  const { mutate: updateProduct, isPending: pendingUpdate, isSuccess:productUpdateSuccess } =
-    useUpdateProductsMutation();
+  const {
+    mutate: createProduct,
+    isPending: pendingAddition,
+    isSuccess: productCreateSuccess,
+  } = useCreateProductsMutation();
+  const {
+    mutate: updateProduct,
+    isPending: pendingUpdate,
+    isSuccess: productUpdateSuccess,
+  } = useUpdateProductsMutation();
   const { data: categories, isSuccess: categorySuccess } =
     useGetAllProductCategoriesQuery();
   const { data: subCategories, isSuccess: subSuccess } =
@@ -149,14 +155,14 @@ const ProductForm = () => {
     { value: "newarrivals", label: "New Arrivals" },
     { value: "recommended", label: "Recommended for you" },
   ];
-const formstate = id??'add'
+  const formstate = id ?? "add";
   const form = useForm({
     defaultValues: generateProductDefaultValue(formstate, productData),
     // validators: {
     //   onChange: validationSchema,
     // },
-    validators:{
-      onChange:validationSchema.parse
+    validators: {
+      onChange: validationSchema.parse,
     },
     onSubmit: async ({ value }) => {
       try {
@@ -197,9 +203,9 @@ const formstate = id??'add'
     },
   });
 
-  useEffect(()=>{
-    if(productCreateSuccess || productUpdateSuccess) form.reset()
-  },[productCreateSuccess, productUpdateSuccess])
+  useEffect(() => {
+    if (productCreateSuccess || productUpdateSuccess) form.reset();
+  }, [productCreateSuccess, productUpdateSuccess]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -325,7 +331,7 @@ const formstate = id??'add'
                         Product Size
                       </button>
                     </div>
-                    {field.state.value.map((_:void, i:number) => (
+                    {field.state.value.map((_: void, i: number) => (
                       <div key={i}>
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                           <form.Field name={`variant.${i}.price`}>

@@ -18,13 +18,19 @@ import { Modal } from "../../components/shared";
 import { Link } from "react-router-dom";
 import { FrontendRoutes } from "../../routes/routes";
 import Header from "../../components/shared/table_heading/Header";
+import {
+  IFetchBanner,
+  useDeleteBannerMutation,
+  useGetAllBannerQuery,
+} from "../../server/api/bannerHook";
+import { ScrollableModal } from "../../components/shared/ScrollableModal";
 
 interface BannerItem {
   _id: string;
   title: string;
   banner_type: string;
-  web_image: string;
-  mobile_image: string;
+  image: string[];
+  mobImage: string[];
 
   banner_title?: string;
   description?: string;
@@ -41,10 +47,26 @@ const BannerIndex: React.FC = () => {
   const [selectedSort, setSelectedSort] = useState("");
   console.log(selectedSort);
 
-  const [selectedTab, setSelectedTab] = useState("home_page");
+  const [selectedTab, setSelectedTab] = useState("homepage");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setisViewModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<BannerItem | null>(null);
+  const [editingItem, setEditingItem] = useState<IFetchBanner | null>(null);
+
+  const { data: banners = [], isLoading, error } = useGetAllBannerQuery();
+  const { mutate: deleteBanner } = useDeleteBannerMutation();
+  console.log("banners", banners);
+  const customerTableData: IFetchBanner[] = banners
+    .filter((item) => item.locations?.includes(selectedTab))
+    .map((banner, index) => ({
+      _id: banner._id,
+      title: banner.title,
+      description: banner.description,
+      image: banner.image,
+      mobImage: banner.mobImage,
+      priority: banner.priority,
+      locations: banner.locations,
+      type: banner.type,
+    }));
 
   const handleAddBannerClick = () => {
     setIsModalOpen(true);
@@ -54,32 +76,8 @@ const BannerIndex: React.FC = () => {
     setIsModalOpen(false);
     setEditingItem(null);
   };
-  console.log(isModalOpen, handleAddBannerClick, handleCloseModal);
 
   // Sample inventory data for different tabs
-  const [bannerItems] = useState<BannerItem[]>([
-    {
-      _id: "1",
-      title: "Wedding Season Sale",
-      banner_type: "Silver",
-      web_image: "/testimg.jpg",
-      mobile_image: "/testimg.jpg",
-    },
-    {
-      _id: "2",
-      title: "Wedding Season Sale",
-      banner_type: "Gold",
-      web_image: "/testimg.jpg",
-      mobile_image: "/testimg.jpg",
-    },
-    {
-      _id: "3",
-      title: "Wedding Season Sale",
-      banner_type: "Pasni Set",
-      web_image: "/testimg.jpg",
-      mobile_image: "/testimg.jpg",
-    },
-  ]);
 
   // Filter options for the dropdown
   const filterOptions = [
@@ -97,52 +95,38 @@ const BannerIndex: React.FC = () => {
     { value: "orders-low", label: "Orders (Low)" },
   ];
 
-  const [otherPageItems] = useState<BannerItem[]>([
-    {
-      _id: "1",
-      title: "Wedding Season Sale",
-      banner_type: "Silver",
-      web_image: "/testimg.jpg",
-      mobile_image: "/testimg.jpg",
-    },
-    {
-      _id: "2",
-      title: "Wedding Season Sale",
-      banner_type: "Gold",
-      web_image: "/testimg.jpg",
-      mobile_image: "/testimg.jpg",
-    },
-  ]);
-
-  const filterItems = (items: BannerItem[]) => {
+  const filterItems = (items: IFetchBanner[]) => {
     return items.filter(
       (item) =>
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item._id?.toLowerCase().includes(searchQuery.toLowerCase())
+        (item?.title &&
+          item.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (item?._id &&
+          item._id.toLowerCase().includes(searchQuery.toLowerCase()))
     );
   };
 
-  const handleViewItem = (item: TableData<BannerItem>) => {
-    if (selectedTab === "home_page") {
-      setEditingItem(item);
-    } else if (selectedTab === "other_page") {
-      setEditingItem(item);
-    }
+  const handleViewItem = (item: TableData<IFetchBanner>) => {
+    // if (selectedTab === "home_page") {
+    //   setEditingItem(item);
+    // } else if (selectedTab === "other_page") {
+    //   setEditingItem(item);
+    // }
+    setEditingItem(item);
     setisViewModalOpen(true);
   };
 
-  const handleEditItem = (item: TableData<BannerItem>) => {
+  const handleEditItem = (item: TableData<IFetchBanner>) => {
     // Check which tab is selected and set the editing item accordingly
-    if (selectedTab === "home_page") {
-      setEditingItem(item); // Set the item for the Home Page Banner
-    } else if (selectedTab === "other_page") {
-      setEditingItem(item); // Set the item for the Other Page Banner
-    }
+    // if (selectedTab === "home_page") {
+    //   setEditingItem(item); // Set the item for the Home Page Banner
+    // } else if (selectedTab === "other_page") {
+    //   setEditingItem(item); // Set the item for the Other Page Banner
+    // }
     setIsModalOpen(true); // Open the modal for either banner
   };
 
-  const handleDeleteItem = (item: TableData<BannerItem>) => {
-    console.log("Delete item:", item);
+  const handleDeleteItem = (item: TableData<IFetchBanner>) => {
+    deleteBanner(item._id);
   };
 
   const handlePageChange = (page: number) => {
@@ -169,41 +153,55 @@ const BannerIndex: React.FC = () => {
     setCurrentPage(1);
   };
 
-  const columns: ColumnConfig<BannerItem>[] = [
+  const columns: ColumnConfig<IFetchBanner>[] = [
     {
       header: "Title",
       key: "title",
     },
     {
       header: "Banner Type",
-      key: "banner_type",
+      key: "type",
     },
     {
       header: "Web Image",
-      key: "web_image",
+      key: "image",
       render: (_, row) => (
-        <img
-          src={row.web_image}
-          alt={row.title}
-          className="w-28 h-14 aspect-w-2 aspect-h-3 rounded-md mr-3 object-cover"
-        />
+        <div>
+          {row.image &&
+            row?.image.map((item) => {
+              return (
+                <img
+                  src={`https://gold-api.webstudiomatrix.com/${item}`}
+                  width={120}
+                  className="rounded-lg"
+                />
+              );
+            })}
+        </div>
       ),
     },
 
     {
       header: "Mobile Image",
-      key: "mobile_image",
+      key: "mobImage",
       render: (_, row) => (
-        <img
-          src={row.mobile_image}
-          alt={row.title}
-          className="w-28 h-14 aspect-w-2 aspect-h-3 rounded-md mr-3 object-cover"
-        />
+        <div>
+          {row.mobImage &&
+            row?.mobImage.map((item) => {
+              return (
+                <img
+                  src={`https://gold-api.webstudiomatrix.com/${item}`}
+                  width={120}
+                  className="rounded-lg"
+                />
+              );
+            })}
+        </div>
       ),
     },
   ];
 
-  const renderBannerTable = (items: BannerItem[]) => {
+  const renderBannerTable = (items: IFetchBanner[]) => {
     const filteredItems = filterItems(items);
 
     return (
@@ -248,7 +246,7 @@ const BannerIndex: React.FC = () => {
       </Header>
       <div className="bg-white rounded-lg shadow">
         <Tabs
-          defaultValue="home_page"
+          defaultValue="homepage"
           value={selectedTab}
           onValueChange={(value) => setSelectedTab(value)}
           className="w-full"
@@ -257,16 +255,22 @@ const BannerIndex: React.FC = () => {
           <div className="flex items-center justify-between ">
             <TabsList className="bg-transparent p-0 h-auto">
               <TabsTrigger
-                value="home_page"
+                value="homepage"
                 className="px-4 py-3 rounded-none data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:text-[#DF8D28] data-[state=active]:border-b-2 data-[state=active]:border-[#DF8D28] text-gray-500"
               >
                 Home Page
               </TabsTrigger>
               <TabsTrigger
-                value="other_page"
+                value="category-page"
                 className="px-4 py-3 rounded-none data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:text-[#DF8D28] data-[state=active]:border-b-2 data-[state=active]:border-[#DF8D28] text-gray-500"
               >
-                Other Page
+                Category Page
+              </TabsTrigger>
+              <TabsTrigger
+                value="product-page"
+                className="px-4 py-3 rounded-none data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:text-[#DF8D28] data-[state=active]:border-b-2 data-[state=active]:border-[#DF8D28] text-gray-500"
+              >
+                Product Page
               </TabsTrigger>
             </TabsList>
 
@@ -284,17 +288,20 @@ const BannerIndex: React.FC = () => {
           </div>
 
           {/* Tab content remains unchanged */}
-          <TabsContent value="home_page" className="px-4 pb-4 ">
-            {renderBannerTable(bannerItems)}
+          <TabsContent value="homepage" className="px-4 pb-4 ">
+            {renderBannerTable(customerTableData)}
           </TabsContent>
-          <TabsContent value="other_page" className="px-4 pb-4">
-            {renderBannerTable(otherPageItems)}
+          <TabsContent value="category-page" className="px-4 pb-4">
+            {renderBannerTable(customerTableData)}
+          </TabsContent>
+          <TabsContent value="product-page" className="px-4 pb-4">
+            {renderBannerTable(customerTableData)}
           </TabsContent>
         </Tabs>
       </div>
 
-      {isViewModalOpen && (
-        <Modal>
+      {isViewModalOpen && editingItem && (
+        <ScrollableModal classname="w-[30%]" onClose={handleCloseModal}>
           <div className="p-4">
             <h2 className="text-xl font-bold mb-4">Banner Details</h2>
             {editingItem && (
@@ -303,12 +310,12 @@ const BannerIndex: React.FC = () => {
                   <strong>Title:</strong> {editingItem.title}
                 </div>
                 <div>
-                  <strong>Banner Type:</strong> {editingItem.banner_type}
+                  <strong>Banner Type:</strong> {editingItem.type}
                 </div>
                 <div>
                   <strong>Web Image:</strong>{" "}
                   <img
-                    src={editingItem.web_image}
+                    src={`https://gold-api.webstudiomatrix.com/${editingItem.image?.[0]}`}
                     alt={editingItem.title}
                     className="w-28 h-14 aspect-w-2 aspect-h-3 rounded-md object-cover"
                   />
@@ -316,9 +323,9 @@ const BannerIndex: React.FC = () => {
                 <div>
                   <strong>Mobile Image:</strong>{" "}
                   <img
-                    src={editingItem.mobile_image}
+                    src={`https://gold-api.webstudiomatrix.com/${editingItem.mobImage?.[0]}`}
                     alt={editingItem.title}
-                    className="w-28 h-14 aspect-w-2 aspect-h-3 rounded-md object-cover"
+                    className="w-28 h-14   rounded-md object-cover"
                   />
                 </div>
               </div>
@@ -330,7 +337,7 @@ const BannerIndex: React.FC = () => {
               Close
             </button>
           </div>
-        </Modal>
+        </ScrollableModal>
       )}
     </div>
   );
