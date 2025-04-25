@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { SearchFilterSort } from "../../../components/global/SearchFilterSort";
 import { filterOptions, sortOptions } from "../../../constants/DropDownOptions";
@@ -12,6 +12,8 @@ import { ProductGridView } from "./component/GridView";
 import { Table } from "../../../components/shared";
 import { updateProductState } from "../../../store/productStore";
 import { get } from "lodash";
+import MasterTable from "../../../components/shared/MasterTable";
+import Header from "../../../components/shared/table_heading/Header";
 
 // Filter state interface
 interface FilterState {
@@ -35,7 +37,10 @@ const ProductList: React.FC = () => {
     filterValue: "",
     sortValue: "",
   });
-
+  const onEdit = useCallback((row: IFetchProduct) => {
+    updateProductState(row);
+    navigate(`/product/edit`);
+  }, []);
   const filteredProducts = useMemo(() => {
     if (!productsData || productsData.length === 0) return [];
 
@@ -119,23 +124,23 @@ const ProductList: React.FC = () => {
   }
   const columns = [
     {
-      header: "Product",
+      title: "Product",
       key: "product",
     },
     {
-      header: "Category",
+      title: "Category",
       key: "category",
     },
     {
-      header: "Sub Category",
+      title: "Sub Category",
       key: "subCategory",
     },
     {
-      header: "Price",
+      title: "Price",
       key: "price",
     },
     {
-      header: "Stock",
+      title: "Stock",
       key: "stock",
     },
   ];
@@ -144,50 +149,39 @@ const ProductList: React.FC = () => {
     product: get(product, "name", ""),
     category: get(product, "category.name", ""),
     subCategory: get(product, "subCategory.name", ""),
+    price: get(product, "price", 0),
+    stock: get(product, "-"),
+  }));
 
-    
-  }))
   return (
-    <div className="container pl-10 pr-4 mx-auto py-auto">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Products</h1>
-        <Link to="/product/add">
-          <button className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-white px-4 py-2 flex rounded-lg transition-colors duration-200">
-            <Icon icon="ic:outline-add" fontSize={24} />
-            New Product
-          </button>
-        </Link>
-      </div>
-
-      <div className="p-4 bg-white">
-        <SearchFilterSort
-          onSearch={handleSearch}
-          onFilter={handleFilter}
-          onSort={handleSort}
-          onViewChange={() => {}}
-          showFilter={true}
-          showSort={true}
-          showView={true}
-          filterOptions={filterOptions}
-          sortOptions={sortOptions}
-          placeholder="Search products..."
-        />
-
-        {/* <ProductGridView
-          productList={filteredProducts}
-          handleCardClick={handleCardClick}
-        /> */}
-        <Table
+    <div className="container mx-auto py-auto">
+      <Header text="Products">
+        <button className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-sm text-white px-4 py-2 flex rounded-lg transition-colors duration-200">
+          <Icon icon="ic:outline-add" fontSize={18} />
+          New Product
+        </button>
+      </Header>
+      <div className="p-4">
+        <MasterTable
           columns={columns}
-          showEdit={true}
-          editRow={(row) => {
-            updateProductState(row);
-            navigate(`/product/edit`);
-          }}
-          deleteRow={(row) => deleteProduct(row._id)}
-          showDelete={true}
-          // showView={true}
-          data={tableData}
+          onDelete={(id) => deleteProduct(id)}
+          editAction={onEdit}
+          filterSection={
+            <SearchFilterSort
+              onSearch={handleSearch}
+              onFilter={handleFilter}
+              onSort={handleSort}
+              onViewChange={() => {}}
+              showFilter={true}
+              showSort={true}
+              showView={true}
+              filterOptions={filterOptions}
+              sortOptions={sortOptions}
+              placeholder="Search products..."
+            />
+          }
+          rows={tableData}
+          showAction
         />
       </div>
     </div>

@@ -52,6 +52,7 @@ export interface IBaseProduct {
 }
 export interface IFetchProduct extends IBaseProduct {
   _id: string;
+  name: string;
   isActive?: boolean;
 }
 

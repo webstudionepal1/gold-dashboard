@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  UseQueryOptions,
+} from "@tanstack/react-query";
 import { apiClient } from "../utils/ApiGateway";
 import { toast } from "react-toastify";
 
@@ -64,9 +69,18 @@ interface SelectedVariant {
 interface OrderedProduct {
   selectedVariant: SelectedVariant;
   quantity: number;
-  product: string;
+  product: {
+    _id: string;
+    name: string;
+    images?: string[];
+  };
 }
 
+interface ICustomer {
+  name: string;
+  email: string;
+  _id: string;
+}
 export interface IFetchOrder {
   shippingAddress: ShippingAddress;
   billingAddress: BillingAddress;
@@ -74,7 +88,7 @@ export interface IFetchOrder {
   orderTimeline: OrderTimeline;
   transactionDetails: TransactionDetails;
   _id: string;
-  customer: string;
+  customer: ICustomer;
   orderedProducts: OrderedProduct[];
   orderStatus: string;
   paymentStatus: string;
@@ -99,11 +113,21 @@ export const useGetAllOrdersQuery = (params = {}) => {
     },
   });
 };
+export const useGetOrderById = (id: string | undefined) => {
+  return useQuery({
+    queryKey: ["orders", id],
+    queryFn: async () => {
+      const res = await apiClient.get<{ data: IFetchOrder }>(`order/${id}`);
+      return res?.data?.data;
+    },
+    enabled: !!id,
+  });
+};
 export const useCreateOrderMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["order"],
+    mutationKey: ["orders"],
     mutationFn: async (body: FormData) => {
       const res = await apiClient.post("order", body);
       return res?.data?.data;
@@ -122,7 +146,7 @@ export const useUpdateOrderMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["order"],
+    mutationKey: ["orders"],
     mutationFn: async ({ id, body }: IParams) => {
       const res = await apiClient.patch(`order/${id}`, body);
       return res?.data?.data;
@@ -141,7 +165,7 @@ export const useDeleteOrderMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["order"],
+    mutationKey: ["orders"],
     mutationFn: async (id: string) => {
       const res = await apiClient.delete(`order/${id}`);
       return res?.data?.data;
