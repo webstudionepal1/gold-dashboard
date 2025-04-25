@@ -1,9 +1,8 @@
-import * as z from 'zod'
+import * as z from "zod";
 export const categoryColumns = [
   {
-    title:"Name",
-    key:"name",
-
+    title: "Name",
+    key: "name",
   },
   {
     title: "Description",

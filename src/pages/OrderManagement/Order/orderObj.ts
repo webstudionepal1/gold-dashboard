@@ -88,4 +88,4 @@ export const order_details_columns = [
   { key: "price", title: "Price" },
   { key: "total_price", title: "Total Price" },
   { key: "status", title: "Status" },
-]
+];

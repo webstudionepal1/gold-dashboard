@@ -12,7 +12,7 @@ export interface IFetchBanner {
   image?: string[];
   mobImage?: string[];
   category?: string;
-  sub_category?: string;
+  subCategory?: string;
   priority?: number;
   locations?: string[];
   type?: string;

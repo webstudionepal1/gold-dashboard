@@ -15,7 +15,7 @@ import {
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Modal } from "../../components/shared";
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FrontendRoutes } from "../../routes/routes";
 import Header from "../../components/shared/table_heading/Header";
 import {
@@ -24,6 +24,7 @@ import {
   useGetAllBannerQuery,
 } from "../../server/api/bannerHook";
 import { ScrollableModal } from "../../components/shared/ScrollableModal";
+import { updateBannerState } from "./Components/bannerStore";
 
 interface BannerItem {
   _id: string;
@@ -31,7 +32,8 @@ interface BannerItem {
   banner_type: string;
   image: string[];
   mobImage: string[];
-
+  category: string;
+  subCategory: string;
   banner_title?: string;
   description?: string;
   select_by?: string;
@@ -46,7 +48,7 @@ const BannerIndex: React.FC = () => {
   console.log(selectedFilter);
   const [selectedSort, setSelectedSort] = useState("");
   console.log(selectedSort);
-
+  const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState("homepage");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setisViewModalOpen] = useState(false);
@@ -58,9 +60,12 @@ const BannerIndex: React.FC = () => {
   const customerTableData: IFetchBanner[] = banners
     .filter((item) => item.locations?.includes(selectedTab))
     .map((banner, index) => ({
+      ...banner,
       _id: banner._id,
       title: banner.title,
       description: banner.description,
+      category: banner.category,
+      subCategory: banner.subCategory,
       image: banner.image,
       mobImage: banner.mobImage,
       priority: banner.priority,
@@ -116,13 +121,9 @@ const BannerIndex: React.FC = () => {
   };
 
   const handleEditItem = (item: TableData<IFetchBanner>) => {
-    // Check which tab is selected and set the editing item accordingly
-    // if (selectedTab === "home_page") {
-    //   setEditingItem(item); // Set the item for the Home Page Banner
-    // } else if (selectedTab === "other_page") {
-    //   setEditingItem(item); // Set the item for the Other Page Banner
-    // }
-    setIsModalOpen(true); // Open the modal for either banner
+    console.log("editing items", item);
+    updateBannerState(item);
+    navigate(`/banner/edit`);
   };
 
   const handleDeleteItem = (item: TableData<IFetchBanner>) => {
@@ -233,7 +234,7 @@ const BannerIndex: React.FC = () => {
     <div className="container mx-auto px-4 py-3">
       <Header text="Banner">
         <button className="px-3 py-2  flex items-center  text-white bg-[#d49327] transition-transform duration-200 ease-in-out hover:scale-105 rounded-lg">
-          <Link className="flex items-center" to={FrontendRoutes.ADDBANNER}>
+          <Link className="flex items-center" to="/banner/add">
             <Icon
               icon="material-symbols-light:add-rounded"
               width="24"

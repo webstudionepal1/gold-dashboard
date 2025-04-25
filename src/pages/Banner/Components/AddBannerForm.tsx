@@ -1,39 +1,77 @@
 import Breadcrumbs from "../../../components/shared/Breadcrumb";
-import { useForm } from "@tanstack/react-form";
+import { useForm, useStore } from "@tanstack/react-form";
 import { InputField } from "../../../components/shared/form_components/InputField";
 import { DropdownField } from "../../../components/shared/form_components/Dropdown";
-import { z } from "zod";
+import * as z from "zod";
 import FileDropInput from "../../../components/shared/form_components/FileDropInput";
 import {
   useCreateBannerMutation,
   useGetAllBannerQuery,
+  useUpdateBannerMutation,
 } from "../../../server/api/bannerHook";
 import {
   useGetAllProductCategoriesQuery,
   useGetAllProductsQuery,
   useGetAllProductSubCategoriesQuery,
 } from "../../../server/api/productHooks";
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { DropdownTagField } from "../../../components/shared/form_components/DropdownTags";
 import Tags from "./Tags";
+import { useParams } from "react-router-dom";
+import { bannerStore } from "./bannerStore";
+import { generateBannerFormDefaultValue, IBannerFormData } from "./bannerobj";
+import Header from "../../../components/shared/table_heading/Header";
+
+// const AddBannerSchema = z.object({
+//   title: z.string().min(1, "Banner Title is required"),
+//   description: z.string().min(1, "Description is required"),
+//   category: z.string(),
+//   subCategory: z.string(),
+//   priority: z.number().min(0, "Price must be a positive number"),
+//   location: z.array(z.string()).min(1, "Location is required"),
+
+//   image: z.instanceof(File, {
+//     message: "Web Image is required",
+//   }),
+//   mobImage: z.instanceof(File, {
+//     message: "Mobile Image is required",
+//   }),
+// });
 
 const AddBannerSchema = z.object({
   title: z.string().min(1, "Banner Title is required"),
   description: z.string().min(1, "Description is required"),
-  category: z.string(),
-  sub_category: z.string(),
-  priority: z.coerce.number().min(0, "Price must be a positive number"),
-  location: z.array(z.string()).min(1, "Location is required"),
+  category: z.string().min(1, "Category is required"),
+  subCategory: z.string().min(1, "Sub Category is required"),
+  priority: z.number().min(0, "Price must be a positive number"),
+  locations: z.array(z.string()).min(1, "Location is required"),
 
-  image: z.instanceof(File, {
-    message: "Web Image is required",
-  }),
-  mobImage: z.instanceof(File, {
-    message: "Mobile Image is required",
-  }),
+  // Make file validations conditional based on whether it's a new record or update
+  image: z
+    .instanceof(File)
+    .nullable()
+    .refine((file) => file !== null, { message: "Web Image is required" }),
+  mobImage: z
+    .instanceof(File)
+    .nullable()
+    .refine((file) => file !== null, { message: "Mobile Image is required" }),
 });
 const AddBannerForm = () => {
-  const createBanner = useCreateBannerMutation();
+  const { id } = useParams();
+  const bannerData = useStore(bannerStore, (state) => state);
+  console.log("BANNER DATA", bannerData);
+  const [selectedTagItems, setSelectedTagItems] = useState<string[]>([]);
+  const {
+    mutate: createBanner,
+    isPending: bannerPending,
+    isSuccess: bannerSuccess,
+  } = useCreateBannerMutation();
+
+  const {
+    mutate: updateBanner,
+    isPending: bannerUpdatePending,
+    isSuccess: bannerUpdateSuccess,
+  } = useUpdateBannerMutation();
   const FieldError = ({ field }: { field: any }) => {
     if (field.state.meta.errors.length > 0) {
       const error = field.state.meta.errors[0];
@@ -57,82 +95,90 @@ const AddBannerForm = () => {
   const {
     data: categories,
     isLoading: isCategoryLoading,
+    isSuccess: categorySuccess,
     error: categoryError,
   } = useGetAllProductCategoriesQuery();
 
   const {
     data: subCategories,
     isLoading: isSubCategoryLoading,
+    isSuccess: subCategorySuccess,
     error: subCategoryError,
   } = useGetAllProductSubCategoriesQuery();
 
   console.log("CATEORIEEEEEEEEEEEEEEEEESSSSSSSSSSSSSSS", categories);
 
-  const categoryOptions = categories?.map((category) => ({
-    value: category._id,
-    label: category.name,
-  }));
+  // const categoryOptions = categories?.map((category) => ({
+  //   value: category._id,
+  //   label: category.name,
+  // }));
 
-  const subCategoryOptions = subCategories?.map((subCategory) => ({
-    value: subCategory._id,
-    label: subCategory.name,
-  }));
+  const categoryOptions = useMemo(
+    () =>
+      categorySuccess
+        ? categories.map((item) => ({ label: item.name, value: item._id }))
+        : [],
+    [categorySuccess, categories]
+  );
 
-  // const categoryOptions =
-  //   products?.map((category) => ({
-  //     value: category._id,
-  //     label: category.name,
-  //   })) || [];
-
-  // const subCategoryOptions = products?.map((subCategory) => ({
+  // const subCategoryOptions = subCategories?.map((subCategory) => ({
   //   value: subCategory._id,
   //   label: subCategory.name,
   // }));
 
-  // console.log("CATEGORY OPTIONS", categoryOptions);
+  const subCategoryOptions = useMemo(
+    () =>
+      subCategorySuccess
+        ? subCategories.map((item) => ({ label: item.name, value: item._id }))
+        : [],
+    [subCategorySuccess, subCategories]
+  );
+
+  const formState = id ?? "add";
   const form = useForm({
-    defaultValues: {
-      title: "",
-      description: "",
-      category: "",
-      sub_category: "",
-      priority: 0,
-      location: ["homepage"],
-      image: null as File | null,
-      mobImage: null as File | null,
-    },
+    defaultValues: generateBannerFormDefaultValue(
+      formState,
+      bannerData
+    ) as IBannerFormData,
     validators: {
       onSubmit: AddBannerSchema,
     },
     onSubmit: async ({ value }) => {
-      console.log("FORM DATA", value);
-      const formData = new FormData();
-
-      formData.append("title", value.title);
-      formData.append("description", value.description);
-      formData.append("category", value.category);
-      formData.append("sub_category", value.sub_category);
-      formData.append("priority", String(value.priority));
-      value.location.forEach((item) => formData.append("locations", item));
-
-      if (value.image) formData.append("image", value.image);
-
-      if (value.mobImage) formData.append("mobImage", value.mobImage);
-      // createBanner.mutate(formData);
-
       try {
-        await createBanner.mutateAsync(formData);
-        form.reset(); // Reset the form after successful submission
+        console.log("FORM DATA", value);
+        const formData = new FormData();
+
+        formData.append("title", value.title);
+        formData.append("description", value.description);
+        formData.append("category", value.category);
+        formData.append("subCategory", value.subCategory);
+        formData.append("priority", `${value.priority}`);
+        value.locations.forEach((item: string) =>
+          formData.append("locations", item)
+        );
+
+        if (value.image) formData.append("image", value.image);
+
+        if (value.mobImage) formData.append("mobImage", value.mobImage);
+        // createBanner.mutate(formData);
+
+        if (id == "add") createBanner(formData);
+        else updateBanner({ id: bannerData._id, body: formData });
+        // Reset the form after successful submission
       } catch (error) {
         console.error("Failed to create banner", error);
       }
     },
   });
+
+  useEffect(() => {
+    if (bannerSuccess || bannerUpdateSuccess) form.reset();
+  }, [bannerSuccess, bannerUpdateSuccess]);
   return (
     <>
       <div className="mx-8 my-3">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-semibold">Add New Banner</h1>
+          <Header text={id === "add" ? "Add New Banner" : "Edit Banner"} />
           <Breadcrumbs />
         </div>
 
@@ -157,6 +203,7 @@ const AddBannerForm = () => {
                       <InputField
                         label="Banner Title"
                         required
+                        type="text"
                         placeholder="Enter Banner Title"
                         value={field.state.value}
                         onChange={(e) => field.handleChange(e.target.value)}
@@ -198,7 +245,7 @@ const AddBannerForm = () => {
                   )}
                 </form.Field>
 
-                <form.Field name="sub_category">
+                <form.Field name="subCategory">
                   {(field) => (
                     <div className="w-full">
                       <DropdownField
@@ -249,7 +296,7 @@ const AddBannerForm = () => {
                         placeholder="0"
                         value={field.state.value}
                         onChange={(e) =>
-                          field.handleChange(e.target.value as any)
+                          field.handleChange(Number(e.target.value))
                         }
                       />
                       <FieldError field={field} />
@@ -257,35 +304,23 @@ const AddBannerForm = () => {
                   )}
                 </form.Field>
 
-                <form.Field name="location">
+                <form.Field name="locations">
                   {(field) => (
-                    <div className="w-full">
-                      {/* <DropdownField
-                        label="Location"
-                        options={[
-                          { value: "homepage", label: "Home Page" },
-                          { value: "category-page", label: "Category Page" },
-                          { value: "product-page", label: "Product Page" },
-                        ]}
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                      /> */}
-
-                      {/* <DropdownTagField
+                    <div className="w-full ">
+                      <DropdownTagField
                         required
-                        values={field.state.value}
-                        onChange={(e) => field.handleChange(value)}
+                        values={selectedTagItems}
+                        onChange={(newValues) => {
+                          setSelectedTagItems(newValues);
+                          field.handleChange(newValues);
+                        }}
                         options={[
                           { value: "homepage", label: "Home Page" },
                           { value: "category-page", label: "Category Page" },
                           { value: "product-page", label: "Product Page" },
                         ]}
-                      /> */}
-
-                      <Tags
-                        field={field}
-                        options={["homepage", "category-page", "product-page"]}
                       />
+
                       <FieldError field={field} />
                     </div>
                   )}
@@ -294,10 +329,10 @@ const AddBannerForm = () => {
 
               <button
                 type="submit"
-                disabled={createBanner.isPending}
+                disabled={bannerPending}
                 className="self-end bg-[#df8d29] text-white px-7 py-2 rounded-xl"
               >
-                {createBanner.isPending ? "Saving..." : "Save"}
+                {bannerPending ? "Saving..." : "Save"}
               </button>
             </form>
           </div>

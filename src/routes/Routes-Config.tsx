@@ -69,8 +69,8 @@ export const routesConfig = [
     element: <OrderDetails />,
   },
   {
-    path:"/attribs",
-    element:<AttribConfig/>
+    path: "/attribs",
+    element: <AttribConfig />,
   },
   {
     path: "/order/assigned-order-details/:id",
@@ -180,7 +180,7 @@ export const routesConfig = [
     element: <BannerIndex />,
   },
   {
-    path: FrontendRoutes.ADDBANNER,
+    path: "/banner/:id",
     element: <AddBannerForm />,
   },
   {

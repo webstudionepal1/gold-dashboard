@@ -1,5 +1,5 @@
 import { get } from "lodash";
-export const generateProductDefaultValue = (state:string, editData?: any) => {
+export const generateProductDefaultValue = (state: string, editData?: any) => {
   if (state === "add") {
     return {
       // General Information
@@ -50,4 +50,3 @@ export const generateProductDefaultValue = (state:string, editData?: any) => {
     };
   }
 };
-
