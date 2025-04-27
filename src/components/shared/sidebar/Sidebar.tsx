@@ -65,21 +65,21 @@ const SubRouteItem: React.FC<{
     <Link
       to={child.path}
       key={child.id}
-      className="relative flex items-center pl-4 rounded-lg"
+      className="relative flex items-center pl-4 mt-[2px] rounded-lg"
       onClick={() => closeSidebar()}
     >
-      <div className="absolute left-[0.1rem] top-1/2 -translate-y-1/2">
+      <div className="absolute left-[0.4rem] top-1/2 -translate-y-1/2">
         <div
-          className={`h-2 w-2 rounded-full transition-colors duration-200 ${
-            isActive ? "bg-primary-blue" : "bg-gray-300"
+          className={`h-[1px] w-2 rounded-full transition-colors duration-200 ${
+            isActive ? "bg-yellow" : "bg-gray-300"
           }`}
         />
       </div>
       <Text
-        variant={isActive ? "lime-green" : "fadish-black"}
+        variant={isActive ? "yellow" : "fadish-black"}
         size="body-sm-default"
         className={`hover:bg-gray-50 py-2 px-3 rounded transition-colors duration-200 ${
-          isActive ? "bg-gray-50" : ""
+          isActive ? "bg-[#FCF4EA]" : ""
         }`}
       >
         {child.title}
@@ -87,6 +87,7 @@ const SubRouteItem: React.FC<{
     </Link>
   );
 };
+
 
 const RouteItem: React.FC<{
   route: Route;
@@ -109,7 +110,7 @@ const RouteItem: React.FC<{
             isCollapsed ? "justify-center" : "justify-between"
           } rounded-lg transition-colors duration-200`,
           isCollapsed ? "px-2 py-3" : "px-6 py-2 gap-5",
-          pathname.startsWith(route.path) &&
+         isActive &&
             "bg-[#FCF4EA] text-white rounded-lg",
           !pathname.startsWith(route.path) &&
             `hover:bg-[${COLORS.navHoverColor}]`
@@ -127,7 +128,7 @@ const RouteItem: React.FC<{
         <div className={clsx("flex items-center", isCollapsed ? "" : "gap-3")}>
           <Icon
             icon={route.icon}
-            color={isActive ? "#2275FC" : "#5C5E64"}
+            color={isActive ? "orange" : "#5C5E64"}
             className={clsx(
               "transition-colors duration-200",
               isCollapsed ? "size-4" : "size-5"
@@ -135,7 +136,7 @@ const RouteItem: React.FC<{
           />
           {!isCollapsed && (
             <Text
-              variant={isActive ? "primary-blue" : "fadish-black"}
+              variant={isActive ? "orange" : "fadish-black"}
               size="body-sm-default"
             >
               {route.title}
@@ -146,7 +147,7 @@ const RouteItem: React.FC<{
           <Icon
             icon="oui:arrow-right"
             className={clsx(
-              "size-3 transition-transform duration-200",
+              "size-3 transition-transform text-black duration-200",
               isExpanded && "rotate-90"
             )}
           />
@@ -159,7 +160,7 @@ const RouteItem: React.FC<{
             isExpanded ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
           }`}
         >
-          <div className="absolute left-[0.3125rem] top-0 bottom-0 w-px bg-blue-500" />
+          <div className="absolute left-[0.3125rem] top-0 bottom-0 w-px bg-yellow" />
           {route.children &&
             route.children.map((child) => (
               <SubRouteItem

@@ -17,91 +17,12 @@ import ChipInputInside from "../../ProductCategory/components/ChipInputInside";
 import { useParams } from "react-router-dom";
 import Header from "../../../../components/shared/table_heading/Header";
 import { productStore } from "../../../../store/productStore";
-import { generateProductDefaultValue } from "./productobj";
-
-// Define types for the form
-type VisibilityType =
-  | "featured"
-  | "bestsellers"
-  | "newarrivals"
-  | "recommended"
-  | "";
-
-type ProductVariant = {
-  price: number;
-  size: string;
-  unit: string;
-};
-
-type ProductFormValues = {
-  // General Information
-  name: string;
-  description: string;
-  category: string;
-  subCategory: string;
-
-  // Price and Variants
-  variant: ProductVariant[];
-
-  // Product Specification
-  length: number; // Changed to number
-  claspType: string | undefined;
-  rhodoumFinishes: boolean; // Changed to boolean
-
-  // Material Information
-  shape: string;
-  clarity: string;
-  dimension: number; // Changed to number
-
-  // Visibility Option (single selection)
-  visibleAs: VisibilityType;
-
-  // Tags
-  tags: string[];
-};
-
-// Define types for image uploads
-type UploadedImage = {
-  name: string;
-  url: string;
-  file: File;
-};
-const validationSchema = z.object({
-  // General Information
-  name: z.string().min(1, "Name is required"),
-  description: z.string().min(1, "Description is required"),
-  category: z.string().min(1, "Category is required"),
-  subCategory: z.string().min(1, "Sub Category is required"),
-
-  // Price
-  variant: z
-    .array(
-      z.object({ price: z.number().min(1), size: z.string(), unit: z.string() })
-    )
-    .min(1, "At least one variant is required"),
-
-  // Product Specification
-  length: z.number().min(1, "Length is required"),
-  claspType: z.string().optional(),
-  rhodoumFinishes: z.boolean(),
-
-  // Material Information
-  shape: z.string().min(1, "Shape is required"),
-  clarity: z.string().min(1, "Clarity is required"),
-  dimension: z.number().min(1, "Dimension is required"),
-
-  // Visibility Option (single selection)
-  visibleAs: z.enum([
-    "",
-    "featured",
-    "bestsellers",
-    "newarrivals",
-    "recommended",
-  ]),
-
-  // Tags
-  tags: z.array(z.string()).min(1, "At least one tag is required"),
-});
+import {
+  generateProductDefaultValue,
+  IProductFormValues,
+  productFormSchema,
+  UploadedImage,
+} from "../../productObj";
 
 const ProductForm = () => {
   const { id } = useParams();
@@ -157,49 +78,63 @@ const ProductForm = () => {
   ];
   const formstate = id ?? "add";
   const form = useForm({
-    defaultValues: generateProductDefaultValue(formstate, productData),
-    // validators: {
-    //   onChange: validationSchema,
-    // },
+    defaultValues: generateProductDefaultValue(
+      formstate,
+      productData
+    ) as IProductFormValues,
     validators: {
-      onChange: validationSchema.parse,
+      onChange: productFormSchema,
+      onSubmit: productFormSchema,
+      onBlur: productFormSchema,
     },
     onSubmit: async ({ value }) => {
-      try {
-        // Create a proper data object to send to the server (avoid FormData issues with complex objects)
+      const formData = new FormData();
+      // Object.entries(value).forEach(([key, value]) => {
+      //   if (key === "variant") {
+      //     value.forEach((v, index: number) => {
+      //       formData.append(`variant[${index}][price]`, String(v.price));
+      //       formData.append(`variant[${index}][size]`, v.size);
+      //       formData.append(`variant[${index}][unit]`, v.unit);
+      //     });
+      //   } else if (Array.isArray(value)) {
+      //     value.forEach((item, index: number) => {
+      //       formData.append(`${key}[${index}]`, item);
+      //     });
+      //   } else if (uploadedImages.some((img) => img.name === key)) {
+      //     uploadedImages.find((img) => img.name === key)?.file &&
+      //       formData.append(key, uploadedImages.find((img) => img.name === key)?.file);
+      //   } else {
+      //     formData.append(key, value);
+      //   }
+      // });
+      formData.append("name", value.name);
+      formData.append("description", value.description);
+      formData.append("category", value.category);
+      formData.append("subCategory", value.subCategory);
 
-        const formData = new FormData();
-        formData.append("name", value.name);
-        formData.append("description", value.description);
-        formData.append("category", value.category);
-        formData.append("subCategory", value.subCategory);
+      value.variant.forEach((v, index: number) => {
+        formData.append(`variant[${index}][price]`, String(v.price));
+        formData.append(`variant[${index}][size]`, v.size);
+        formData.append(`variant[${index}][unit]`, v.unit);
+      });
 
-        value.variant.forEach((v: ProductVariant, index: number) => {
-          formData.append(`variant[${index}][price]`, String(v.price));
-          formData.append(`variant[${index}][size]`, v.size);
-          formData.append(`variant[${index}][unit]`, v.unit);
-        });
+      formData.append("length", String(value.length));
+      if (value.claspType) formData.append("claspType", value.claspType);
+      formData.append("rhodoumFinishes", String(value.rhodoumFinishes));
+      formData.append("shape", value.shape);
+      formData.append("clarity", value.clarity);
+      formData.append("dimension", String(value.dimension));
+      formData.append("visibleAs", value.visibleAs);
 
-        formData.append("length", String(value.length));
-        if (value.claspType) formData.append("claspType", value.claspType);
-        formData.append("rhodoumFinishes", String(value.rhodoumFinishes));
-        formData.append("shape", value.shape);
-        formData.append("clarity", value.clarity);
-        formData.append("dimension", String(value.dimension));
-        formData.append("visibleAs", value.visibleAs);
+      value.tags.forEach((tag: string, index: number) => {
+        formData.append(`tags[${index}]`, tag);
+      });
 
-        value.tags.forEach((tag: string, index: number) => {
-          formData.append(`tags[${index}]`, tag);
-        });
-
-        uploadedImages.forEach((img) => {
-          formData.append(`images`, img.file);
-        });
-        if (id == "add") createProduct(formData);
-        else updateProduct({ id: productData._id, body: formData });
-      } catch (error) {
-        console.error("Form submission error:", error);
-      }
+      uploadedImages.forEach((img) => {
+        formData.append(`images`, img.file);
+      });
+      if (id == "add") createProduct(formData);
+      else updateProduct({ id: productData._id, body: formData });
     },
   });
 
@@ -230,8 +165,8 @@ const ProductForm = () => {
         }}
         className="grid grid-cols-1 gap-4 lg:grid-cols-3"
       >
-        <div className="col-span-2 bg-white rounded-md">
-          {/* Left Column - Main Form */}
+        {/* Left Column */}
+        <div className="col-span-2 bg-white border rounded-md">
           <div className="col-span-2">
             {/* General Information Section */}
             <div className="p-4 rounded-lg">
@@ -331,10 +266,10 @@ const ProductForm = () => {
                         Product Size
                       </button>
                     </div>
-                    {field.state.value.map((_: void, i: number) => (
-                      <div key={i}>
+                    {field.state.value.map((_, i: number) => (
+                      <div key={i.toString()}>
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                          <form.Field name={`variant.${i}.price`}>
+                          <form.Field name={`variant[${i}].price`}>
                             {(subField) => (
                               <div>
                                 <PriceInputField
@@ -342,18 +277,17 @@ const ProductForm = () => {
                                   placeholder="Enter base price"
                                   type="number"
                                   required
-                                  value={subField.state.value as string}
+                                  value={subField.state.value}
                                   onChange={(e) =>
                                     subField.handleChange(
                                       Number(e.target.value)
                                     )
                                   }
                                 />
-                                <FieldError field={subField} />
                               </div>
                             )}
                           </form.Field>
-                          <form.Field name={`variant.${i}.size`}>
+                          <form.Field name={`variant[${i}].size`}>
                             {(subField) => (
                               <div>
                                 <InputField
@@ -500,7 +434,7 @@ const ProductForm = () => {
           </div>
         </div>
 
-        {/* Right Column - Sidebar */}
+        {/* Right Column */}
         <div className="space-y-6 ">
           {/* Visibility Options - Radio Buttons */}
           <div className="p-4 bg-white border rounded-lg">
@@ -516,7 +450,7 @@ const ProductForm = () => {
                         id={`visibility-${option.value}`}
                         value={option.value}
                         checked={field.state.value === option.value}
-                        onChange={() => field.handleChange(option.value)}
+                        // onChange={() => field.setValue(() => option.value)}
                         className="mr-2"
                       />
                       <label htmlFor={`visibility-${option.value}`}>

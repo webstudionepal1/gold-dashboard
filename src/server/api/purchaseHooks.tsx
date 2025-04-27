@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { apiClient } from "../utils/ApiGateway";
+import { IFetchSupplier } from "./supplierHooks";
+import { IFetchProduct } from "./productHooks";
 
 export interface IItem {
   item: string;
@@ -22,7 +24,7 @@ export interface IFetchPurchase {
   billNo: string;
   items: IItem[];
   products: IProducts[];
-  supplier: string;
+  supplier: IFetchSupplier;
   discount: number;
   discountType: string;
   totalAmount: number;
@@ -230,15 +232,20 @@ export const useDeleteRawMaterial = () => {
 };
 // purchase - return hooks
 export interface IReturnItem {
-  item: string;
+  item: any;
+  quantity?: number;
+}
+export interface IReturnProduct {
+  product: IFetchProduct;
   quantity: number;
   reason: string;
 }
 export interface IFetchPurchaseReturn {
   _id: string;
-  purchase: IFetchPurchase;
+  purchase: string;
   returnNo: string;
   items: IReturnItem[];
+  products: IReturnProduct[];
   totalReturnAmount: number;
   refundAmount: number;
   reason: string;
@@ -247,7 +254,7 @@ export interface IFetchPurchaseReturn {
 }
 export interface IPurchaseReturn {
   _id?: string;
-  purchase?: IFetchPurchase;
+  purchase?: string;
   returnNo?: string;
   items?: IReturnItem[];
   totalReturnAmount?: number;

@@ -81,7 +81,8 @@ interface PropTypes
     | "grey-400"
     | "grey-500"
     | "lime-green"
-    | "red";
+    | "red"
+    | "orange";
 
   text?: string;
   className?: string;
@@ -166,6 +167,7 @@ export const Text = React.memo(
             "text-grey-500": variant === "grey-500",
             "text-lime-green": variant === "lime-green",
             "text-red": variant === "red",
+            "text-orange": variant === "orange",
           }
         )}
         {...other}

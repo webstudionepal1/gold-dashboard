@@ -4,6 +4,14 @@ import {
   SimpleTable,
   SimpleTableColumn,
 } from "../../Customer/components/SimpleTable";
+import {
+  IFetchPurchase,
+  IFetchPurchaseReturn,
+} from "../../../server/api/purchaseHooks";
+import dayjs from "dayjs";
+import { get } from "lodash";
+import MasterTable from "../../../components/shared/MasterTable";
+import { viewPurchaseColumns } from "../purchaseObj";
 
 type Item = {
   name: string;
@@ -27,101 +35,63 @@ type PurchaseDetailsProps = {
   summaryType?: SummaryType;
 };
 
-export const PurchaseDetailsCard: React.FC<PurchaseDetailsProps> = ({
-  billNo,
-  date,
-  purchaseId,
-  supplier,
-  items,
-  totalCost,
-  discount,
-  netTotal,
-  refundAmount,
-  summaryType,
+interface PropDetails {
+  data: IFetchPurchase | IFetchPurchaseReturn;
+  summary?: string;
+}
+export const PurchaseDetailsCard: React.FC<PropDetails> = ({
+  data,
+  summary = "Purchase",
 }) => {
-  const itemColumns: SimpleTableColumn<Item>[] = [
-    { key: "name", header: "Item Name" },
-    { key: "unit", header: "Unit" },
-    {
-      key: "costPerUnit",
-      header: "Cost per unit",
-      render: (val) => `Rs.${val}`,
-    },
-    { key: "quantity", header: "QTY" },
-    {
-      key: "total",
-      header: "Total",
-      render: (val) => `Rs.${val}`,
-    },
-  ];
-
+ 
+  const rows =
+    data?.items.length > 0
+      ? data.items.map((item: any) => ({
+          name: item.item?.name,
+          unit: item.product?.unit,
+          costPerUnit: item.costPerUnit,
+          quantity: item.quantity,
+          total: item.total,
+        }))
+      : data.products.map((item: any) => ({
+          name: item.product?.name,
+          unit: item.product?.unit,
+          costPerUnit: item.costPerUnit,
+          quantity: item.quantity,
+          total: item.total,
+        }));
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white rounded-xl shadow-md space-y-4 text-sm text-gray-700 font-sans">
-      {summaryType === "purchase" ? (
-        <div className="text-center font-semibold text-lg">
-          Purchase Details
-        </div>
-      ) : summaryType === "refund" ? (
-        <div className="text-center font-semibold text-lg">
-          Purchase Return Details
-        </div>
-      ) : null}
+    <div className="max-w-3xl p-6 mx-auto space-y-4 font-sans text-sm text-gray-700 bg-white shadow-md rounded-xl">
+      <div className="text-lg font-semibold text-center">{summary}</div>
 
       {/* Header Info */}
-      <div className="flex justify-between text-gray-500 gap-10">
+      <div className="flex justify-between gap-10 text-gray-500">
         <div className="flex items-center gap-10">
           <div className="text-xs">Bill No.</div>
-          <div className="font-semibold">#{billNo}</div>
+          <div className="font-semibold">#{get("data", "billNo", "-")}</div>
         </div>
         <div className="flex items-center gap-2 pl-[">
           <div className="text-xs">Date:</div>
-          <div className="font-semibold">{date}</div>
+          <div className="font-semibold">
+            {dayjs(data?.createdAt).format("MMM-DD-YYYY")}
+          </div>
         </div>
       </div>
 
       <div className="flex items-center gap-10">
-        <div className="text-xs text-gray-500">Purchase ID</div>
-        <div className="font-semibold">{purchaseId}</div>
-      </div>
-      <div className="flex items-center gap-10">
         <div className="text-xs text-gray-500">Suppliers</div>
-        <div className="font-semibold">{supplier}</div>
+        <div className="font-semibold">{get(data, "supplier.name")}</div>
       </div>
 
       {/* Reused Table Component */}
-      <SimpleTable<Item>
-        title=""
-        data={items}
-        columns={itemColumns}
-        showCheckbox={false}
-        showViewButton={false}
+      <MasterTable
+        canSearch={false}
+        columns={viewPurchaseColumns}
+        rows={rows}
       />
 
       {/* Summary */}
-      {summaryType === "purchase" ? (
-        <div className="flex flex-col items-end space-y-1 mt-4 text-sm">
-          <div className="flex justify-between w-64">
-            <span className="text-gray-500">Total Cost</span>
-            <span>Rs.{totalCost}</span>
-          </div>
-          <div>
-            <div className="flex justify-between w-64">
-              <span className="text-gray-500">Discount (%)</span>
-              <span>Rs.{discount}</span>
-            </div>
-            <div className="border-b border-[#dedde2] w-full my-2" />
-          </div>
-          <div className="flex justify-between w-64 font-bold text-base mt-2">
-            <span>Net Total</span>
-            <span>Rs.{netTotal}</span>
-          </div>
-        </div>
-      ) : summaryType === "refund" ? (
-        <div className="flex justify-between w-64 ml-auto font-bold text-base mt-4">
-          <span>Refund Amount</span>
-          <span>Rs.{refundAmount}</span>
-        </div>
-      ) : null}
+     
     </div>
   );
 };

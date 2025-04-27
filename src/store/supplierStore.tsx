@@ -1,8 +1,8 @@
 import { Store } from "@tanstack/react-store";
-import { IFetchProduct } from "../server/api/productHooks";
+import { IFetchSupplier } from "../server/api/supplierHooks";
 
-export const supplierStore = new Store<IFetchProduct>({} as IFetchProduct);
+export const supplierStore = new Store<IFetchSupplier>({} as IFetchSupplier);
 
-export const updateProductState = (newState: IFetchProduct) => {
+export const updateSuplierState = (newState: IFetchSupplier) => {
   supplierStore.setState(() => newState);
 };

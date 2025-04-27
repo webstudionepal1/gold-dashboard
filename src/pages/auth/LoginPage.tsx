@@ -1,10 +1,11 @@
+import { Icon } from "@iconify/react/dist/iconify.js";
 import { useForm } from "@tanstack/react-form";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { twMerge } from "tailwind-merge";
 import * as z from "zod";
 import { useGetLoginMutation } from "../../server/api/authHooks";
-import { useEffect } from "react";
-import { Icon } from "@iconify/react/dist/iconify.js";
-import { twMerge } from "tailwind-merge";
-import { useNavigate } from "react-router-dom";
 export const FieldError = ({ field }: { field: any }) => {
   if (field.state.meta.errors.length > 0) {
     const error = field.state.meta.errors[0];
@@ -24,6 +25,7 @@ export const FieldError = ({ field }: { field: any }) => {
 };
 
 export const LoginPage = () => {
+  const queryClient = useQueryClient();
   const { mutate: doLogin, isPending, isSuccess } = useGetLoginMutation();
   const navigate = useNavigate();
   const loginSchema = z.object({
@@ -40,14 +42,14 @@ export const LoginPage = () => {
       onSubmit: loginSchema,
     },
     onSubmit: ({ value }) => {
-      const res = doLogin(value);
-      console.log(res);
+      doLogin(value);
     },
   });
 
   useEffect(() => {
     if (isSuccess) {
       form.reset();
+      queryClient.invalidateQueries({ queryKey: ["auth"] });
       navigate("/", { replace: true });
     }
   }, [isSuccess]);

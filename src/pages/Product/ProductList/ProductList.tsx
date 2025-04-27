@@ -156,10 +156,12 @@ const ProductList: React.FC = () => {
   return (
     <div className="container mx-auto py-auto">
       <Header text="Products">
+        <Link to="/product/add">
         <button className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-sm text-white px-4 py-2 flex rounded-lg transition-colors duration-200">
           <Icon icon="ic:outline-add" fontSize={18} />
           New Product
         </button>
+        </Link>
       </Header>
       <div className="p-4">
         <MasterTable
