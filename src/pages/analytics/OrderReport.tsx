@@ -18,6 +18,44 @@ import {
 
 import { SearchFilterSort } from "../../components/global/SearchFilterSort";
 import { filterOptions, sortOptions } from "../../constants/DropDownOptions";
+import { StatCard } from "./components/iconCard";
+
+const stats = [
+  {
+    percentage: 12,
+    label: "Gold",
+    icon: <img src="/Gold.png" alt="Gold" className="h-6 w-6 object-contain" />,
+    imageBgClassName: "bg-[#f7e8c9]",
+  },
+  {
+    percentage: 8,
+    label: "Silver",
+    icon: (
+      <img src="/Silver.png" alt="Silver" className="h-6 w-6 object-contain" />
+    ),
+    imageBgClassName: "bg-[#edeef2]",
+  },
+  {
+    percentage: 5,
+    label: "Watch",
+    icon: (
+      <img src="/watch.png" alt="Watch" className="h-6 w-6 object-contain" />
+    ),
+    imageBgClassName: "bg-[#d8efff]",
+  },
+  {
+    percentage: 15,
+    label: "Pasni Set",
+    icon: (
+      <img
+        src="/pasniSet.png"
+        alt="Pasni Set"
+        className="h-6 w-6 object-contain"
+      />
+    ),
+    imageBgClassName: "bg-[#ffe3e9]",
+  },
+];
 
 interface IEditModal {
   state: boolean;
@@ -136,25 +174,16 @@ const OrderReport = () => {
   const expenseTableData = useMemo(
     () => ({
       columns: [
-        { key: "date", title: "Date" },
-        { key: "expenseCategory", title: "Category" },
-        { key: "description", title: "Description" },
-        { key: "amount", title: "Amount" },
-        { key: "invoice", title: "Invoice" },
+        { key: "status", title: "Status" },
+        { key: "totalOrder", title: "Total Order" },
+        { key: "percentage", title: "Percentage" },
       ],
       rows: map(expensesList, (item) => ({
         ...item,
         amount: `Rs ${item.amount}`,
-        invoice: (
-          <div>
-            {item.images.map((imag) => (
-              <img
-                src={`https://gold-api.webstudiomatrix.com/api/v1/en/${imag}`}
-                alt="image"
-              />
-            ))}
-          </div>
-        ),
+        status: "Assigned",
+        totalOrder: "120",
+        percentage: "12%",
       })),
     }),
     [expensesList, expensesSuccess]
@@ -162,14 +191,15 @@ const OrderReport = () => {
   const expenseCategoryTableData = useMemo(
     () => ({
       columns: [
-        { key: "sn", title: "S.N." },
-        { key: "name", title: "Name" },
-        { key: "description", title: "Description" },
+        { key: "product", title: "Product" },
+        { key: "category", title: "Category" },
+        { key: "percentage", title: "Percentage" },
       ],
       rows: map(expenseCategories, (item, sn) => ({
         ...item,
-        sn: sn + 1,
-        description: <h1>DESCRIPTION</h1>,
+        product: "Anklets",
+        category: "Gold",
+        percentage: "12%",
       })),
     }),
     [expenseCategories, expenseCatSuccess]
@@ -201,6 +231,20 @@ const OrderReport = () => {
   return (
     <div className="container px-4 py-3 mx-auto ">
       <Header text="Order Report" />
+
+      {selectedTab === "topOrderProducts" && (
+        <div className="grid grid-cols-1 gap-4 p-8 sm:grid-cols-2 lg:grid-cols-4">
+          {stats.map((stat, index) => (
+            <StatCard
+              key={index}
+              percentage={stat.percentage}
+              label={stat.label}
+              icon={stat.icon}
+              imageBgClassName={stat.imageBgClassName}
+            />
+          ))}
+        </div>
+      )}
       <MasterTable
         loading={expensesLoading || expenseCatLoading}
         tabsOptions={
@@ -226,10 +270,7 @@ const OrderReport = () => {
         }
         rows={tableDataObj[selectedTab].rows || []}
         columns={tableDataObj[selectedTab].columns}
-        showAction={true}
-        viewAction={() => console.log("VIEW")}
-        editAction={() => console.log("edit")}
-        onDelete={(id) => deleteExpense(id)}
+        canSelect
       />
     </div>
   );

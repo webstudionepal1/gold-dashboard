@@ -31,7 +31,7 @@ import ProfitandLoss from "../pages/financeandexpenses/ProfitandLoss";
 import SettingForm from "../pages/settings/SettingForm";
 import OrderReport from "../pages/analytics/OrderReport";
 import SalesReport from "../pages/analytics/SalesReport";
-import StoreReport from "../pages/analytics/StoreReport";
+import StoreReport from "../pages/analytics/StockReport";
 import ProductForm from "../pages/Product/ProductList/component/ProductForm";
 import CustomerDetails from "../pages/Customer/components/CustomerDetails";
 import OrderDetails from "../pages/OrderManagement/Order/OrderDetails";
