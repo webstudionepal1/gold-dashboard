@@ -14,8 +14,8 @@ interface PurchaseProps {
 
 const PurchaseForm = ({ onClose }: PurchaseProps) => {
   return (
-    <div className="w-full max-w-2xl mx-auto p-4 bg-white shadow-md rounded-md">
-      <h2 className="text-xl font-semibold mb-4 flex items-center justify-center">
+    <div className="w-full max-w-2xl p-4 mx-auto bg-white rounded-md shadow-md">
+      <h2 className="flex items-center justify-center mb-4 text-xl font-semibold">
         Purchase Form
       </h2>
 
@@ -48,3 +48,5 @@ const PurchaseForm = ({ onClose }: PurchaseProps) => {
 };
 
 export default PurchaseForm;
+
+

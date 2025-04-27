@@ -1,24 +1,25 @@
 import { useForm, useStore } from "@tanstack/react-form";
-import { useEffect, useState } from "react";
+import clsx from "clsx";
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Breadcrumbs from "../../../components/shared/Breadcrumb";
 import { DropdownTagField } from "../../../components/shared/form_components/DropdownTags";
 import FileDropInput from "../../../components/shared/form_components/FileDropInput";
 import { InputField } from "../../../components/shared/form_components/InputField";
 import Header from "../../../components/shared/table_heading/Header";
+import { useGetAllProductsQuery } from "../../../server/api/productHooks";
 import {
   useCreateSupplierMutation,
   useUpdateSupplierMutation,
 } from "../../../server/api/supplierHooks";
+import { supplierStore } from "../../../store/supplierStore";
+import { FieldError } from "../../auth/LoginPage";
 import {
   appendFormData,
   getSupplierInitialFormValues,
   SupplierFormValues,
+  supplierSchema,
 } from "../purchaseObj";
-import { FieldError } from "../../auth/LoginPage";
-import { supplierStore } from "../../../store/supplierStore";
-import clsx from "clsx";
-import { useGetAllProductsQuery } from "../../../server/api/productHooks";
 
 const AddSupplierForm = () => {
   const { page = "add" } = useParams();
@@ -38,11 +39,15 @@ const AddSupplierForm = () => {
     : [];
 
   const editData = useStore(supplierStore, (state) => state);
+  console.log("editData", editData);
   const form = useForm({
     defaultValues: getSupplierInitialFormValues(
       page,
       editData
     ) as SupplierFormValues,
+    validators: {
+      onChange: supplierSchema,
+    },
 
     onSubmit: async ({ value }) => {
       const formdata = new FormData();
@@ -51,10 +56,10 @@ const AddSupplierForm = () => {
       else updateSupplier({ id: editData?._id, body: formdata });
     },
   });
+  console.log("page", page);
   useEffect(() => {
     if (createSuccess || updateSuccess) form.reset();
   }, [updateSuccess, createSuccess]);
-  const [selectedTagItems, setSelectedTagItems] = useState<string[]>([]);
 
   return (
     <>
@@ -410,9 +415,8 @@ const AddSupplierForm = () => {
                     <div className="w-full">
                       <DropdownTagField
                         required
-                        values={selectedTagItems}
+                        values={field.state.value}
                         onChange={(newValues) => {
-                          setSelectedTagItems(newValues);
                           field.handleChange(newValues);
                         }}
                         options={productsList}

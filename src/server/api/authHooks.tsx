@@ -17,12 +17,9 @@ export const useGetLoginMutation = () => {
       toast.success("User logged in successfully");
       Cookies.set("_UPLFMMATRIX", data.token);
       Cookies.set("user", data.user);
-      // navigate("/", { replace: true });
     },
     onError: (err: string) => {
       toast.error(err);
     },
   });
 };
-
-

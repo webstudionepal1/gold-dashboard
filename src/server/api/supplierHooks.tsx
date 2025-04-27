@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../utils/ApiGateway";
 import { toast } from "react-toastify";
+import { IFetchProduct } from "./productHooks";
 export interface IParams {
   id?: string;
   body: FormData;
@@ -30,9 +31,9 @@ export interface IFetchSupplier {
     PAN: string;
   };
   bankDetails: string;
-  products: string;
-  logo?: string;
-  _id:string;
+  products: IFetchProduct[];
+  logo: string[];
+  _id: string;
 }
 export const useGetSupplierQuery = (params = {}) => {
   return useQuery({
@@ -45,15 +46,27 @@ export const useGetSupplierQuery = (params = {}) => {
     },
   });
 };
+export const useGetSupplierByIdQuery = (id: string) => {
+  return useQuery({
+    queryKey: ["supplier", id],
+    queryFn: async () => {
+      const res = await apiClient.get<{ data: IFetchSupplier }>(
+        `supplier/${id}`
+      );
+      return res?.data?.data;
+    },
+    enabled: !!id,
+  });
+};
 export const useCreateSupplierMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ["supplier"],
-    mutationFn: async (body:FormData) => {
-      const res = await apiClient.post("supplier", body,{
-        headers:{
+    mutationFn: async (body: FormData) => {
+      const res = await apiClient.post("supplier", body, {
+        headers: {
           "Content-Type": "multipart/form-data",
-        }
+        },
       });
       return res?.data?.data;
     },
