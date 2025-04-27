@@ -1,298 +1,259 @@
-import type React from "react";
-import { useState } from "react";
-import { ColumnConfig, Table, TableData } from "../../components/shared/Table";
-import { SearchFilterSort } from "../../components/global/SearchFilterSort";
+import { Icon } from "@iconify/react/dist/iconify.js";
+import { useCallback, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import MasterTable from "../../components/shared/MasterTable";
+import { ScrollableModal } from "../../components/shared/ScrollableModal";
+import Header from "../../components/shared/table_heading/Header";
+import { DynamicTab } from "../PurchaseManagement/components/DynamicTab";
+
 import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "../../components/shared/tab";
-import TransactionDetails from "./components/TransactionDetails";
+  buttonObj,
+  transactionTabOption,
+  ITable,
+} from "../transaction/transactionObj";
+
+import { map } from "lodash";
+import {
+  IFetchExpenses,
+  useDeleteExpenseMutation,
+  useGetExpenseCategoryQuery,
+  useGetExpensesQuery,
+} from "../../server/api/expensesHook";
 import { useOutsideClick } from "../../hooks/UseOutsideClick";
 
-interface Transaction {
-  _id: string;
-  customername: string;
-  phone: string;
-  orderId: string;
-  orderDate: string;
-  totalAmount: number;
-  status: "Delivered" | "In Process";
+import { SearchFilterSort } from "../../components/global/SearchFilterSort";
+import { filterOptions, sortOptions } from "../../constants/DropDownOptions";
+
+interface IEditModal {
+  state: boolean;
+  editData?: IFetchExpenses | null;
 }
 
-const Transaction: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [selectedFilter, setSelectedFilter] = useState("");
-  const [selectedSort, setSelectedSort] = useState("");
+interface FilterState {
+  searchQuery: string;
+  filterValue: string;
+  sortValue: string;
+}
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const modalRef = useOutsideClick(() => setIsModalOpen(false));
+const Transaction = () => {
+  const navigate = useNavigate();
+  const [selectedTab, setSelectedTab] = useState("cash");
+  const [isExpenseModalOpen, setIsExpenseModalOpen] = useState<IEditModal>({
+    state: false,
+    editData: null,
+  });
 
-  // Sample inventory data for different tabs
-  const [Cash] = useState<Transaction[]>([
-    {
-      _id: "1",
-      customername: "Ram Prasad",
-      phone: "0987654321",
-      orderId: "45",
-      orderDate: "2 April 2025",
-      totalAmount: 1000,
-      status: "Delivered",
-    },
-    {
-      _id: "2",
-      customername: "Ram Prasad",
-      phone: "0987654321",
-      orderId: "45",
-      orderDate: "2 April 2025",
-      totalAmount: 1000,
-      status: "Delivered",
-    },
-    {
-      _id: "3",
-      customername: "Ram Prasad",
-      phone: "0987654321",
-      orderId: "45",
-      orderDate: "2 April 2025",
-      totalAmount: 1000,
-      status: "Delivered",
-    },
-  ]);
+  const [filterState, setFilterState] = useState<FilterState>({
+    searchQuery: "",
+    filterValue: "",
+    sortValue: "",
+  });
 
-  // Filter options for the dropdown
-  const filterOptions = [
-    { value: "", label: "All Customers" },
-    { value: "active", label: "Active" },
-    { value: "inactive", label: "Inactive" },
-  ];
+  const { mutate: deleteExpense } = useDeleteExpenseMutation();
+  const {
+    data: expensesList,
+    isLoading: expensesLoading,
+    isSuccess: expensesSuccess,
+  } = useGetExpensesQuery();
 
-  // Sort options for the dropdown
-  const sortOptions = [
-    { value: "", label: "Default" },
-    { value: "name-asc", label: "Name (A-Z)" },
-    { value: "name-desc", label: "Name (Z-A)" },
-    { value: "orders-high", label: "Orders (High)" },
-    { value: "orders-low", label: "Orders (Low)" },
-  ];
+  const {
+    data: expenseCategories,
+    isLoading: expenseCatLoading,
+    isSuccess: expenseCatSuccess,
+  } = useGetExpenseCategoryQuery();
 
-  const [DigitalPayment] = useState<Transaction[]>([
-    {
-      _id: "3",
-      customername: "Ram Prasad",
-      phone: "0987654321",
-      orderId: "45",
-      orderDate: "2 April 2025",
-      totalAmount: 1000,
-      status: "Delivered",
-    },
-    {
-      _id: "2",
-      customername: "Ram Prasad",
-      phone: "0987654321",
-      orderId: "45",
-      orderDate: "2 April 2025",
-      totalAmount: 1000,
-      status: "Delivered",
-    },
-    {
-      _id: "1",
-      customername: "Ram Prasad",
-      phone: "0987654321",
-      orderId: "45",
-      orderDate: "2 April 2025",
-      totalAmount: 1000,
-      status: "Delivered",
-    },
-  ]);
+  const expenseData = useMemo(
+    () => (expensesSuccess ? expensesList : []),
+    [expensesSuccess, expensesList]
+  );
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "On Stock":
-        return "bg-green-100 text-green-800";
-      case "Low Stock":
-        return "bg-yellow-100 text-yellow-800";
-      case "Out of Stock":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
+  const filteredExpenses = useMemo(() => {
+    if (!expenseData || expenseData.length === 0) return [];
+
+    let result = [...expenseData];
+
+    if (filterState.searchQuery) {
+      const query = filterState.searchQuery.toLowerCase();
+      result = result.filter(
+        (item) =>
+          (item.expenseCategory.name &&
+            item.expenseCategory.name.toLowerCase().includes(query)) ||
+          (typeof item.expenseCategory.name === "string" &&
+            item.expenseCategory.name.toLowerCase().includes(query)) ||
+          (item.description && item.description.toLowerCase().includes(query))
+      );
     }
-  };
+    if (filterState.filterValue) {
+      result = result.filter(
+        (item) =>
+          (typeof item.expenseCategory.name === "string" &&
+            item.expenseCategory.name === filterState.filterValue) ||
+          (item.description && item.description === filterState.filterValue)
+      );
+    }
 
-  const filterItems = (items: Transaction[]) => {
-    return items.filter(
-      (item) =>
-        item.customername.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item._id?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  };
+    // if (filterState.sortValue) {
+    //   switch (filterState.sortValue) {
+    //     case "title_asc":
+    //       result.sort((a, b) =>
+    //         a.name && b.name ? a.name.localeCompare(b.name) : 0
+    //       );
+    //       break;
+    //     case "title_desc":
+    //       result.sort((a, b) =>
+    //         a.name && b.name ? b.name.localeCompare(a.name) : 0
+    //       );
+    //       break;
+    //     case "price_asc":
+    //       result.sort((a, b) => (a.price && b.price ? a.price - b.price : 0));
+    //       break;
+    //     case "price_desc":
+    //       result.sort((a, b) => (a.price && b.price ? b.price - a.price : 0));
+    //       break;
+    //     case "rating_asc":
+    //       result.sort((a, b) =>
+    //         a.ratings && b.ratings ? a.ratings - b.ratings : 0
+    //       );
+    //       break;
+    //     case "rating_desc":
+    //       result.sort((a, b) =>
+    //         a.ratings && b.ratings ? b.ratings - a.ratings : 0
+    //       );
+    //       break;
+    //   }
+    // }
 
-  const handleViewItem = (item: TableData<Transaction>) => {
-    console.log("View item:", item);
-  };
-
-  const handleEditItem = (item: TableData<Transaction>) => {
-    console.log("Edit item:", item);
-  };
-
-  const handleDeleteItem = (item: TableData<Transaction>) => {
-    console.log("Delete item:", item);
-  };
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  const handleItemsPerPageChange = (limit: number) => {
-    setItemsPerPage(limit);
-    setCurrentPage(1);
-  };
+    return result;
+  }, [expenseData, filterState]);
 
   const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    setCurrentPage(1);
+    setFilterState((prev) => ({ ...prev, searchQuery: query }));
   };
 
   const handleFilter = (filter: string) => {
-    setSelectedFilter(filter);
-    setCurrentPage(1);
+    setFilterState((prev) => ({ ...prev, filterValue: filter }));
   };
 
   const handleSort = (sort: string) => {
-    setSelectedSort(sort);
-    setCurrentPage(1);
+    setFilterState((prev) => ({ ...prev, sortValue: sort }));
   };
 
-  const columns: ColumnConfig<Transaction>[] = [
-    {
-      header: "Customer Name",
-      key: "customername",
-      render: (_, row) => (
-        <div className="flex items-center">
-          <div>
-            <div className="font-medium text-gray-900">{row.customername}</div>
-            {row._id && (
-              <div className="text-sm text-gray-500">ID {row._id}</div>
-            )}
-          </div>
-        </div>
-      ),
-    },
-    {
-      header: "Phone No.",
-      key: "phone",
-    },
-    {
-      header: "Order ID",
-      key: "orderId ",
-    },
-    {
-      header: "Order date",
-      key: "orderDate",
-    },
-    {
-      header: "Total Amount",
-      key: "total",
-    },
-    {
-      header: "Status",
-      key: "status",
-      render: (_, row) => (
-        <span
-          className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
-            row.status
-          )}`}
-        >
-          {row.status}
-        </span>
-      ),
-    },
-  ];
+  const expenseTableData = useMemo(
+    () => ({
+      columns: [
+        { key: "customer_name", title: "Customer Name" },
+        { key: "phone_no", title: "Phone No." },
+        { key: "order_id", title: "Order ID" },
+        { key: "order_date", title: "Order Date" },
+        { key: "total_amount", title: "Total Amount" },
+        { key: "status", title: "Status" },
+      ],
+      rows: map(expensesList, (item) => ({
+        ...item,
+        customer_name: "Ram Prasad",
+        phone_no: "+977-9898989898",
+        order_id: "#8989",
+        order_date: "2025-02-25",
+        total_amount: "Rs. 55,450",
+        status: "delivered",
+        amount: `Rs ${item.amount}`,
+      })),
+    }),
+    [expensesList, expensesSuccess]
+  );
+  const expenseCategoryTableData = useMemo(
+    () => ({
+      columns: [
+        { key: "customer_name", title: "Customer Name" },
+        { key: "phone_no", title: "Phone No." },
+        { key: "order_id", title: "Order ID" },
+        { key: "order_date", title: "Order Date" },
+        { key: "total_amount", title: "Total Amount" },
+        { key: "status", title: "Status" },
+      ],
+      rows: map(expenseCategories, (item, sn) => ({
+        ...item,
+        customer_name: "Ram Prasad",
+        phone_no: "+977-9898989898",
+        order_id: "#8989",
+        order_date: "2025-02-25",
+        total_amount: "Rs. 55,450",
+        status: "paid",
+      })),
+    }),
+    [expenseCategories, expenseCatSuccess]
+  );
+  // const returnTableData = useMemo(
+  //   () => ({
+  //     columns: [{ key: "name", title: "Name" }],
+  //     rows: map(returnList, (item) => ({
+  //       ...item,
+  //     })),
+  //   }),
+  //   [returnList, returnSuccess]
+  // );
 
-  const renderInventoryTable = (items: Transaction[]) => {
-    const filteredItems = filterItems(items);
-
-    return (
-      <Table
-        columns={columns}
-        data={filteredItems}
-        showEdit={false}
-        showDelete={false}
-        showView={true}
-        showAction={true}
-        showSelectAll={true}
-        viewRow={handleViewItem}
-        editRow={handleEditItem}
-        deleteRow={handleDeleteItem}
-        showPagination={true}
-        paginationDetails={{
-          currentPage,
-          limit: itemsPerPage,
-          totalCount: filteredItems.length,
-        }}
-        onItemsPerPageChange={handleItemsPerPageChange}
-        onPageChange={handlePageChange}
-        showBg={true}
-      />
-    );
+  const tableDataObj: ITable = {
+    cash: expenseTableData,
+    digitalPayment: expenseCategoryTableData,
   };
-
+  const [modal, setModal] = useState({
+    of: "",
+    edit: false,
+    data: null,
+  });
+  const closeModal = useCallback(
+    () => setModal({ of: "", edit: false, data: null }),
+    []
+  );
+  console.log(selectedTab);
   return (
-    <div className="container mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Transaction</h1>
-      <div className="bg-white rounded-lg shadow">
-        <Tabs defaultValue="cash" className="w-full">
-          {/* Container for both TabsList and SearchFilterSort */}
-          <div className="flex items-center justify-between border-b">
-            <TabsList className="bg-transparent p-0 h-auto">
-              <TabsTrigger
-                value="cash"
-                className="px-4 py-3 rounded-none data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:text-[#DF8D28] data-[state=active]:border-b-2 data-[state=active]:border-[#DF8D28] text-gray-500"
-              >
-                Cash
-              </TabsTrigger>
-              <TabsTrigger
-                value="digitalPayment"
-                className="px-4 py-3 rounded-none data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:text-[#DF8D28] data-[state=active]:border-b-2 data-[state=active]:border-[#DF8D28] text-gray-500"
-              >
-                Digital Payment
-              </TabsTrigger>
-            </TabsList>
-
-            {/* SearchFilterSort moved here and aligned to the right */}
-            <div className="p-4">
-              <SearchFilterSort
-                onSearch={handleSearch}
-                onFilter={handleFilter}
-                onSort={handleSort}
-                filterOptions={filterOptions}
-                sortOptions={sortOptions}
-                placeholder="Search here..."
-              />
-            </div>
-          </div>
-
-          {/* Tab content remains unchanged */}
-          <TabsContent
-            value="cash"
-            className="px-4 pb-4 "
-            onClick={() => {
-              setIsModalOpen(true);
-            }}
-          >
-            {renderInventoryTable(Cash)}
-          </TabsContent>
-          <TabsContent value="digitalPayment" className="px-4 pb-4">
-            {renderInventoryTable(DigitalPayment)}
-          </TabsContent>
-        </Tabs>
-      </div>
-
-      {isModalOpen && (
-        <TransactionDetails modalRef={modalRef} setOpenModal={setIsModalOpen} />
+    <div className="container px-4 py-3 mx-auto ">
+      <Header
+        // text={selectedTab === "expenses" ? "Expenses" : "Expenses Category"}
+        text="Transaction"
+      />
+      <MasterTable
+        loading={expensesLoading || expenseCatLoading}
+        tabsOptions={
+          <DynamicTab
+            selectedTab={selectedTab}
+            setSelectedTab={setSelectedTab}
+            tabOptions={transactionTabOption}
+          />
+        }
+        filterSection={
+          <SearchFilterSort
+            onSearch={handleSearch}
+            onFilter={handleFilter}
+            onSort={handleSort}
+            onViewChange={() => {}}
+            showFilter={true}
+            showSort={true}
+            showView={true}
+            filterOptions={filterOptions}
+            sortOptions={sortOptions}
+            placeholder="Search products..."
+          />
+        }
+        rows={tableDataObj[selectedTab].rows || []}
+        columns={tableDataObj[selectedTab].columns}
+        showAction={true}
+        viewAction={() => console.log("VIEW")}
+        // editAction={() => console.log("edit")}
+        // onDelete={(id) => deleteExpense(id)}
+      />
+      {/* {modal.of === "expenses" && (
+        <ScrollableModal onClose={closeModal} classname="w-[35rem]">
+          <ExpenseForm closeModal={closeModal} />
+        </ScrollableModal>
       )}
+
+      {modal.of === "expensesCategory" && (
+        <ScrollableModal classname="w-[35rem]" onClose={closeModal}>
+          <ExpenseCategoryForm closeModal={closeModal} />
+        </ScrollableModal>
+      )} */}
     </div>
   );
 };

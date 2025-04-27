@@ -1,335 +1,275 @@
-import type React from "react";
-import { useState } from "react";
-import { ColumnConfig, Table, TableData } from "../../components/shared/Table";
-import { SearchFilterSort } from "../../components/global/SearchFilterSort";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "../../components/shared/tab";
-
-import { useOutsideClick } from "../../hooks/UseOutsideClick";
-import InvoiceSlip from "./components/InvoiceSlip";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { useCallback, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import MasterTable from "../../components/shared/MasterTable";
+import { ScrollableModal } from "../../components/shared/ScrollableModal";
+import Header from "../../components/shared/table_heading/Header";
+import { DynamicTab } from "../PurchaseManagement/components/DynamicTab";
+
+import {
+  buttonObj,
+  expenseTabOption,
+  ITable,
+} from "../financeandexpenses/components/expenseObj";
+
+import { map } from "lodash";
+import {
+  IFetchExpenses,
+  useDeleteExpenseMutation,
+  useGetExpenseCategoryQuery,
+  useGetExpensesQuery,
+} from "../../server/api/expensesHook";
 import ExpenseForm from "./components/ExpenseForm";
 import ExpenseCategoryForm from "./components/ExpenseCategoryForm";
+import { SearchFilterSort } from "../../components/global/SearchFilterSort";
+import { filterOptions, sortOptions } from "../../constants/DropDownOptions";
 
-interface Transaction {
-  _id: string;
-  date?: string;
-  expensesId?: string;
-  category?: string;
-  purchaseId?: string;
-  description?: string;
-  amount?: string;
-  sn?: string;
-  image?: string;
+interface IEditModal {
+  state: boolean;
+  editData?: IFetchExpenses | null;
 }
 
-const Expenses: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [selectedFilter, setSelectedFilter] = useState("");
-  const [selectedSort, setSelectedSort] = useState("");
+interface FilterState {
+  searchQuery: string;
+  filterValue: string;
+  sortValue: string;
+}
 
-  const [selectedForm, setSelectedForm] = useState("expenses");
+const Expenses = () => {
+  const navigate = useNavigate();
+  const [selectedTab, setSelectedTab] = useState("expenses");
+  const [isExpenseModalOpen, setIsExpenseModalOpen] = useState<IEditModal>({
+    state: false,
+    editData: null,
+  });
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const modalRef = useOutsideClick(() => setIsModalOpen(false));
+  const [filterState, setFilterState] = useState<FilterState>({
+    searchQuery: "",
+    filterValue: "",
+    sortValue: "",
+  });
 
-  // Sample inventory data for different tabs
-  const [Expenses] = useState<Transaction[]>([
-    {
-      _id: "1",
-      date: "2023-01-12",
-      expensesId: "#012",
-      category: "inventory",
-      purchaseId: "#39",
-      description: "Purchase of rice and lentils",
-      amount: "Rs 1290",
-      image: "/invoice.png",
-    },
-    {
-      _id: "3",
-      date: "2023-01-12",
-      expensesId: "#012",
-      category: "inventory",
-      purchaseId: "#39",
-      description: "Purchase of rice and lentils",
-      amount: "Rs 1290",
-      image: "/invoice.png",
-    },
-    {
-      _id: "2",
-      date: "2023-01-12",
-      expensesId: "#012",
-      category: "inventory",
-      purchaseId: "#39",
-      description: "Purchase of rice and lentils",
-      amount: "Rs 1290",
-      image: "/invoice.png",
-    },
-  ]);
+  const { mutate: deleteExpense } = useDeleteExpenseMutation();
+  const {
+    data: expensesList,
+    isLoading: expensesLoading,
+    isSuccess: expensesSuccess,
+  } = useGetExpensesQuery();
 
-  // Filter options for the dropdown
-  const filterOptions = [
-    { value: "", label: "All Customers" },
-    { value: "active", label: "Active" },
-    { value: "inactive", label: "Inactive" },
-  ];
+  const {
+    data: expenseCategories,
+    isLoading: expenseCatLoading,
+    isSuccess: expenseCatSuccess,
+  } = useGetExpenseCategoryQuery();
 
-  // Sort options for the dropdown
-  const sortOptions = [
-    { value: "", label: "Default" },
-    { value: "name-asc", label: "Name (A-Z)" },
-    { value: "name-desc", label: "Name (Z-A)" },
-    { value: "orders-high", label: "Orders (High)" },
-    { value: "orders-low", label: "Orders (Low)" },
-  ];
+  const expenseData = useMemo(
+    () => (expensesSuccess ? expensesList : []),
+    [expensesSuccess, expensesList]
+  );
 
-  const [Expenses_Category] = useState<Transaction[]>([
-    {
-      _id: "3",
-      sn: "1",
-      category: "Manitenence",
-    },
-    {
-      _id: "2",
-      sn: "2",
-      category: "Manitenence",
-    },
-    {
-      _id: "1",
-      sn: "3",
-      category: "Manitenence",
-    },
-  ]);
+  const filteredExpenses = useMemo(() => {
+    if (!expenseData || expenseData.length === 0) return [];
 
-  // const getStatusColor = (status: string) => {
-  //   switch (status) {
-  //     case "On Stock":
-  //       return "bg-green-100 text-green-800";
-  //     case "Low Stock":
-  //       return "bg-yellow-100 text-yellow-800";
-  //     case "Out of Stock":
-  //       return "bg-red-100 text-red-800";
-  //     default:
-  //       return "bg-gray-100 text-gray-800";
-  //   }
-  // };
+    let result = [...expenseData];
 
-  const filterItems = (items: Transaction[]) => {
-    return items.filter((item) =>
-      item._id?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  };
+    if (filterState.searchQuery) {
+      const query = filterState.searchQuery.toLowerCase();
+      result = result.filter(
+        (item) =>
+          (item.expenseCategory.name &&
+            item.expenseCategory.name.toLowerCase().includes(query)) ||
+          (typeof item.expenseCategory.name === "string" &&
+            item.expenseCategory.name.toLowerCase().includes(query)) ||
+          (item.description && item.description.toLowerCase().includes(query))
+      );
+    }
+    if (filterState.filterValue) {
+      result = result.filter(
+        (item) =>
+          (typeof item.expenseCategory.name === "string" &&
+            item.expenseCategory.name === filterState.filterValue) ||
+          (item.description && item.description === filterState.filterValue)
+      );
+    }
 
-  const handleViewItem = (item: TableData<Transaction>) => {
-    console.log("View item:", item);
-  };
+    // if (filterState.sortValue) {
+    //   switch (filterState.sortValue) {
+    //     case "title_asc":
+    //       result.sort((a, b) =>
+    //         a.name && b.name ? a.name.localeCompare(b.name) : 0
+    //       );
+    //       break;
+    //     case "title_desc":
+    //       result.sort((a, b) =>
+    //         a.name && b.name ? b.name.localeCompare(a.name) : 0
+    //       );
+    //       break;
+    //     case "price_asc":
+    //       result.sort((a, b) => (a.price && b.price ? a.price - b.price : 0));
+    //       break;
+    //     case "price_desc":
+    //       result.sort((a, b) => (a.price && b.price ? b.price - a.price : 0));
+    //       break;
+    //     case "rating_asc":
+    //       result.sort((a, b) =>
+    //         a.ratings && b.ratings ? a.ratings - b.ratings : 0
+    //       );
+    //       break;
+    //     case "rating_desc":
+    //       result.sort((a, b) =>
+    //         a.ratings && b.ratings ? b.ratings - a.ratings : 0
+    //       );
+    //       break;
+    //   }
+    // }
 
-  const handleEditItem = (item: TableData<Transaction>) => {
-    console.log("Edit item:", item);
-  };
-
-  const handleDeleteItem = (item: TableData<Transaction>) => {
-    console.log("Delete item:", item);
-  };
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  const handleItemsPerPageChange = (limit: number) => {
-    setItemsPerPage(limit);
-    setCurrentPage(1);
-  };
+    return result;
+  }, [expenseData, filterState]);
 
   const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    setCurrentPage(1);
+    setFilterState((prev) => ({ ...prev, searchQuery: query }));
   };
 
   const handleFilter = (filter: string) => {
-    setSelectedFilter(filter);
-    setCurrentPage(1);
+    setFilterState((prev) => ({ ...prev, filterValue: filter }));
   };
 
   const handleSort = (sort: string) => {
-    setSelectedSort(sort);
-    setCurrentPage(1);
+    setFilterState((prev) => ({ ...prev, sortValue: sort }));
   };
 
-  const handleClick = () => {
-    console.log("clicked");
-    setIsModalOpen(true);
-  };
-
-  const columns1: ColumnConfig<Transaction>[] = [
-    {
-      header: "Date",
-      key: "date",
-    },
-    {
-      header: "Expense ID",
-      key: "expensesId",
-    },
-    {
-      header: "Category",
-      key: "category",
-    },
-    {
-      header: "Link Purchase ID",
-      key: "purchaseId",
-    },
-    {
-      header: "Description",
-      key: "description",
-    },
-    {
-      header: "Amount",
-      key: "amount",
-    },
-    {
-      header: "Invoice",
-      key: "image",
-      render: (item) => (
-        <img
-          src={item}
-          alt="no"
-          className="w-10 h-16 rounded-sm object-cover"
-          onClick={handleClick}
-        />
-      ),
-    },
-  ];
-  const columns2: ColumnConfig<Transaction>[] = [
-    {
-      header: "S.N.",
-      key: "sn",
-    },
-    {
-      header: "Category",
-      key: "category",
-    },
-  ];
-
-  const [columns, setColumns] = useState<any>(columns1);
-
-  const renderInventoryTable = (items: Transaction[]) => {
-    const filteredItems = filterItems(items);
-
-    return (
-      <Table
-        columns={columns}
-        data={filteredItems}
-        showEdit={true}
-        showDelete={true}
-        showView={true}
-        showAction={true}
-        showSelectAll={true}
-        viewRow={handleViewItem}
-        editRow={handleEditItem}
-        deleteRow={handleDeleteItem}
-        showPagination={true}
-        paginationDetails={{
-          currentPage,
-          limit: itemsPerPage,
-          totalCount: filteredItems.length,
-        }}
-        onItemsPerPageChange={handleItemsPerPageChange}
-        onPageChange={handlePageChange}
-        showBg={true}
-      />
-    );
-  };
-
-  return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="flex justify-between items-center mb-6">
-        <p className="text-2xl font-bold text-gray-800">Expenses </p>
-        <button
-          className="flex  items-center gap-2 bg-[#df8d28] rounded-md text-white font-medium px-3 py-2"
-          onClick={() => setIsFormOpen(true)}
-        >
-          <Icon icon="material-symbols:add-2" />
-          <span>
-            {selectedForm == "expenses" ? "Add Expenses" : "Add Category"}
-          </span>
-        </button>
-      </div>
-      <div className="bg-white rounded-lg shadow">
-        <Tabs defaultValue="expenses" className="w-full">
-          {/* Container for both TabsList and SearchFilterSort */}
-          <div className="flex items-center justify-between border-b">
-            <TabsList className="bg-transparent p-0 h-auto">
-              <TabsTrigger
-                value="expenses"
-                onClick={() => {
-                  setColumns(columns1);
-                  setSelectedForm("expenses");
-                }}
-                className="px-4 py-3 rounded-none data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:text-[#DF8D28] data-[state=active]:border-b-2 data-[state=active]:border-[#DF8D28] text-gray-500"
-              >
-                Expenses
-              </TabsTrigger>
-              <TabsTrigger
-                value="expensesCategory"
-                onClick={() => {
-                  setColumns(columns2);
-                  setSelectedForm("category");
-                }}
-                className="px-4 py-3 rounded-none data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:text-[#DF8D28] data-[state=active]:border-b-2 data-[state=active]:border-[#DF8D28] text-gray-500"
-              >
-                Expenses Category
-              </TabsTrigger>
-            </TabsList>
-
-            {/* SearchFilterSort moved here and aligned to the right */}
-            <div className="p-4">
-              <SearchFilterSort
-                onSearch={handleSearch}
-                onFilter={handleFilter}
-                onSort={handleSort}
-                filterOptions={filterOptions}
-                sortOptions={sortOptions}
-                placeholder="Search here..."
+  const expenseTableData = useMemo(
+    () => ({
+      columns: [
+        { key: "date", title: "Date" },
+        { key: "expenseCategory", title: "Category" },
+        { key: "description", title: "Description" },
+        { key: "amount", title: "Amount" },
+        { key: "invoice", title: "Invoice" },
+      ],
+      rows: map(expensesList, (item) => ({
+        ...item,
+        amount: `Rs ${item.amount}`,
+        invoice: (
+          <div>
+            {item.images.map((imag) => (
+              <img
+                src={`https://gold-api.webstudiomatrix.com/api/v1/en/${imag}`}
+                alt="image"
               />
-            </div>
+            ))}
           </div>
+        ),
+      })),
+    }),
+    [expensesList, expensesSuccess]
+  );
+  const expenseCategoryTableData = useMemo(
+    () => ({
+      columns: [
+        { key: "sn", title: "S.N." },
+        { key: "name", title: "Name" },
+        { key: "description", title: "Description" },
+      ],
+      rows: map(expenseCategories, (item, sn) => ({
+        ...item,
+        sn: sn + 1,
+        description: <h1>DESCRIPTION</h1>,
+      })),
+    }),
+    [expenseCategories, expenseCatSuccess]
+  );
+  // const returnTableData = useMemo(
+  //   () => ({
+  //     columns: [{ key: "name", title: "Name" }],
+  //     rows: map(returnList, (item) => ({
+  //       ...item,
+  //     })),
+  //   }),
+  //   [returnList, returnSuccess]
+  // );
 
-          {/* Tab content remains unchanged */}
-          <TabsContent
-            value="expenses"
-            className="px-4 pb-4 "
+  const tableDataObj: ITable = {
+    expenses: expenseTableData,
+    expensesCategory: expenseCategoryTableData,
+  };
+  const [modal, setModal] = useState({
+    of: "",
+    edit: false,
+    data: null,
+  });
+  const closeModal = useCallback(
+    () => setModal({ of: "", edit: false, data: null }),
+    []
+  );
+  console.log(selectedTab);
+  return (
+    <div className="container px-4 py-3 mx-auto ">
+      <Header
+        text={selectedTab === "expenses" ? "Expenses" : "Expenses Category"}
+      >
+        {buttonObj[selectedTab]?.show && (
+          <button
             onClick={() => {
-              setIsModalOpen(true);
+              if (selectedTab === "expenses") {
+                setModal((prev) => ({ ...prev, of: "expenses" }));
+              } else {
+                setModal((prev) => ({ ...prev, of: "expensesCategory" }));
+              }
             }}
+            className="px-3 py-2 flex items-center text-white bg-[#d49327] transition-transform duration-200 ease-in-out hover:scale-105 rounded-lg"
           >
-            {renderInventoryTable(Expenses)}
-          </TabsContent>
-          <TabsContent value="expensesCategory" className="px-4 pb-4">
-            {renderInventoryTable(Expenses_Category)}
-          </TabsContent>
-        </Tabs>
-      </div>
-
-      {isModalOpen && (
-        <InvoiceSlip modalRef={modalRef} setOpenModal={setIsModalOpen} />
+            <Icon
+              icon="material-symbols-light:add-rounded"
+              width="24"
+              height="24"
+              className="fill-white"
+            />
+            Add {buttonObj[selectedTab].text}
+          </button>
+        )}
+      </Header>
+      <MasterTable
+        loading={expensesLoading || expenseCatLoading}
+        tabsOptions={
+          <DynamicTab
+            selectedTab={selectedTab}
+            setSelectedTab={setSelectedTab}
+            tabOptions={expenseTabOption}
+          />
+        }
+        filterSection={
+          <SearchFilterSort
+            onSearch={handleSearch}
+            onFilter={handleFilter}
+            onSort={handleSort}
+            onViewChange={() => {}}
+            showFilter={true}
+            showSort={true}
+            showView={true}
+            filterOptions={filterOptions}
+            sortOptions={sortOptions}
+            placeholder="Search products..."
+          />
+        }
+        rows={tableDataObj[selectedTab].rows || []}
+        columns={tableDataObj[selectedTab].columns}
+        showAction={true}
+        viewAction={() => console.log("VIEW")}
+        editAction={() => console.log("edit")}
+        onDelete={(id) => deleteExpense(id)}
+      />
+      {modal.of === "expenses" && (
+        <ScrollableModal onClose={closeModal} classname="w-[35rem]">
+          <ExpenseForm closeModal={closeModal} />
+        </ScrollableModal>
       )}
 
-      {isFormOpen &&
-        (selectedForm === "expenses" ? (
-          <ExpenseForm modalRef={modalRef} setOpenModal={setIsFormOpen} />
-        ) : (
-          <ExpenseCategoryForm
-            modalRef={modalRef}
-            setOpenModal={setIsFormOpen}
-          />
-        ))}
+      {modal.of === "expensesCategory" && (
+        <ScrollableModal classname="w-[35rem]" onClose={closeModal}>
+          <ExpenseCategoryForm closeModal={closeModal} />
+        </ScrollableModal>
+      )}
     </div>
   );
 };

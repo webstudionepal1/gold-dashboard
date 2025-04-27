@@ -105,21 +105,21 @@ export const SidebarConfig = {
         // },
         {
           id: 18,
-          path: "#",
+          path: FrontendRoutes.TRANSACTION,
           title: "Transaction",
           icon: "hugeicons:bitcoin-transaction",
           children: [
-            {
-              id: 60,
-              path: FrontendRoutes.TRANSACTION,
-              title: "Transaction",
-            },
-            {
-              id: 61,
-              path: FrontendRoutes.VERIFY_CASH,
-              title: "Verify Cash Payment",
-              icon: "",
-            },
+            // {
+            //   id: 60,
+            //   path: FrontendRoutes.TRANSACTION,
+            //   title: "Transaction",
+            // },
+            // {
+            //   id: 61,
+            //   path: FrontendRoutes.VERIFY_CASH,
+            //   title: "Verify Cash Payment",
+            //   icon: "",
+            // },
           ],
         },
         {

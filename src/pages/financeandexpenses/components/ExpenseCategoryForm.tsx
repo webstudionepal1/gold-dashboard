@@ -1,96 +1,96 @@
-import { Form, FormikProvider, useFormik } from "formik";
-import { Modal } from "../../../components/shared";
-import Field from "../../settings/components/Field";
-import React, { useState } from "react";
-
-const validationSchema = {};
-
-interface PropTypes {
-  modalRef: React.RefObject<HTMLDivElement | null>;
-  setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
+import { useForm } from "@tanstack/react-form";
+import { get } from "lodash";
+import React from "react";
+import { z } from "zod";
+interface propTypes {
+  editData?: any;
+  closeModal: () => void;
 }
+import { FieldError } from "../../auth/LoginPage";
+import { InputField } from "../../../components/shared/form_components/InputField";
+import { DropdownField } from "../../../components/shared/form_components/Dropdown";
+import FileDropInput from "../../../components/shared/form_components/FileDropInput";
+import { TextareaField } from "../../../components/shared/form_components/TextArea";
 
-const ExpenseCategoryForm: React.FC<PropTypes> = ({
-  modalRef,
-  setOpenModal,
-}) => {
-  const handleSubmit = (values: any) => {
-    console.log(values);
-  };
-
-  const formik = useFormik({
-    initialValues: {},
-    onSubmit: handleSubmit,
-    validationSchema,
+const addExpenseCategorySchema = z.object({
+  category: z.string().min(1, "Category is required"),
+  description: z.string().min(1, "Description is required"),
+});
+const ExpenseCategoryForm = ({ editData, closeModal }: propTypes) => {
+  const form = useForm({
+    defaultValues: {
+      category: editData ? get(editData, "category", "") : "",
+      description: editData ? get(editData, "description", "") : "",
+    },
+    validators: {
+      onSubmit: addExpenseCategorySchema,
+    },
+    onSubmit: async ({ value }) => {
+      console.log("Order Submitted", value);
+    },
   });
-
-  const [addCategory, setAddCategory] = useState<number>(0);
-
-  console.log(addCategory);
-
   return (
     <>
-      <Modal ref={modalRef}>
-        <FormikProvider value={formik}>
-          <Form className="flex flex-col gap-4 p-3 min-w-[400px]">
-            <h1 className="text-center font-bold my-2">
-              Add Expenses Category
-            </h1>
+      <div className="bg-[#ffffff]">
+        <form
+          className="flex flex-col gap-4 mx-4 my-6"
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            form.handleSubmit();
+          }}
+        >
+          <h1 className="flex items-center justify-center text-xl font-semibold">
+            Add Expenses
+          </h1>
 
-            <div>
-              <Field
-                label="Category"
-                type="text"
-                name="category"
-                placeholder="eg. Inventory"
-              />
-            </div>
-            <hr />
-            <div className="flex gap-3">
-              {addCategory < 3 && (
-                <button
-                  type="button"
-                  className="bg-[#f7e8ca] text-sm font-semibold py-1 px-2 rounded-md"
-                  onClick={() => {
-                    setAddCategory(addCategory + 1);
-                  }}
-                >
-                  Add More
-                </button>
-              )}
-              {addCategory > 0 && (
-                <button
-                  type="button"
-                  className="bg-[#d1d1d1] text-sm font-semibold py-1 px-2 rounded-md"
-                  onClick={() => {
-                    setAddCategory(addCategory - 1);
-                  }}
-                >
-                  Cancel
-                </button>
-              )}
-            </div>
+          <form.Field name="category">
+            {(field) => (
+              <div className="w-full">
+                <InputField
+                  label="Category"
+                  required
+                  min={0}
+                  placeholder="eg. Inventory"
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+                <FieldError field={field} />
+              </div>
+            )}
+          </form.Field>
 
-            <div className="flex gap-4">
-              <button
-                type="button"
-                className="bg-[#c9c9c9] w-1/2 py-1 rounded-md"
-                onClick={() => {
-                  setOpenModal(false);
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                className="bg-[#df8d28] text-white w-1/2 rounded-md py-1"
-                type="submit"
-              >
-                Create
-              </button>
-            </div>
-          </Form>
-        </FormikProvider>
-      </Modal>
+          <form.Field name="description">
+            {(field) => (
+              <div className="w-full">
+                <TextareaField
+                  label="Description"
+                  placeholder="Enter description"
+                  required
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+                <FieldError field={field} />
+              </div>
+            )}
+          </form.Field>
+
+          <div className="flex items-center w-full gap-5">
+            <button
+              onClick={() => closeModal()}
+              className=" bg-[#c9c9c9] flex-1  px-7 py-2 rounded-xl "
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className=" bg-[#df8d29] flex-1 text-white px-7 py-2 rounded-xl "
+            >
+              Save
+            </button>
+          </div>
+        </form>
+      </div>
     </>
   );
 };

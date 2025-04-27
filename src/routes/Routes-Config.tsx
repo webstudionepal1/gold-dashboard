@@ -197,10 +197,10 @@ export const routesConfig = [
     path: FrontendRoutes.TRANSACTION,
     element: <Transaction />,
   },
-  {
-    path: FrontendRoutes.VERIFY_CASH,
-    element: <VerifyCashPayment />,
-  },
+  // {
+  //   path: FrontendRoutes.VERIFY_CASH,
+  //   element: <VerifyCashPayment />,
+  // },
 
   //finance and expenses
   {
