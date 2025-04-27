@@ -28,7 +28,7 @@ import VerifyCashPayment from "../pages/transaction/VerifyCashPayment";
 import Expenses from "../pages/financeandexpenses/Expenses";
 import Cashflow from "../pages/financeandexpenses/Cashflow";
 import ProfitandLoss from "../pages/financeandexpenses/ProfitandLoss";
-import SettingForm from "../pages/settings/SettingForm";
+
 import OrderReport from "../pages/analytics/OrderReport";
 import SalesReport from "../pages/analytics/SalesReport";
 import StoreReport from "../pages/analytics/StockReport";
@@ -41,6 +41,7 @@ import AddSupplierForm from "../pages/PurchaseManagement/components/AddSupplierF
 import SupplierDetail from "../pages/PurchaseManagement/pages/SupplierDetail";
 import SupplierHistory from "../pages/PurchaseManagement/pages/SupplierHistory";
 import AttribConfig from "../pages/settings/components/AttribConfig";
+import EditProfileForm from "../pages/settings/ProfileConfig/EditProfileForm";
 
 export const routesConfig = [
   {
@@ -217,11 +218,15 @@ export const routesConfig = [
   },
 
   //Settings
-  {
-    path: FrontendRoutes.SETTINGS,
-    element: <SettingForm />,
-  },
+  // {
+  //   path: FrontendRoutes.SETTINGS,
+  //   element: <SettingForm />,
+  // },
 
+  {
+    path: FrontendRoutes.PROFILECONFIG,
+    element: <EditProfileForm />,
+  },
   //Analytics
   {
     path: FrontendRoutes.ORDER_REPORT,

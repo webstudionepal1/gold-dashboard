@@ -76,8 +76,8 @@ const Expenses = () => {
       const query = filterState.searchQuery.toLowerCase();
       result = result.filter(
         (item) =>
-          (item.expenseCategory.name &&
-            item.expenseCategory.name.toLowerCase().includes(query)) ||
+          (item.expenseCategory?.name &&
+            item.expenseCategory?.name.toLowerCase().includes(query)) ||
           (typeof item.expenseCategory.name === "string" &&
             item.expenseCategory.name.toLowerCase().includes(query)) ||
           (item.description && item.description.toLowerCase().includes(query))
@@ -149,6 +149,7 @@ const Expenses = () => {
       ],
       rows: map(expensesList, (item) => ({
         ...item,
+        expenseCategory: item.expenseCategory?.name,
         amount: `Rs ${item.amount}`,
         invoice: (
           <div>
@@ -161,6 +162,15 @@ const Expenses = () => {
           </div>
         ),
       })),
+      onDelete(id: string) {
+        deleteExpense(id);
+      },
+      viewAction(row: IFetchExpenses) {
+        console.log("row");
+      },
+      editAction(row: IFetchExpenses) {
+        console.log("Edit");
+      },
     }),
     [expensesList, expensesSuccess]
   );
@@ -174,8 +184,16 @@ const Expenses = () => {
       rows: map(expenseCategories, (item, sn) => ({
         ...item,
         sn: sn + 1,
-        description: <h1>DESCRIPTION</h1>,
       })),
+      onDelete(id: string) {
+        console.log("DELETE");
+      },
+      viewAction(row: IFetchExpenses) {
+        console.log("VIEW");
+      },
+      editAction(row: IFetchExpenses) {
+        console.log("Edit");
+      },
     }),
     [expenseCategories, expenseCatSuccess]
   );
@@ -252,12 +270,8 @@ const Expenses = () => {
             placeholder="Search products..."
           />
         }
-        rows={tableDataObj[selectedTab].rows || []}
-        columns={tableDataObj[selectedTab].columns}
-        showAction={true}
-        viewAction={() => console.log("VIEW")}
-        editAction={() => console.log("edit")}
-        onDelete={(id) => deleteExpense(id)}
+        {...tableDataObj[selectedTab]}
+        showAction
       />
       {modal.of === "expenses" && (
         <ScrollableModal onClose={closeModal} classname="w-[35rem]">

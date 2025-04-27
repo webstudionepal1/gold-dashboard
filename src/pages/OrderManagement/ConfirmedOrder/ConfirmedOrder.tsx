@@ -4,9 +4,7 @@ import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import MasterTable from "../../../components/shared/MasterTable";
 import Header from "../../../components/shared/table_heading/Header";
-import {
-  useGetAllOrdersQuery
-} from "../../../server/api/orderHooks";
+import { useGetAllOrdersQuery } from "../../../server/api/orderHooks";
 import { confirmedColumns } from "../Order/orderObj";
 
 // Filter state interface
@@ -18,10 +16,12 @@ interface FilterState {
   sort: string;
 }
 
-
-
 const ConfirmedOrder = () => {
-  const { data: orders, isSuccess, isLoading } = useGetAllOrdersQuery({
+  const {
+    data: orders,
+    isSuccess,
+    isLoading,
+  } = useGetAllOrdersQuery({
     orderStatus: "confirmed",
   });
   const navigate = useNavigate();
@@ -210,7 +210,7 @@ const ConfirmedOrder = () => {
             showEdit={false}
             showAction
             viewRow={handleViewItem}
-            showPagination={true}
+            showPagination={true} 
             paginationDetails={{
               currentPage: filterState.currentPage,
               limit: filterState.itemsPerPage,

@@ -170,11 +170,19 @@ export const SidebarConfig = {
             },
           ],
         },
+
         {
           id: 13,
-          path: "/settings",
+          path: "#",
           title: "Settings",
           icon: "mdi-light:settings",
+          children: [
+            {
+              id: 90,
+              path: FrontendRoutes.PROFILECONFIG,
+              title: "Profile Config",
+            },
+          ],
         },
         {
           id: 15,

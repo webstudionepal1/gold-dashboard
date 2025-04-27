@@ -41,4 +41,5 @@ export const FrontendRoutes = {
   STOCK_REPORT: "/stock-report",
 
   SETTINGS: "/settings",
+  PROFILECONFIG: "/settings/profile-config",
 };

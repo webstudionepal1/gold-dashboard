@@ -39,6 +39,7 @@ export interface IFetchExpenses {
 interface IFetchExpensesCategory {
   _id: string;
   name: string;
+  description: string;
 }
 interface IUpdateProps {
   id: string;
@@ -73,20 +74,20 @@ export const useGetExpenseCategoryQuery = (params = {}) => {
   });
 };
 
-export const useCreatePurchaseMutation = () => {
+export const useCreateExpenseMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["purchases"],
+    mutationKey: ["expense"],
     mutationFn: async (body: IFetchExpensesCategory) => {
-      const res = await apiClient.post("purchase", body);
+      const res = await apiClient.post("expense", body);
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Purchase created successfully");
-      queryClient.invalidateQueries({ queryKey: ["purchases"] });
+      toast.success("Expense created successfully");
+      queryClient.invalidateQueries({ queryKey: ["expense"] });
     },
     onError(err: string) {
-      toast.error(err || "Error creating purchase");
+      toast.error(err || "Error creating expense");
     },
   });
 };

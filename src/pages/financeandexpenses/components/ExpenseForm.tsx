@@ -10,6 +10,7 @@ import { FieldError } from "../../auth/LoginPage";
 import { InputField } from "../../../components/shared/form_components/InputField";
 import { DropdownField } from "../../../components/shared/form_components/Dropdown";
 import FileDropInput from "../../../components/shared/form_components/FileDropInput";
+import { useCreateExpenseMutation } from "../../../server/api/expensesHook";
 
 const addExpenseSchema = z.object({
   date: z.coerce
@@ -29,6 +30,11 @@ const addExpenseSchema = z.object({
     .refine((file) => file !== null, { message: "Image is required" }),
 });
 const ExpenseForm = ({ editData, closeModal }: propTypes) => {
+  const {
+    mutate: createExpense,
+    isPending: ExpensePending,
+    isSuccess: ExpenseSuccess,
+  } = useCreateExpenseMutation();
   const form = useForm({
     defaultValues: {
       date: editData ? get(editData, "name", "") : "",
@@ -42,6 +48,20 @@ const ExpenseForm = ({ editData, closeModal }: propTypes) => {
     },
     onSubmit: async ({ value }) => {
       console.log("Order Submitted", value);
+
+      try {
+        const formData = new FormData();
+
+        formData.append("date", value.date),
+          formData.append("category", value.category),
+          formData.append("amount", value.amount),
+          formData.append("description", value.description),
+          formData.append("image", value.image);
+
+        // createExpense(formData);
+      } catch (error) {
+        console.error("Failed to create Expense", error);
+      }
     },
   });
   return (

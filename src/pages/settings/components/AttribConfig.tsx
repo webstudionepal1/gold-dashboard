@@ -41,7 +41,13 @@ const AttribConfig = () => {
           console.log("row", row);
         }}
         rows={data}
-        filterSection={<SearchFilterSort onFilter={()=>{}} onSort={()=>{}}  onSearch={()=>{}}  />}
+        filterSection={
+          <SearchFilterSort
+            onFilter={() => {}}
+            onSort={() => {}}
+            onSearch={() => {}}
+          />
+        }
       />
     </div>
   );
