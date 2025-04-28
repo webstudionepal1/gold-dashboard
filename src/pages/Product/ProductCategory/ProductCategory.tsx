@@ -36,7 +36,7 @@ const ProductCategory: React.FC = () => {
             // subCategory: get(item, "subCategory", [])
             //   .map((subItem) => get(subItem, "name", ""))
             //   .join(", "),
-            
+
             description: get(item, "description", ""),
             totalProducts: get(item, "totalProducts", 0),
           }))
@@ -73,7 +73,6 @@ const ProductCategory: React.FC = () => {
           showView={false}
         /> */}
 
-
         <MasterTable
           columns={categoryColumns}
           rows={categoriesData}
@@ -87,7 +86,6 @@ const ProductCategory: React.FC = () => {
           modalRef={modalRef}
           closeModal={() => setIsModalOpen({ state: false, editData: null })}
           editData={isModalOpen.editData}
-
         />
       )}
     </div>

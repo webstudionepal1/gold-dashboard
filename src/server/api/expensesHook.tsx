@@ -36,12 +36,18 @@ export interface IFetchExpenses {
   //   updatedAt: Date;
   //   createdBy: string;
 }
-interface IFetchExpensesCategory {
-  _id: string;
-  name: string;
+export interface IFetchExpensesCategory {
+  _id?: string;
+  name?: string;
   description: string;
 }
 interface IUpdateProps {
+  id: string;
+  body: FormData;
+  headers?: { [key: string]: string };
+}
+
+interface IUpdateCategoryProps {
   id: string;
   body: IFetchExpensesCategory;
 }
@@ -78,8 +84,10 @@ export const useCreateExpenseMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ["expense"],
-    mutationFn: async (body: IFetchExpensesCategory) => {
-      const res = await apiClient.post("expense", body);
+    mutationFn: async (body: FormData) => {
+      const res = await apiClient.post("expense", body, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       return res?.data?.data;
     },
     onSuccess() {
@@ -92,20 +100,58 @@ export const useCreateExpenseMutation = () => {
   });
 };
 
-export const useUpdatePurchaseMutation = () => {
+export const useCreateExpenseCategoryMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["purchases"],
-    mutationFn: async ({ id, body }: IUpdateProps) => {
-      const res = await apiClient.patch(`purchase/${id}`, body);
+    mutationKey: ["expense/category"],
+    mutationFn: async (body: IFetchExpensesCategory) => {
+      const res = await apiClient.post("expense/category", body, {});
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Purchase updated successfully");
-      queryClient.invalidateQueries({ queryKey: ["purchases"] });
+      toast.success("Expense Category created successfully");
+      queryClient.invalidateQueries({ queryKey: ["expense/category"] });
     },
     onError(err: string) {
-      toast.error(err || "Error updating purchase");
+      toast.error(err || "Error creating expense category");
+    },
+  });
+};
+
+export const useUpdateExpenseMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["expense"],
+    mutationFn: async ({ id, body }: { id: string; body: FormData }) => {
+      const res = await apiClient.patch(`expense/${id}`, body, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      return res?.data?.data;
+    },
+    onSuccess() {
+      toast.success("Expense updated successfully");
+      queryClient.invalidateQueries({ queryKey: ["expense"] });
+    },
+    onError(err: string) {
+      toast.error(err || "Error updating Expense");
+    },
+  });
+};
+
+export const useUpdateExpenseCategoryMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["expense/category"],
+    mutationFn: async ({ id, body }: IUpdateCategoryProps) => {
+      const res = await apiClient.patch(`expense/category/${id}`, body);
+      return res?.data?.data;
+    },
+    onSuccess() {
+      toast.success("Expense Category updated successfully");
+      queryClient.invalidateQueries({ queryKey: ["expense/category"] });
+    },
+    onError(err: string) {
+      toast.error(err || "Error updating Expense Category");
     },
   });
 };
@@ -124,6 +170,24 @@ export const useDeleteExpenseMutation = () => {
     },
     onError(err: string) {
       toast.error(err || "Error deleting expense");
+    },
+  });
+};
+
+export const useDeleteExpenseCategoryMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["expense/category"],
+    mutationFn: async (id: string) => {
+      const res = await apiClient.delete(`expense/category/${id}`);
+      return res?.data?.data;
+    },
+    onSuccess() {
+      toast.success("Expense category deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["expense/category"] });
+    },
+    onError(err: string) {
+      toast.error(err || "Error deleting expense category");
     },
   });
 };

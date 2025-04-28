@@ -109,7 +109,7 @@ const OrderReport = () => {
       const query = filterState.searchQuery.toLowerCase();
       result = result.filter(
         (item) =>
-          (item.expenseCategory.name &&
+          (item.expenseCategory &&
             item.expenseCategory.name.toLowerCase().includes(query)) ||
           (typeof item.expenseCategory.name === "string" &&
             item.expenseCategory.name.toLowerCase().includes(query)) ||

@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { Modal } from "../../../../components/shared";
 import {
   useCreateProductCategoriesMutation,
-  useUpdateProductCategoriesMutation
+  useUpdateProductCategoriesMutation,
 } from "../../../../server/api/productHooks";
 interface propTypes {
   modalRef: React.RefObject<HTMLDivElement | null>;
@@ -69,7 +69,7 @@ const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
               )}
             </form.Field>
           </div>
-      
+
           <div>
             <label
               htmlFor="description"

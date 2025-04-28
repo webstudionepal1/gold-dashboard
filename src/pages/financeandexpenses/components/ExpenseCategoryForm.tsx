@@ -1,6 +1,6 @@
 import { useForm } from "@tanstack/react-form";
 import { get } from "lodash";
-import React from "react";
+import React, { useEffect } from "react";
 import { z } from "zod";
 interface propTypes {
   editData?: any;
@@ -11,15 +11,33 @@ import { InputField } from "../../../components/shared/form_components/InputFiel
 import { DropdownField } from "../../../components/shared/form_components/Dropdown";
 import FileDropInput from "../../../components/shared/form_components/FileDropInput";
 import { TextareaField } from "../../../components/shared/form_components/TextArea";
+import {
+  useCreateExpenseCategoryMutation,
+  useUpdateExpenseCategoryMutation,
+} from "../../../server/api/expensesHook";
 
 const addExpenseCategorySchema = z.object({
-  category: z.string().min(1, "Category is required"),
+  name: z.string().min(1, "Category name is required"),
   description: z.string().min(1, "Description is required"),
 });
 const ExpenseCategoryForm = ({ editData, closeModal }: propTypes) => {
+  {
+    console.log("CAT#EROERE EIDT ", editData);
+  }
+  const {
+    mutate: createExpenseCategory,
+    isPending: createExpenseCatPending,
+    isSuccess: createExpenseCatSuccess,
+  } = useCreateExpenseCategoryMutation();
+
+  const {
+    mutate: updateExpenseCategory,
+    isPending: updateExpenseCatPending,
+    isSuccess: updateExpenseCatSuccess,
+  } = useUpdateExpenseCategoryMutation();
   const form = useForm({
     defaultValues: {
-      category: editData ? get(editData, "category", "") : "",
+      name: editData ? get(editData, "name", "") : "",
       description: editData ? get(editData, "description", "") : "",
     },
     validators: {
@@ -27,8 +45,20 @@ const ExpenseCategoryForm = ({ editData, closeModal }: propTypes) => {
     },
     onSubmit: async ({ value }) => {
       console.log("Order Submitted", value);
+      if (editData) {
+        updateExpenseCategory({ id: editData._id, body: value });
+      } else {
+        createExpenseCategory(value);
+      }
     },
   });
+
+  useEffect(() => {
+    if (createExpenseCatSuccess) {
+      form.reset();
+      closeModal();
+    }
+  }, [createExpenseCatSuccess, closeModal]);
   return (
     <>
       <div className="bg-[#ffffff]">
@@ -44,7 +74,7 @@ const ExpenseCategoryForm = ({ editData, closeModal }: propTypes) => {
             Add Expenses
           </h1>
 
-          <form.Field name="category">
+          <form.Field name="name">
             {(field) => (
               <div className="w-full">
                 <InputField

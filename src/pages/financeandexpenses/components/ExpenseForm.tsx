@@ -1,6 +1,6 @@
 import { useForm } from "@tanstack/react-form";
 import { get } from "lodash";
-import React from "react";
+import React, { useEffect } from "react";
 import { z } from "zod";
 interface propTypes {
   editData?: any;
@@ -10,7 +10,11 @@ import { FieldError } from "../../auth/LoginPage";
 import { InputField } from "../../../components/shared/form_components/InputField";
 import { DropdownField } from "../../../components/shared/form_components/Dropdown";
 import FileDropInput from "../../../components/shared/form_components/FileDropInput";
-import { useCreateExpenseMutation } from "../../../server/api/expensesHook";
+import {
+  useCreateExpenseMutation,
+  useGetExpenseCategoryQuery,
+  useUpdateExpenseMutation,
+} from "../../../server/api/expensesHook";
 
 const addExpenseSchema = z.object({
   date: z.coerce
@@ -21,7 +25,7 @@ const addExpenseSchema = z.object({
     .refine((date) => date <= new Date(), {
       message: "The year cannot be above the present date.",
     }),
-  category: z.string().min(1, "Category is required"),
+  expenseCategory: z.string().min(1, "Category is required"),
   amount: z.number().min(0, "Amount cannot be negative"),
   description: z.string().min(1, "Description is required"),
   image: z
@@ -30,15 +34,30 @@ const addExpenseSchema = z.object({
     .refine((file) => file !== null, { message: "Image is required" }),
 });
 const ExpenseForm = ({ editData, closeModal }: propTypes) => {
+  {
+    console.log("EDIIIIITTTT EXPENSE", editData);
+  }
   const {
     mutate: createExpense,
     isPending: ExpensePending,
     isSuccess: ExpenseSuccess,
   } = useCreateExpenseMutation();
+
+  const {
+    mutate: updateExpense,
+    isPending: updateExpensePending,
+    isSuccess: updateExpenseSuccess,
+  } = useUpdateExpenseMutation();
+  const {
+    data: expenseCategoryList,
+    isLoading: expenseCategoryLoading,
+    isSuccess: expenseCategorySuccess,
+  } = useGetExpenseCategoryQuery();
+
   const form = useForm({
     defaultValues: {
-      date: editData ? get(editData, "name", "") : "",
-      category: editData ? get(editData, "category", "") : "",
+      date: editData ? get(editData, "date", "") : "",
+      expenseCategory: editData ? get(editData, "expenseCategory._id", "") : "",
       amount: editData ? get(editData, "amount", 0) : 0,
       description: editData ? get(editData, "description", "") : "",
       image: editData ? get(editData, "image", null) : null,
@@ -49,21 +68,26 @@ const ExpenseForm = ({ editData, closeModal }: propTypes) => {
     onSubmit: async ({ value }) => {
       console.log("Order Submitted", value);
 
-      try {
-        const formData = new FormData();
+      const formData = new FormData();
 
-        formData.append("date", value.date),
-          formData.append("category", value.category),
-          formData.append("amount", value.amount),
-          formData.append("description", value.description),
-          formData.append("image", value.image);
+      formData.append("date", value.date);
+      formData.append("expenseCategory", value.expenseCategory);
+      formData.append("amount", `${value.amount}`);
+      formData.append("description", value.description);
 
-        // createExpense(formData);
-      } catch (error) {
-        console.error("Failed to create Expense", error);
+      formData.append("images", value.image);
+
+      if (editData) {
+        updateExpense({ id: editData._id, body: formData });
+      } else {
+        createExpense(formData);
       }
     },
   });
+
+  useEffect(() => {
+    if (ExpenseSuccess) form.reset();
+  }, [ExpenseSuccess]);
   return (
     <>
       <div className="bg-[#ffffff]">
@@ -73,6 +97,7 @@ const ExpenseForm = ({ editData, closeModal }: propTypes) => {
             e.preventDefault();
             e.stopPropagation();
             form.handleSubmit();
+            closeModal();
           }}
         >
           <h1 className="flex items-center justify-center text-xl font-semibold">
@@ -99,16 +124,16 @@ const ExpenseForm = ({ editData, closeModal }: propTypes) => {
           </div>
 
           <div className="flex items-center gap-4 w-full">
-            <form.Field name="category">
+            <form.Field name="expenseCategory">
               {(field) => (
                 <div className="w-full">
                   <DropdownField
                     label="Category"
                     required
-                    options={[
-                      { value: "fixed", label: "Fixed" },
-                      { value: "percentage", label: "Percentage" },
-                    ]}
+                    options={expenseCategoryList?.map((item) => ({
+                      label: item.name ?? "",
+                      value: item._id ?? "",
+                    }))}
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
                     inputClassname="w-full"
@@ -126,9 +151,8 @@ const ExpenseForm = ({ editData, closeModal }: propTypes) => {
                     label="Amount"
                     required
                     min={0}
-                    placeholder="Enter Discount"
                     value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={(e) => field.handleChange(Number(e.target.value))}
                   />
                   <FieldError field={field} />
                 </div>
@@ -176,7 +200,7 @@ const ExpenseForm = ({ editData, closeModal }: propTypes) => {
               type="submit"
               className=" bg-[#df8d29] flex-1 text-white px-7 py-2 rounded-xl "
             >
-              Save
+              {editData ? "Update" : "Add"}
             </button>
           </div>
         </form>
