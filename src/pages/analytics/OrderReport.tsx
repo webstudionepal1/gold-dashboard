@@ -19,6 +19,7 @@ import {
 import { SearchFilterSort } from "../../components/global/SearchFilterSort";
 import { filterOptions, sortOptions } from "../../constants/DropDownOptions";
 import { StatCard } from "./components/iconCard";
+import { useGetOrderStatusQuery } from "../../server/api/orderReportHook";
 
 const stats = [
   {
@@ -84,80 +85,79 @@ const OrderReport = () => {
 
   const { mutate: deleteExpense } = useDeleteExpenseMutation();
   const {
-    data: expensesList,
-    isLoading: expensesLoading,
-    isSuccess: expensesSuccess,
-  } = useGetExpensesQuery();
+    data: orderStatusList,
+    isLoading: orderStatusLoading,
+    isSuccess: orderStatusSuccess,
+  } = useGetOrderStatusQuery();
 
+  console.log("ORDE STATUS", orderStatusList);
   const {
     data: expenseCategories,
     isLoading: expenseCatLoading,
     isSuccess: expenseCatSuccess,
   } = useGetExpenseCategoryQuery();
 
-  const expenseData = useMemo(
-    () => (expensesSuccess ? expensesList : []),
-    [expensesSuccess, expensesList]
+  const orderStatusData = useMemo(
+    () => (orderStatusSuccess ? orderStatusList : []),
+    [orderStatusSuccess, orderStatusList]
   );
 
-  const filteredExpenses = useMemo(() => {
-    if (!expenseData || expenseData.length === 0) return [];
+  // const filteredOrderStatus = useMemo(() => {
+  //   if (!orderStatusData || orderStatusData.length === 0) return [];
 
-    let result = [...expenseData];
+  //   let result = [...orderStatusData];
 
-    if (filterState.searchQuery) {
-      const query = filterState.searchQuery.toLowerCase();
-      result = result.filter(
-        (item) =>
-          (item.expenseCategory.name &&
-            item.expenseCategory.name.toLowerCase().includes(query)) ||
-          (typeof item.expenseCategory.name === "string" &&
-            item.expenseCategory.name.toLowerCase().includes(query)) ||
-          (item.description && item.description.toLowerCase().includes(query))
-      );
-    }
-    if (filterState.filterValue) {
-      result = result.filter(
-        (item) =>
-          (typeof item.expenseCategory.name === "string" &&
-            item.expenseCategory.name === filterState.filterValue) ||
-          (item.description && item.description === filterState.filterValue)
-      );
-    }
+  //   if (filterState.searchQuery) {
+  //     const query = filterState.searchQuery.toLowerCase();
+  //     result = result.filter(
+  //       (item) =>
+  //         (item.status && item.status.toLowerCase().includes(query)) ||
+  //         (typeof item.status === "string" &&
+  //           item.status.toLowerCase().includes(query))
+  //     );
+  //   }
+  //   if (filterState.filterValue) {
+  //     result = result.filter(
+  //       (item) =>
+  //         (typeof item.status === "string" &&
+  //           item.status === filterState.filterValue) ||
+  //         (item.status && item.status === filterState.filterValue)
+  //     );
+  //   }
 
-    // if (filterState.sortValue) {
-    //   switch (filterState.sortValue) {
-    //     case "title_asc":
-    //       result.sort((a, b) =>
-    //         a.name && b.name ? a.name.localeCompare(b.name) : 0
-    //       );
-    //       break;
-    //     case "title_desc":
-    //       result.sort((a, b) =>
-    //         a.name && b.name ? b.name.localeCompare(a.name) : 0
-    //       );
-    //       break;
-    //     case "price_asc":
-    //       result.sort((a, b) => (a.price && b.price ? a.price - b.price : 0));
-    //       break;
-    //     case "price_desc":
-    //       result.sort((a, b) => (a.price && b.price ? b.price - a.price : 0));
-    //       break;
-    //     case "rating_asc":
-    //       result.sort((a, b) =>
-    //         a.ratings && b.ratings ? a.ratings - b.ratings : 0
-    //       );
-    //       break;
-    //     case "rating_desc":
-    //       result.sort((a, b) =>
-    //         a.ratings && b.ratings ? b.ratings - a.ratings : 0
-    //       );
-    //       break;
-    //   }
-    // }
+  //   // if (filterState.sortValue) {
+  //   //   switch (filterState.sortValue) {
+  //   //     case "title_asc":
+  //   //       result.sort((a, b) =>
+  //   //         a.name && b.name ? a.name.localeCompare(b.name) : 0
+  //   //       );
+  //   //       break;
+  //   //     case "title_desc":
+  //   //       result.sort((a, b) =>
+  //   //         a.name && b.name ? b.name.localeCompare(a.name) : 0
+  //   //       );
+  //   //       break;
+  //   //     case "price_asc":
+  //   //       result.sort((a, b) => (a.price && b.price ? a.price - b.price : 0));
+  //   //       break;
+  //   //     case "price_desc":
+  //   //       result.sort((a, b) => (a.price && b.price ? b.price - a.price : 0));
+  //   //       break;
+  //   //     case "rating_asc":
+  //   //       result.sort((a, b) =>
+  //   //         a.ratings && b.ratings ? a.ratings - b.ratings : 0
+  //   //       );
+  //   //       break;
+  //   //     case "rating_desc":
+  //   //       result.sort((a, b) =>
+  //   //         a.ratings && b.ratings ? b.ratings - a.ratings : 0
+  //   //       );
+  //   //       break;
+  //   //   }
+  //   // }
 
-    return result;
-  }, [expenseData, filterState]);
+  //   return result;
+  // }, [orderStatusData, filterState]);
 
   const handleSearch = (query: string) => {
     setFilterState((prev) => ({ ...prev, searchQuery: query }));
@@ -171,22 +171,19 @@ const OrderReport = () => {
     setFilterState((prev) => ({ ...prev, sortValue: sort }));
   };
 
-  const expenseTableData = useMemo(
+  const orderStatusTableData = useMemo(
     () => ({
       columns: [
         { key: "status", title: "Status" },
-        { key: "totalOrder", title: "Total Order" },
-        { key: "percentage", title: "Percentage" },
+        { key: "count", title: "Total Order" },
+        { key: "formattedPercentage", title: "Percentage" },
       ],
-      rows: map(expensesList, (item) => ({
+      rows: map(orderStatusList?.orders || [], (item) => ({
         ...item,
-        amount: `Rs ${item.amount}`,
-        status: "Assigned",
-        totalOrder: "120",
-        percentage: "12%",
+        formattedPercentage: `${item.percentage} %`,
       })),
     }),
-    [expensesList, expensesSuccess]
+    [orderStatusList, orderStatusSuccess]
   );
   const expenseCategoryTableData = useMemo(
     () => ({
@@ -215,7 +212,7 @@ const OrderReport = () => {
   // );
 
   const tableDataObj: ITable = {
-    statusSummary: expenseTableData,
+    statusSummary: orderStatusTableData,
     topOrderProducts: expenseCategoryTableData,
   };
   const [modal, setModal] = useState({
@@ -246,7 +243,7 @@ const OrderReport = () => {
         </div>
       )}
       <MasterTable
-        loading={expensesLoading || expenseCatLoading}
+        loading={orderStatusLoading}
         tabsOptions={
           <DynamicTab
             selectedTab={selectedTab}
@@ -254,20 +251,20 @@ const OrderReport = () => {
             tabOptions={orderReportTabOption}
           />
         }
-        filterSection={
-          <SearchFilterSort
-            onSearch={handleSearch}
-            onFilter={handleFilter}
-            onSort={handleSort}
-            onViewChange={() => {}}
-            showFilter={true}
-            showSort={true}
-            showView={true}
-            filterOptions={filterOptions}
-            sortOptions={sortOptions}
-            placeholder="Search products..."
-          />
-        }
+        // filterSection={
+        //   <SearchFilterSort
+        //     onSearch={handleSearch}
+        //     onFilter={handleFilter}
+        //     onSort={handleSort}
+        //     onViewChange={() => {}}
+        //     showFilter={true}
+        //     showSort={true}
+        //     showView={true}
+        //     filterOptions={filterOptions}
+        //     sortOptions={sortOptions}
+        //     placeholder="Search products..."
+        //   />
+        // }
         rows={tableDataObj[selectedTab].rows || []}
         columns={tableDataObj[selectedTab].columns}
         canSelect
