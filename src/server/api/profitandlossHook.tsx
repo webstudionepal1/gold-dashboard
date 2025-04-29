@@ -20,27 +20,54 @@ interface Period {
   endDate: string;
 }
 
+export interface ExpensesData {
+  category: string;
+  inflow: number;
+  outflow: number;
+  balance: number;
+  references: Reference[];
+}
+
 interface FinancialReportData {
   period: Period;
   revenue: RevenueCategory[];
-  expenses: any[];
+  expenses: ExpensesData[];
 }
 
 export interface FinancialReportResponse {
   data: FinancialReportData;
 }
 
-export const useGetFinancialReportQuery = (params = {}) => {
+// export const useGetFinancialReportQuery = (params = {}) => {
+//   return useQuery({
+//     queryKey: ["financial-report", params],
+//     queryFn: async () => {
+//       const res = await apiClient.get<{ data: FinancialReportData }>(
+//         "financial-report",
+//         {
+//           params,
+//         }
+//       );
+//       return res?.data?.data;
+//     },
+//   });
+// };
+
+export const useGetFinancialReportQuery = ({
+  startDate,
+  endDate,
+}: {
+  startDate: string;
+  endDate: string;
+}) => {
   return useQuery({
-    queryKey: ["financial-report", params],
+    queryKey: ["financial-report", startDate, endDate],
     queryFn: async () => {
-      const res = await apiClient.get<{ data: FinancialReportData }>(
-        "financial-report",
-        {
-          params,
-        }
-      );
-      return res?.data?.data;
+      const res = await apiClient.get("/financial-report", {
+        params: { startDate, endDate },
+      });
+      return res.data?.data;
     },
+    enabled: !!startDate && !!endDate, // don’t fetch until both dates are available
   });
 };

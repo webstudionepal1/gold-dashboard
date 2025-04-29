@@ -21,21 +21,27 @@ interface FilterState {
 }
 
 const ProfitandLoss = () => {
-  const {
-    data: FinancialReport,
-    isSuccess: isfinancialRepSuccess,
-    isLoading: isfinancialRepLoading,
-  } = useGetFinancialReportQuery();
-
-  const financialReportList = useMemo(
-    () =>
-      isfinancialRepSuccess && FinancialReport?.revenue
-        ? FinancialReport.revenue
-        : [],
-    [isfinancialRepSuccess, FinancialReport]
-  );
-  console.log("FINANCIAL REPORT LIST", financialReportList);
   // Consolidated filter state
+  const today = new Date();
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(today.getDate() - 7);
+
+  const formatDate = (date: Date) => date.toISOString().split("T")[0];
+
+  const [startDate, setStartDate] = useState<string>(formatDate(sevenDaysAgo));
+  const [endDate, setEndDate] = useState<string>(formatDate(today));
+
+  const handleDataChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    type: "start" | "end"
+  ) => {
+    if (type === "start") {
+      setStartDate(e.target.value);
+    } else {
+      setEndDate(e.target.value);
+    }
+  };
+
   const [filterState, setFilterState] = useState<FilterState>({
     searchQuery: "",
     currentPage: 1,
@@ -44,8 +50,32 @@ const ProfitandLoss = () => {
     sort: "",
   });
 
+  const {
+    data: FinancialReport,
+    isSuccess: isfinancialRepSuccess,
+    isLoading: isfinancialRepLoading,
+  } = useGetFinancialReportQuery({ startDate, endDate });
+  console.log("DATA", FinancialReport);
+
   // State for controlling hidden rows toggle visibility
   const [showHiddenRows, setShowHiddenRows] = useState(false);
+  const financialReportList = useMemo(
+    () =>
+      isfinancialRepSuccess && FinancialReport?.revenue
+        ? FinancialReport.revenue
+        : [],
+    [isfinancialRepSuccess, FinancialReport]
+  );
+  console.log("DATA FINANCIAL", financialReportList);
+
+  const financiallReportList = useMemo(
+    () =>
+      isfinancialRepSuccess && FinancialReport?.expenses
+        ? FinancialReport.expenses
+        : [],
+    [isfinancialRepSuccess, FinancialReport]
+  );
+  console.log("finadkfsdfs", financiallReportList);
 
   const navigate = useNavigate();
 
@@ -139,32 +169,43 @@ const ProfitandLoss = () => {
   }, [financialReportList, filterState]);
 
   const detailedTransactions = useMemo(() => {
-    // Generate detailed transaction rows based on the main transactions
-    return mainTransactions.slice(0, 3).flatMap((transaction) => {
-      // Generate detailed rows based on inflow and outflow for each transaction
-      return [
-        {
-          id: `${transaction.id}-detail-1`,
+    return filterItems(financiallReportList).map((item) => ({
+      id: item.category,
+      category: item.category,
+      inflow: item.inflow,
+      outflow: item.outflow,
+      balance: item.balance,
+    }));
+  }, [financiallReportList]);
+  console.log("DETAIED TRANSCSTIONS ", detailedTransactions);
 
-          category: `${transaction.category} - Item 1`,
-          inFlow: Math.round(transaction.inflow * 0.6),
-          outFlow: Math.round(transaction.outflow * 0.6),
-          balance:
-            Math.round(transaction.inflow * 0.6) -
-            Math.round(transaction.outflow * 0.6),
-        },
-        {
-          // id: `${transaction.id}-detail-2`,
+  // const detailedTransactions = useMemo(() => {
+  //   // Generate detailed transaction rows based on the main transactions
+  //   return mainTransactions.slice(0, 3).flatMap((transaction) => {
+  //     // Generate detailed rows based on inflow and outflow for each transaction
+  //     return [
+  //       {
+  //         id: `${transaction.id}-detail-1`,
 
-          inFlow: Math.round(transaction.inflow * 0.4),
-          outFlow: Math.round(transaction.outflow * 0.4),
-          balance:
-            Math.round(transaction.inflow * 0.4) -
-            Math.round(transaction.outflow * 0.4),
-        },
-      ];
-    });
-  }, [mainTransactions]);
+  //         category: `${transaction.category} - Item 1`,
+  //         inFlow: Math.round(transaction.inflow * 0.6),
+  //         outFlow: Math.round(transaction.outflow * 0.6),
+  //         balance:
+  //           Math.round(transaction.inflow * 0.6) -
+  //           Math.round(transaction.outflow * 0.6),
+  //       },
+  //       {
+  //         // id: `${transaction.id}-detail-2`,
+
+  //         inFlow: Math.round(transaction.inflow * 0.4),
+  //         outFlow: Math.round(transaction.outflow * 0.4),
+  //         balance:
+  //           Math.round(transaction.inflow * 0.4) -
+  //           Math.round(transaction.outflow * 0.4),
+  //       },
+  //     ];
+  //   });
+  // }, [mainTransactions]);
 
   const handleViewItem = (item: any) => {
     navigate(`${FrontendRoutes.ORDERDETAILS}/${item.id}`);
@@ -185,6 +226,27 @@ const ProfitandLoss = () => {
   return (
     <div className="container px-4 py-3 mx-auto">
       <Header text="Profit & Loss"></Header>
+
+      <div className="flex gap-4 items-center my-4">
+        <div>
+          <label>Start Date</label>
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="border px-2 py-1 rounded"
+          />
+        </div>
+        <div>
+          <label>End Date</label>
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="border px-2 py-1 rounded"
+          />
+        </div>
+      </div>
       <div className="bg-white border-[#eae9ec] border-2 w-full pb-8 rounded-xl">
         <div className="mx-3">
           <ProfitTable
