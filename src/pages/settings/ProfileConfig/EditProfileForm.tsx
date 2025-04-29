@@ -7,18 +7,15 @@ import FileDropInput from "../../../components/shared/form_components/FileDropIn
 import Header from "../../../components/shared/table_heading/Header";
 import { useGetCompanyDetailsQuery } from "../../../server/api/companyHooks";
 import { FieldError } from "../../auth/LoginPage";
-import { editCustomerSchema } from "../profileObj";
+import { editCustomerSchema, generateProfileValue } from "../profileObj";
 import { useMemo } from "react";
 
 const EditProfileForm = () => {
   const { data, isLoading, isSuccess } = useGetCompanyDetailsQuery();
-  const companyData = useMemo(
-    () => (isSuccess ? data[0] : []),
-    [isSuccess, data]
-  );
+  const companyData = useMemo(() => isSuccess && data[0], [isSuccess, data]);
 
   const form = useForm({
-    defaultValues: {},
+    defaultValues: generateProfileValue(),
     validators: {
       onSubmit: editCustomerSchema,
     },

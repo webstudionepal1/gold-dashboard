@@ -81,7 +81,7 @@ export const editCustomerSchema = z.object({
   }),
 });
 
-export const generateProfileValue = (data: IFetchCompany) => ({
+export const generateProfileValue = () => ({
   shop_name: "",
   owner_name: "",
   email: "",
