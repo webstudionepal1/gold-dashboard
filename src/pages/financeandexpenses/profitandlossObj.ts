@@ -39,11 +39,11 @@ export const profitandlossColumns = [
   },
   {
     key: "inflow",
-    title: "In Flow (Rs)",
+    title: "In Flow",
   },
   {
     key: "outflow",
-    title: "Out Flow (Rs)",
+    title: "Out Flow",
   },
   {
     key: "balance",

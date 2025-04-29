@@ -27,8 +27,6 @@ const ProfitandLoss = () => {
     isLoading: isfinancialRepLoading,
   } = useGetFinancialReportQuery();
 
-  console.log("PROFIT AND LOSSDATA", FinancialReport);
-
   const financialReportList = useMemo(
     () =>
       isfinancialRepSuccess && FinancialReport?.revenue
