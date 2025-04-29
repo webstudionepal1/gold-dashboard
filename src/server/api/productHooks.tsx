@@ -71,6 +71,7 @@ export interface IBaseProduct {
 export interface IFetchProduct {
   _id: string;
   name: string;
+  ratings:number;
   description: string;
   category: IFetchCategory;
   subCategory: IFetchSubCategory;

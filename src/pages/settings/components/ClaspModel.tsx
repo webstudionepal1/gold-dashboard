@@ -23,6 +23,9 @@ interface IClaspProps {
 const schema = z.object({
   name: z.string().min(1, "**Name is Required"),
 });
+interface FormValues {
+  name: string;
+}
 const ClaspModel: React.FC<IClaspProps> = ({ onClose, data, edit = false }) => {
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const {
@@ -38,11 +41,11 @@ const ClaspModel: React.FC<IClaspProps> = ({ onClose, data, edit = false }) => {
   const form = useForm({
     defaultValues: {
       name: edit ? get(data, "name", "") : "",
-      validators: {
-        onChange: schema,
-        onBlur: schema,
-        onSubmit: schema,
-      },
+    },
+    validators: {
+      onChange: schema,
+      onBlur: schema,
+      onSubmit: schema,
     },
     onSubmit: async ({ value }) => {
       const formdata = new FormData();

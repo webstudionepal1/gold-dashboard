@@ -3,7 +3,9 @@ import { useState } from "react";
 
 interface IProps {
   title: string;
-  data: any;
+  data: {
+    [key: string]: any;
+  };
 }
 export const DropdownSection: React.FC<IProps> = ({ title, data }) => {
   const [isOpen, setOpen] = useState(false);
@@ -27,7 +29,7 @@ export const DropdownSection: React.FC<IProps> = ({ title, data }) => {
               <span className="text-sm text-gray-500 capitalize">
                 {key.replace(/([A-Z])/g, " $1").trim()}
               </span>
-              <span >{value.toString() || "N/A"}</span>
+              <span>{value.toString() || "N/A"}</span>
             </div>
           ))}
         </div>

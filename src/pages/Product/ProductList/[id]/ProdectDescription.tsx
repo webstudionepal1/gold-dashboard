@@ -21,7 +21,7 @@ const ProductDescription: React.FC = () => {
         <ProductImage images={images} />
         <ProductDetails product={product} />
       </div>
-      <ReviewsSection product={product} />
+      {/* <ReviewsSection product={product} /> */}
     </div>
   );
 };
