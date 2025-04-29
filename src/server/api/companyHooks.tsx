@@ -54,7 +54,7 @@ export const useGetCompanyDetailsQuery = () => {
   return useQuery({
     queryKey: ["company"],
     queryFn: async () => {
-      const res = await apiClient.get<{ data: IFetchCompany }>("company");
+      const res = await apiClient.get<{ data: IFetchCompany[] }>("company");
       return res?.data?.data;
     },
   });

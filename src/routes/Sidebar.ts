@@ -177,8 +177,8 @@ export const SidebarConfig = {
           title: "Settings",
           icon: "mdi-light:settings",
           children: [
-            { id: 107, path: "/settings/profile", title: "Profile" },
-            { id: 108, path: "/settings/attribute", title: "Attribute config" },
+            { id: 107, path: "/settings/profile-config", title: "Profile config" },
+            { id: 108, path: "/settings/attribute-config", title: "Attribute config" },
           ],
         },
         {

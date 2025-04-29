@@ -1,103 +1,26 @@
-import Breadcrumbs from "../../../components/shared/Breadcrumb";
 import { useForm } from "@tanstack/react-form";
+import Breadcrumbs from "../../../components/shared/Breadcrumb";
 import { InputField } from "../../../components/shared/form_components/InputField";
 
-import { z } from "zod";
-import FileDropInput from "../../../components/shared/form_components/FileDropInput";
-import { useStore } from "@tanstack/react-form";
-import Header from "../../../components/shared/table_heading/Header";
 import { DropdownField } from "../../../components/shared/form_components/Dropdown";
+import FileDropInput from "../../../components/shared/form_components/FileDropInput";
+import Header from "../../../components/shared/table_heading/Header";
+import { useGetCompanyDetailsQuery } from "../../../server/api/companyHooks";
+import { FieldError } from "../../auth/LoginPage";
+import { editCustomerSchema } from "../profileObj";
+import { useMemo } from "react";
 
-const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
-const EditCustomerSchema = z.object({
-  shop_name: z.string().min(1, "Shop Name is required"),
-  owner_name: z.string().min(1, "Owner Name is required"),
-  email: z.string().min(1, "Email is required"),
-  phone_no: z.string().min(1, "Phone Number is required"),
-  registration_number: z.string().min(1, "Registration number is required"),
-  street_address: z.string().min(1, "Street Address is required"),
-  city: z.string().min(1, "City is required"),
-  country: z.string().min(1, "Country is required"),
-  zip_code: z.string().min(1, "Zip Code is required"),
-  open_day: z.string().min(1, "Opening days are required"),
-  opening_time: z
-    .string()
-    .regex(timeRegex, { message: "Invalid time format. Use 24 hour format" }),
-
-  closing_time: z
-    .string()
-    .regex(timeRegex, { message: "Invalid time format. Use 24 hour format" }),
-
-  payment_method: z.string().min(1, "Payment method is required"),
-  bank_name: z.string().min(1, "Bank Name is required"),
-  bank_account_number: z.string().min(1, "Bank Account Number is required"),
-  account_name: z.string().min(1, "Account Name is required"),
-
-  password: z
-    .string()
-    .min(1, "Password is required")
-    .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$/,
-      "Password must be at least 8 characters long, and include uppercase, lowercase, number, and special character"
-    ),
-  terms_and_conditions: z.literal(true, {
-    errorMap: () => ({ message: "Follow through the terms and conditions" }),
-  }),
-
-  profile_photo: z.instanceof(File, {
-    message: "Profile photo is required",
-  }),
-  qrcode: z.instanceof(File, {
-    message: "QR code is required",
-  }),
-});
 const EditProfileForm = () => {
-  const FieldError = ({ field }: { field: any }) => {
-    if (field.state.meta.errors.length > 0) {
-      const error = field.state.meta.errors[0];
-      // Handle the case where the error is an object
-      const errorMessage =
-        typeof error === "string"
-          ? error
-          : error.message || JSON.stringify(error);
-
-      return (
-        <div className="min-h-[20px]">
-          <span className="text-xs text-red">{errorMessage}</span>
-        </div>
-      );
-    }
-    return <div className="min-h-[20px]"></div>; // Return empty div when no errors
-  };
+  const { data, isLoading, isSuccess } = useGetCompanyDetailsQuery();
+  const companyData = useMemo(
+    () => (isSuccess ? data[0] : []),
+    [isSuccess, data]
+  );
 
   const form = useForm({
-    defaultValues: {
-      shop_name: "",
-      owner_name: "",
-      email: "",
-      phone_no: "",
-      registration_number: "",
-      street_address: "",
-      city: "",
-      country: "",
-      zip_code: "",
-
-      open_day: "",
-      opening_time: "",
-
-      closing_time: "",
-      payment_method: "",
-
-      bank_name: "",
-      bank_account_number: "",
-      account_name: "",
-      password: "",
-      terms_and_conditions: false,
-      profile_photo: null as File | null,
-      qrcode: null as File | null,
-    },
+    defaultValues: {},
     validators: {
-      onSubmit: EditCustomerSchema,
+      onSubmit: editCustomerSchema,
     },
     onSubmit: async ({ value }) => {
       console.log("Order Submitted:", value);
@@ -105,14 +28,14 @@ const EditProfileForm = () => {
     },
   });
 
-  const termsAccepted = useStore(
-    form.store,
-    (state) => state.values.terms_and_conditions
-  );
+  // const termsAccepted = useStore(
+  //   form.store,
+  //   (state) => state.values.terms_and_conditions
+  // );
 
   return (
     <>
-      <div className="mx-8 my-3">
+      <div className="">
         <div className="flex items-center justify-between">
           <Header text="Edit Shop Profile" />
           <Breadcrumbs />

@@ -231,10 +231,8 @@ export const routesConfig = [
   {
     path: FrontendRoutes.PROFILECONFIG,
     element: <EditProfileForm />,
-    path: '/settings/profile',
-    element: <SettingForm />,
   },{
-    path:'/settings/attribute',
+    path:'/settings/attribute-config',
     element: <AttribConfig />,
   },
   //Analytics
