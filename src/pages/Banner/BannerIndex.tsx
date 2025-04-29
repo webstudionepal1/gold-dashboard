@@ -45,9 +45,9 @@ const BannerIndex: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [selectedFilter, setSelectedFilter] = useState("");
-  console.log(selectedFilter);
+
   const [selectedSort, setSelectedSort] = useState("");
-  console.log(selectedSort);
+
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState("homepage");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -56,7 +56,7 @@ const BannerIndex: React.FC = () => {
 
   const { data: banners = [], isLoading, error } = useGetAllBannerQuery();
   const { mutate: deleteBanner } = useDeleteBannerMutation();
-  console.log("banners", banners);
+
   const customerTableData: IFetchBanner[] = banners
     .filter((item) => item.locations?.includes(selectedTab))
     .map((banner, index) => ({
@@ -121,7 +121,6 @@ const BannerIndex: React.FC = () => {
   };
 
   const handleEditItem = (item: TableData<IFetchBanner>) => {
-    console.log("editing items", item);
     updateBannerState(item);
     navigate(`/banner/edit`);
   };

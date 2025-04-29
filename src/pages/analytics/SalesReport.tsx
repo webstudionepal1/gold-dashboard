@@ -192,7 +192,7 @@ const SalesReport = () => {
     () => setModal({ of: "", edit: false, data: null }),
     []
   );
-  console.log(selectedTab);
+
   return (
     <div className="container px-4 py-3 mx-auto ">
       <Header text="Sales Report" />

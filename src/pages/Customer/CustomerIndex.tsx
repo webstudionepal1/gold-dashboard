@@ -35,8 +35,6 @@ const CustomerIndex = () => {
     error,
   } = useGetCustomerQuery({ role: "customer" });
 
-  console.log("customer data", customers);
-
   const customerTableData: CustomerItem[] = customers.map(
     (customer, index) => ({
       _id: customer._id,

@@ -64,7 +64,6 @@ const AddCustomerForm = () => {
       onSubmit: AddCustomerSchema,
     },
     onSubmit: async ({ value }) => {
-      console.log("Order Submitted:", value);
       // Submit to backend or API
     },
   });

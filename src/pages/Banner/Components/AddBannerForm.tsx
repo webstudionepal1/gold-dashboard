@@ -59,7 +59,7 @@ const AddBannerSchema = z.object({
 const AddBannerForm = () => {
   const { id } = useParams();
   const bannerData = useStore(bannerStore, (state) => state);
-  console.log("BANNER DATA", bannerData);
+
   const [selectedTagItems, setSelectedTagItems] = useState<string[]>([]);
   const {
     mutate: createBanner,
@@ -106,8 +106,6 @@ const AddBannerForm = () => {
     error: subCategoryError,
   } = useGetAllProductSubCategoriesQuery();
 
-  console.log("CATEORIEEEEEEEEEEEEEEEEESSSSSSSSSSSSSSS", categories);
-
   // const categoryOptions = categories?.map((category) => ({
   //   value: category._id,
   //   label: category.name,
@@ -145,7 +143,6 @@ const AddBannerForm = () => {
     },
     onSubmit: async ({ value }) => {
       try {
-        console.log("FORM DATA", value);
         const formData = new FormData();
 
         formData.append("title", value.title);

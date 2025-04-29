@@ -205,7 +205,7 @@ const CustomerDetails = () => {
   // totalPrice: item.quantity * item.selectedVariant.price,
   //   }))
   // );
-  console.log(selectedOrder, "selected");
+
   const fla = selectedOrder
     ? selectedOrder?.orderedProducts.map((item) => ({
         // name: item?.product?.name || "name",
@@ -220,8 +220,6 @@ const CustomerDetails = () => {
       }))
     : [];
 
-  console.log("FLAAAAA", fla);
-  console.log("orders", orders);
   interface customerData {
     _id: string;
     customer_name: string;
@@ -408,7 +406,6 @@ const CustomerDetails = () => {
                 key: "orderStatus",
                 header: "Status",
                 render: (value: string) => {
-                  console.log("Status value", value); // Log the value to inspect it
                   return (
                     <span
                       className={`px-3 py-[6px] rounded-full text-xs ${getStatusColor(

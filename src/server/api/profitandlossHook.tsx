@@ -7,7 +7,7 @@ interface Reference {
   date: string;
 }
 
-interface RevenueCategory {
+export interface RevenueCategory {
   category: string;
   inflow: number;
   outflow: number;
@@ -26,7 +26,7 @@ interface FinancialReportData {
   expenses: any[];
 }
 
-interface FinancialReportResponse {
+export interface FinancialReportResponse {
   data: FinancialReportData;
 }
 
@@ -34,7 +34,7 @@ export const useGetFinancialReportQuery = (params = {}) => {
   return useQuery({
     queryKey: ["financial-report", params],
     queryFn: async () => {
-      const res = await apiClient.get<{ data: FinancialReportResponse }>(
+      const res = await apiClient.get<{ data: FinancialReportData }>(
         "financial-report",
         {
           params,
