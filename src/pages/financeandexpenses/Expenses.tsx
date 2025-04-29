@@ -15,6 +15,8 @@ import {
 import { map } from "lodash";
 import {
   IFetchExpenses,
+  IFetchExpensesCategory,
+  useDeleteExpenseCategoryMutation,
   useDeleteExpenseMutation,
   useGetExpenseCategoryQuery,
   useGetExpensesQuery,
@@ -23,10 +25,14 @@ import ExpenseForm from "./components/ExpenseForm";
 import ExpenseCategoryForm from "./components/ExpenseCategoryForm";
 import { SearchFilterSort } from "../../components/global/SearchFilterSort";
 import { filterOptions, sortOptions } from "../../constants/DropDownOptions";
+import { updateExpenseState } from "./components/ExpenseStore";
+import { updateExpenseCategoryState } from "./components/ExpenseCategoryStore";
 
-interface IEditModal {
-  state: boolean;
-  editData?: IFetchExpenses | null;
+interface IModalState {
+  of: string;
+  edit: boolean;
+
+  data: IFetchExpenses | IFetchExpensesCategory | null;
 }
 
 interface FilterState {
@@ -38,10 +44,6 @@ interface FilterState {
 const Expenses = () => {
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState("expenses");
-  const [isExpenseModalOpen, setIsExpenseModalOpen] = useState<IEditModal>({
-    state: false,
-    editData: null,
-  });
 
   const [filterState, setFilterState] = useState<FilterState>({
     searchQuery: "",
@@ -50,6 +52,7 @@ const Expenses = () => {
   });
 
   const { mutate: deleteExpense } = useDeleteExpenseMutation();
+  const { mutate: deleteExpenseCategory } = useDeleteExpenseCategoryMutation();
   const {
     data: expensesList,
     isLoading: expensesLoading,
@@ -76,8 +79,8 @@ const Expenses = () => {
       const query = filterState.searchQuery.toLowerCase();
       result = result.filter(
         (item) =>
-          (item.expenseCategory.name &&
-            item.expenseCategory.name.toLowerCase().includes(query)) ||
+          (item.expenseCategory?.name &&
+            item.expenseCategory?.name.toLowerCase().includes(query)) ||
           (typeof item.expenseCategory.name === "string" &&
             item.expenseCategory.name.toLowerCase().includes(query)) ||
           (item.description && item.description.toLowerCase().includes(query))
@@ -142,25 +145,40 @@ const Expenses = () => {
     () => ({
       columns: [
         { key: "date", title: "Date" },
-        { key: "expenseCategory", title: "Category" },
+        { key: "category", title: "Category" },
         { key: "description", title: "Description" },
-        { key: "amount", title: "Amount" },
+        { key: "totalAmount", title: "Amount" },
         { key: "invoice", title: "Invoice" },
       ],
       rows: map(expensesList, (item) => ({
         ...item,
-        amount: `Rs ${item.amount}`,
+        category: item.expenseCategory?.name,
+        totalAmount: `Rs ${item.amount}`,
         invoice: (
-          <div>
+          <div className="flex justify-center items-center">
             {item.images.map((imag) => (
               <img
-                src={`https://gold-api.webstudiomatrix.com/api/v1/en/${imag}`}
+                src={`https://gold-api.webstudiomatrix.com/${imag}`}
                 alt="image"
+                height={200}
+                width={120}
+                className="rounded-xl"
               />
             ))}
           </div>
         ),
       })),
+      onDelete(id: string) {
+        deleteExpense(id);
+      },
+      // viewAction(row: IFetchExpenses) {
+
+      // },
+      editAction(row: IFetchExpenses) {
+        updateExpenseState(row);
+
+        setModal({ of: "expenses", edit: true, data: row });
+      },
     }),
     [expensesList, expensesSuccess]
   );
@@ -171,11 +189,20 @@ const Expenses = () => {
         { key: "name", title: "Name" },
         { key: "description", title: "Description" },
       ],
+
       rows: map(expenseCategories, (item, sn) => ({
         ...item,
         sn: sn + 1,
-        description: <h1>DESCRIPTION</h1>,
       })),
+      onDelete(id: string) {
+        deleteExpenseCategory(id);
+      },
+
+      editAction(row: IFetchExpensesCategory) {
+        updateExpenseCategoryState(row);
+
+        setModal({ of: "expensesCategory", edit: true, data: row });
+      },
     }),
     [expenseCategories, expenseCatSuccess]
   );
@@ -193,7 +220,8 @@ const Expenses = () => {
     expenses: expenseTableData,
     expensesCategory: expenseCategoryTableData,
   };
-  const [modal, setModal] = useState({
+
+  const [modal, setModal] = useState<IModalState>({
     of: "",
     edit: false,
     data: null,
@@ -252,22 +280,18 @@ const Expenses = () => {
             placeholder="Search products..."
           />
         }
-        rows={tableDataObj[selectedTab].rows || []}
-        columns={tableDataObj[selectedTab].columns}
-        showAction={true}
-        viewAction={() => console.log("VIEW")}
-        editAction={() => console.log("edit")}
-        onDelete={(id) => deleteExpense(id)}
+        {...tableDataObj[selectedTab]}
+        showAction
       />
       {modal.of === "expenses" && (
         <ScrollableModal onClose={closeModal} classname="w-[35rem]">
-          <ExpenseForm closeModal={closeModal} />
+          <ExpenseForm editData={modal.data} closeModal={closeModal} />
         </ScrollableModal>
       )}
 
       {modal.of === "expensesCategory" && (
         <ScrollableModal classname="w-[35rem]" onClose={closeModal}>
-          <ExpenseCategoryForm closeModal={closeModal} />
+          <ExpenseCategoryForm editData={modal.data} closeModal={closeModal} />
         </ScrollableModal>
       )}
     </div>

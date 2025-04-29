@@ -170,9 +170,10 @@ export const SidebarConfig = {
             },
           ],
         },
+
         {
           id: 13,
-          path: "/settings",
+          path: "#",
           title: "Settings",
           icon: "mdi-light:settings",
           children: [

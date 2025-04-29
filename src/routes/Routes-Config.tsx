@@ -28,10 +28,10 @@ import VerifyCashPayment from "../pages/transaction/VerifyCashPayment";
 import Expenses from "../pages/financeandexpenses/Expenses";
 import Cashflow from "../pages/financeandexpenses/Cashflow";
 import ProfitandLoss from "../pages/financeandexpenses/ProfitandLoss";
-import SettingForm from "../pages/settings/SettingForm";
+
 import OrderReport from "../pages/analytics/OrderReport";
 import SalesReport from "../pages/analytics/SalesReport";
-import StoreReport from "../pages/analytics/StoreReport";
+import StoreReport from "../pages/analytics/StockReport";
 import ProductForm from "../pages/Product/ProductList/component/ProductForm";
 import CustomerDetails from "../pages/Customer/components/CustomerDetails";
 import OrderDetails from "../pages/OrderManagement/Order/OrderDetails";
@@ -41,6 +41,7 @@ import AddSupplierForm from "../pages/PurchaseManagement/components/AddSupplierF
 import SupplierDetail from "../pages/PurchaseManagement/pages/SupplierDetail";
 import SupplierHistory from "../pages/PurchaseManagement/pages/SupplierHistory";
 import AttribConfig from "../pages/settings/components/AttribConfig";
+import EditProfileForm from "../pages/settings/ProfileConfig/EditProfileForm";
 import { ProductDetails } from "../pages/Product/ProductList/[id]/components/ProductDetails";
 
 export const routesConfig = [
@@ -222,14 +223,20 @@ export const routesConfig = [
   },
 
   //Settings
+  // {
+  //   path: FrontendRoutes.SETTINGS,
+  //   element: <SettingForm />,
+  // },
+
   {
+    path: FrontendRoutes.PROFILECONFIG,
+    element: <EditProfileForm />,
     path: '/settings/profile',
     element: <SettingForm />,
   },{
     path:'/settings/attribute',
     element: <AttribConfig />,
   },
-
   //Analytics
   {
     path: FrontendRoutes.ORDER_REPORT,

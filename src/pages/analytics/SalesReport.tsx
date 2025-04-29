@@ -1,239 +1,229 @@
-import type React from "react";
-import { useState } from "react";
-import { ColumnConfig, Table, TableData } from "../../components/shared/Table";
-import { SearchFilterSort } from "../../components/global/SearchFilterSort";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "../../components/shared/tab";
-import { useOutsideClick } from "../../hooks/UseOutsideClick";
+import { Icon } from "@iconify/react/dist/iconify.js";
+import { useCallback, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import MasterTable from "../../components/shared/MasterTable";
+import { ScrollableModal } from "../../components/shared/ScrollableModal";
+import Header from "../../components/shared/table_heading/Header";
+import { DynamicTab } from "../PurchaseManagement/components/DynamicTab";
 
-interface Sales_Report {
-  _id: string;
-  category: string;
-  totalOrders: number;
-  revenue: string;
-  percentageShare: string;
+import { salesReportTabOption, ITable } from "../analytics/SalesReportObj";
+
+import { map } from "lodash";
+import {
+  IFetchExpenses,
+  useDeleteExpenseMutation,
+  useGetExpenseCategoryQuery,
+  useGetExpensesQuery,
+} from "../../server/api/expensesHook";
+
+import { SearchFilterSort } from "../../components/global/SearchFilterSort";
+import { filterOptions, sortOptions } from "../../constants/DropDownOptions";
+
+interface IEditModal {
+  state: boolean;
+  editData?: IFetchExpenses | null;
 }
 
-const SalesReport: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [selectedFilter, setSelectedFilter] = useState("");
-  const [selectedSort, setSelectedSort] = useState("");
+interface FilterState {
+  searchQuery: string;
+  filterValue: string;
+  sortValue: string;
+}
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const modalRef = useOutsideClick(() => setIsModalOpen(false));
+const SalesReport = () => {
+  const navigate = useNavigate();
+  const [selectedTab, setSelectedTab] = useState("productWise");
+  const [isExpenseModalOpen, setIsExpenseModalOpen] = useState<IEditModal>({
+    state: false,
+    editData: null,
+  });
 
-  // Sample inventory data for different tabs
-  const [Product] = useState<Sales_Report[]>([
-    {
-      _id: "1",
-      category: "Gold",
-      totalOrders: 122,
-      revenue: "23.0%",
-      percentageShare: "1%",
-    },
-    {
-      _id: "2",
-      category: "Silver",
-      totalOrders: 122,
-      revenue: "23.0%",
-      percentageShare: "1%",
-    },
-    {
-      _id: "3",
-      category: "Watch",
-      totalOrders: 122,
-      revenue: "23.0%",
-      percentageShare: "1%",
-    },
-  ]);
+  const [filterState, setFilterState] = useState<FilterState>({
+    searchQuery: "",
+    filterValue: "",
+    sortValue: "",
+  });
 
-  // Filter options for the dropdown
-  const filterOptions = [
-    { value: "", label: "All Customers" },
-    { value: "active", label: "Active" },
-    { value: "inactive", label: "Inactive" },
-  ];
+  const { mutate: deleteExpense } = useDeleteExpenseMutation();
+  const {
+    data: expensesList,
+    isLoading: expensesLoading,
+    isSuccess: expensesSuccess,
+  } = useGetExpensesQuery();
 
-  // Sort options for the dropdown
-  const sortOptions = [
-    { value: "", label: "Default" },
-    { value: "name-asc", label: "Name (A-Z)" },
-    { value: "name-desc", label: "Name (Z-A)" },
-    { value: "orders-high", label: "Orders (High)" },
-    { value: "orders-low", label: "Orders (Low)" },
-  ];
+  const {
+    data: expenseCategories,
+    isLoading: expenseCatLoading,
+    isSuccess: expenseCatSuccess,
+  } = useGetExpenseCategoryQuery();
 
-  const [Category] = useState<Sales_Report[]>([
-    {
-      _id: "1",
-      category: "Gold",
-      totalOrders: 122,
-      revenue: "23.0%",
-      percentageShare: "1%",
-    },
-    {
-      _id: "2",
-      category: "Silver",
-      totalOrders: 122,
-      revenue: "23.0%",
-      percentageShare: "1%",
-    },
-    {
-      _id: "3",
-      category: "Watch",
-      totalOrders: 122,
-      revenue: "23.0%",
-      percentageShare: "1%",
-    },
-  ]);
+  const expenseData = useMemo(
+    () => (expensesSuccess ? expensesList : []),
+    [expensesSuccess, expensesList]
+  );
 
-  const filterItems = (items: Sales_Report[]) => {
-    return items.filter(
-      (item) =>
-        item.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item._id?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  };
+  const filteredExpenses = useMemo(() => {
+    if (!expenseData || expenseData.length === 0) return [];
 
-  const handleViewItem = (item: TableData<Sales_Report>) => {
-    console.log("View item:", item);
-  };
+    let result = [...expenseData];
 
-  const handleEditItem = (item: TableData<Sales_Report>) => {
-    console.log("Edit item:", item);
-  };
+    if (filterState.searchQuery) {
+      const query = filterState.searchQuery.toLowerCase();
+      result = result.filter(
+        (item) =>
+          (item.expenseCategory.name &&
+            item.expenseCategory.name.toLowerCase().includes(query)) ||
+          (typeof item.expenseCategory.name === "string" &&
+            item.expenseCategory.name.toLowerCase().includes(query)) ||
+          (item.description && item.description.toLowerCase().includes(query))
+      );
+    }
+    if (filterState.filterValue) {
+      result = result.filter(
+        (item) =>
+          (typeof item.expenseCategory.name === "string" &&
+            item.expenseCategory.name === filterState.filterValue) ||
+          (item.description && item.description === filterState.filterValue)
+      );
+    }
 
-  const handleDeleteItem = (item: TableData<Sales_Report>) => {
-    console.log("Delete item:", item);
-  };
+    // if (filterState.sortValue) {
+    //   switch (filterState.sortValue) {
+    //     case "title_asc":
+    //       result.sort((a, b) =>
+    //         a.name && b.name ? a.name.localeCompare(b.name) : 0
+    //       );
+    //       break;
+    //     case "title_desc":
+    //       result.sort((a, b) =>
+    //         a.name && b.name ? b.name.localeCompare(a.name) : 0
+    //       );
+    //       break;
+    //     case "price_asc":
+    //       result.sort((a, b) => (a.price && b.price ? a.price - b.price : 0));
+    //       break;
+    //     case "price_desc":
+    //       result.sort((a, b) => (a.price && b.price ? b.price - a.price : 0));
+    //       break;
+    //     case "rating_asc":
+    //       result.sort((a, b) =>
+    //         a.ratings && b.ratings ? a.ratings - b.ratings : 0
+    //       );
+    //       break;
+    //     case "rating_desc":
+    //       result.sort((a, b) =>
+    //         a.ratings && b.ratings ? b.ratings - a.ratings : 0
+    //       );
+    //       break;
+    //   }
+    // }
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  const handleItemsPerPageChange = (limit: number) => {
-    setItemsPerPage(limit);
-    setCurrentPage(1);
-  };
+    return result;
+  }, [expenseData, filterState]);
 
   const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    setCurrentPage(1);
+    setFilterState((prev) => ({ ...prev, searchQuery: query }));
   };
 
   const handleFilter = (filter: string) => {
-    setSelectedFilter(filter);
-    setCurrentPage(1);
+    setFilterState((prev) => ({ ...prev, filterValue: filter }));
   };
 
   const handleSort = (sort: string) => {
-    setSelectedSort(sort);
-    setCurrentPage(1);
+    setFilterState((prev) => ({ ...prev, sortValue: sort }));
   };
 
-  const columns: ColumnConfig<Sales_Report>[] = [
-    {
-      header: "Category",
-      key: "category",
-    },
-    {
-      header: "Total Orders",
-      key: "totalOrders",
-    },
-    {
-      header: "Revenue",
-      key: "revenue",
-    },
-    {
-      header: "Percentage Share",
-      key: "percentageShare",
-    },
-  ];
+  const expenseTableData = useMemo(
+    () => ({
+      columns: [
+        { key: "category", title: "Category" },
+        { key: "totalOrder", title: "Total Orders" },
+        { key: "revenue", title: "Revenue" },
+        { key: "percentageShare", title: "Percentage Share" },
+      ],
+      rows: map(expensesList, (item) => ({
+        ...item,
+        category: "Gold",
+        totalOrder: "122",
+        revenue: "23.0%",
+        percentageShare: "1%",
+      })),
+    }),
+    [expensesList, expensesSuccess]
+  );
+  const expenseCategoryTableData = useMemo(
+    () => ({
+      columns: [
+        { key: "category", title: "Category" },
+        { key: "totalOrder", title: "Total Orders" },
+        { key: "revenue", title: "Revenue" },
+        { key: "percentageShare", title: "Percentage Share" },
+      ],
+      rows: map(expenseCategories, (item) => ({
+        ...item,
+        category: "Gold",
+        totalOrder: "122",
+        revenue: "23.0%",
+        percentageShare: "1%",
+      })),
+    }),
+    [expenseCategories, expenseCatSuccess]
+  );
+  // const returnTableData = useMemo(
+  //   () => ({
+  //     columns: [{ key: "name", title: "Name" }],
+  //     rows: map(returnList, (item) => ({
+  //       ...item,
+  //     })),
+  //   }),
+  //   [returnList, returnSuccess]
+  // );
 
-  const renderInventoryTable = (items: Sales_Report[]) => {
-    const filteredItems = filterItems(items);
-
-    return (
-      <Table
-        columns={columns}
-        data={filteredItems}
-        showEdit={false}
-        showDelete={false}
-        showView={true}
-        showAction={false}
-        showSelectAll={true}
-        viewRow={handleViewItem}
-        editRow={handleEditItem}
-        deleteRow={handleDeleteItem}
-        showPagination={true}
-        paginationDetails={{
-          currentPage,
-          limit: itemsPerPage,
-          totalCount: filteredItems.length,
-        }}
-        onItemsPerPageChange={handleItemsPerPageChange}
-        onPageChange={handlePageChange}
-        showBg={true}
-      />
-    );
+  const tableDataObj: ITable = {
+    productWise: expenseTableData,
+    categoryWise: expenseCategoryTableData,
   };
-
+  const [modal, setModal] = useState({
+    of: "",
+    edit: false,
+    data: null,
+  });
+  const closeModal = useCallback(
+    () => setModal({ of: "", edit: false, data: null }),
+    []
+  );
+  console.log(selectedTab);
   return (
-    <div className="container mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Sales Report</h1>
-      <div className="bg-white rounded-lg shadow">
-        <Tabs defaultValue="product" className="w-full">
-          {/* Container for both TabsList and SearchFilterSort */}
-          <div className="flex items-center justify-between border-b">
-            <TabsList className="bg-transparent p-0 h-auto">
-              <TabsTrigger
-                value="product"
-                className="px-4 py-3 rounded-none data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:text-[#DF8D28] data-[state=active]:border-b-2 data-[state=active]:border-[#DF8D28] text-gray-500"
-              >
-                Product Wise
-              </TabsTrigger>
-              <TabsTrigger
-                value="category"
-                className="px-4 py-3 rounded-none data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:text-[#DF8D28] data-[state=active]:border-b-2 data-[state=active]:border-[#DF8D28] text-gray-500"
-              >
-                Category Wise
-              </TabsTrigger>
-            </TabsList>
+    <div className="container px-4 py-3 mx-auto ">
+      <Header text="Sales Report" />
 
-            {/* SearchFilterSort moved here and aligned to the right */}
-            <div className="p-4">
-              <SearchFilterSort
-                onSearch={handleSearch}
-                onFilter={handleFilter}
-                onSort={handleSort}
-                filterOptions={filterOptions}
-                sortOptions={sortOptions}
-                placeholder="Search here..."
-              />
-            </div>
-          </div>
-
-          {/* Tab content remains unchanged */}
-          <TabsContent
-            value="product"
-            className="px-4 pb-4 "
-            onClick={() => {
-              setIsModalOpen(true);
-            }}
-          >
-            {renderInventoryTable(Product)}
-          </TabsContent>
-          <TabsContent value="category" className="px-4 pb-4">
-            {renderInventoryTable(Category)}
-          </TabsContent>
-        </Tabs>
-      </div>
+      <MasterTable
+        loading={expensesLoading || expenseCatLoading}
+        tabsOptions={
+          <DynamicTab
+            selectedTab={selectedTab}
+            setSelectedTab={setSelectedTab}
+            tabOptions={salesReportTabOption}
+          />
+        }
+        filterSection={
+          <SearchFilterSort
+            onSearch={handleSearch}
+            onFilter={handleFilter}
+            onSort={handleSort}
+            onViewChange={() => {}}
+            showFilter={true}
+            showSort={true}
+            showView={true}
+            filterOptions={filterOptions}
+            sortOptions={sortOptions}
+            placeholder="Search products..."
+          />
+        }
+        rows={tableDataObj[selectedTab].rows || []}
+        columns={tableDataObj[selectedTab].columns}
+        canSelect
+      />
     </div>
   );
 };

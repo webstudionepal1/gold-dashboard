@@ -1,8 +1,13 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { SearchFilterSort } from "../../components/global/SearchFilterSort";
 import { Table, ColumnConfig, TableData } from "../../components/shared/Table";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Header from "../../components/shared/table_heading/Header";
+import MasterTable from "../../components/shared/MasterTable";
+import { IFetchOrder, useGetAllOrdersQuery } from "../../server/api/orderHooks";
+import { get, map } from "lodash";
+import dayjs from "dayjs";
+import { useNavigate } from "react-router-dom";
 
 interface PostBusinessItem {
   _id: string;
@@ -12,44 +17,152 @@ interface PostBusinessItem {
   image: string;
   selected_packages: string;
 }
+interface FilterState {
+  searchQuery: string;
+  currentPage: number;
+  itemsPerPage: number;
+  filter: string;
+  sort: string;
+}
 
 const MyPostBusinessIndex = () => {
-  const [selectedFilter, setSelectedFilter] = useState("");
-  const [selectedSort, setSelectedSort] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  console.log(selectedFilter, selectedSort, searchQuery);
   const [isactionButtonClicked, setIsActionButtonClicked] = useState(false);
 
+  const {
+    data: orders,
+    isSuccess,
+    isLoading,
+  } = useGetAllOrdersQuery({
+    orderStatus: "pending",
+  });
+
+  const orderList = useMemo(
+    () => (isSuccess ? orders : []),
+    [isSuccess, orders]
+  );
+
+  const [filterState, setFilterState] = useState<FilterState>({
+    searchQuery: "",
+    currentPage: 1,
+    itemsPerPage: 10,
+    filter: "",
+    sort: "",
+  });
+
+  const navigate = useNavigate();
+
   const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    setCurrentPage(1);
+    setFilterState((prev) => ({ ...prev, searchQuery: query, currentPage: 1 }));
   };
 
   const handleFilter = (filter: string) => {
-    setSelectedFilter(filter);
-    setCurrentPage(1);
+    setFilterState((prev) => ({ ...prev, filter, currentPage: 1 }));
   };
 
   const handleSort = (sort: string) => {
-    setSelectedSort(sort);
-    setCurrentPage(1);
+    setFilterState((prev) => ({ ...prev, sort, currentPage: 1 }));
   };
-
   const filterOptions = [
-    { value: "", label: "All Customers" },
-    { value: "active", label: "Active" },
-    { value: "inactive", label: "Inactive" },
+    { value: "", label: "All Orders" },
+    { value: "pending", label: "Pending" },
+    { value: "completed", label: "Completed" },
+    { value: "delivered", label: "Delivered" },
+    { value: "cancelled", label: "Cancelled" },
   ];
 
   const sortOptions = [
     { value: "", label: "Default" },
-    { value: "name-asc", label: "Name (A-Z)" },
-    { value: "name-desc", label: "Name (Z-A)" },
-    { value: "orders-high", label: "Orders (High)" },
-    { value: "orders-low", label: "Orders (Low)" },
+    { value: "name-asc", label: "Customer Name (A-Z)" },
+    { value: "name-desc", label: "Customer Name (Z-A)" },
+    { value: "date-newest", label: "Newest First" },
+    { value: "date-oldest", label: "Oldest First" },
+    { value: "amount-high", label: "Amount (High to Low)" },
+    { value: "amount-low", label: "Amount (Low to High)" },
   ];
+
+  const filterItems = (items: IFetchOrder[]) => {
+    if (!items || items.length === 0) return [];
+
+    let filteredItems = [...items];
+
+    // Apply search filter
+    if (filterState.searchQuery) {
+      filteredItems = filteredItems.filter((item) => {
+        const customerName = item.customer?.name?.toLowerCase() || "";
+        const orderId = item._id?.toLowerCase() || "";
+        const email = item.customer?.email?.toLowerCase() || "";
+
+        return (
+          customerName.includes(filterState.searchQuery.toLowerCase()) ||
+          orderId.includes(filterState.searchQuery.toLowerCase()) ||
+          email.includes(filterState.searchQuery.toLowerCase())
+        );
+      });
+    }
+
+    // Apply status filter
+    if (filterState.filter) {
+      filteredItems = filteredItems.filter((item) => {
+        return (
+          item.orderStatus.toLowerCase() === filterState.filter.toLowerCase()
+        );
+      });
+    }
+
+    // Apply sorting
+    if (filterState.sort) {
+      filteredItems = [...filteredItems].sort((a, b) => {
+        switch (filterState.sort) {
+          case "name-asc":
+            return (a.customer?.name || "").localeCompare(
+              b.customer?.name || ""
+            );
+          case "name-desc":
+            return (b.customer?.name || "").localeCompare(
+              a.customer?.name || ""
+            );
+          case "date-newest":
+            return (
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+          case "date-oldest":
+            return (
+              new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+            );
+          case "amount-high":
+            return b.totalAmount - a.totalAmount;
+          case "amount-low":
+            return a.totalAmount - b.totalAmount;
+          default:
+            return 0;
+        }
+      });
+    }
+
+    return filteredItems;
+  };
+
+  const filteredItems = useMemo(
+    () =>
+      filterItems(orderList).map((item) => ({
+        ...item,
+        orderedProducts: get(item, "orderedProducts.length", 0),
+        orderStatus: (
+          <div className="px-2 py-1 text-xs text-white rounded-full bg-green dark-green">
+            {get(item, "orderStatus", "")}
+          </div>
+        ),
+        customer: get(item, "customer.name", "-"),
+        createdAt: (
+          <div className="text-center">
+            {dayjs(get(item, "createdAt", "")).format("MMMM D, YYYY")}
+            <br />
+            {dayjs(get(item, "createdAt", "")).format("h:mm A")}
+          </div>
+        ),
+      })),
+    [orderList, filterState]
+  );
 
   const dummyData: TableData<PostBusinessItem>[] = [
     {
@@ -86,45 +199,59 @@ const MyPostBusinessIndex = () => {
     },
   ];
 
-  const columns: ColumnConfig<PostBusinessItem>[] = [
-    {
-      header: "Items",
-      key: "items",
-      render: (_, row) => (
-        <div className="flex items-center">
-          <img
-            src={row.image}
-            alt={row.item_name}
-            className="w-10 h-10 rounded-md mr-3 object-cover"
-          />
-          <div>
-            <div className="font-medium text-gray-900">{row.item_name}</div>
-            {row._id && (
-              <div className="text-sm text-gray-500">ID {row._id}</div>
-            )}
-          </div>
-        </div>
-      ),
-    },
-    { key: "price", header: "Price" },
-    { key: "total_amount", header: "Total Amount" },
-    {
-      key: "selected_packages",
-      header: "Selected Packages",
-      render: (_, row) => (
-        <div>
-          <p className="text-wrap">{row.selected_packages}</p>
-        </div>
-      ),
-    },
-  ];
+  const myPostBusinessTableData = useMemo(
+    () => ({
+      columns: [
+        // { key: "productName", title: "Product Name" },
+        // { key: "currentStock", title: "Current Stock" },
+        // { key: "minimumStock", title: "Minimum Stock" },
+        // { key: "totalStock", title: "Total Stock" },
+        // { key: "status", title: "Status" },
+
+        {
+          key: "customer",
+          title: "Item Name",
+        },
+        {
+          title: "Price",
+          key: "createdAt",
+        },
+        {
+          key: "totalAmount",
+          title: "Total Amount",
+        },
+        {
+          key: "orderedProducts",
+          title: "Selected Packages",
+        },
+
+        // {
+        //   key: "orderStatus",
+        //   title: "Status",
+        // },
+      ],
+      rows: map(orders, (item) => ({
+        ...item,
+        // productName: "Maintainenance",
+        // currentStock: "1",
+        // minimumStock: "1",
+        // totalStock: "1",
+        // status: "pending",
+        customer: "hello",
+        createdAt: "world",
+        totalAmount: "Rs 100",
+        orderedProducts: "Custom Packing(15 x 10x 3) Weight(Kg) 0.09",
+      })),
+    }),
+    [orders, isSuccess]
+  );
 
   return (
     <div className="mx-6 my-3">
       <Header text="Packages" />
 
       <div className="bg-[#ffffff] border-[#dcdddf] pb-[1rem] border-2 rounded-xl">
-        <div className="p-4">
+        {/* <div className="p-4">
           <SearchFilterSort
             onSearch={handleSearch}
             onFilter={handleFilter}
@@ -133,22 +260,23 @@ const MyPostBusinessIndex = () => {
             sortOptions={sortOptions}
             placeholder="Search here..."
           />
-        </div>
+        </div> */}
 
         <div className="flex items-center gap-2 px-3 ">
-          <Table
-            data={dummyData}
-            columns={columns}
-            showSelectAll
-            showPagination
-            showAction={false}
-            paginationDetails={{
-              currentPage,
-              limit: itemsPerPage,
-              totalCount: dummyData.length,
-            }}
-            onPageChange={setCurrentPage}
-            onItemsPerPageChange={setItemsPerPage}
+          <MasterTable
+            filterSection={
+              <SearchFilterSort
+                onSearch={handleSearch}
+                onFilter={handleFilter}
+                onSort={handleSort}
+                filterOptions={filterOptions}
+                sortOptions={sortOptions}
+                placeholder="Search by customer name, ID or email..."
+              />
+            }
+            rows={filteredItems}
+            columns={myPostBusinessTableData.columns}
+            loading={isLoading}
           />
           <div className="w-[40%] mx-4 mb-[10rem]">
             <div className="flex justify-end items-center gap-2  ">
