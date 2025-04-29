@@ -35,6 +35,7 @@ export interface UploadedImage {
 }
 
 export const categoryColumns = [
+  { title: "S.N", key: "sn" },
   {
     title: "Name",
     key: "name",
@@ -50,6 +51,7 @@ export const categoryColumns = [
 ];
 
 export const subCategoryColumns = [
+  { title: "S.N", key: "sn" },
   {
     title: "Name",
     key: "name",
@@ -94,7 +96,7 @@ export const generateProductDefaultValue = (state: string, editData?: any) => {
       subCategory: get(editData, "subCategory", ""),
       variant: get(editData, "variant", [{ price: 0, size: "", unit: "gm" }]),
       length: get(editData, "length", 0),
-      claspType: get(editData, "claspType", ""),
+      claspType: get(editData, "claspType.name", ""),
       rhodoumFinishes: get(editData, "rhodoumFinishes", true),
       shape: get(editData, "shape", ""),
       clarity: get(editData, "clarity", ""),
@@ -141,3 +143,28 @@ export const productFormSchema = z.object({
   // Tags
   tags: z.array(z.string()).min(1, "At least one tag is required"),
 });
+
+export const productListColumns = [
+  { title: "S.N", key: "sn" },
+  { title: "IMage", key: "image" },
+  {
+    title: "Product",
+    key: "product",
+  },
+  {
+    title: "Category",
+    key: "category",
+  },
+  {
+    title: "Sub Category",
+    key: "subCategory",
+  },
+  {
+    title: "Price",
+    key: "price",
+  },
+  {
+    title: "Stock",
+    key: "stock",
+  },
+];

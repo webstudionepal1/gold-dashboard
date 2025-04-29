@@ -1,18 +1,32 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useForm } from "@tanstack/react-form";
+import { get } from "lodash";
 import { z } from "zod";
 import { DropdownField } from "../../../components/shared/form_components/Dropdown";
 import { InputField } from "../../../components/shared/form_components/InputField";
-import { useGetAllProductsQuery } from "../../../server/api/productHooks";
-import { useCreatePurchaseMutation } from "../../../server/api/purchaseHooks";
+import {
+  IBaseProduct,
+  useGetAllProductsQuery,
+} from "../../../server/api/productHooks";
+import {
+  useCreatePurchaseMutation,
+  useUpdatePurchaseMutation,
+} from "../../../server/api/purchaseHooks";
 import { useGetSupplierQuery } from "../../../server/api/supplierHooks";
 import { FieldError } from "../../auth/LoginPage";
 
 interface NewProductProps {
   onClose: () => void;
+  edit?: boolean;
+  data?: IBaseProduct | null;
 }
-const NewProductForm = ({ onClose }: NewProductProps) => {
+const NewProductForm = ({
+  onClose,
+  edit = false,
+  data = null,
+}: NewProductProps) => {
   const { mutate: createPurchase } = useCreatePurchaseMutation();
+  const { mutate: updatePurchase } = useUpdatePurchaseMutation();
   const { data: suppliers, isSuccess } = useGetSupplierQuery();
   const { data: products, isSuccess: productSuccess } =
     useGetAllProductsQuery();
@@ -26,41 +40,51 @@ const NewProductForm = ({ onClose }: NewProductProps) => {
     ? products?.map((item) => ({ label: item.name, value: item._id }))
     : [];
 
-  const AddNewProductSchema = z.object({
-    bill_no: z.string().min(1, "Bill No is required"),
-    supplier_name: z.string().min(1, "Supplier name is required"),
-    phone_no: z.string().min(1, "Phone Number is required"),
-    products: z.array(
-      z.object({
-        product_name: z.string().min(1, "Product name is required"),
-        material: z.string().min(1, "Material is required"),
-        units: z.string().min(1, "Unit is required"),
-        quantity: z.number().min(1, "Quantity must be greater than 0"),
-        paid_price: z.string().min(1, "Paid Price is required"),
-      })
-    ),
-  });
+  // const AddNewProductSchema = z.object({
+  //   bill_no: z.string().min(1, "Bill No is required"),
+  //   supplier_name: z.string().min(1, "Supplier name is required"),
+  //   phone_no: z.string().min(1, "Phone Number is required"),
+  //   products: z.array(
+  //     z.object({
+  //       product_name: z.string().min(1, "Product name is required"),
+  //       material: z.string().min(1, "Material is required"),
+  //       units: z.string().min(1, "Unit is required"),
+  //       quantity: z.number().min(1, "Quantity must be greater than 0"),
+  //       paid_price: z.string().min(1, "Paid Price is required"),
+  //     })
+  //   ),
+  // });
 
   const form = useForm({
     defaultValues: {
-      billNo: "",
-      supplier: "",
-      phone_no: "",
-      items: [
-        {
-          item: "",
-          quantity: 1,
-          price: 0,
-          paidAmount: 0,
-        },
-      ],
-      description: "",
+      billNo: edit ? get(data, "billNo") : "",
+      supplier: edit ? get(data, "supplier._id") : "",
+      phone_no: edit ? get(data, "phone_no") : "",
+      items: edit
+        ? get(data, "items", [
+            {
+              item: "",
+              quantity: 1,
+              price: 0,
+              paidAmount: 0,
+            },
+          ])
+        : [
+            {
+              item: "",
+              quantity: 1,
+              price: 0,
+              paidAmount: 0,
+            },
+          ],
+      description: edit ? get(data, "description") : "",
     },
     // validators: {
     //   onSubmit: AddNewProductSchema,
     // },
     onSubmit: async ({ value }) => {
-      createPurchase(value);
+      if (edit) updatePurchase({ id: data?._id ?? "", body: value });
+      else createPurchase(value);
     },
   });
 

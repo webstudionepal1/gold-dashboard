@@ -134,7 +134,10 @@ const ProductForm = () => {
         formData.append(`images`, img.file);
       });
       if (id == "add") createProduct(formData);
-      else updateProduct({ id: productData._id, body: formData });
+      else {
+        productData.images.map((img) => formData.append(`existingImages`, img));
+        updateProduct({ id: productData._id, body: formData });
+      }
     },
   });
 
@@ -154,7 +157,7 @@ const ProductForm = () => {
   };
 
   return (
-    <div className="max-w-6xl p-2 mx-auto">
+    <div className="p-2">
       <Header text={id === "add" ? "Add Product" : "Edit Product"} />
 
       <form
@@ -538,14 +541,33 @@ const ProductForm = () => {
               </div>
             )}
           </div>
+          {formstate !== "add" && productData.images && (
+            <div className="p-4 bg-white border rounded-lg">
+              <h2 className="mb-4 font-medium text-gray-700">Product Images</h2>
+              <div className="grid grid-cols-4 gap-2">
+                {productData.images.map((img, index) => (
+                  <img
+                    src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${img}`}
+                    alt="preview"
+                    className="object-contain w-full h-full"
+                  />
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Submit Button */}
           <div className="text-right">
             <button
               type="submit"
-              className="px-6 py-2 text-white rounded-md bg-orange hover:bg-orange-600"
+              disabled={pendingAddition || pendingUpdate}
+              className="px-6 py-2 text-white rounded-md min-w-32 bg-orange hover:bg-orange-600"
             >
-              Save Product
+              {pendingAddition || pendingUpdate ? (
+                <Icon icon="nrk:spinner" width={18} height={18} />
+              ) : (
+                "Save Product"
+              )}
             </button>
           </div>
         </div>

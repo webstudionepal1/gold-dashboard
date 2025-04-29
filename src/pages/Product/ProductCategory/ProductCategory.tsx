@@ -26,17 +26,18 @@ const ProductCategory: React.FC = () => {
     setIsModalOpen({ state: false, editData: null })
   );
 
-  const { data: categories, isSuccess } = useGetAllProductCategoriesQuery();
+  const { data: categories, isSuccess, isLoading } = useGetAllProductCategoriesQuery();
   const { mutate: deleteCategory } = useDeleteProductCategoriesMutation();
   const categoriesData = useMemo(
     () =>
       isSuccess
-        ? categories?.map((item) => ({
+        ? categories?.map((item, index) => ({
             ...item,
             // subCategory: get(item, "subCategory", [])
             //   .map((subItem) => get(subItem, "name", ""))
             //   .join(", "),
-            
+            sn: index + 1,
+
             description: get(item, "description", ""),
             totalProducts: get(item, "totalProducts", 0),
           }))
@@ -73,10 +74,10 @@ const ProductCategory: React.FC = () => {
           showView={false}
         /> */}
 
-
         <MasterTable
           columns={categoryColumns}
           rows={categoriesData}
+          loading={isLoading}
           onDelete={(id) => deleteCategory(id)}
           editAction={(row) => setIsModalOpen({ state: true, editData: row })}
           showAction
@@ -87,7 +88,6 @@ const ProductCategory: React.FC = () => {
           modalRef={modalRef}
           closeModal={() => setIsModalOpen({ state: false, editData: null })}
           editData={isModalOpen.editData}
-
         />
       )}
     </div>

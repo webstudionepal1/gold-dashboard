@@ -11,6 +11,7 @@ import { AddProductSubCategory } from "./components/AddProductSubCategory";
 import Header from "../../../components/shared/table_heading/Header";
 import { subCategoryColumns } from "../productObj";
 import MasterTable from "../../../components/shared/MasterTable";
+import { get } from "lodash";
 
 interface IEditModal {
   state: boolean;
@@ -25,14 +26,19 @@ const Productsubcategory: React.FC = () => {
     setIsModalOpen({ state: false, editData: null })
   );
 
-  const { data: subCategories, isSuccess } =
-    useGetAllProductSubCategoriesQuery();
+  const {
+    data: subCategories,
+    isSuccess,
+    isLoading,
+  } = useGetAllProductSubCategoriesQuery();
   const { mutate: deleteSubCategory } = useDeleteProductSubCategoryMutation();
   const subCategoriesData = useMemo(
     () =>
       isSuccess
-        ? subCategories?.map((item) => ({
+        ? subCategories?.map((item, index: number) => ({
             ...item,
+            sn: index + 1,
+            category: get(item, "category.name", "-"),
           }))
         : [],
     [isSuccess, subCategories]
@@ -55,21 +61,10 @@ const Productsubcategory: React.FC = () => {
         </button>
       </Header>
       <div className="p-4 bg-white">
-        {/* <SearchFilterSort
-          onSearch={handleSearch}
-          onFilter={handleFilter}
-          onSort={handleSort}
-          filterOptions={filterOptions}
-          sortOptions={sortOptions}
-          placeholder="Search here"
-          showFilter={true}
-          showSort={true}
-          showView={false}
-        /> */}
-
         <MasterTable
           columns={subCategoryColumns}
           rows={subCategoriesData}
+          loading={isLoading}
           showAction
           editAction={(row) => setIsModalOpen({ state: true, editData: row })}
           onDelete={(id) => deleteSubCategory(id)}

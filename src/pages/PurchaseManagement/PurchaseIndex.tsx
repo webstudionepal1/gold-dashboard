@@ -74,6 +74,13 @@ const PurchaseIndex = () => {
           data: row,
         });
       },
+      editAction(row: IFetchProduct) {
+        setModal({
+          of: "purchase",
+          edit: true,
+          data: row,
+        });
+      },
       onDelete(id: string) {
         deletePurchase(id);
       },
@@ -94,7 +101,7 @@ const PurchaseIndex = () => {
         ...item,
       })),
       viewAction(row: IFetchSupplier) {
-       navigate(`/inventory/supplier/${row._id}`);
+        navigate(`/inventory/supplier/${row._id}`);
       },
 
       editAction(row: IFetchSupplier) {
@@ -175,25 +182,29 @@ const PurchaseIndex = () => {
         columns={tableDataObj[selectedTab].columns}
       />
       {modal.of === "purchase" && (
-        <ScrollableModal onClose={closeModal}>
-          <PurchaseForm onClose={closeModal} />
+        <ScrollableModal classname="w-full max-w-xl" onClose={closeModal}>
+          <PurchaseForm
+            onClose={closeModal}
+            edit={modal.edit}
+            data={modal.data}
+          />
         </ScrollableModal>
       )}
 
       {modal.of === "purchase-view" && modal.data && (
-        <ScrollableModal onClose={closeModal} classname="w-[35rem]">
+        <ScrollableModal classname="w-full max-w-xl" onClose={closeModal}>
           <PurchaseDetailsCard data={modal.data} />
         </ScrollableModal>
       )}
 
       {modal.of === "purchase-return" && modal.data && (
-        <ScrollableModal classname="w-[35rem]" onClose={closeModal}>
+        <ScrollableModal classname="w-full max-w-xl" onClose={closeModal}>
           <PurchaseDetailsCard summary="refund" data={modal.data} />
         </ScrollableModal>
       )}
 
       {modal.of === "purchase-return-form" && (
-        <ScrollableModal onClose={closeModal}>
+        <ScrollableModal classname="w-full max-w-xl" onClose={closeModal}>
           <PurchaseReturnForm data={modal.data} onClose={closeModal} />
         </ScrollableModal>
       )}

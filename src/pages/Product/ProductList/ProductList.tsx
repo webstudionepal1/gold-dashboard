@@ -1,19 +1,18 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { get } from "lodash";
 import React, { useCallback, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { SearchFilterSort } from "../../../components/global/SearchFilterSort";
+import MasterTable from "../../../components/shared/MasterTable";
+import Header from "../../../components/shared/table_heading/Header";
 import { filterOptions, sortOptions } from "../../../constants/DropDownOptions";
 import {
   IFetchProduct,
   useDeleteProductsMutation,
   useGetAllProductsQuery,
 } from "../../../server/api/productHooks";
-import { ProductGridView } from "./component/GridView";
-import { Table } from "../../../components/shared";
 import { updateProductState } from "../../../store/productStore";
-import { get } from "lodash";
-import MasterTable from "../../../components/shared/MasterTable";
-import Header from "../../../components/shared/table_heading/Header";
+import { productListColumns } from "../productObj";
 
 // Filter state interface
 interface FilterState {
@@ -37,6 +36,9 @@ const ProductList: React.FC = () => {
     filterValue: "",
     sortValue: "",
   });
+  const viewAction = useCallback((row: IFetchProduct) => {
+    navigate(`/product/details/${row._id}`);
+  }, []);
   const onEdit = useCallback((row: IFetchProduct) => {
     updateProductState(row);
     navigate(`/product/edit`);
@@ -122,30 +124,29 @@ const ProductList: React.FC = () => {
   if (isLoading) {
     return <Icon icon="svg-spinners:ring-resize" width="24" height="24" />;
   }
-  const columns = [
-    {
-      title: "Product",
-      key: "product",
-    },
-    {
-      title: "Category",
-      key: "category",
-    },
-    {
-      title: "Sub Category",
-      key: "subCategory",
-    },
-    {
-      title: "Price",
-      key: "price",
-    },
-    {
-      title: "Stock",
-      key: "stock",
-    },
-  ];
-  const tableData = filteredProducts.map((product) => ({
+
+  const tableData = filteredProducts.map((product, index) => ({
     ...product,
+    sn: index + 1,
+    image: (
+      <div className="size-6">
+        {product.images && product.images.length > 0 ? (
+          <img
+            src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${
+              product.images[0]
+            }`}
+            alt={"product image"}
+            className="w-full h-full rounded-sm object fite aspect-square"
+          />
+        ) : (
+          <img
+            src={"/no-image.png"}
+            alt={"product image"}
+            className="w-full h-full rounded-sm object fite aspect-square"
+          />
+        )}
+      </div>
+    ),
     product: get(product, "name", ""),
     category: get(product, "category.name", ""),
     subCategory: get(product, "subCategory.name", ""),
@@ -154,20 +155,21 @@ const ProductList: React.FC = () => {
   }));
 
   return (
-    <div className="container mx-auto py-auto">
+    <div className="">
       <Header text="Products">
         <Link to="/product/add">
-        <button className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-sm text-white px-4 py-2 flex rounded-lg transition-colors duration-200">
-          <Icon icon="ic:outline-add" fontSize={18} />
-          New Product
-        </button>
+          <button className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-sm text-white px-4 py-2 flex rounded-lg transition-colors duration-200">
+            <Icon icon="ic:outline-add" fontSize={18} />
+            New Product
+          </button>
         </Link>
       </Header>
-      <div className="p-4">
+      <div className="">
         <MasterTable
-          columns={columns}
+          columns={productListColumns}
           onDelete={(id) => deleteProduct(id)}
           editAction={onEdit}
+          viewAction={viewAction}
           filterSection={
             <SearchFilterSort
               onSearch={handleSearch}

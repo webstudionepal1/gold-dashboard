@@ -29,16 +29,35 @@ export interface IFetchCategory extends IProductCategory {
   _id: string;
   name: string;
 }
+export interface StockItem {
+  usedStock: number;
+  price: number;
+  unit: string;
+  _id: string;
+  wt: number;
+  remainingStock: number;
+  totalStock: number;
+}
+
 export interface IBaseProduct {
-  ratings: number;
+  _id?: string
   name?: string;
   description?: string;
-  category?: string | IProductCategory;
-  subCategory?: string | IBaseProductSubCategory;
-  price?: number;
+  category?: string
+  subCategory?: string
+  variant?: Array<{
+    price?: number;
+    wt?: number;
+    unit?: string;
+    totalStock?: number;
+    usedStock?: number;
+    remainingStock?: number;
+    reorderPoint?: number;
+  }>;
+  makingCharges?: number;
   length?: number;
-  claspType?: string;
-  rhodiumFinishes?: boolean;
+  claspType?: string
+  rhodoumFinishes?: boolean;
   shape?: string;
   quantity?: number;
   totalCarat?: number;
@@ -48,12 +67,35 @@ export interface IBaseProduct {
   tags?: string[];
   visibleAs?: string;
   images?: string[];
-  _id?: string;
 }
-export interface IFetchProduct extends IBaseProduct {
+export interface IFetchProduct {
   _id: string;
   name: string;
-  isActive?: boolean;
+  description: string;
+  category: IFetchCategory;
+  subCategory: IFetchSubCategory;
+  variant:[{
+    price: number,
+    wt: number,
+     unit:string,
+     totalStock: number
+     usedStock: number
+     remainingStock: number
+     reorderPoint: number
+  }],
+  makingCharges:number;
+  length: number;
+  claspType: IFetchClasps;
+  rhodoumFinishes: boolean;
+  shape:string;
+  quantity: number;
+  totalCarat: number;
+  color:string;
+  clarity: string;
+  dimension: number;
+  tags: string[];
+  visibleAs: string;
+  images: string[];
 }
 
 //clasps interfaces
@@ -71,6 +113,15 @@ export const useGetAllProductsQuery = (params: IParams = {}) => {
       const res = await apiClient.get<{ data: IFetchProduct[] }>("product", {
         params,
       });
+      return res?.data?.data;
+    },
+  });
+};
+export const useGetProductById = (id: string) => {
+  return useQuery({
+    queryKey: ["products", id],
+    queryFn: async () => {
+      const res = await apiClient.get<{ data: IFetchProduct }>(`product/${id}`);
       return res?.data?.data;
     },
   });
@@ -287,12 +338,66 @@ export const useDeleteProductSubCategoryMutation = () => {
 // Product clasp
 export const useGetAllProductClaspsQuery = (params: IParams = {}) => {
   return useQuery({
-    queryKey: ["clasp"],
+    queryKey: ["clasptype"],
     queryFn: async () => {
-      const res = await apiClient.get<{ data: IFetchClasps[] }>("clasp", {
+      const res = await apiClient.get<{ data: IFetchClasps[] }>("calsptype", {
         params,
       });
       return res?.data?.data;
+    },
+  });
+};
+
+export const useCreateProductClaspsMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["clasptype"],
+    mutationFn: async (body: FormData) => {
+      const res = await apiClient.post("calsptype", body);
+      return res?.data?.data;
+    },
+    onSuccess() {
+      toast.success("Product clasp created successfully");
+      queryClient.invalidateQueries({ queryKey: ["clasptype"] });
+    },
+    onError(err: string) {
+      toast.error(err || "Error creating product clasp");
+    },
+  });
+};
+
+export const useUpdateProductClaspsMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["clasptype"],
+    mutationFn: async ({ id, body }: { id: string; body: FormData }) => {
+      const res = await apiClient.patch(`calsptype/${id}`, body);
+      return res?.data?.data;
+    },
+    onSuccess() {
+      toast.success("Product clasp updated successfully");
+      queryClient.invalidateQueries({ queryKey: ["clasptype"] });
+    },
+    onError(err: string) {
+      toast.error(err || "Error updating product clasp");
+    },
+  });
+};
+
+export const useDeleteProductClaspsMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["clasptype"],
+    mutationFn: async (id: string) => {
+      const res = await apiClient.delete(`calsptype/${id}`);
+      return res?.data?.data;
+    },
+    onSuccess() {
+      toast.success("Product clasp deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["clasptype"] });
+    },
+    onError(err: string) {
+      toast.error(err || "Error deleting product clasp");
     },
   });
 };
