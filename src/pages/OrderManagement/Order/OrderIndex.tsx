@@ -24,7 +24,11 @@ interface FilterState {
 // Dynamic config for IFetchOrder
 
 const OrderIndex = () => {
-  const { data: orders, isSuccess, isLoading } = useGetAllOrdersQuery({
+  const {
+    data: orders,
+    isSuccess,
+    isLoading,
+  } = useGetAllOrdersQuery({
     orderStatus: "pending",
   });
 
@@ -173,7 +177,6 @@ const OrderIndex = () => {
       <div className="bg-white border-[#eae9ec] border-2 w-full pb-8 rounded-xl">
         <div className="px-2">
           <SearchFilterSort
-            onSearch={handleSearch}
             onFilter={handleFilter}
             onSort={handleSort}
             filterOptions={filterOptions}

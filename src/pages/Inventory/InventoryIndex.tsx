@@ -286,7 +286,6 @@ const InventoryIndex = () => {
         <div className="bg-[#ffffff] border-[#dcdddf] pb-[1rem] border rounded-xl">
           <div className="p-4">
             <SearchFilterSort
-              onSearch={handleSearch}
               onFilter={handleFilter}
               onSort={handleSort}
               filterOptions={filterOptions}

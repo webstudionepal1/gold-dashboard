@@ -42,11 +42,7 @@ const AttribConfig = () => {
         }}
         rows={data}
         filterSection={
-          <SearchFilterSort
-            onFilter={() => {}}
-            onSort={() => {}}
-            onSearch={() => {}}
-          />
+          <SearchFilterSort onFilter={() => {}} onSort={() => {}} />
         }
       />
     </div>

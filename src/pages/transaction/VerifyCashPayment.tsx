@@ -159,7 +159,6 @@ const VerifyCashPayment: React.FC = () => {
 
       <div className="bg-white p-4">
         <SearchFilterSort
-          onSearch={handleSearch}
           onFilter={handleFilter}
           onSort={handleSort}
           filterOptions={filterOptions}
