@@ -2,50 +2,36 @@ import React, { memo, useState } from "react";
 import { Icon } from "@iconify/react";
 
 interface SearchFilterSortProps {
-  onSearch: (query: string) => void;
-  onFilter: (filter: string) => void;
+  onFilter?: (filter: string) => void;
   onSort: (sort: string) => void;
   filterOptions?: { value: string; label: string }[];
   sortOptions?: { value: string; label: string }[];
   placeholder?: string;
   onViewChange?: (view: "grid" | "column") => void;
-  showSearch?: boolean;
-  showFilter?: boolean;
-  showView?: boolean;
-  showSort?: boolean;
-  expenseFilterOptions?: { value: string; label: string }[];
-  expenseSortOptions?: { value: string; label: string }[];
+  showFilter?: boolean; // Control filter dropdown visibility
+  showView?: boolean; // Control view select visibility
+  showSort?: boolean; // Control sort dropdown visibility
 }
 
 export const SearchFilterSort: React.FC<SearchFilterSortProps> = memo(
   ({
-    onSearch,
     onFilter,
     onSort,
     filterOptions = [],
     sortOptions = [],
-    placeholder = "Search",
     onViewChange,
-    showSearch = true, // Default to true for each
     showFilter = true,
-    showView = true,
+    showView = false,
     showSort = true,
   }) => {
-    const [searchQuery, setSearchQuery] = useState("");
     const [selectedFilter, setSelectedFilter] = useState("");
     const [selectedSort, setSelectedSort] = useState("");
     const [view, setView] = useState<"grid" | "column">("grid");
 
-    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const query = e.target.value;
-      setSearchQuery(query);
-      onSearch(query);
-    };
-
     const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
       const filter = e.target.value;
       setSelectedFilter(filter);
-      onFilter(filter);
+      onFilter?.(filter);
     };
 
     const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -60,7 +46,7 @@ export const SearchFilterSort: React.FC<SearchFilterSortProps> = memo(
       if (onViewChange) onViewChange(newView);
     };
     return (
-      <div className="container my-4">
+      <div className="container">
         <div className="flex flex-row justify-between gap-4 text-sm md:flex-row ">
           <div className="flex items-center border divide-x-2 rounded-lg">
             {/* Filter Dropdown */}
@@ -139,7 +125,6 @@ export const SearchFilterSort: React.FC<SearchFilterSortProps> = memo(
             {/* Sort Dropdown */}
             {showSort && sortOptions.length > 0 && (
               <div className="relative flex justify-center w-auto">
-                {" "}
                 {/* Equal width */}
                 <label htmlFor="sort-select" className="sr-only">
                   Sort

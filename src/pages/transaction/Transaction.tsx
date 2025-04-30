@@ -224,7 +224,6 @@ const Transaction = () => {
         }
         filterSection={
           <SearchFilterSort
-            onSearch={handleSearch}
             onFilter={handleFilter}
             onSort={handleSort}
             onViewChange={() => {}}

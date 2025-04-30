@@ -252,7 +252,6 @@ const ProfitandLoss = () => {
           <ProfitTable
             // filterSection={
             //   <SearchFilterSort
-            //     onSearch={handleSearch}
             //     onFilter={handleFilter}
             //     onSort={handleSort}
             //     filterOptions={filterOptions}

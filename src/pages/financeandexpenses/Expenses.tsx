@@ -273,7 +273,7 @@ const Expenses = () => {
                 alt="image"
                 height={200}
                 width={120}
-                className="rounded-xl"
+                className="rounded-xl aspect-[16/9]"
               />
             ))}
           </div>
@@ -379,7 +379,6 @@ const Expenses = () => {
         }
         filterSection={
           <SearchFilterSort
-            onSearch={handleSearch}
             onFilter={handleFilter}
             onSort={handleSort}
             onViewChange={() => {}}

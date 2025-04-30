@@ -277,7 +277,6 @@ const BannerIndex: React.FC = () => {
             {/* SearchFilterSort moved here and aligned to the right */}
             <div className="p-4">
               <SearchFilterSort
-                onSearch={handleSearch}
                 onFilter={handleFilter}
                 onSort={handleSort}
                 filterOptions={filterOptions}

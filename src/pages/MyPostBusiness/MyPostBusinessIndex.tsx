@@ -251,22 +251,10 @@ const MyPostBusinessIndex = () => {
       <Header text="Packages" />
 
       <div className="bg-[#ffffff] border-[#dcdddf] pb-[1rem] border-2 rounded-xl">
-        {/* <div className="p-4">
-          <SearchFilterSort
-            onSearch={handleSearch}
-            onFilter={handleFilter}
-            onSort={handleSort}
-            filterOptions={filterOptions}
-            sortOptions={sortOptions}
-            placeholder="Search here..."
-          />
-        </div> */}
-
         <div className="flex items-center gap-2 px-3 ">
           <MasterTable
             filterSection={
               <SearchFilterSort
-                onSearch={handleSearch}
                 onFilter={handleFilter}
                 onSort={handleSort}
                 filterOptions={filterOptions}
