@@ -16,12 +16,38 @@ interface IOrderStatusResponse {
   orders: IFetchOrderStatus[];
 }
 
+interface topOrderProductsData {
+  productName: string;
+  productImage: string;
+  totalQuantitySold: number;
+  totalRevenue: number;
+}
+
+interface topOrderProductsResponse {
+  products: topOrderProductsData[];
+}
+
 export const useGetOrderStatusQuery = (params = {}) => {
   return useQuery({
     queryKey: ["orderStatus", params],
     queryFn: async () => {
       const res = await apiClient.get<{ data: IOrderStatusResponse }>(
         "orderStatus",
+        {
+          params,
+        }
+      );
+      return res?.data?.data;
+    },
+  });
+};
+
+export const useGetTopOrderProductsQuery = (params = {}) => {
+  return useQuery({
+    queryKey: ["top-products", params],
+    queryFn: async () => {
+      const res = await apiClient.get<{ data: topOrderProductsResponse }>(
+        "top-products",
         {
           params,
         }

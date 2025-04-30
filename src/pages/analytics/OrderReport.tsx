@@ -19,7 +19,10 @@ import {
 import { SearchFilterSort } from "../../components/global/SearchFilterSort";
 import { filterOptions, sortOptions } from "../../constants/DropDownOptions";
 import { StatCard } from "./components/iconCard";
-import { useGetOrderStatusQuery } from "../../server/api/orderReportHook";
+import {
+  useGetOrderStatusQuery,
+  useGetTopOrderProductsQuery,
+} from "../../server/api/orderReportHook";
 
 const stats = [
   {
@@ -96,9 +99,22 @@ const OrderReport = () => {
     isSuccess: expenseCatSuccess,
   } = useGetExpenseCategoryQuery();
 
+  const {
+    data: TopOrderList,
+    isLoading: topOrderLoading,
+    isSuccess: topOrderSuccess,
+  } = useGetTopOrderProductsQuery();
+
+  console.log("Top order data", TopOrderList);
+
   const orderStatusData = useMemo(
     () => (orderStatusSuccess ? orderStatusList : []),
     [orderStatusSuccess, orderStatusList]
+  );
+
+  const TopOrderData = useMemo(
+    () => (topOrderSuccess ? TopOrderList : []),
+    [topOrderSuccess, TopOrderList]
   );
 
   // const filteredOrderStatus = useMemo(() => {
@@ -184,21 +200,20 @@ const OrderReport = () => {
     }),
     [orderStatusList, orderStatusSuccess]
   );
-  const expenseCategoryTableData = useMemo(
+  const TopOrderProductsTableData = useMemo(
     () => ({
       columns: [
-        { key: "product", title: "Product" },
-        { key: "category", title: "Category" },
-        { key: "percentage", title: "Percentage" },
+        { key: "productImage", title: "Product Image" },
+        { key: "productName", title: "Product Name" },
+        { key: "totalQuantitySold", title: "Total Quantity Sold" },
+        { key: "totalRevenue", title: "Total Revenue" },
       ],
-      rows: map(expenseCategories, (item, sn) => ({
+      rows: map(TopOrderList?.products, (item, sn) => ({
         ...item,
-        product: "Anklets",
-        category: "Gold",
-        percentage: "12%",
+        productImage: "IMAGE",
       })),
     }),
-    [expenseCategories, expenseCatSuccess]
+    [TopOrderList, topOrderSuccess]
   );
   // const returnTableData = useMemo(
   //   () => ({
@@ -212,7 +227,7 @@ const OrderReport = () => {
 
   const tableDataObj: ITable = {
     statusSummary: orderStatusTableData,
-    topOrderProducts: expenseCategoryTableData,
+    topOrderProducts: TopOrderProductsTableData,
   };
   const [modal, setModal] = useState({
     of: "",
