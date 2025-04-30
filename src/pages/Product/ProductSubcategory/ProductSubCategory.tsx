@@ -45,7 +45,7 @@ const Productsubcategory: React.FC = () => {
   );
 
   return (
-    <div className="container px-4 mx-auto">
+    <div>
       <Header text="Product Subcategories">
         <button
           onClick={() => {
@@ -54,13 +54,13 @@ const Productsubcategory: React.FC = () => {
               editData: null,
             });
           }}
-          className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-white px-4 py-2 flex rounded-lg transition-colors duration-200"
+         className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-sm text-white px-4 py-2 flex rounded-lg transition-colors duration-200"
         >
           <Icon icon="ic:outline-add" fontSize={24} />
           New Subcategory
         </button>
       </Header>
-      <div className="p-4 bg-white">
+      <div className="p-4 bg-white border-2 rounded-lg">
         <MasterTable
           columns={subCategoryColumns}
           rows={subCategoriesData}

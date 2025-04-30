@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { useState } from "react";
+import { memo, useState } from "react";
 
 interface IProps {
   title: string;
@@ -7,7 +7,7 @@ interface IProps {
     [key: string]: any;
   };
 }
-export const DropdownSection: React.FC<IProps> = ({ title, data }) => {
+export const DropdownSection: React.FC<IProps> = memo(({ title, data }) => {
   const [isOpen, setOpen] = useState(false);
   const toggle = () => setOpen((prev) => !prev);
   return data ? (
@@ -16,7 +16,7 @@ export const DropdownSection: React.FC<IProps> = ({ title, data }) => {
         className="flex items-center justify-between py-2 border-b cursor-pointer"
         onClick={toggle}
       >
-        <h3 className="text-sm font-semibold">{title}</h3>
+        <h3 className="text-lg font-semibold">{title}</h3>
         <Icon
           icon={isOpen ? "mdi:chevron-up" : "mdi:chevron-down"}
           className="w-5 h-5 transition-transform"
@@ -36,4 +36,4 @@ export const DropdownSection: React.FC<IProps> = ({ title, data }) => {
       )}
     </div>
   ) : null;
-};
+});

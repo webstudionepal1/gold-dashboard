@@ -41,18 +41,16 @@ const Cashflow = () => {
   );
 
   return (
-    <div className="container px-4 py-3 mx-auto">
+    <div>
       <Header text="Cash Flow" />
-      <div className="bg-white border-[#eae9ec] border-2 w-full pb-8 rounded-xl">
-        <div className="mx-3">
-          <MasterTable
-            showAction
-            onDelete={(id: string) => deleteCash(id)}
-            rows={rows}
-            columns={cashFlowColumns}
-            loading={isLoading}
-          />
-        </div>
+      <div className="p-4 bg-white border-2 rounded-lg">
+        <MasterTable
+          showAction
+          onDelete={(id: string) => deleteCash(id)}
+          rows={rows}
+          columns={cashFlowColumns}
+          loading={isLoading}
+        />
       </div>
     </div>
   );

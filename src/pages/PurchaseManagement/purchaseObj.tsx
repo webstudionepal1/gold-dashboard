@@ -280,3 +280,64 @@ export const viewPurchaseColumns = [
     title: "Total",
   },
 ];
+
+export interface IRawMaterialForm {
+  billNo: string;
+  supplier: string;
+  phone_no: string;
+  items: {
+    item: string;
+    quantity: number;
+    price: number;
+    paidAmount: number;
+  }[];
+  description?: string;
+}
+export const RawMaterialSchema = z.object({
+  billNo: z.string().min(1, "**Bill No is required**"),
+  supplier: z.string().min(1, "**Supplier name is required**"),
+  phone_no: z.string().min(1, "**Phone Number is required**"),
+  items: z
+    .array(
+      z.object({
+        item: z.string().min(1, "**Item name is required**"),
+        quantity: z.coerce.number().min(1, "**Quantity is required**"),
+        price: z.coerce.number().min(1, "**Price is required**"),
+        paidAmount: z.coerce.number().min(1, "**Paid Amount is required**"),
+      })
+    )
+    .min(1, "**At least one item is required**"),
+  description: z.string().optional(),
+});
+
+export interface IPurchaseForm {
+  billNo: string;
+  supplier: string;
+  phone_no: string;
+  products: {
+    product: string;
+    quantity: number;
+    price: number;
+    paidAmount: number;
+    wt: number;
+  }[];
+  description?: string;
+}
+export const PurchaseSchema = z.object({
+  billNo: z.string().min(1, "**Bill No is required**"),
+  supplier: z.string().min(1, "**Supplier name is required**"),
+  phone_no: z.string().min(1, "**Phone Number is required**"),
+  products: z
+    .array(
+      z.object({
+        product: z.string().min(1, "**Product name is required**"),
+        quantity: z.coerce.number().min(1, "**Quantity is required**"),
+        price: z.coerce.number().min(1, "**Price is required**"),
+        paidAmount: z.coerce.number().min(1, "**Paid Amount is required**"),
+        wt: z.coerce.number().min(1, "**Weight is required**"),
+      })
+    )
+    .min(1, "**At least one item is required**"),
+  description: z.string().optional(),
+});
+

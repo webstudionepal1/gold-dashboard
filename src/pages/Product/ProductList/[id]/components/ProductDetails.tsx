@@ -1,6 +1,9 @@
 import { get } from "lodash";
 import { IFetchProduct } from "../../../../../server/api/productHooks";
 import { DropdownSection } from "./DropDownSection";
+import { ReviewsSection } from "./ReviewSection";
+import { useGetAllReviews } from "../../../../../server/api/reviewHooks";
+import { Inventory } from "./Inventory";
 
 interface ProductDetailsProps {
   product: IFetchProduct;
@@ -12,15 +15,19 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
     "Rhodoum Finishes": get(product, "rhodoumFinishes", "false"),
   };
   const natural = {
-    Shape: get(product, "shape",'-'),
-    Color: get(product, "color",'-'),
-    Quantity: get(product, "quantity",'-'),
-    Clarity: get(product, "clarity",'-'),
+    Shape: get(product, "shape", "-"),
+    Color: get(product, "color", "-"),
+    Quantity: get(product, "quantity", "-"),
+    Clarity: get(product, "clarity", "-"),
   };
-//   const inventory = {
-//  "Stock QTY":get(product, ''), "Reorder Level":""
-//   }
-// const invetories = product.variant.map(item=>({}))
+  //   const inventory = {
+  //  "Stock QTY":get(product, ''), "Reorder Level":""
+  //   }
+  const inventories = product.variant.map((item) => ({
+    Weight: `${get(item, "wt", 0)} ${get(item, "unit", "")}`,
+    "Stock Qty": get(item, "remainingStock", 0),
+    "Reorder Level": get(item, "reorderPoint", 0),
+  }));
 
   return (
     <div className="p-4 space-y-4 bg-white rounded-md">
@@ -46,25 +53,25 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
             key={index}
             className="px-2 py-1 text-xs text-gray-500 bg-gray-100 rounded"
           >
-            #{tag.replace(/\s+/g, "")}
+            u #{tag.replace(/\s+/g, "")}
           </span>
         ))}
       </div>
-      {product.variant.length > 0 &&
-        product.variant.map((item) => (
-          <div className="flex items-center gap-3 py-2">
-            <span className="font-bold text-gray-900 text-md">
-              {`${item?.wt} ${item?.unit}`}
-            </span>
-            <span className="text-gray-500 text-md">{`$ ${item?.price}`}</span>
-          </div>
-        ))}
- {/* <Inventory inventory={inventory} />  */}
+      {product.variant.length > 0 && (
+        <div className="flex items-center gap-4">
+          {product.variant.map((item) => (
+            <div className="w-28 flex flex-col bg-white border-2 p-4 rounded-lg py-2">
+              <span className="text-gray-900 text-center font-semibold text-">{`$ ${item?.price} /-`}</span>
+              <span className=" text-gray-500 text-xs font-bold text-center">
+                {`${item?.wt} ${item?.unit}`}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+      <Inventory inventory={inventories} />
       <DropdownSection title="Specifications" data={specifications} />
-      <DropdownSection
-        title="Natural Gold Information"
-        data={natural}
-      />
+      <DropdownSection title="Natural Gold Information" data={natural} />
     </div>
   );
 };

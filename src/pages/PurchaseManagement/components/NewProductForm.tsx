@@ -13,6 +13,7 @@ import {
 } from "../../../server/api/purchaseHooks";
 import { useGetSupplierQuery } from "../../../server/api/supplierHooks";
 import { FieldError } from "../../auth/LoginPage";
+import { IPurchaseForm, PurchaseSchema } from "../purchaseObj";
 interface NewProductProps {
   onClose: () => void;
   edit?: boolean;
@@ -63,10 +64,10 @@ const NewProductForm = ({
             },
           ],
       description: edit ? get(data, "description", "") : "",
+    } as IPurchaseForm,
+    validators: {
+      onSubmit: PurchaseSchema,
     },
-    // validators: {
-    //   onSubmit: AddNewProductSchema,
-    // },
     onSubmit: async ({ value }) => {
       if (edit) updatePurchase({ id: data?._id ?? "", body: value });
       else createPurchase(value);

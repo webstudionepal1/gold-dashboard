@@ -188,47 +188,18 @@ const ConfirmedOrder = () => {
   // };
 
   return (
-    <div className="container px-4 py-3 mx-auto">
+    <div>
       <Header text="Orders"></Header>
-      <div className="bg-white border-[#eae9ec] border-2 w-full pb-8 rounded-xl">
-        {/* <div className="px-2">
-          <SearchFilterSort
-            onSearch={handleSearch}
-            onFilter={handleFilter}
-            onSort={handleSort}
-            filterOptions={filterOptions}
-            sortOptions={sortOptions}
-            placeholder="Search by customer name, ID or email..."
-          />
-        </div> */}
-        <div className="mx-3">
-          {/* <Table
-            data={paginatedItems}
-            columns={columns}
-            showView
-            showDelete={false}
-            showEdit={false}
-            showAction
-            viewRow={handleViewItem}
-            showPagination={true} 
-            paginationDetails={{
-              currentPage: filterState.currentPage,
-              limit: filterState.itemsPerPage,
-              totalCount: filteredItems.length,
-            }}
-            onItemsPerPageChange={handleItemsPerPageChange}
-            onPageChange={handlePageChange}
-          /> */}
-          <MasterTable
-            showAction
-            loading={isLoading}
-            viewAction={(row) =>
-              navigate(`/order/confirmed-order-details/${row._id}`)
-            }
-            columns={confirmedColumns}
-            rows={orderList}
-          />
-        </div>
+      <div className="p-4 bg-white border-2 rounded-lg">
+        <MasterTable
+          showAction
+          loading={isLoading}
+          viewAction={(row) =>
+            navigate(`/order/confirmed-order-details/${row._id}`)
+          }
+          columns={confirmedColumns}
+          rows={orderList}
+        />
       </div>
     </div>
   );

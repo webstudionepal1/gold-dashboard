@@ -20,7 +20,7 @@ const InventoryIndex = () => {
             .map((item, index: number) => ({
               ...item,
               sn: index + 1,
-              wt:get(item, 'wt', '-'),
+              wt: get(item, "wt", "-"),
               id: get(item, "_id", "-"),
               item: `${get(item, "name", "")} (${get(item, "wt", "-")})`,
             }))
@@ -44,8 +44,7 @@ const InventoryIndex = () => {
   return (
     <div className="">
       <Header text="Inventory" />
-
-      <div className="bg-[#ffffff] border-[#dcdddf] pb-[1rem] border rounded-md">
+      <div className="p-4 bg-white border-2 rounded-lg">
         <MasterTable
           columns={inventoryColumns}
           rows={inventoryData}

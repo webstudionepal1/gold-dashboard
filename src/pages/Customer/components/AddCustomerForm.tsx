@@ -5,6 +5,7 @@ import { InputField } from "../../../components/shared/form_components/InputFiel
 import { z } from "zod";
 import FileDropInput from "../../../components/shared/form_components/FileDropInput";
 import { useStore } from "@tanstack/react-form";
+import { FieldError } from "../../auth/LoginPage";
 const AddCustomerSchema = z.object({
   full_name: z.string().min(1, "Full Name is required"),
   email: z.string().min(1, "Email is required"),
@@ -30,24 +31,6 @@ const AddCustomerSchema = z.object({
   }),
 });
 const AddCustomerForm = () => {
-  const FieldError = ({ field }: { field: any }) => {
-    if (field.state.meta.errors.length > 0) {
-      const error = field.state.meta.errors[0];
-      // Handle the case where the error is an object
-      const errorMessage =
-        typeof error === "string"
-          ? error
-          : error.message || JSON.stringify(error);
-
-      return (
-        <div className="min-h-[20px]">
-          <span className="text-xs text-red">{errorMessage}</span>
-        </div>
-      );
-    }
-    return <div className="min-h-[20px]"></div>; // Return empty div when no errors
-  };
-
   const form = useForm({
     defaultValues: {
       full_name: "",
@@ -269,7 +252,9 @@ const AddCustomerForm = () => {
                           <FileDropInput
                             value={field.state.value as unknown as File}
                             onChange={(file) => {
-                              field.handleChange(file);
+                              if (!Array.isArray(file)) {
+                                field.handleChange(file);
+                              }
                             }}
                           />
                           <FieldError field={field} />

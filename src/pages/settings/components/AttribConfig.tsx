@@ -32,8 +32,9 @@ interface IButtonObj {
 }
 const AttribConfig = () => {
   const [tab, setTab] = useState("clasp-type");
-  const { data: claspsType } = useGetAllProductClaspsQuery();
-  const { data: rawmaterial } = useGetRawMaterialsQuery();
+  const { data: claspsType, isLoading } = useGetAllProductClaspsQuery();
+  const { data: rawmaterial, isLoading: materialLoading } =
+    useGetRawMaterialsQuery();
   const { mutate: deleteClasp } = useDeleteProductClaspsMutation();
   const { mutate: deleteRawMaterial } = useDeleteRawMaterial();
   const [modal, setModal] = useState<IModalProps>({
@@ -41,7 +42,8 @@ const AttribConfig = () => {
     data: null,
     edit: false,
   });
-  const buttonObj:IButtonObj = {
+  console.log(claspsType);
+  const buttonObj: IButtonObj = {
     "raw-material": {
       text: "Add Raw Material",
       handleClick: () =>
@@ -60,11 +62,41 @@ const AttribConfig = () => {
         ...item,
         sn: index + 1,
         id: item._id,
+        status: (
+          <span
+            className={`text-white py-1 px-2 rounded-full ${
+              item.isActive ? "bg-green" : "bg-red"
+            }`}
+          >
+            {item.isActive ? "Active" : "Inactive"}
+          </span>
+        ),
+        photo: (
+          <div>
+            {item.images ? (
+              item.images.length > 0 && (
+                <img
+                  src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${
+                    item.images[0]
+                  }`}
+                  alt="hello"
+                  className="size-8"
+                />
+              )
+            ) : (
+              <img
+                src={"/public/no-image.png"}
+                alt="no-imgage"
+                className="size-8"
+              />
+            )}
+          </div>
+        ),
       })),
       onDelete(id: string) {
         deleteClasp(id);
       },
-      onEdit(rows: IFetchClasps) {
+      editAction(rows: IFetchClasps) {
         setModal({ of: "clasp-type", edit: true, data: rows });
       },
     }),
@@ -73,12 +105,12 @@ const AttribConfig = () => {
   const rawTableData = useMemo(
     () => ({
       columns: rawColumns,
-      rows: map(rawmaterial, (item, index:number) => ({
+      rows: map(rawmaterial, (item, index: number) => ({
         ...item,
         id: item._id,
-        sn:index+1
+        sn: index + 1,
       })),
-      onEdit(rows: IFetchItems) {
+      editAction(rows: IFetchItems) {
         setModal({ of: "raw-material", edit: true, data: rows });
       },
       onDelete(id: string) {
@@ -93,32 +125,35 @@ const AttribConfig = () => {
     "raw-material": rawTableData,
   };
   return (
-    <div className="p-4">
+    <div>
       <Header text="Attribute Config">
         <button
           onClick={() => buttonObj[tab].handleClick()}
-          className="px-3 py-2 flex items-center text-white bg-[#d49327] transition-transform duration-200 ease-in-out hover:scale-105 rounded-lg"
+         className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-sm text-white px-4 py-2 flex rounded-lg transition-colors duration-200"
         >
           <Icon
             icon="material-symbols-light:add-rounded"
-            width="24"
-            height="24"
+            width="18"
+            height="18"
             className="fill-white"
           />
           {buttonObj[tab].text}
         </button>
       </Header>
-      <MasterTable
-        showAction
-        {...tableDataObj[tab]}
-        tabsOptions={
-          <DynamicTab
-            selectedTab={tab}
-            setSelectedTab={setTab}
-            tabOptions={attributeObj}
-          />
-        }
-      />
+      <div className="p-4 bg-white border-2 rounded-lg">
+        <MasterTable
+          loading={isLoading || materialLoading}
+          showAction
+          {...tableDataObj[tab]}
+          tabsOptions={
+            <DynamicTab
+              selectedTab={tab}
+              setSelectedTab={setTab}
+              tabOptions={attributeObj}
+            />
+          }
+        />
+      </div>
       {modal.of === "clasp-type" && (
         <ClaspModel
           onClose={() => setModal({ of: "", data: null, edit: false })}

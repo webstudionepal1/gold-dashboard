@@ -9,7 +9,6 @@ export interface IFetchCompany {
   address: string;
   email: string;
   phone: string;
-  logo: [string];
   description: string;
   registrationNo: string;
   city: string;
@@ -22,15 +21,16 @@ export interface IFetchCompany {
   accountNo: string;
   accountHolder: string;
   branch: string;
-  qr: [string];
+  companyName: string;
+  [key: string]: any;
 }
 export interface ICompany {
+  _id?: string;
   name?: string;
   ownerNo?: string;
   address?: string;
   email?: string;
   phone?: string;
-  logo?: [string];
   description?: string;
   registrationNo?: string;
   city?: string;
@@ -39,16 +39,16 @@ export interface ICompany {
   openTime?: string;
   closeTime?: string;
   paymentMode?: string;
+  companyName?: string;
   bankName?: string;
   accountNo?: string;
   accountHolder?: string;
   branch?: string;
-  qr?: [string];
 }
 
 interface IUpdateProps {
   id: string;
-  body: ICompany;
+  body: FormData;
 }
 export const useGetCompanyDetailsQuery = () => {
   return useQuery({
@@ -65,7 +65,11 @@ export const useUpdateCompanyDetailsMutation = () => {
   return useMutation({
     mutationKey: ["company"],
     mutationFn: async ({ id, body }: IUpdateProps) => {
-      const res = await apiClient.patch(`company/${id}`, body);
+      const res = await apiClient.patch(`company/${id}`, body, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       return res?.data?.data;
     },
     onSuccess() {

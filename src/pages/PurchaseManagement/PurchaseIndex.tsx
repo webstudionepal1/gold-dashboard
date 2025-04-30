@@ -144,7 +144,7 @@ const PurchaseIndex = () => {
   );
 
   return (
-    <div className="container px-4 py-3 mx-auto ">
+    <div>
       <Header text="Purchase Management">
         {buttonObj[selectedTab]?.show && (
           <button
@@ -168,19 +168,21 @@ const PurchaseIndex = () => {
           </button>
         )}
       </Header>
-      <MasterTable
-        showAction
-        tabsOptions={
-          <DynamicTab
-            selectedTab={selectedTab}
-            setSelectedTab={setSelectedTab}
-            tabOptions={purchaseTabOption}
-          />
-        }
-        {...tableDataObj[selectedTab]}
-        rows={tableDataObj[selectedTab].rows}
-        columns={tableDataObj[selectedTab].columns}
-      />
+      <div className="p-4 bg-white border-2 rounded-lg">
+        <MasterTable
+          showAction
+          tabsOptions={
+            <DynamicTab
+              selectedTab={selectedTab}
+              setSelectedTab={setSelectedTab}
+              tabOptions={purchaseTabOption}
+            />
+          }
+          {...tableDataObj[selectedTab]}
+          rows={tableDataObj[selectedTab].rows}
+          columns={tableDataObj[selectedTab].columns}
+        />
+      </div>
       {modal.of === "purchase" && (
         <ScrollableModal classname="w-full max-w-xl" onClose={closeModal}>
           <PurchaseForm

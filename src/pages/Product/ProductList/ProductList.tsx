@@ -146,8 +146,8 @@ const ProductList: React.FC = () => {
       </div>
     ),
     product: get(product, "name", ""),
-    category: get(product, "category.name", ""),
-    subCategory: get(product, "subCategory.name", ""),
+    categ: get(product, "category.name", ""),
+    subCate: get(product, "subCategory.name", ""),
     price: get(product, "price", 0),
     stock: get(product, "-"),
   }));
@@ -162,7 +162,7 @@ const ProductList: React.FC = () => {
           </button>
         </Link>
       </Header>
-      <div className="">
+      <div className="p-4 bg-white border-2 rounded-lg">
         <MasterTable
           columns={productListColumns}
           onDelete={(id) => deleteProduct(id)}

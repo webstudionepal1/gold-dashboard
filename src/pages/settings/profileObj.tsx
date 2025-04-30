@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { IFetchCompany } from "../../server/api/companyHooks";
+import { get } from "lodash";
 
 export const attributeObj = [
   {
@@ -20,7 +21,7 @@ export const claspsColumn = [
     title: "Claspy Type Name",
   },
   {
-    key: "img",
+    key: "photo",
     title: "Image",
   },
   {
@@ -81,28 +82,25 @@ export const editCustomerSchema = z.object({
   }),
 });
 
-export const generateProfileValue = () => ({
-  shop_name: "",
-  owner_name: "",
-  email: "",
-  phone_no: "",
-  registration_number: "",
-  street_address: "",
-  city: "",
-  country: "",
-  zip_code: "",
-
-  open_day: "",
-  opening_time: "",
-
-  closing_time: "",
-  payment_method: "",
-
-  bank_name: "",
-  bank_account_number: "",
-  account_name: "",
-  password: "",
-  terms_and_conditions: false,
-  profile_photo: null as File | null,
-  qrcode: null as File | null,
+export const generateProfileValue = (data: IFetchCompany) => ({
+  name: get(data, "name", ""),
+  ownerNo: get(data, "ownerNo", ""),
+  phone: get(data, "phone", ""),
+  email: get(data, "email", ""),
+  registrationNo: get(data, "registrationNo", ""),
+  address: get(data, "address", ""),
+  city: get(data, "city", ""),
+  country: get(data, "country", ""),
+  zipCode: get(data, "zipCode", ""),
+  openDay: get(data, "openDay", ""),
+  openTime: get(data, "openTime", ""),
+  closeTime: get(data, "closeTime", ""),
+  paymentMode: get(data, "paymentMode"),
+  companyName: get(data, "companyName"),
+  bankName: get(data, "bankName", ""),
+  branch: get(data, "branch", ""),
+  accountNo: get(data, "accountNo", ""),
+  accountHolder: get(data, "accountHolder", ""),
+  logo: [] as File[],
+  qr: [] as File[],
 });

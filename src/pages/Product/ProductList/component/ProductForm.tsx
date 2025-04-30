@@ -27,7 +27,7 @@ import {
 const ProductForm = () => {
   const { id } = useParams();
   const productData = useStore(productStore, (state) => state);
-
+  console.log("productData", productData);
   const {
     mutate: createProduct,
     isPending: pendingAddition,
@@ -87,26 +87,10 @@ const ProductForm = () => {
       onSubmit: productFormSchema,
       onBlur: productFormSchema,
     },
+
     onSubmit: async ({ value }) => {
       const formData = new FormData();
-      // Object.entries(value).forEach(([key, value]) => {
-      //   if (key === "variant") {
-      //     value.forEach((v, index: number) => {
-      //       formData.append(`variant[${index}][price]`, String(v.price));
-      //       formData.append(`variant[${index}][size]`, v.size);
-      //       formData.append(`variant[${index}][unit]`, v.unit);
-      //     });
-      //   } else if (Array.isArray(value)) {
-      //     value.forEach((item, index: number) => {
-      //       formData.append(`${key}[${index}]`, item);
-      //     });
-      //   } else if (uploadedImages.some((img) => img.name === key)) {
-      //     uploadedImages.find((img) => img.name === key)?.file &&
-      //       formData.append(key, uploadedImages.find((img) => img.name === key)?.file);
-      //   } else {
-      //     formData.append(key, value);
-      //   }
-      // });
+
       formData.append("name", value.name);
       formData.append("description", value.description);
       formData.append("category", value.category);
@@ -114,8 +98,8 @@ const ProductForm = () => {
 
       value.variant.forEach((v, index: number) => {
         formData.append(`variant[${index}][price]`, String(v.price));
-        formData.append(`variant[${index}][size]`, v.size);
-        formData.append(`variant[${index}][unit]`, v.unit);
+        formData.append(`variant[${index}][wt]`, v.wt.toString());
+        formData.append(`variant[${index}][unit]`, v.unit ?? "gm");
       });
 
       formData.append("length", String(value.length));
@@ -260,7 +244,7 @@ const ProductForm = () => {
                       </h2>
                       <button
                         onClick={() =>
-                          field.pushValue({ price: 0, size: "", unit: "gm" })
+                          field.pushValue({ price: 0, wt: 0, unit: "gm" })
                         }
                         type="button"
                         className="flex bg-[#DF8D28] rounded-md text-white items-center gap-2 px-3 py-2"
@@ -290,16 +274,18 @@ const ProductForm = () => {
                               </div>
                             )}
                           </form.Field>
-                          <form.Field name={`variant[${i}].size`}>
+                          <form.Field name={`variant[${i}].wt`}>
                             {(subField) => (
                               <div>
                                 <InputField
                                   label="size"
                                   required
                                   placeholder="Enter in gram"
-                                  value={subField.state.value as string}
+                                  value={subField.state.value}
                                   onChange={(e) =>
-                                    subField.handleChange(e.target.value)
+                                    subField.handleChange(
+                                      Number(e.target.value)
+                                    )
                                   }
                                 />
                                 <FieldError field={subField} />

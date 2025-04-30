@@ -14,6 +14,7 @@ import {
 } from "../../../server/api/purchaseHooks";
 import { useGetSupplierQuery } from "../../../server/api/supplierHooks";
 import { FieldError } from "../../auth/LoginPage";
+import { IRawMaterialForm, RawMaterialSchema } from "../purchaseObj";
 
 interface NewProductProps {
   onClose: () => void;
@@ -40,26 +41,11 @@ const NewProductForm = ({
     ? products?.map((item) => ({ label: item.name, value: item._id }))
     : [];
 
-  // const AddNewProductSchema = z.object({
-  //   bill_no: z.string().min(1, "Bill No is required"),
-  //   supplier_name: z.string().min(1, "Supplier name is required"),
-  //   phone_no: z.string().min(1, "Phone Number is required"),
-  //   products: z.array(
-  //     z.object({
-  //       product_name: z.string().min(1, "Product name is required"),
-  //       material: z.string().min(1, "Material is required"),
-  //       units: z.string().min(1, "Unit is required"),
-  //       quantity: z.number().min(1, "Quantity must be greater than 0"),
-  //       paid_price: z.string().min(1, "Paid Price is required"),
-  //     })
-  //   ),
-  // });
-
   const form = useForm({
     defaultValues: {
-      billNo: edit ? get(data, "billNo") : "",
-      supplier: edit ? get(data, "supplier._id") : "",
-      phone_no: edit ? get(data, "phone_no") : "",
+      billNo: edit ? get(data, "billNo", "") : "",
+      supplier: edit ? get(data, "supplier._id", "") : "",
+      phone_no: edit ? get(data, "phone_no", "") : "",
       items: edit
         ? get(data, "items", [
             {
@@ -78,10 +64,10 @@ const NewProductForm = ({
             },
           ],
       description: edit ? get(data, "description") : "",
+    } as IRawMaterialForm,
+    validators: {
+      onSubmit: RawMaterialSchema,
     },
-    // validators: {
-    //   onSubmit: AddNewProductSchema,
-    // },
     onSubmit: async ({ value }) => {
       if (edit) updatePurchase({ id: data?._id ?? "", body: value });
       else createPurchase(value);

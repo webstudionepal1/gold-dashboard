@@ -10,6 +10,7 @@ import {
 } from "../../../../server/api/productHooks";
 import { DropdownField } from "../../../../components/shared/form_components/Dropdown";
 import { FieldError } from "../../../auth/LoginPage";
+import { get } from "lodash";
 interface propTypes {
   modalRef: React.RefObject<HTMLDivElement | null>;
   editData?: IFetchSubCategory | null;
@@ -17,10 +18,15 @@ interface propTypes {
 }
 
 const validationSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  category: z.string().min(1, "Category is required"),
-  description: z.string(),
+  name: z.string().min(1, "**Name is required"),
+  category: z.string().min(1, "**Category is required"),
+  description: z.string().optional(),
 });
+interface ISubCategorForm {
+  name: string;
+  category: string;
+  description?: string;
+}
 export const AddProductSubCategory = ({
   modalRef,
   closeModal,
@@ -40,13 +46,13 @@ export const AddProductSubCategory = ({
         : [],
     [categorySuccess, categories]
   );
-  console.log(categoriesList)
+  console.log(categoriesList);
   const form = useForm({
     defaultValues: {
-      name: editData?.name ?? " ",
-      category: editData?.name ?? "",
-      description: editData?.description ?? " ",
-    },
+      name: editData ? get(editData, "name", "") : "",
+      category: editData ? get(editData, "category._id", "") : "",
+      description: editData ? get(editData, "description", "") : "",
+    } as ISubCategorForm,
     validators: {
       onSubmit: validationSchema,
     },
@@ -83,14 +89,17 @@ export const AddProductSubCategory = ({
             </label>
             <form.Field name="name">
               {(field) => (
-                <input
-                  id="sub-category"
-                  type="text"
-                  value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  className={`border border-gray-300 rounded-md p-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
-                  placeholder="Enter subcategory name"
-                />
+                <div>
+                  <input
+                    id="sub-category"
+                    type="text"
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    className={`border border-gray-300 rounded-md p-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                    placeholder="Enter subcategory name"
+                  />
+                  <FieldError field={field} />
+                </div>
               )}
             </form.Field>
           </div>
@@ -118,14 +127,17 @@ export const AddProductSubCategory = ({
             </label>
             <form.Field name="description">
               {(field) => (
-                <textarea
-                  id="description"
-                  value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  className={`border border-gray-300 rounded-md p-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 `}
-                  rows={3}
-                  placeholder="Enter description"
-                />
+                <div>
+                  <textarea
+                    id="description"
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    className={`border border-gray-300 rounded-md p-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 `}
+                    rows={3}
+                    placeholder="Enter description"
+                  />
+                  <FieldError field={field} />
+                </div>
               )}
             </form.Field>
           </div>

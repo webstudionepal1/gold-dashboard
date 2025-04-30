@@ -40,11 +40,11 @@ export interface StockItem {
 }
 
 export interface IBaseProduct {
-  _id?: string
+  _id?: string;
   name?: string;
   description?: string;
-  category?: string
-  subCategory?: string
+  category?: string;
+  subCategory?: string;
   variant?: Array<{
     price?: number;
     wt?: number;
@@ -56,7 +56,7 @@ export interface IBaseProduct {
   }>;
   makingCharges?: number;
   length?: number;
-  claspType?: string
+  claspType?: string;
   rhodoumFinishes?: boolean;
   shape?: string;
   quantity?: number;
@@ -67,31 +67,37 @@ export interface IBaseProduct {
   tags?: string[];
   visibleAs?: string;
   images?: string[];
+  averageRating?: number;
+  numberOfReviews?: number;
 }
 export interface IFetchProduct {
   _id: string;
   name: string;
-  ratings:number;
+  ratings: number;
   description: string;
   category: IFetchCategory;
   subCategory: IFetchSubCategory;
-  variant:[{
-    price: number,
-    wt: number,
-     unit:string,
-     totalStock: number
-     usedStock: number
-     remainingStock: number
-     reorderPoint: number
-  }],
-  makingCharges:number;
+  averageRating?: number;
+  numberOfReviews?: number;
+  variant: [
+    {
+      price: number;
+      wt: number;
+      unit: string;
+      totalStock: number;
+      usedStock: number;
+      remainingStock: number;
+      reorderPoint: number;
+    }
+  ];
+  makingCharges: number;
   length: number;
   claspType: IFetchClasps;
   rhodoumFinishes: boolean;
-  shape:string;
+  shape: string;
   quantity: number;
   totalCarat: number;
-  color:string;
+  color: string;
   clarity: string;
   dimension: number;
   tags: string[];
@@ -104,6 +110,7 @@ export interface IFetchClasps {
   name: string;
   images?: string[];
   _id: string;
+  isActive: boolean;
 }
 
 //Products routes
@@ -160,7 +167,11 @@ export const useUpdateProductsMutation = () => {
       id: string | undefined;
       body: FormData;
     }) => {
-      const res = await apiClient.patch(`product/${id}`, body);
+      const res = await apiClient.patch(`product/${id}`, body, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       return res?.data?.data;
     },
     onSuccess() {
@@ -354,7 +365,9 @@ export const useCreateProductClaspsMutation = () => {
   return useMutation({
     mutationKey: ["clasptype"],
     mutationFn: async (body: FormData) => {
-      const res = await apiClient.post("calsptype", body);
+      const res = await apiClient.post("calsptype", body, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       return res?.data?.data;
     },
     onSuccess() {
@@ -372,7 +385,9 @@ export const useUpdateProductClaspsMutation = () => {
   return useMutation({
     mutationKey: ["clasptype"],
     mutationFn: async ({ id, body }: { id: string; body: FormData }) => {
-      const res = await apiClient.patch(`calsptype/${id}`, body);
+      const res = await apiClient.patch(`calsptype/${id}`, body, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       return res?.data?.data;
     },
     onSuccess() {
