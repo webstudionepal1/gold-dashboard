@@ -24,10 +24,40 @@ import {
 import ExpenseForm from "./components/ExpenseForm";
 import ExpenseCategoryForm from "./components/ExpenseCategoryForm";
 import { SearchFilterSort } from "../../components/global/SearchFilterSort";
-import { filterOptions, sortOptions } from "../../constants/DropDownOptions";
+
 import { updateExpenseState } from "./components/ExpenseStore";
 import { updateExpenseCategoryState } from "./components/ExpenseCategoryStore";
 
+export const expenseFilterOptions = [
+  { value: "", label: "All" },
+  { value: "Gold", label: "Gold" },
+  { value: "Silver", label: "Silver" },
+  { value: "Office Supplies", label: "Office Supplies" },
+  { value: "Travel", label: "Travel" },
+];
+export const expenseSortOptions = [
+  { value: "category_asc", label: "Category (A-Z)" },
+  { value: "category_desc", label: "Category (Z-A)" },
+  { value: "description_asc", label: "Description (A-Z)" },
+  { value: "description_desc", label: "Description (Z-A)" },
+  { value: "amount_asc", label: "Amount (Low-High)" },
+  { value: "amount_desc", label: "Amount (High-Low)" },
+  { value: "date_asc", label: "Date (Oldest-Newest)" },
+  { value: "date_desc", label: "Date (Newest-Oldest)" },
+];
+
+const expenseCategoryFilterOptions = [
+  { value: "", label: "All" },
+  { value: "Office Supplies", label: "Office Supplies" },
+  { value: "Travel", label: "Travel" },
+];
+
+const expenseCategorySortOptions = [
+  { value: "name_asc", label: "Name (A-Z)" },
+  { value: "name_desc", label: "Name (Z-A)" },
+  { value: "description_asc", label: "Description (A-Z)" },
+  { value: "description_desc", label: "Description (Z-A)" },
+];
 interface IModalState {
   of: string;
   edit: boolean;
@@ -44,6 +74,15 @@ interface FilterState {
 const Expenses = () => {
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState("expenses");
+
+  const filterOptions =
+    selectedTab === "expenses"
+      ? expenseFilterOptions
+      : expenseCategoryFilterOptions;
+  const sortOptions =
+    selectedTab === "expenses"
+      ? expenseSortOptions
+      : expenseCategorySortOptions;
 
   const [filterState, setFilterState] = useState<FilterState>({
     searchQuery: "",
@@ -95,39 +134,111 @@ const Expenses = () => {
       );
     }
 
-    // if (filterState.sortValue) {
-    //   switch (filterState.sortValue) {
-    //     case "title_asc":
-    //       result.sort((a, b) =>
-    //         a.name && b.name ? a.name.localeCompare(b.name) : 0
-    //       );
-    //       break;
-    //     case "title_desc":
-    //       result.sort((a, b) =>
-    //         a.name && b.name ? b.name.localeCompare(a.name) : 0
-    //       );
-    //       break;
-    //     case "price_asc":
-    //       result.sort((a, b) => (a.price && b.price ? a.price - b.price : 0));
-    //       break;
-    //     case "price_desc":
-    //       result.sort((a, b) => (a.price && b.price ? b.price - a.price : 0));
-    //       break;
-    //     case "rating_asc":
-    //       result.sort((a, b) =>
-    //         a.ratings && b.ratings ? a.ratings - b.ratings : 0
-    //       );
-    //       break;
-    //     case "rating_desc":
-    //       result.sort((a, b) =>
-    //         a.ratings && b.ratings ? b.ratings - a.ratings : 0
-    //       );
-    //       break;
-    //   }
-    // }
+    if (filterState.sortValue) {
+      switch (filterState.sortValue) {
+        case "category_asc":
+          result.sort((a, b) =>
+            (a.expenseCategory?.name ?? "").localeCompare(
+              b.expenseCategory?.name ?? ""
+            )
+          );
+          break;
+
+        case "category_desc":
+          result.sort((a, b) =>
+            (b.expenseCategory?.name ?? "").localeCompare(
+              a.expenseCategory?.name ?? ""
+            )
+          );
+          break;
+
+        case "description_asc":
+          result.sort((a, b) =>
+            (a.description ?? "").localeCompare(b.description ?? "")
+          );
+          break;
+
+        case "description_desc":
+          result.sort((a, b) =>
+            (b.description ?? "").localeCompare(a.description ?? "")
+          );
+          break;
+
+        case "amount_asc":
+          result.sort(
+            (a, b) => (a.amount ?? Infinity) - (b.amount ?? Infinity)
+          );
+          break;
+
+        case "amount_desc":
+          result.sort(
+            (a, b) => (b.amount ?? -Infinity) - (a.amount ?? -Infinity)
+          );
+          break;
+
+        case "date_asc":
+          result.sort(
+            (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+          );
+          break;
+
+        case "date_desc":
+          result.sort(
+            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+          );
+          break;
+      }
+    }
 
     return result;
   }, [expenseData, filterState]);
+
+  const filteredExpenseCategories = useMemo(() => {
+    if (!expenseCategories || expenseCategories.length === 0) return [];
+
+    let result = [...expenseCategories];
+
+    // Filter by search query
+    if (filterState.searchQuery) {
+      const query = filterState.searchQuery.toLowerCase();
+      result = result.filter(
+        (item) =>
+          item.name.toLowerCase().includes(query) ||
+          item.description.toLowerCase().includes(query)
+      );
+    }
+
+    // Filter by selected filter value (if any)
+    if (filterState.filterValue) {
+      result = result.filter(
+        (item) =>
+          item.name === filterState.filterValue ||
+          item.description === filterState.filterValue
+      );
+    }
+
+    // Sort based on selected sort value
+    if (filterState.sortValue) {
+      switch (filterState.sortValue) {
+        case "name_asc":
+          result.sort((a, b) => a.name.localeCompare(b.name));
+          break;
+        case "name_desc":
+          result.sort((a, b) => b.name.localeCompare(a.name));
+          break;
+        case "description_asc":
+          result.sort((a, b) => a.description.localeCompare(b.description));
+          break;
+        case "description_desc":
+          result.sort((a, b) => b.description.localeCompare(a.description));
+          break;
+        default:
+          break;
+      }
+    }
+
+    return result;
+  }, [expenseCategories, filterState]);
 
   const handleSearch = (query: string) => {
     setFilterState((prev) => ({ ...prev, searchQuery: query }));
@@ -150,7 +261,7 @@ const Expenses = () => {
         { key: "totalAmount", title: "Amount" },
         { key: "invoice", title: "Invoice" },
       ],
-      rows: map(expensesList, (item) => ({
+      rows: map(filteredExpenses, (item) => ({
         ...item,
         category: item.expenseCategory?.name,
         totalAmount: `Rs ${item.amount}`,
@@ -180,7 +291,7 @@ const Expenses = () => {
         setModal({ of: "expenses", edit: true, data: row });
       },
     }),
-    [expensesList, expensesSuccess]
+    [filteredExpenses, expensesSuccess]
   );
   const expenseCategoryTableData = useMemo(
     () => ({
@@ -190,7 +301,7 @@ const Expenses = () => {
         { key: "description", title: "Description" },
       ],
 
-      rows: map(expenseCategories, (item, sn) => ({
+      rows: map(filteredExpenseCategories, (item, sn) => ({
         ...item,
         sn: sn + 1,
       })),
@@ -204,7 +315,7 @@ const Expenses = () => {
         setModal({ of: "expensesCategory", edit: true, data: row });
       },
     }),
-    [expenseCategories, expenseCatSuccess]
+    [filteredExpenseCategories, expenseCatSuccess]
   );
   // const returnTableData = useMemo(
   //   () => ({
@@ -274,7 +385,7 @@ const Expenses = () => {
             onViewChange={() => {}}
             showFilter={true}
             showSort={true}
-            showView={true}
+            showView={false}
             filterOptions={filterOptions}
             sortOptions={sortOptions}
             placeholder="Search products..."

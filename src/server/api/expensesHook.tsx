@@ -24,21 +24,10 @@ export interface IFetchExpenses {
   description: string;
   amount: number;
   images: string[];
-
-  //   items: IItem[];
-  //   products: IProducts[];
-  //   supplier: string;
-  //   discount: number;
-  //   discountType: string;
-  //   totalAmount: number;
-  //   paid: number;
-  //   createdAt: Date;
-  //   updatedAt: Date;
-  //   createdBy: string;
 }
 export interface IFetchExpensesCategory {
   _id?: string;
-  name?: string;
+  name: string;
   description: string;
 }
 interface IUpdateProps {
