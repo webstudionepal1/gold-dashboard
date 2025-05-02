@@ -42,6 +42,7 @@ import SupplierDetail from "../pages/PurchaseManagement/pages/SupplierDetail";
 import SupplierHistory from "../pages/PurchaseManagement/pages/SupplierHistory";
 import AttribConfig from "../pages/settings/components/AttribConfig";
 import EditProfileForm from "../pages/settings/ProfileConfig/EditProfileForm";
+import { ProductDetails } from "../pages/Product/ProductList/[id]/components/ProductDetails";
 
 export const routesConfig = [
   {
@@ -110,13 +111,17 @@ export const routesConfig = [
     element: <ProductList />,
   },
   {
+    path:"/product/details/:id",
+    element:<ProductDescription/>
+  },
+  {
     path: "/product/:id",
     element: <ProductForm />,
   },
-  {
-    path: FrontendRoutes.PRODUCTDESCRIPTION,
-    element: <ProductDescription />,
-  },
+  // {
+  //   path: FrontendRoutes.PRODUCTDESCRIPTION,
+  //   element: <ProductDescription />,
+  // },
   {
     path: FrontendRoutes.PRODUCTCATEGORY,
     element: <ProductCategory />,
@@ -215,6 +220,9 @@ export const routesConfig = [
   {
     path: FrontendRoutes.PROFILECONFIG,
     element: <EditProfileForm />,
+  },{
+    path:'/settings/attribute-config',
+    element: <AttribConfig />,
   },
   //Analytics
   {

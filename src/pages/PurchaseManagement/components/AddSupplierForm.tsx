@@ -338,7 +338,9 @@ const AddSupplierForm = () => {
                     <FileDropInput
                       value={field.state.value}
                       onChange={(file) => {
-                        field.handleChange(file);
+                        if (!Array.isArray(file)) {
+                          field.handleChange(file);
+                        }
                       }}
                     />
                     <FieldError field={field} />

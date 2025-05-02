@@ -1,17 +1,31 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useForm } from "@tanstack/react-form";
+import { get } from "lodash";
 import { DropdownField } from "../../../components/shared/form_components/Dropdown";
 import { InputField } from "../../../components/shared/form_components/InputField";
-import { useGetAllProductsQuery } from "../../../server/api/productHooks";
-import { useCreatePurchaseMutation } from "../../../server/api/purchaseHooks";
+import {
+  IBaseProduct,
+  useGetAllProductsQuery,
+} from "../../../server/api/productHooks";
+import {
+  useCreatePurchaseMutation,
+  useUpdatePurchaseMutation,
+} from "../../../server/api/purchaseHooks";
 import { useGetSupplierQuery } from "../../../server/api/supplierHooks";
 import { FieldError } from "../../auth/LoginPage";
-
+import { IPurchaseForm, PurchaseSchema } from "../purchaseObj";
 interface NewProductProps {
   onClose: () => void;
+  edit?: boolean;
+  data?: IBaseProduct | null;
 }
-const NewProductForm = ({ onClose }: NewProductProps) => {
+const NewProductForm = ({
+  onClose,
+  edit = false,
+  data = null,
+}: NewProductProps) => {
   const { mutate: createPurchase } = useCreatePurchaseMutation();
+  const { mutate: updatePurchase } = useUpdatePurchaseMutation();
   const { data: suppliers, isSuccess } = useGetSupplierQuery();
   const { data: products, isSuccess: productSuccess } =
     useGetAllProductsQuery();
@@ -24,30 +38,39 @@ const NewProductForm = ({ onClose }: NewProductProps) => {
   const productList = productSuccess
     ? products?.map((item) => ({ label: item.name, value: item._id }))
     : [];
-
- 
-
+  console.log("data", data);
   const form = useForm({
     defaultValues: {
-      billNo: "",
-      supplier: "",
-      phone_no: "",
-      products: [
-        {
-          product: "",
-          quantity: 1,
-          price: 0,
-          paidAmount: 0,
-          wt: 0,
-        },
-      ],
-      description: "",
+      billNo: edit ? get(data, "billNo") : "",
+      supplier: edit ? get(data, "supplier._id") : "",
+      phone_no: edit ? get(data, "phone", "") : "",
+      products: edit
+        ? get(data, "products", [
+            {
+              product: "",
+              quantity: 1,
+              price: 0,
+              paidAmount: 0,
+              wt: 0,
+            },
+          ])
+        : [
+            {
+              product: "",
+              quantity: 1,
+              price: 0,
+              paidAmount: 0,
+              wt: 0,
+            },
+          ],
+      description: edit ? get(data, "description", "") : "",
+    } as IPurchaseForm,
+    validators: {
+      onSubmit: PurchaseSchema,
     },
-    // validators: {
-    //   onSubmit: AddNewProductSchema,
-    // },
     onSubmit: async ({ value }) => {
-      createPurchase(value);
+      if (edit) updatePurchase({ id: data?._id ?? "", body: value });
+      else createPurchase(value);
     },
   });
 
@@ -95,7 +118,7 @@ const NewProductForm = ({ onClose }: NewProductProps) => {
 
         <form.Field name="products" mode="array">
           {(field) => (
-            <div className='space-y-2'>
+            <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <h1 className="text-xl font-semibold">Product Information</h1>
                 <button

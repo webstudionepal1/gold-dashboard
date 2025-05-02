@@ -1,3 +1,5 @@
+import { IFetchOrder } from "../../../server/api/orderHooks";
+
 export const Ordertitle: Record<string, string> = {
   "order-details": "Order Details",
   "confirmed-order-details": "Confirmed Orders",
@@ -89,3 +91,68 @@ export const order_details_columns = [
   { key: "total_price", title: "Total Price" },
   { key: "status", title: "Status" },
 ];
+
+export const filterOptions = [
+  { value: "", label: "All Orders" },
+  { value: "pending", label: "Pending" },
+  { value: "completed", label: "Completed" },
+  { value: "delivered", label: "Delivered" },
+  { value: "cancelled", label: "Cancelled" },
+];
+
+export const sortOptions = [
+  { value: "", label: "Default" },
+  { value: "name-asc", label: "Customer Name (A-Z)" },
+  { value: "name-desc", label: "Customer Name (Z-A)" },
+  { value: "date-newest", label: "Newest First" },
+  { value: "date-oldest", label: "Oldest First" },
+  { value: "amount-high", label: "Amount (High to Low)" },
+  { value: "amount-low", label: "Amount (Low to High)" },
+
+];
+export interface FilterState {
+  filter: string;
+  sort: string;
+}
+export const filterItems = (items: IFetchOrder[], filterState: FilterState) => {
+  if (!items || items.length === 0) return [];
+
+  let filteredItems = [...items];
+
+  // Apply status filter
+  if (filterState.filter) {
+    filteredItems = filteredItems.filter((item) => {
+      return (
+        item.orderStatus.toLowerCase() === filterState.filter.toLowerCase()
+      );
+    });
+  }
+
+  // Apply sorting
+  if (filterState.sort) {
+    filteredItems = [...filteredItems].sort((a, b) => {
+      switch (filterState.sort) {
+        case "name-asc":
+          return (a.customer?.name || "").localeCompare(b.customer?.name || "");
+        case "name-desc":
+          return (b.customer?.name || "").localeCompare(a.customer?.name || "");
+        case "date-newest":
+          return (
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
+        case "date-oldest":
+          return (
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          );
+        case "amount-high":
+          return b.totalAmount - a.totalAmount;
+        case "amount-low":
+          return a.totalAmount - b.totalAmount;
+        default:
+          return 0;
+      }
+    });
+  }
+
+  return filteredItems;
+};

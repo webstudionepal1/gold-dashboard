@@ -354,7 +354,9 @@ const AddBannerForm = () => {
                           <FileDropInput
                             value={field.state.value as unknown as File}
                             onChange={(file) => {
-                              field.handleChange(file); // store the file directly
+                              if (!Array.isArray(file)) {
+                                field.handleChange(file);
+                              }
                             }}
                           />
                           <FieldError field={field} />
@@ -388,7 +390,9 @@ const AddBannerForm = () => {
                           <FileDropInput
                             value={field.state.value as unknown as File}
                             onChange={(file) => {
-                              field.handleChange(file); // store the file directly
+                              if (!Array.isArray(file)) {
+                                field.handleChange(file);
+                              }
                             }}
                           />
                           <FieldError field={field} />

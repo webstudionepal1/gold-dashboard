@@ -5,16 +5,15 @@ import { CheckIcon, Download, PackageIcon, TruckIcon } from "lucide-react";
 import React, { useEffect, useMemo } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
+import MasterTable from "../../../components/shared/MasterTable";
 import Header from "../../../components/shared/table_heading/Header";
 import {
   useGetOrderById,
   useUpdateOrderMutation,
 } from "../../../server/api/orderHooks";
-import { SimpleTable } from "../../Customer/components/SimpleTable";
 import InfoSection from "./components/InfoSection";
 import OrderTracker from "./components/OrderTracker";
 import { order_details_columns, Ordertitle, StepperObj } from "./orderObj";
-import MasterTable from "../../../components/shared/MasterTable";
 
 // Define proper TypeScript interfaces
 interface OrderedProduct {
@@ -153,46 +152,43 @@ const OrderDetails: React.FC = () => {
     return [
       {
         id: 1,
-        title: "Customer Name",
-        value: get(order, "customer.name", ""),
+        title: "Customer ",
+        value: get(order, "shippingAddress.fullname", ""),
       },
       {
         id: 2,
         title: "Phone Number",
-        value: get(order, "customer.phone", ""),
+        value: get(order, "shippingAddress.phone", ""),
       },
       {
         id: 3,
         title: "Address",
-        value: get(order, "customer.address", ""),
+        value: get(order, "shippingAddress.address", ""),
       },
       {
         id: 4,
         title: "Email",
-        value: get(order, "customer.email", ""),
+        value: get(order, "shippingAddress.email", ""),
       },
       {
         id: 5,
         title: "Shipping Method",
-        value: get(order, "shippingMethod", "Standard Shipping"),
+        value: get(order, "shippingMethod", "Normal"),
       },
       {
         id: 6,
-        title: "Payment Method",
+        title: "Payment Status",
         value: (
           <div
             className={
-              order?.paymentStatus === "paid" ? "text-green" : "text-red"
+              order?.paymentStatus === "paid"
+                ? "text-white bg-green text-sm rounded-full py-1 px-4"
+                : "text-white bg-red text-sm rounded-full py-1 px-4"
             }
           >
             {get(order, "paymentStatus", "pending")}
           </div>
         ),
-      },
-      {
-        id: 7,
-        title: "Note",
-        Note: get(order, "note", "N/A"),
       },
     ];
   }, [order]);
@@ -205,27 +201,27 @@ const OrderDetails: React.FC = () => {
       {
         id: 1,
         title: "Customer Name",
-        value: get(order, "customer.name", ""),
+        value: get(order, "billingAddress.fullname", "-"),
       },
       {
         id: 2,
         title: "Phone Number",
-        value: get(order, "customer.phone", ""),
+        value: get(order, "billingAddress.phone", ""),
       },
       {
         id: 3,
         title: "Email",
-        value: get(order, "customer.email", ""),
+        value: get(order, "billingAddress.email", ""),
       },
       {
         id: 4,
         title: "Address",
-        value: get(order, "customer.address", ""),
+        value: get(order, "billingAddress.address", ""),
       },
       {
         id: 5,
-        title: "Note",
-        Note: get(order, "note", "N/A"),
+        title: "landmark",
+        Note: get(order, "billingAddress.landMark", "N/A"),
       },
     ];
   }, [order]);
@@ -236,34 +232,18 @@ const OrderDetails: React.FC = () => {
 
     return [
       {
-        id: 1,
-        title: "Customer Name",
-        value: get(order, "customer.name", ""),
-      },
-      {
-        id: 2,
-        title: "Phone Number",
-        value: get(order, "customer.phone", ""),
-      },
-      {
-        id: 3,
-        title: "Email",
-        value: get(order, "customer.email", ""),
-      },
-      {
-        id: 4,
-        title: "Address",
-        value: get(order, "customer.address", ""),
-      },
-      {
         id: 5,
         title: "Cancelled Date",
-        date: <div className="text-red">{get(order, "cancelDate", "N/A")}</div>,
+        date: (
+          <div className="text-red">
+            {get(order, "cancellation.data", "N/A")}
+          </div>
+        ),
       },
       {
         id: 6,
         title: "Reason for cancellation",
-        reason: get(order, "cancelReason", "N/A"),
+        reason: get(order, "cancellation.reason", "N/A"),
       },
     ];
   }, [order]);

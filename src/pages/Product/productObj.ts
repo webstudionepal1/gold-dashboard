@@ -8,8 +8,8 @@ type VisibilityType =
 
 type ProductVariant = {
   price: number;
-  size: string;
-  unit: string;
+  wt: number;
+  unit?: string;
 };
 
 export interface IProductFormValues {
@@ -35,6 +35,7 @@ export interface UploadedImage {
 }
 
 export const categoryColumns = [
+  { title: "S.N", key: "sn" },
   {
     title: "Name",
     key: "name",
@@ -50,6 +51,7 @@ export const categoryColumns = [
 ];
 
 export const subCategoryColumns = [
+  { title: "S.N", key: "sn" },
   {
     title: "Name",
     key: "name",
@@ -76,7 +78,7 @@ export const generateProductDefaultValue = (state: string, editData?: any) => {
       description: "",
       category: "",
       subCategory: "",
-      variant: [{ price: 0, size: "", unit: "gm" }],
+      variant: [{ price: 0, wt: 0, unit: "gm" }],
       length: 0,
       claspType: "",
       rhodoumFinishes: true,
@@ -87,14 +89,15 @@ export const generateProductDefaultValue = (state: string, editData?: any) => {
       tags: ["Featured"],
     };
   } else {
-    return {
+    console.log("editDat", editData);
+    const cata = {
       name: get(editData, "name", ""),
       description: get(editData, "description", ""),
-      category: get(editData, "category", ""),
-      subCategory: get(editData, "subCategory", ""),
-      variant: get(editData, "variant", [{ price: 0, size: "", unit: "gm" }]),
+      category: get(editData, "category._id", ""),
+      subCategory: get(editData, "subCategory._id", ""),
+      variant: get(editData, "variant", [{ price: 0, wt: 0, unit: "gm" }]),
       length: get(editData, "length", 0),
-      claspType: get(editData, "claspType", ""),
+      claspType: get(editData, "claspType._id", ""),
       rhodoumFinishes: get(editData, "rhodoumFinishes", true),
       shape: get(editData, "shape", ""),
       clarity: get(editData, "clarity", ""),
@@ -102,6 +105,8 @@ export const generateProductDefaultValue = (state: string, editData?: any) => {
       visibleAs: get(editData, "visibleAs", "featured"),
       tags: get(editData, "tags", ["Featured"]),
     };
+    console.log(cata);
+    return cata;
   }
 };
 
@@ -115,7 +120,10 @@ export const productFormSchema = z.object({
   // Price
   variant: z
     .array(
-      z.object({ price: z.number().min(1), size: z.string(), unit: z.string() })
+      z.object({
+        price: z.number().min(1),
+        wt: z.number().min(1, "Size is required"),
+      })
     )
     .min(1, "At least one variant is required"),
 
@@ -141,3 +149,28 @@ export const productFormSchema = z.object({
   // Tags
   tags: z.array(z.string()).min(1, "At least one tag is required"),
 });
+
+export const productListColumns = [
+  { title: "S.N", key: "sn" },
+  { title: "IMage", key: "image" },
+  {
+    title: "Product",
+    key: "product",
+  },
+  {
+    title: "Category",
+    key: "categ",
+  },
+  {
+    title: "Sub Category",
+    key: "subCateg",
+  },
+  {
+    title: "Price",
+    key: "price",
+  },
+  {
+    title: "Stock",
+    key: "stock",
+  },
+];

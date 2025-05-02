@@ -11,6 +11,7 @@ interface SearchFilterSortProps {
   showFilter?: boolean; // Control filter dropdown visibility
   showView?: boolean; // Control view select visibility
   showSort?: boolean; // Control sort dropdown visibility
+  onSearch?: (s?: any) => void;
 }
 
 export const SearchFilterSort: React.FC<SearchFilterSortProps> = memo(

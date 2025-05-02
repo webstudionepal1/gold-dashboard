@@ -27,7 +27,7 @@ import {
 const ProductForm = () => {
   const { id } = useParams();
   const productData = useStore(productStore, (state) => state);
-
+  console.log("productData", productData);
   const {
     mutate: createProduct,
     isPending: pendingAddition,
@@ -87,26 +87,10 @@ const ProductForm = () => {
       onSubmit: productFormSchema,
       onBlur: productFormSchema,
     },
+
     onSubmit: async ({ value }) => {
       const formData = new FormData();
-      // Object.entries(value).forEach(([key, value]) => {
-      //   if (key === "variant") {
-      //     value.forEach((v, index: number) => {
-      //       formData.append(`variant[${index}][price]`, String(v.price));
-      //       formData.append(`variant[${index}][size]`, v.size);
-      //       formData.append(`variant[${index}][unit]`, v.unit);
-      //     });
-      //   } else if (Array.isArray(value)) {
-      //     value.forEach((item, index: number) => {
-      //       formData.append(`${key}[${index}]`, item);
-      //     });
-      //   } else if (uploadedImages.some((img) => img.name === key)) {
-      //     uploadedImages.find((img) => img.name === key)?.file &&
-      //       formData.append(key, uploadedImages.find((img) => img.name === key)?.file);
-      //   } else {
-      //     formData.append(key, value);
-      //   }
-      // });
+
       formData.append("name", value.name);
       formData.append("description", value.description);
       formData.append("category", value.category);
@@ -114,8 +98,8 @@ const ProductForm = () => {
 
       value.variant.forEach((v, index: number) => {
         formData.append(`variant[${index}][price]`, String(v.price));
-        formData.append(`variant[${index}][size]`, v.size);
-        formData.append(`variant[${index}][unit]`, v.unit);
+        formData.append(`variant[${index}][wt]`, v.wt.toString());
+        formData.append(`variant[${index}][unit]`, v.unit ?? "gm");
       });
 
       formData.append("length", String(value.length));
@@ -134,7 +118,10 @@ const ProductForm = () => {
         formData.append(`images`, img.file);
       });
       if (id == "add") createProduct(formData);
-      else updateProduct({ id: productData._id, body: formData });
+      else {
+        productData.images.map((img) => formData.append(`existingImages`, img));
+        updateProduct({ id: productData._id, body: formData });
+      }
     },
   });
 
@@ -154,7 +141,7 @@ const ProductForm = () => {
   };
 
   return (
-    <div className="max-w-6xl p-2 mx-auto">
+    <div className="p-2">
       <Header text={id === "add" ? "Add Product" : "Edit Product"} />
 
       <form
@@ -257,7 +244,7 @@ const ProductForm = () => {
                       </h2>
                       <button
                         onClick={() =>
-                          field.pushValue({ price: 0, size: "", unit: "gm" })
+                          field.pushValue({ price: 0, wt: 0, unit: "gm" })
                         }
                         type="button"
                         className="flex bg-[#DF8D28] rounded-md text-white items-center gap-2 px-3 py-2"
@@ -287,16 +274,18 @@ const ProductForm = () => {
                               </div>
                             )}
                           </form.Field>
-                          <form.Field name={`variant[${i}].size`}>
+                          <form.Field name={`variant[${i}].wt`}>
                             {(subField) => (
                               <div>
                                 <InputField
                                   label="size"
                                   required
                                   placeholder="Enter in gram"
-                                  value={subField.state.value as string}
+                                  value={subField.state.value}
                                   onChange={(e) =>
-                                    subField.handleChange(e.target.value)
+                                    subField.handleChange(
+                                      Number(e.target.value)
+                                    )
                                   }
                                 />
                                 <FieldError field={subField} />
@@ -538,14 +527,33 @@ const ProductForm = () => {
               </div>
             )}
           </div>
+          {formstate !== "add" && productData.images && (
+            <div className="p-4 bg-white border rounded-lg">
+              <h2 className="mb-4 font-medium text-gray-700">Product Images</h2>
+              <div className="grid grid-cols-4 gap-2">
+                {productData.images.map((img, index) => (
+                  <img
+                    src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${img}`}
+                    alt="preview"
+                    className="object-contain w-full h-full"
+                  />
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Submit Button */}
           <div className="text-right">
             <button
               type="submit"
-              className="px-6 py-2 text-white rounded-md bg-orange hover:bg-orange-600"
+              disabled={pendingAddition || pendingUpdate}
+              className="px-6 py-2 text-white rounded-md min-w-32 bg-orange hover:bg-orange-600"
             >
-              Save Product
+              {pendingAddition || pendingUpdate ? (
+                <Icon icon="nrk:spinner" width={18} height={18} />
+              ) : (
+                "Save Product"
+              )}
             </button>
           </div>
         </div>
