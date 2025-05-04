@@ -20,9 +20,12 @@ import { SearchFilterSort } from "../../components/global/SearchFilterSort";
 import { filterOptions, sortOptions } from "../../constants/DropDownOptions";
 import { StatCard } from "./components/iconCard";
 import {
+  IOrderCategoryData,
+  useGetOrderCategoryQuery,
   useGetOrderStatusQuery,
   useGetTopOrderProductsQuery,
 } from "../../server/api/orderReportHook";
+import { Carousel } from "./components/Carousel";
 
 const stats = [
   {
@@ -86,7 +89,6 @@ const OrderReport = () => {
     sortValue: "",
   });
 
-  const { mutate: deleteExpense } = useDeleteExpenseMutation();
   const {
     data: orderStatusList,
     isLoading: orderStatusLoading,
@@ -94,10 +96,17 @@ const OrderReport = () => {
   } = useGetOrderStatusQuery();
 
   const {
-    data: expenseCategories,
-    isLoading: expenseCatLoading,
-    isSuccess: expenseCatSuccess,
-  } = useGetExpenseCategoryQuery();
+    data: orderCategoryList,
+    isLoading: orderCategoryLoading,
+    isSuccess: orderCategorySuccess,
+  } = useGetOrderCategoryQuery();
+
+  console.log("ORDER CATEOGRY0", orderCategoryList);
+
+  const transformedData = (orderCategoryList ?? []).map((item) => ({
+    category: item.category,
+    percentageShare: item.percentageShare,
+  }));
 
   const {
     data: TopOrderList,
@@ -243,19 +252,19 @@ const OrderReport = () => {
     <div className="container px-4 py-3 mx-auto ">
       <Header text="Order Report" />
 
-      {selectedTab === "topOrderProducts" && (
-        <div className="grid grid-cols-1 gap-4 p-8 sm:grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat, index) => (
-            <StatCard
-              key={index}
-              percentage={stat.percentage}
-              label={stat.label}
-              icon={stat.icon}
-              imageBgClassName={stat.imageBgClassName}
-            />
-          ))}
-        </div>
-      )}
+      {/* {selectedTab === "topOrderProducts" && (
+        <Carousel itemsPerView={4} autoSlideInterval={2500} className="p-8">
+          {orderCategoryList &&
+            orderCategoryList?.map((stat: IOrderCategoryData, index) => (
+              <StatCard
+                key={index}
+                percentage={stat.percentageShare}
+                label={stat.category}
+              />
+            ))}
+        </Carousel>
+      )} */}
+
       <MasterTable
         loading={orderStatusLoading}
         tabsOptions={

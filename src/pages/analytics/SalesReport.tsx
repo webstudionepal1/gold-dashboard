@@ -18,6 +18,12 @@ import {
 
 import { SearchFilterSort } from "../../components/global/SearchFilterSort";
 import { filterOptions, sortOptions } from "../../constants/DropDownOptions";
+import {
+  useGetCategoryWiseDataQuery,
+  useGetProductWiseDataQuery,
+  useGetSubCategoryWiseDataQuery,
+} from "../../server/api/salesReportHook";
+import { useGetOrderCategoryQuery } from "../../server/api/orderReportHook";
 
 interface IEditModal {
   state: boolean;
@@ -38,11 +44,38 @@ const SalesReport = () => {
     editData: null,
   });
 
+  const today = new Date();
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(today.getDate() - 7);
+
+  const formatDate = (date: Date) => date.toISOString().split("T")[0];
+
+  const [startDate, setStartDate] = useState<string>(formatDate(sevenDaysAgo));
+  const [endDate, setEndDate] = useState<string>(formatDate(today));
+
   const [filterState, setFilterState] = useState<FilterState>({
     searchQuery: "",
     filterValue: "",
     sortValue: "",
   });
+
+  const {
+    data: ProductWiseData,
+    isSuccess: isProductWiseDataSuccess,
+    isLoading: isProductWiseDataLoading,
+  } = useGetProductWiseDataQuery({ startDate, endDate });
+
+  const {
+    data: categoryWiseDataList,
+    isLoading: isCategoryWiseDataLoading,
+    isSuccess: isCategoryWiseDataSuccess,
+  } = useGetCategoryWiseDataQuery();
+
+  const {
+    data: subCategoryWiseDataList,
+    isLoading: isSubCategoryWiseDataLoading,
+    isSuccess: isSubCategoryWiseDataSuccess,
+  } = useGetSubCategoryWiseDataQuery();
 
   const { mutate: deleteExpense } = useDeleteExpenseMutation();
   const {
@@ -133,41 +166,50 @@ const SalesReport = () => {
     setFilterState((prev) => ({ ...prev, sortValue: sort }));
   };
 
-  const expenseTableData = useMemo(
+  const productWiseTableData = useMemo(
     () => ({
       columns: [
         { key: "category", title: "Category" },
-        { key: "totalOrder", title: "Total Orders" },
-        { key: "revenue", title: "Revenue" },
-        { key: "percentageShare", title: "Percentage Share" },
+        { key: "subCategory", title: "Sub Category" },
+        { key: "product", title: "Products" },
+        { key: "totalRevenue", title: "Revenue" },
       ],
-      rows: map(expensesList, (item) => ({
+      rows: map(ProductWiseData, (item) => ({
         ...item,
-        category: "Gold",
-        totalOrder: "122",
-        revenue: "23.0%",
-        percentageShare: "1%",
       })),
     }),
-    [expensesList, expensesSuccess]
+    [ProductWiseData, isProductWiseDataSuccess]
   );
-  const expenseCategoryTableData = useMemo(
+  const categoryWiseTableData = useMemo(
     () => ({
       columns: [
         { key: "category", title: "Category" },
-        { key: "totalOrder", title: "Total Orders" },
-        { key: "revenue", title: "Revenue" },
-        { key: "percentageShare", title: "Percentage Share" },
+        { key: "totalOrders", title: "Total Orders" },
+        { key: "totalRevenue", title: "Revenue" },
+        { key: "percentageSharee", title: "Percentage Share" },
       ],
-      rows: map(expenseCategories, (item) => ({
+      rows: map(categoryWiseDataList, (item) => ({
         ...item,
-        category: "Gold",
-        totalOrder: "122",
-        revenue: "23.0%",
-        percentageShare: "1%",
+        percentageSharee: <div>{item.percentageShare} %</div>,
       })),
     }),
-    [expenseCategories, expenseCatSuccess]
+    [categoryWiseDataList, isCategoryWiseDataSuccess]
+  );
+
+  const subCategoryTableData = useMemo(
+    () => ({
+      columns: [
+        { key: "subCategory", title: "Sub Category" },
+        { key: "totalOrders", title: "Total Orders" },
+        { key: "totalRevenue", title: "Revenue" },
+        { key: "percentageSharee", title: "Percentage Share" },
+      ],
+      rows: map(subCategoryWiseDataList, (item) => ({
+        ...item,
+        percentageSharee: <div>{item.percentageShare} %</div>,
+      })),
+    }),
+    [subCategoryWiseDataList, isSubCategoryWiseDataSuccess]
   );
   // const returnTableData = useMemo(
   //   () => ({
@@ -180,8 +222,9 @@ const SalesReport = () => {
   // );
 
   const tableDataObj: ITable = {
-    productWise: expenseTableData,
-    categoryWise: expenseCategoryTableData,
+    productWise: productWiseTableData,
+    categoryWise: categoryWiseTableData,
+    subCategoryWise: subCategoryTableData,
   };
   const [modal, setModal] = useState({
     of: "",
@@ -197,6 +240,26 @@ const SalesReport = () => {
     <div className="container px-4 py-3 mx-auto ">
       <Header text="Sales Report" />
 
+      <div className="flex gap-4 items-center my-4">
+        <div>
+          <label>Start Date</label>
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="border px-2 py-1 rounded"
+          />
+        </div>
+        <div>
+          <label>End Date</label>
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="border px-2 py-1 rounded"
+          />
+        </div>
+      </div>
       <MasterTable
         loading={expensesLoading || expenseCatLoading}
         tabsOptions={
@@ -206,19 +269,19 @@ const SalesReport = () => {
             tabOptions={salesReportTabOption}
           />
         }
-        filterSection={
-          <SearchFilterSort
-            onFilter={handleFilter}
-            onSort={handleSort}
-            onViewChange={() => {}}
-            showFilter={true}
-            showSort={true}
-            showView={true}
-            filterOptions={filterOptions}
-            sortOptions={sortOptions}
-            placeholder="Search products..."
-          />
-        }
+        // filterSection={
+        //   <SearchFilterSort
+        //     onFilter={handleFilter}
+        //     onSort={handleSort}
+        //     onViewChange={() => {}}
+        //     showFilter={true}
+        //     showSort={true}
+        //     showView={true}
+        //     filterOptions={filterOptions}
+        //     sortOptions={sortOptions}
+        //     placeholder="Search products..."
+        //   />
+        // }
         rows={tableDataObj[selectedTab].rows || []}
         columns={tableDataObj[selectedTab].columns}
         canSelect

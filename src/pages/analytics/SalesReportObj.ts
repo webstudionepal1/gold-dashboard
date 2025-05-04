@@ -23,6 +23,7 @@ import * as z from "zod";
 export const salesReportTabOption = [
   { label: "Product Wise", value: "productWise" },
   { label: "Category Wise", value: "categoryWise" },
+  { label: "Sub-Category Wise", value: "subCategoryWise" },
 ];
 
 export interface ITable {

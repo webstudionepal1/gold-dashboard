@@ -27,6 +27,15 @@ interface topOrderProductsResponse {
   products: topOrderProductsData[];
 }
 
+export interface IOrderCategoryData {
+  category: string;
+  unitsSold: number;
+  totalOrders: number;
+  totalRevenue: number;
+  averagePrice: number;
+  percentageShare: number;
+}
+
 export const useGetOrderStatusQuery = (params = {}) => {
   return useQuery({
     queryKey: ["orderStatus", params],
@@ -53,6 +62,22 @@ export const useGetTopOrderProductsQuery = (params = {}) => {
         }
       );
       return res?.data?.data;
+    },
+  });
+};
+
+export const useGetOrderCategoryQuery = (params = {}) => {
+  return useQuery({
+    queryKey: ["orderCategory", params],
+    queryFn: async () => {
+      const res = await apiClient.get<{ data: IOrderCategoryData[] }>(
+        "orderCategory",
+        {
+          params,
+        }
+      );
+      console.log("res", res);
+      return res?.data.data;
     },
   });
 };

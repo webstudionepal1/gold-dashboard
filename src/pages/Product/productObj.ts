@@ -115,7 +115,7 @@ export const productFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().min(1, "Description is required"),
   category: z.string().min(1, "Category is required"),
-  subCategory: z.string().min(1, "Sub Category is required"),
+  // subCategory: z.string().min(1, "Sub Category is required"),
 
   // Price
   variant: z
