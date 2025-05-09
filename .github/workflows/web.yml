@@ -13,13 +13,12 @@ jobs:
 
       - name: Build Web Application
         run: |
-          cd admin
           npm install
           npm run build
 
       - name: Create Web Production Bundle
         run: |
-          tar -czf dist-web.tar.gz admin/dist
+          tar -czf dist-web.tar.gz dist
 
       - name: Setup SSH Key
         if: github.ref == 'refs/heads/main'
