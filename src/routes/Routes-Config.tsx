@@ -187,10 +187,11 @@ export const routesConfig = [
     path: FrontendRoutes.NOTIFICATION,
     element: <NotificationIndex />,
   },
-  {
-    path: FrontendRoutes.MYPOSTBUSINESS,
-    element: <MyPostBusinessIndex />,
-  },
+  // MyPostBusiness route commented out - will be integrated later
+  // {
+  //   path: FrontendRoutes.MYPOSTBUSINESS,
+  //   element: <MyPostBusinessIndex />,
+  // },
 
   //Transactions
   {
