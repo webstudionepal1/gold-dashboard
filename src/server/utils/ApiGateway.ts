@@ -1,8 +1,8 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 // Configure base URL from environment variables
-export const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}api/v1/en/`;
-export const API_BASE_URL_EN = `${import.meta.env.VITE_API_LOCAL_URL}`;
+// export const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}api/v1/en/`;
+export const API_BASE_URL = `${import.meta.env.VITE_API_LOCAL_URL}`;
 
 // Create an axios instance
 export const apiClient = axios.create({
@@ -52,17 +52,17 @@ apiClient.interceptors.response.use(
     }
     return response;
   },
-  (error: any) => {
+  (error) => {
     // Handle unauthorized access
     if (error.response?.status === 401) {
       console.log(error);
-      // localStorage.clear();
-      // const redirectPath = encodeURIComponent(window.location.pathname);
-      // window.location.href = `/auth-login?redirect=${redirectPath}`;
+      localStorage.clear();
+      const redirectPath = encodeURIComponent(window.location.pathname);
+      window.location.href = `/auth-login?redirect=${redirectPath}`;
     }
 
     // If request was canceled, do not show error
-    if (axios.isCancel(error as any)) {
+    if (axios.isCancel(error)) {
       return Promise.resolve({ canceled: true });
     }
 

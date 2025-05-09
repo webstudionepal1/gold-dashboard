@@ -12,8 +12,10 @@ export default {
         white: '#ffffff',
         'fade-white': '#D9D9D9',
         yellow: '#F6B827',
+        'fade-yellow': '#FFFAE680', // Light yellow with 50% opacity
         orange: '#F87D08',
         red: '#FF3B30',
+        'fade-red': '#FFECEB80', // Light red with 50% opacity
         'fade-orange': '#F87D081A',
         parrot: '#22C55E',
         'dark-green': '#617B47',

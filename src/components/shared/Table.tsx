@@ -5,6 +5,7 @@ import { DeleteDialog } from "./DeleteDialog";
 
 export type TableData<T = Record<string, any>> = {
   _id: string;
+  _rowStyle?: string; // Custom property for row styling
 } & T;
 
 export type ColumnConfig<T> = {
@@ -191,7 +192,8 @@ export const Table = <T extends Record<string, any>>({
                   data.map((row, index) => (
                     <tr
                       key={`${row._id}-${index}`}
-                      className={`border border-[#e0e2e5]${
+                      className={`border border-[#e0e2e5] ${
+                        row._rowStyle ? row._rowStyle :
                         index % 2 === 0 && showBg ? "bg-fade-bg" : ""
                       }`}
                     >

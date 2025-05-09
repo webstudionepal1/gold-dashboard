@@ -41,6 +41,15 @@ export interface IBaseProduct {
   rhodiumFinishes?: boolean;
   shape?: string;
   quantity?: number;
+  variant?:[{
+    price: number,
+    wt: number,
+    unit:string,
+    totalStock: number
+    usedStock: number
+    remainingStock: number
+    reorderPoint: number
+  }],
   totalCarat?: number;
   color?: string;
   clarity?: string;
