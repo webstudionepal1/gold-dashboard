@@ -13,28 +13,39 @@ jobs:
 
       - name: Build Web Application
         run: |
-          npm install --legacy-peer-deps
+          cd admin
+          npm install
           npm run build
 
       - name: Create Web Production Bundle
         run: |
-          tar -czf dist-web.tar.gz dist
+          tar -czf dist-web.tar.gz admin/dist
+
+      - name: Setup SSH Key
+        if: github.ref == 'refs/heads/main'
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -p 72 -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy Web to VPS
         if: github.ref == 'refs/heads/main'
         env:
           VPS_HOST: ${{ secrets.VPS_HOST }}
           VPS_USER: ${{ secrets.VPS_USER }}
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
-          # Setup SSH
-          mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H "$VPS_HOST" >> ~/.ssh/known_hosts
+          # Copy web bundle using SSH key
+          scp -P 72 dist-web.tar.gz $VPS_USER@$VPS_HOST:/tmp/
           
-          # Copy web bundle
-          scp -P 72 -i ~/.ssh/deploy_key dist-web.tar.gz $VPS_USER@$VPS_HOST:/tmp/
-          
-          # Execute remote commands
-          ssh -p 72 -i ~/.ssh/deploy_key $VPS_USER@$VPS_HOST "mkdir -p gold && tar -xzf /tmp/dist-web.tar.gz -C gold && rm /tmp/dist-web.tar.gz"
+          # SSH into the VPS and extract the bundle
+          ssh -p 72 $VPS_USER@$VPS_HOST << 'EOF'
+            # Create and extract web files
+            mkdir -p "/home/nabin/gold"
+            tar -xzf /tmp/dist-web.tar.gz -C "/home/nabin/gold"
+            rm /tmp/dist-web.tar.gz
+          EOF
+
+      - name: Cleanup SSH Key
+        if: always()
+        run: rm -f ~/.ssh/id_rsa
