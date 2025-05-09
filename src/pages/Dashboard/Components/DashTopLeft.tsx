@@ -4,15 +4,21 @@ import BrideImageBg from "../../../assets/images/BrideImageBg.png";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import SalesChart from '../../../components/ui/SalesChart';
 import { ChartData, ChartOptions } from 'chart.js';
+import { DashboardData } from "../../../server/api/dashboardHooks";
+import { FrontendRoutes } from "../../../routes/routes";
 
-const DashTopLeft = () => {
+interface DashTopLeftProps {
+    dashboardData: DashboardData;
+}
+
+const DashTopLeft = ({ dashboardData }: DashTopLeftProps) => {
 
     const chartData: ChartData<'line'> = {
-        labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+        labels: dashboardData.salesMetrics?.dailySales?.map(sale => sale.day) || [],
         datasets: [
             {
                 label: 'Total Sales',
-                data: [330, 400, 450, 310, 450, 250, 300],
+                data: dashboardData.salesMetrics?.dailySales?.map(sale => sale.amount) || [],
                 fill: true,
                 backgroundColor: 'rgba(247, 203, 109, 0.2)',
                 borderColor: '#E7932F',
@@ -106,7 +112,7 @@ const DashTopLeft = () => {
             <div className="p-4 bg-white shadow-md rounded-xl h-[25rem] overflow-y-scroll">
                 <div className="flex flex-row items-center justify-between py-1 border-b border-gray-300">
                     <h2 className="mb-4 text-xl font-semibold text-gray-700">Today's Order</h2>
-                    <button className="bg-white border-2 mb-4 border-[#F1D097] text-[#F1D097] px-2 py-[3px] rounded-md lg:text-base md:text-sm text-xs">View All</button>
+                    <Link to={FrontendRoutes.ORDER} className="bg-white border-2 mb-4 border-[#F1D097] text-[#F1D097] px-2 py-[3px] rounded-md lg:text-base md:text-sm text-xs hover:bg-[#F1D097] hover:text-white transition-colors">View All</Link>
                 </div>
 
                 {/* Orders Table */}
@@ -122,38 +128,46 @@ const DashTopLeft = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {[
-                                { item: 'Pram Set', customer: 'Henna Baptista', qty: '01', status: 'Completed' },
-                                { item: 'Necklest', customer: 'Chance Korsgaard', qty: '02', status: 'Cancelled' },
-                                { item: 'Pram Set', customer: 'Brendon Sighten', qty: '02', status: 'Meeting' },
-                                { item: 'Rings', customer: 'Angel Korsgaard', qty: '02', status: 'Meeting' },
-                                { item: 'Ear Rings', customer: 'Madelgin Curtis', qty: '02', status: 'Meeting' },
-                            ].map((order, index) => (
-                                <tr key={index} className="text-sm font-medium text-center border-b">
-                                    <td className="py-3">
-                                        <input type="checkbox" className="w-4 h-4 form-checkbox" />
-                                    </td>
-                                    <td className="py-3 text-gray-800">{order.item}</td>
-                                    <td className="py-3 text-gray-600">{order.customer}</td>
-                                    <td className="py-3 text-gray-600">{order.qty}</td>
-                                    <td className="py-3">
-                                        <span className={`px-3 py-[6px] rounded-full text-xs ${order.status === 'Completed' ? 'bg-[#22C55E] text-[#22C55E] bg-opacity-20' :
-                                            order.status === 'Cancelled' ? 'bg-[#FF4D4D] bg-opacity-20 text-[#FF4D4D]' :
-                                                'bg-[#eeeeee] text-[#777676]'
-                                            }`}>
-                                            {order.status}
-                                        </span>
+                            {dashboardData.orderMetrics?.todaysOrders?.length ? (
+                                dashboardData.orderMetrics.todaysOrders.map((order, index) => (
+                                    <tr key={index} className="text-sm font-medium text-center border-b">
+                                        <td className="py-3">
+                                            <input type="checkbox" className="w-4 h-4 form-checkbox" />
+                                        </td>
+                                        <td className="py-3 text-gray-800">{order.item}</td>
+                                        <td className="py-3 text-gray-600">{order.customer}</td>
+                                        <td className="py-3 text-gray-600">{order.qty}</td>
+                                        <td className="py-3">
+                                            <span className={`px-3 py-[6px] rounded-full text-xs ${order.status === 'Completed' ? 'bg-[#22C55E] text-[#22C55E] bg-opacity-20' :
+                                                order.status === 'Cancelled' ? 'bg-[#FF4D4D] bg-opacity-20 text-[#FF4D4D]' :
+                                                    'bg-[#eeeeee] text-[#777676]'
+                                                }`}>
+                                                {order.status}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan={5} className="py-8 text-center text-gray-400">
+                                        No orders available today
                                     </td>
                                 </tr>
-                            ))}
+                            )}
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <div className="bg-white shadow-md rounded-xl">
-                <SalesChart data={chartData} options={chartOptions} />
-
+            <div className="bg-white shadow-md rounded-xl p-4">
+                <h2 className="mb-4 text-base font-semibold text-left text-black lg:text-xl md:text-lg">Sales Overview</h2>
+                {dashboardData.salesMetrics?.dailySales?.length ? (
+                    <SalesChart data={chartData} options={chartOptions} />
+                ) : (
+                    <div className="flex items-center justify-center h-40 text-gray-400">
+                        <p>No sales data available</p>
+                    </div>
+                )}
             </div>
         </div>
     );
