@@ -33,7 +33,7 @@ jobs:
           ssh-keyscan -H $VPS_HOST >> ~/.ssh/known_hosts
 
           # Copy web bundle
-          scp -i ~/.ssh/deploy_key dist-web.tar.gz $VPS_USER@$VPS_HOST:/tmp/
+          scp -p 72 -i ~/.ssh/deploy_key dist-web.tar.gz $VPS_USER@$VPS_HOST:/tmp/
 
           ssh -i ~/.ssh/deploy_key $VPS_USER@$VPS_HOST << 'EOF'
             # Create and extract web files
