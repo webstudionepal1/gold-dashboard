@@ -37,4 +37,4 @@ jobs:
           scp -P 72 -i ~/.ssh/deploy_key dist-web.tar.gz $VPS_USER@$VPS_HOST:/tmp/
           
           # Execute remote commands
-          ssh -i ~/.ssh/deploy_key $VPS_USER@$VPS_HOST "mkdir -p gold && tar -xzf /tmp/dist-web.tar.gz -C gold && rm /tmp/dist-web.tar.gz"
+          ssh -p 72 -i ~/.ssh/deploy_key $VPS_USER@$VPS_HOST "mkdir -p gold && tar -xzf /tmp/dist-web.tar.gz -C gold && rm /tmp/dist-web.tar.gz"
