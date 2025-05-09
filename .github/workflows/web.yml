@@ -27,17 +27,14 @@ jobs:
           VPS_USER: ${{ secrets.VPS_USER }}
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
+          # Setup SSH
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H $VPS_HOST >> ~/.ssh/known_hosts
-
+          ssh-keyscan -H "$VPS_HOST" >> ~/.ssh/known_hosts
+          
           # Copy web bundle
-          scp -p 72 -i ~/.ssh/deploy_key dist-web.tar.gz $VPS_USER@$VPS_HOST:/tmp/
-
-          ssh -i ~/.ssh/deploy_key $VPS_USER@$VPS_HOST << 'EOF'
-            # Create and extract web files
-            mkdir -p "gold"
-            tar -xzf /tmp/dist-web.tar.gz -C "gold"
-            rm /tmp/dist-web.tar.gz
-          EOF
+          scp -P 72 -i ~/.ssh/deploy_key dist-web.tar.gz $VPS_USER@$VPS_HOST:/tmp/
+          
+          # Execute remote commands
+          ssh -i ~/.ssh/deploy_key $VPS_USER@$VPS_HOST "mkdir -p gold && tar -xzf /tmp/dist-web.tar.gz -C gold && rm /tmp/dist-web.tar.gz"
