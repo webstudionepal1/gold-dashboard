@@ -51,18 +51,25 @@ export const useGetOrderStatusQuery = (params = {}) => {
   });
 };
 
-export const useGetTopOrderProductsQuery = (params = {}) => {
+export const useGetTopOrderProductsQuery = ({
+  date,
+  period,
+}: {
+  date: string;
+  period: string;
+}) => {
   return useQuery({
-    queryKey: ["top-products", params],
+    queryKey: ["top-products", date, period],
     queryFn: async () => {
       const res = await apiClient.get<{ data: topOrderProductsResponse }>(
         "top-products",
         {
-          params,
+          params: { date, period },
         }
       );
       return res?.data?.data;
     },
+    enabled: !!date && !!period,
   });
 };
 

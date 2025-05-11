@@ -15,21 +15,21 @@ interface productWiseResponse {
 }
 
 export const useGetProductWiseDataQuery = ({
-  startDate,
-  endDate,
+  date,
+  period,
 }: {
-  startDate: string;
-  endDate: string;
+  date: string;
+  period: string;
 }) => {
   return useQuery<productWiseResponse>({
-    queryKey: ["orderProduct", startDate, endDate],
+    queryKey: ["orderProduct", date, period],
     queryFn: async () => {
       const res = await apiClient.get("/orderProduct", {
-        params: { startDate, endDate },
+        params: { date, period },
       });
       return res.data?.data;
     },
-    enabled: !!startDate && !!endDate, // don’t fetch until both dates are available
+    enabled: !!date && !!period, // don’t fetch until both dates are available
   });
 };
 
@@ -41,35 +41,49 @@ interface categoryWiseData {
   percentageShare: number;
 }
 
-export const useGetCategoryWiseDataQuery = (params = {}) => {
+export const useGetCategoryWiseDataQuery = ({
+  date,
+  period,
+}: {
+  date: string;
+  period: string;
+}) => {
   return useQuery({
-    queryKey: ["orderCategory", params],
+    queryKey: ["orderCategory", date, period],
     queryFn: async () => {
       const res = await apiClient.get<{ data: categoryWiseData[] }>(
         "orderCategory",
         {
-          params,
+          params: { date, period },
         }
       );
       return res?.data?.data;
     },
+    enabled: !!date && !!period,
   });
 };
 
 // orderSubCategory;
 
-export const useGetSubCategoryWiseDataQuery = (params = {}) => {
+export const useGetSubCategoryWiseDataQuery = ({
+  date,
+  period,
+}: {
+  date: string;
+  period: string;
+}) => {
   return useQuery({
-    queryKey: ["orderSubCategory", params],
+    queryKey: ["orderSubCategory", date, period],
     queryFn: async () => {
       const res = await apiClient.get<{ data: subCategoryWiseData[] }>(
         "orderSubCategory",
         {
-          params,
+          params: { date, period },
         }
       );
       return res?.data?.data;
     },
+    enabled: !!date && !!period,
   });
 };
 

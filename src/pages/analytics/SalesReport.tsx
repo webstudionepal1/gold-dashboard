@@ -24,6 +24,10 @@ import {
   useGetSubCategoryWiseDataQuery,
 } from "../../server/api/salesReportHook";
 import { useGetOrderCategoryQuery } from "../../server/api/orderReportHook";
+import {
+  DateFilter,
+  PeriodOption,
+} from "../../components/shared/DatePeriodFilter";
 
 interface IEditModal {
   state: boolean;
@@ -36,9 +40,28 @@ interface FilterState {
   sortValue: string;
 }
 
+type TabFilter = {
+  date: string;
+  period: PeriodOption;
+};
+
 const SalesReport = () => {
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState("productWise");
+  const todayFilter = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+  const initialTabFilters: Record<string, TabFilter> = {
+    productWise: { date: todayFilter, period: "Monthly" },
+    categoryWise: { date: todayFilter, period: "Monthly" },
+    subCategoryWise: { date: todayFilter, period: "Monthly" },
+  };
+
+  const [tabFilters, setTabFilters] = useState(initialTabFilters);
+  const handleTabFilterChange = (updatedFilter: TabFilter) => {
+    setTabFilters((prev) => ({
+      ...prev,
+      [selectedTab]: updatedFilter,
+    }));
+  };
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState<IEditModal>({
     state: false,
     editData: null,
@@ -53,6 +76,11 @@ const SalesReport = () => {
   const [startDate, setStartDate] = useState<string>(formatDate(sevenDaysAgo));
   const [endDate, setEndDate] = useState<string>(formatDate(today));
 
+  // const [filter, setFilter] = useState<{ date: string; period: PeriodOption }>({
+  //   date: "",
+  //   period: "Daily",
+  // });
+
   const [filterState, setFilterState] = useState<FilterState>({
     searchQuery: "",
     filterValue: "",
@@ -63,19 +91,31 @@ const SalesReport = () => {
     data: ProductWiseData,
     isSuccess: isProductWiseDataSuccess,
     isLoading: isProductWiseDataLoading,
-  } = useGetProductWiseDataQuery({ startDate, endDate });
+  } = useGetProductWiseDataQuery({
+    date: tabFilters.productWise.date,
+    period: tabFilters.productWise.period.toLowerCase(), // lowercase for `monthly`
+  });
+  console.log("PRODUCT WISE DATA", ProductWiseData);
 
   const {
     data: categoryWiseDataList,
     isLoading: isCategoryWiseDataLoading,
     isSuccess: isCategoryWiseDataSuccess,
-  } = useGetCategoryWiseDataQuery();
+  } = useGetCategoryWiseDataQuery({
+    date: tabFilters.categoryWise.date,
+    period: tabFilters.categoryWise.period.toLowerCase(),
+  });
 
   const {
     data: subCategoryWiseDataList,
     isLoading: isSubCategoryWiseDataLoading,
     isSuccess: isSubCategoryWiseDataSuccess,
-  } = useGetSubCategoryWiseDataQuery();
+  } = useGetSubCategoryWiseDataQuery({
+    date: tabFilters.subCategoryWise.date,
+    period: tabFilters.subCategoryWise.period.toLowerCase(),
+  });
+
+  console.log("Sub category data", subCategoryWiseDataList);
 
   const { mutate: deleteExpense } = useDeleteExpenseMutation();
   const {
@@ -240,26 +280,10 @@ const SalesReport = () => {
     <div className="container px-4 py-3 mx-auto ">
       <Header text="Sales Report" />
 
-      <div className="flex gap-4 items-center my-4">
-        <div>
-          <label>Start Date</label>
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className="border px-2 py-1 rounded"
-          />
-        </div>
-        <div>
-          <label>End Date</label>
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className="border px-2 py-1 rounded"
-          />
-        </div>
-      </div>
+      <DateFilter
+        value={tabFilters[selectedTab]}
+        onChange={handleTabFilterChange}
+      />
       <MasterTable
         loading={expensesLoading || expenseCatLoading}
         tabsOptions={

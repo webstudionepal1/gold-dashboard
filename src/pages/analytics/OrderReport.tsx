@@ -26,6 +26,10 @@ import {
   useGetTopOrderProductsQuery,
 } from "../../server/api/orderReportHook";
 import { Carousel } from "./components/Carousel";
+import {
+  DateFilter,
+  PeriodOption,
+} from "../../components/shared/DatePeriodFilter";
 
 const stats = [
   {
@@ -74,6 +78,10 @@ interface FilterState {
   filterValue: string;
   sortValue: string;
 }
+type TabFilter = {
+  date: string;
+  period: PeriodOption;
+};
 
 const OrderReport = () => {
   const navigate = useNavigate();
@@ -88,6 +96,19 @@ const OrderReport = () => {
     filterValue: "",
     sortValue: "",
   });
+
+  const todayFilter = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+  const initialTabFilters: Record<string, TabFilter> = {
+    topOrderProducts: { date: todayFilter, period: "Monthly" },
+  };
+
+  const [tabFilters, setTabFilters] = useState(initialTabFilters);
+  const handleTabFilterChange = (updatedFilter: TabFilter) => {
+    setTabFilters((prev) => ({
+      ...prev,
+      [selectedTab]: updatedFilter,
+    }));
+  };
 
   const {
     data: orderStatusList,
@@ -112,7 +133,10 @@ const OrderReport = () => {
     data: TopOrderList,
     isLoading: topOrderLoading,
     isSuccess: topOrderSuccess,
-  } = useGetTopOrderProductsQuery();
+  } = useGetTopOrderProductsQuery({
+    date: tabFilters.topOrderProducts.date,
+    period: tabFilters.topOrderProducts.period,
+  });
 
   console.log("Top order data", TopOrderList);
 
@@ -264,6 +288,13 @@ const OrderReport = () => {
             ))}
         </Carousel>
       )} */}
+
+      {selectedTab === "topOrderProducts" && (
+        <DateFilter
+          value={tabFilters[selectedTab]}
+          onChange={handleTabFilterChange}
+        />
+      )}
 
       <MasterTable
         loading={orderStatusLoading}
