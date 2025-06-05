@@ -193,12 +193,13 @@ export const SidebarConfig = {
           title: "Notification",
           icon: "iconamoon:notification-bold",
         },
-        {
-          id: 9,
-          path: FrontendRoutes.MYPOSTBUSINESS,
-          title: "My Post Business",
-          icon: "mdi:truck-fast-outline",
-        },
+        // MyPostBusiness commented out - will be integrated later
+        // {
+        //   id: 9,
+        //   path: FrontendRoutes.MYPOSTBUSINESS,
+        //   title: "My Post Business",
+        //   icon: "mdi:truck-fast-outline",
+        // },
       ],
     },
   ],

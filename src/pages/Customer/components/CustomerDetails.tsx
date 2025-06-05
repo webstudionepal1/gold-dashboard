@@ -10,12 +10,13 @@ import {
   IOrderSummary,
   useGetAllOrdersQuery,
 } from "../../../server/api/orderHooks";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import InfoSection from "../../OrderManagement/Order/components/InfoSection";
 import { ScrollableModal } from "../../../components/shared/ScrollableModal";
 import Invoice, { InvoiceData } from "./Invoice";
 import { useReactToPrint, UseReactToPrintOptions } from "react-to-print";
+import { FrontendRoutes } from "../../../routes/routes";
 interface CustomerDetails {
   _id: string;
   order_id: string;
@@ -420,9 +421,9 @@ const CustomerDetails = () => {
             ]}
             onView={handleView}
             viewAllButton={
-              <button className="bg-white border-2 border-[#F1D097] text-[#F1D097] px-2 py-[3px] rounded-md lg:text-base md:text-sm text-xs">
+              <Link to={FrontendRoutes.ORDER} className="bg-white border-2 border-[#F1D097] text-[#F1D097] px-2 py-[3px] rounded-md lg:text-base md:text-sm text-xs hover:bg-[#F1D097] hover:text-white transition-colors">
                 View All
-              </button>
+              </Link>
             }
           />
         </div>
@@ -445,7 +446,7 @@ const CustomerDetails = () => {
               onEditClick={() => console.log("Edit clicked")}
             />
           </div>
-          {/* 
+          {/*
           <InfoCard
             className="bg-white border border-[#d5d9e2] rounded-lg h-full "
             title="Address Book"

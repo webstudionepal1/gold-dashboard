@@ -234,10 +234,11 @@ export function SimpleTable<T extends { [key: string]: any }>({
 
   return (
     <div className="px-4 bg-white rounded-xl overflow-y-auto">
-      <div className={`flex items-center ${titlePosition || ""} py-1`}>
+      <div className={`flex items-center justify-between ${titlePosition || ""} py-1`}>
         {title && (
           <h2 className="mb-4 text-xl font-semibold text-gray-700">{title}</h2>
         )}
+        {viewAllButton && <div className="mb-4">{viewAllButton}</div>}
       </div>
 
       <div className="overflow-x-auto">

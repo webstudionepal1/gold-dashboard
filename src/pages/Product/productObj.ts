@@ -428,7 +428,17 @@ export const generateProductDefaultValue = (state: string, editData?: any) => {
       subCategory: get(editData, "subCategory._id", ""),
       variant: get(editData, "variant", [{ price: 0, wt: 0, unit: "gm" }]),
       length: get(editData, "length", 0),
-      claspType: get(editData, "claspType._id", ""),
+      claspType: (() => {
+        const claspTypeValue = get(editData, "claspType", "");
+        if (
+          claspTypeValue &&
+          typeof claspTypeValue === "object" &&
+          claspTypeValue._id
+        ) {
+          return claspTypeValue._id;
+        }
+        return claspTypeValue || "";
+      })(),
       rhodoumFinishes: get(editData, "rhodoumFinishes", true),
       shape: get(editData, "shape", ""),
       clarity: get(editData, "clarity", ""),

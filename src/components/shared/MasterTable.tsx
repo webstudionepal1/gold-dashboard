@@ -35,7 +35,7 @@ interface MasterTableProps {
   toggleAction?: (row: any) => void;
   editAction?: (row: any) => void;
   returnAction?: (row: any) => void;
-
+  emptyStateMessage?: string;
   printAction?: (row: any) => void;
 }
 
@@ -60,6 +60,7 @@ const MasterTable: React.FC<MasterTableProps> = ({
   editAction,
   returnAction,
   printAction,
+  emptyStateMessage = "No data available",
 }) => {
   // State
   const [globalFilter, setGlobalFilter] = useState<string>("");
@@ -392,7 +393,7 @@ const MasterTable: React.FC<MasterTableProps> = ({
                     }
                     className="px-6 py-4 text-sm text-center text-gray-500"
                   >
-                    No data available
+                    {emptyStateMessage}
                   </td>
                 </tr>
               ) : (
