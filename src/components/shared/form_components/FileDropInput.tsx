@@ -21,11 +21,13 @@ const FileDropInput: React.FC<FileDropInputProps> = ({
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       if (acceptedFiles.length === 0) return;
-      
+
       // Create preview URLs
-      const previewUrls = acceptedFiles.map(file => URL.createObjectURL(file));
+      const previewUrls = acceptedFiles.map((file) =>
+        URL.createObjectURL(file)
+      );
       setPreviews(previewUrls);
-      
+
       // Call onChange with the appropriate value
       if (onChange) {
         onChange(multiple ? acceptedFiles : acceptedFiles[0]);
@@ -43,18 +45,18 @@ const FileDropInput: React.FC<FileDropInputProps> = ({
   // Clean up object URLs on unmount or when files change
   useEffect(() => {
     return () => {
-      previews.forEach(url => URL.revokeObjectURL(url));
+      previews.forEach((url) => URL.revokeObjectURL(url));
     };
   }, [previews]);
 
   // Determine what to display
   const displayName = (): string => {
     if (!value) return "";
-    
+
     if (Array.isArray(value)) {
-      return `${value.length} file${value.length !== 1 ? 's' : ''} selected`;
+      return `${value.length} file${value.length !== 1 ? "s" : ""} selected`;
     }
-    
+
     return value.name;
   };
 
@@ -98,14 +100,14 @@ const FileDropInput: React.FC<FileDropInputProps> = ({
           )}
         </div>
       </div>
-      
+
       {previews.length > 0 && (
         <div className="grid grid-cols-6 gap-2 border-2 p-4 rounded-md">
           {previews.map((preview, index) => (
-            <img 
-              key={`preview-${index}`} 
-              src={preview} 
-              alt={`Preview ${index + 1}`} 
+            <img
+              key={`preview-${index}`}
+              src={preview}
+              alt={`Preview ${index + 1}`}
               className="w-10 h-10 object-cover rounded"
             />
           ))}

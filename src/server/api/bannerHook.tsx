@@ -16,6 +16,7 @@ export interface IFetchBanner {
   priority?: number;
   locations?: string[];
   type?: string;
+  status?: string;
 }
 
 //Products routes

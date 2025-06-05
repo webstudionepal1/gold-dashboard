@@ -338,7 +338,7 @@ const OrderDetails: React.FC = () => {
         {/* Main Content Grid */}
         <div className="grid grid-cols-12 gap-4 mx-3 mt-4">
           {/* Order Items Table */}
-          <div className="col-span-12 bg-white border-2 rounded-xl border-[#d5d9e4] lg:col-span-8">
+          <div className="col-span-12 bg-white border-2 rounded-xl h-auto border-[#d5d9e4] lg:col-span-8">
             <MasterTable
               rows={orderMenu}
               columns={order_details_columns}
