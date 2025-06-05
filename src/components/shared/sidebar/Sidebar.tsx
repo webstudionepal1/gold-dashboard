@@ -45,7 +45,7 @@ const SidebarHeader: React.FC = () => {
       )}
     >
       <img
-        src="/companylogo.png"
+        src="/barun2.png"
         alt="company-logo"
         className={clsx(
           isCollapsed ? "h-[50px] w-[44px]" : "h-full w-full",

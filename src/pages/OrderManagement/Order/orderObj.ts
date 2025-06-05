@@ -108,11 +108,14 @@
 //   { value: "date-oldest", label: "Oldest First" },
 //   { value: "amount-high", label: "Amount (High to Low)" },
 //   { value: "amount-low", label: "Amount (Low to High)" },
-
 // ];
 // export interface FilterState {
 //   filter: string;
 //   sort: string;
+//   orderStatus?: string;
+//   customerName?: string;
+//   dateFrom?: string;
+//   dateTo?: string;
 // }
 // export const filterItems = (items: IFetchOrder[], filterState: FilterState) => {
 //   if (!items || items.length === 0) return [];
@@ -269,6 +272,7 @@ export const sortOptions = [
   { value: "amount-low", label: "Amount (Low to High)" },
 ];
 export interface FilterState {
+  searchQuery: string; // Add searchQuery
   filter: string;
   sort: string;
   orderStatus?: string;
@@ -281,13 +285,23 @@ export const filterItems = (items: IFetchOrder[], filterState: FilterState) => {
 
   let filteredItems = [...items];
 
+  // Apply search filter
+  if (filterState.searchQuery) {
+    const query = filterState.searchQuery.toLowerCase();
+    filteredItems = filteredItems.filter(
+      (item) =>
+        (item.customer?.name &&
+          item.customer.name.toLowerCase().includes(query)) ||
+        (item._id && item._id.toLowerCase().includes(query))
+    );
+  }
+
   // Apply status filter
   if (filterState.filter) {
-    filteredItems = filteredItems.filter((item) => {
-      return (
+    filteredItems = filteredItems.filter(
+      (item) =>
         item.orderStatus.toLowerCase() === filterState.filter.toLowerCase()
-      );
-    });
+    );
   }
 
   // Apply sorting

@@ -50,9 +50,9 @@ const SalesReport = () => {
   const [selectedTab, setSelectedTab] = useState("productWise");
   const todayFilter = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
   const initialTabFilters: Record<string, TabFilter> = {
-    productWise: { date: todayFilter, period: "Monthly" },
-    categoryWise: { date: todayFilter, period: "Monthly" },
-    subCategoryWise: { date: todayFilter, period: "Monthly" },
+    productWise: { date: todayFilter, period: "Yearly" },
+    categoryWise: { date: todayFilter, period: "Yearly" },
+    subCategoryWise: { date: todayFilter, period: "Yearly" },
   };
 
   const [tabFilters, setTabFilters] = useState(initialTabFilters);
