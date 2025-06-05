@@ -272,7 +272,7 @@ export const sortOptions = [
   { value: "amount-low", label: "Amount (Low to High)" },
 ];
 export interface FilterState {
-  searchQuery: string; // Add searchQuery
+  searchQuery?: string; // Add searchQuery
   filter: string;
   sort: string;
   orderStatus?: string;
