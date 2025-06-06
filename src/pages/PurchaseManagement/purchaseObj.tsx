@@ -6,12 +6,18 @@ interface IButtonObj {
     show: boolean;
   };
 }
+interface IContactPerson {
+  name: string;
+  phone: string;
+  email: string;
+}
 export interface SupplierFormValues {
   name: string;
   description?: string;
   email: string;
   phone: string;
-  alternatePhone?: string;
+  contactPerson: IContactPerson;
+  // alternatePhone?: string;
   businessType: string;
   addresses: {
     district: string;
@@ -60,7 +66,12 @@ export const supplierSchema = z.object({
   description: z.string().optional(),
   email: z.string().email("Invalid email format").min(1, "Email is required"),
   phone: z.string().min(1, "Phone is required"),
-  alternatePhone: z.string().optional(),
+  contactPerson: z.object({
+    name: z.string().min(1, "Contact person name is required"),
+    phone: z.string().min(1, "Phone is required"),
+    email: z.string().email("Invalid email format").min(1, "Email is required"),
+  }),
+  // alternatePhone: z.string().optional(),
   businessType: z.string().min(1, "Business Type is required"),
   addresses: z.object({
     district: z.string().min(1, "District is required"),
@@ -89,7 +100,12 @@ export const getSupplierInitialFormValues = (state: string, editData?: any) => {
       description: "",
       email: "",
       phone: "",
-      alternatePhone: "",
+      contactPerson: {
+        name: "",
+        phone: "",
+        email: "",
+      },
+      // alternatePhone: "",
       businessType: "",
       addresses: {
         district: "",
@@ -117,7 +133,12 @@ export const getSupplierInitialFormValues = (state: string, editData?: any) => {
     description: get(editData, "description"),
     email: get(editData, "email", ""),
     phone: get(editData, "phone", ""),
-    alternatePhone: get(editData, "alternatePhone", ""),
+    contactPerson: {
+      name: get(editData, "contactPerson.name", ""),
+      phone: get(editData, "contactPerson.phone", ""),
+      email: get(editData, "contactPerson.email", ""),
+    },
+    // alternatePhone: get(editData, "alternatePhone", ""),
     businessType: get(editData, "businessType", ""),
     addresses: {
       district: get(editData, "addresses.district", ""),

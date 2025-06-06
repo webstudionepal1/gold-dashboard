@@ -99,6 +99,7 @@ const PurchaseIndex = () => {
       columns: supplierColumns,
       rows: map(supplierList, (item) => ({
         ...item,
+        contactPerson: item.contactPerson?.name || "-",
       })),
       viewAction(row: IFetchSupplier) {
         navigate(`/inventory/supplier/${row._id}`);

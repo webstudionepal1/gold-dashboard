@@ -29,7 +29,7 @@ export const PriceInputField = React.forwardRef<
     },
     ref
   ) => (
-    <div className="flex flex-col gap-2 w-full">
+    <div className="flex flex-col gap-2 w-full rounded-2xl">
       <label className="flex gap-1">
         <p className="text-[#95949a]">{label}</p>
         {required && <span className="text-red">*</span>}

@@ -51,7 +51,10 @@ const AddSupplierForm = () => {
 
     onSubmit: async ({ value }) => {
       const formdata = new FormData();
+
       appendFormData(formdata, value);
+
+      console.log(formdata, "SAVING DATA");
       if (page === "add") createSupplier(formdata);
       else updateSupplier({ id: editData?._id, body: formdata });
     },
@@ -82,20 +85,53 @@ const AddSupplierForm = () => {
               <div className="border-b border-[#dedde2] w-full my-2"></div>
             </div>
             <div className="w-full">
-              <form.Field name="name">
-                {(field) => (
-                  <div className="w-full">
-                    <InputField
-                      label="Supplier Name"
-                      required
-                      placeholder="Enter Supplier Name"
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                    />
-                    <FieldError field={field} />
-                  </div>
-                )}
-              </form.Field>
+              <div className="flex items-center justify-between gap-4">
+                <form.Field name="name">
+                  {(field) => (
+                    <div className="w-full">
+                      <InputField
+                        label="Supplier Name"
+                        required
+                        placeholder="Enter Supplier Name"
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                      />
+                      <FieldError field={field} />
+                    </div>
+                  )}
+                </form.Field>
+
+                <form.Field name="email">
+                  {(field) => (
+                    <div className="w-full">
+                      <InputField
+                        label="Email"
+                        type="email"
+                        required
+                        placeholder="Enter Email Address"
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                      />
+                      <FieldError field={field} />
+                    </div>
+                  )}
+                </form.Field>
+
+                <form.Field name="phone">
+                  {(field) => (
+                    <div className="w-full">
+                      <InputField
+                        label="Phone No"
+                        required
+                        placeholder="Enter Phone No."
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                      />
+                      <FieldError field={field} />
+                    </div>
+                  )}
+                </form.Field>
+              </div>
 
               <form.Field name="businessType">
                 {(field) => (
@@ -113,7 +149,7 @@ const AddSupplierForm = () => {
               </form.Field>
 
               <div className="flex items-center justify-between gap-4">
-                <form.Field name="addresses.district">
+                <form.Field name="addresses.address">
                   {(field) => (
                     <div className="w-full">
                       <InputField
@@ -182,7 +218,7 @@ const AddSupplierForm = () => {
               <div className="border-b border-[#dedde2] w-full my-2"></div>
             </div>
             <div className="flex items-center justify-between gap-4">
-              <form.Field name="name">
+              <form.Field name="contactPerson.name">
                 {(field) => (
                   <div className="w-full">
                     <InputField
@@ -197,7 +233,7 @@ const AddSupplierForm = () => {
                 )}
               </form.Field>
 
-              <form.Field name="phone">
+              <form.Field name="contactPerson.phone">
                 {(field) => (
                   <div className="w-full">
                     <InputField
@@ -212,7 +248,7 @@ const AddSupplierForm = () => {
                 )}
               </form.Field>
 
-              <form.Field name="alternatePhone">
+              {/* <form.Field name="alternatePhone">
                 {(field) => (
                   <div className="w-full">
                     <InputField
@@ -224,10 +260,10 @@ const AddSupplierForm = () => {
                     <FieldError field={field} />
                   </div>
                 )}
-              </form.Field>
+              </form.Field> */}
             </div>
 
-            <form.Field name="email">
+            <form.Field name="contactPerson.email">
               {(field) => (
                 <div className="w-full">
                   <InputField
@@ -349,7 +385,7 @@ const AddSupplierForm = () => {
               </form.Field>
             </div>
             <div className="w-full mb-[2rem]">
-              <div className="bg-[#ffffff] border-[#eeeeee] border-2 shadow-lg rounded-xl w-full">
+              <div className="bg-[#ffffff] border-[#eeeeee] border-2  rounded-xl w-full">
                 <div className="mx-6 my-4">
                   <div>
                     <h1 className="text-xl font-semibold">
