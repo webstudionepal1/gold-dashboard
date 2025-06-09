@@ -31,6 +31,7 @@ import {
 import { updateSuplierState } from "../../store/supplierStore";
 import { IFetchProduct } from "../../server/api/productHooks";
 import dayjs from "dayjs";
+import { Constants } from "../../utils/constants";
 
 interface IModalState {
   of: string;
@@ -61,7 +62,7 @@ const PurchaseIndex = () => {
         date: dayjs(item.createdAt).format("MMM-DD-YYYY"),
         supplier: get(item, "supplier.name", "-"),
         billNo: get(item, "billNo", "-"),
-        totalCost: `$ ${
+        totalCost: `${Constants.currency} ${
           item?.items.length > 0
             ? item.items.reduce((acc, item) => acc + item.price, 0)
             : item?.products.reduce((acc, item) => acc + item.price, 0)
@@ -100,6 +101,8 @@ const PurchaseIndex = () => {
       rows: map(supplierList, (item) => ({
         ...item,
         contactPerson: item.contactPerson?.name || "-",
+        contactNo: get(item, "contactPerson.phone"),
+        leadTime: dayjs().diff(dayjs(get(item, "updatedAt")), "days"),
       })),
       viewAction(row: IFetchSupplier) {
         navigate(`/inventory/supplier/${row._id}`);
@@ -120,7 +123,6 @@ const PurchaseIndex = () => {
       columns: purchaseReturnColumns,
       rows: map(returnList, (item) => ({
         ...item,
-        return: get(item, "returnNO", "-"),
         reason: get(item, "reason", "-"),
         date: dayjs(get(item, "createdAt", "-")).format("MMM-DD-YYYY"),
         totalAmount: get(item, "totalReturnAmount", 0),
@@ -195,19 +197,19 @@ const PurchaseIndex = () => {
       )}
 
       {modal.of === "purchase-view" && modal.data && (
-        <ScrollableModal classname="w-full max-w-xl" onClose={closeModal}>
+        <ScrollableModal classname="w-full max-w-2xl" onClose={closeModal}>
           <PurchaseDetailsCard data={modal.data} />
         </ScrollableModal>
       )}
 
       {modal.of === "purchase-return" && modal.data && (
-        <ScrollableModal classname="w-full max-w-xl" onClose={closeModal}>
+        <ScrollableModal classname="w-full max-w-2xl" onClose={closeModal}>
           <PurchaseDetailsCard summary="refund" data={modal.data} />
         </ScrollableModal>
       )}
 
       {modal.of === "purchase-return-form" && (
-        <ScrollableModal classname="w-full max-w-xl" onClose={closeModal}>
+        <ScrollableModal classname="w-full max-w-2xl" onClose={closeModal}>
           <PurchaseReturnForm data={modal.data} onClose={closeModal} />
         </ScrollableModal>
       )}

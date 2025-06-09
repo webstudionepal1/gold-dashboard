@@ -212,6 +212,7 @@ const ExpenseForm = ({ editData, closeModal }: propTypes) => {
           <form.Field name="image">
             {(field) => (
               <MultiImageUploader
+                form={form}
                 label="Upload Receipts"
                 value={field.state.value as File[]}
                 onChange={(files: File[]) => field.handleChange(files)}

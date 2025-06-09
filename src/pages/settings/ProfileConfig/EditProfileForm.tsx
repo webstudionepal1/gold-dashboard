@@ -897,6 +897,7 @@ const EditProfileForm = () => {
               <form.Field name="logo">
                 {(field) => (
                   <MultiImageUploader
+                    form={form}
                     label="Upload Receipts"
                     value={field.state.value as File[]}
                     onChange={(files: File[]) => field.handleChange(files)}
@@ -916,6 +917,7 @@ const EditProfileForm = () => {
                     label="Upload Receipts"
                     value={field.state.value as File[]}
                     onChange={(files: File[]) => field.handleChange(files)}
+                    form={form}
                   />
                 )}
               </form.Field>

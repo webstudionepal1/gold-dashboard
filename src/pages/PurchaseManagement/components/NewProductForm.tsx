@@ -14,6 +14,7 @@ import {
 import { useGetSupplierQuery } from "../../../server/api/supplierHooks";
 import { FieldError } from "../../auth/LoginPage";
 import { IPurchaseForm, PurchaseSchema } from "../purchaseObj";
+import { useEffect } from "react";
 interface NewProductProps {
   onClose: () => void;
   edit?: boolean;
@@ -24,8 +25,10 @@ const NewProductForm = ({
   edit = false,
   data = null,
 }: NewProductProps) => {
-  const { mutate: createPurchase } = useCreatePurchaseMutation();
-  const { mutate: updatePurchase } = useUpdatePurchaseMutation();
+  const { mutate: createPurchase, isSuccess: createSuccess } =
+    useCreatePurchaseMutation();
+  const { mutate: updatePurchase, isSuccess: updateSuccess } =
+    useUpdatePurchaseMutation();
   const { data: suppliers, isSuccess } = useGetSupplierQuery();
   const { data: products, isSuccess: productSuccess } =
     useGetAllProductsQuery();
@@ -38,7 +41,6 @@ const NewProductForm = ({
   const productList = productSuccess
     ? products?.map((item) => ({ label: item.name, value: item._id }))
     : [];
-  console.log("data", data);
   const form = useForm({
     defaultValues: {
       billNo: edit ? get(data, "billNo") : "",
@@ -69,11 +71,17 @@ const NewProductForm = ({
       onSubmit: PurchaseSchema,
     },
     onSubmit: async ({ value }) => {
+      console.log("Order Submitted", value);
       if (edit) updatePurchase({ id: data?._id ?? "", body: value });
       else createPurchase(value);
     },
   });
 
+  useEffect(() => {
+    if (createSuccess || updateSuccess) {
+      onClose();
+    }
+  }, [createSuccess, updateSuccess]);
   return (
     <div>
       <form

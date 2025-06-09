@@ -307,6 +307,7 @@ const AddBannerForm = () => {
               <form.Field name="image">
                 {(field) => (
                   <MultiImageUploader
+                    form={form}
                     label=""
                     value={field.state.value as File[]}
                     onChange={(files: File[]) => field.handleChange(files)}
@@ -326,6 +327,7 @@ const AddBannerForm = () => {
               <form.Field name="mobImage">
                 {(field) => (
                   <MultiImageUploader
+                    form={form}
                     label=""
                     value={field.state.value as File[]}
                     onChange={(files: File[]) => field.handleChange(files)}

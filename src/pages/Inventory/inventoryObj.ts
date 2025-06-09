@@ -14,3 +14,15 @@ export const inventoryColumns = [
     title: "Status",
   },
 ];
+export const columns = [
+  { key: "name", title: "Items" },
+  { key: "category", title: "Category" },
+  { key: "price", title: "Price (Rs)" },
+  { key: "wt", title: "Weight" },
+  { key: "unit", title: "Unit" },
+  { key: "totalStock", title: "Total Stock" },
+  { key: "remainingStock", title: "Remaining" },
+  { key: "usedStock", title: "Used" },
+  { key: "reorder_point", title: "Reorder Point" },
+  { key: "status", title: "Status" },
+];

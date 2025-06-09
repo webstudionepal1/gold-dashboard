@@ -85,7 +85,11 @@ export const useUpdateSupplierMutation = () => {
   return useMutation({
     mutationKey: ["supplier"],
     mutationFn: async ({ id, body }: IParams) => {
-      const res = await apiClient.patch(`supplier/${id}`, body);
+      const res = await apiClient.patch(`supplier/${id}`, body, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       return res?.data?.data;
     },
     onSuccess() {

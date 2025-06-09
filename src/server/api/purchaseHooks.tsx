@@ -24,7 +24,7 @@ export interface IFetchPurchase {
   billNo: string;
   items: IItem[];
   products: IProducts[];
-  supplier: IFetchSupplier;
+  supplier: string;
   discount: number;
   discountType: string;
   totalAmount: number;
@@ -117,22 +117,21 @@ export const useDeletePurchaseMutation = () => {
   });
 };
 
-
 // getraw materials
 export interface IItems {
   name?: string;
   usedStock?: number;
-  unit?:string;
+  unit?: string;
   remainingStock?: number;
   totalStock?: number;
 }
 export interface IFetchItems {
   name: string;
-  unit?:string;
+  unit?: string;
   usedStock: number;
   remainingStock: number;
   totalStock: number;
-  _id:string;
+  _id: string;
 }
 export const useGetRawMaterialsQuery = (params = {}) => {
   return useQuery({
@@ -167,7 +166,7 @@ export const useUpdateRawItemsMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ["rawitem"],
-    mutationFn: async ({ id, body }: {id:string, body:IItems}) => {
+    mutationFn: async ({ id, body }: { id: string; body: IItems }) => {
       const res = await apiClient.patch(`rawitem/${id}`, body);
       return res?.data?.data;
     },

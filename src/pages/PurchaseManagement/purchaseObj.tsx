@@ -1,5 +1,6 @@
 import { get } from "lodash";
 import * as z from "zod";
+import { Constants } from "../../utils/constants";
 interface IButtonObj {
   [key: string]: {
     text?: string;
@@ -17,6 +18,7 @@ export interface SupplierFormValues {
   email: string;
   phone: string;
   contactPerson: IContactPerson;
+  existingImages: string[];
   // alternatePhone?: string;
   businessType: string;
   addresses: {
@@ -68,7 +70,10 @@ export const supplierSchema = z.object({
   phone: z.string().min(1, "Phone is required"),
   contactPerson: z.object({
     name: z.string().min(1, "Contact person name is required"),
-    phone: z.string().min(1, "Phone is required"),
+    phone: z
+      .string()
+      .regex(/^\d+$/, "Only digits are allowed")
+      .min(1, "Phone is required"),
     email: z.string().email("Invalid email format").min(1, "Email is required"),
   }),
   // alternatePhone: z.string().optional(),
@@ -91,9 +96,7 @@ export const supplierSchema = z.object({
     branch: z.string().min(1, "Branch is required"),
   }),
   // logo: z.instanceof(File).nullable(),
-  logo: z
-    .array(z.instanceof(File))
-    .nonempty({ message: "At least one image is required" }),
+  logo: z.array(z.instanceof(File)).optional(),
   products: z.array(z.string()).optional(),
 });
 export const getSupplierInitialFormValues = (state: string, editData?: any) => {
@@ -128,7 +131,7 @@ export const getSupplierInitialFormValues = (state: string, editData?: any) => {
         branch: "",
       },
       logo: [],
-      products: [""],
+      products: [],
     };
 
   return {
@@ -160,7 +163,8 @@ export const getSupplierInitialFormValues = (state: string, editData?: any) => {
       paymentTerms: get(editData, "bankDetails.paymentTerms", ""),
       branch: get(editData, "bankDetails.branch", ""),
     },
-    logo: editData ? get(editData, "logo", []) : [],
+    logo: [],
+    existingImages: editData ? get(editData, "logo", []) : [],
     products: [],
   };
 };
@@ -206,11 +210,11 @@ export const supplierColumns = [
     key: "phone",
   },
   {
-    title: "Contact No",
+    title: "Contact Person No",
     key: "contactNo",
   },
   {
-    title: "Lead Time",
+    title: "Lead Time (Days)",
     key: "leadTime",
   },
 ];
@@ -237,7 +241,7 @@ export const purchaseReturnColumns = [
   { key: "date", title: "Date" },
   {
     title: "Return No",
-    key: "return",
+    key: "returnNo",
   },
   {
     key: "totalAmount",
@@ -282,26 +286,26 @@ export const returnColumns = [
   { key: "name", title: "Item Name" },
   {
     key: "price",
-    title: "Cost per unit",
+    title: `Cost per unit (${Constants.currency})`,
   },
   { key: "quantity", title: "QTY" },
   {
     key: "total",
-    title: "Total",
+    title: `Total (${Constants.currency})`,
   },
 ];
 
 export const viewPurchaseColumns = [
   { key: "name", title: "Item Name" },
-  { key: "unit", title: "Unit" },
   {
     key: "costPerUnit",
-    title: "Cost per unit",
+    title: `Cost per unit (${Constants.currency})`,
   },
   { key: "quantity", title: "QTY" },
+  { key: "wt", title: "Weight" },
   {
     key: "total",
-    title: "Total",
+    title: `Total (${Constants.currency})`,
   },
 ];
 
@@ -339,7 +343,7 @@ export const RawMaterialSchema = z.object({
 export interface IPurchaseForm {
   billNo: string;
   supplier: string;
-  phone_no: string;
+  // phone_no: string;
   products: {
     product: string;
     quantity: number;
@@ -352,7 +356,7 @@ export interface IPurchaseForm {
 export const PurchaseSchema = z.object({
   billNo: z.string().min(1, "**Bill No is required**"),
   supplier: z.string().min(1, "**Supplier name is required**"),
-  phone_no: z.string().min(1, "**Phone Number is required**"),
+  // phone_no: z.string().min(1, "**Phone Number is required**"),
   products: z
     .array(
       z.object({
@@ -366,3 +370,34 @@ export const PurchaseSchema = z.object({
     .min(1, "**At least one item is required**"),
   description: z.string().optional(),
 });
+export const supplierfieldSchemas = {
+  name: supplierSchema.shape.name,
+  email: supplierSchema.shape.email,
+  phone: supplierSchema.shape.phone,
+  businessType: supplierSchema.shape.businessType,
+  addresses: {
+    address: supplierSchema.shape.addresses.shape.address,
+    district: supplierSchema.shape.addresses.shape.district,
+    province: supplierSchema.shape.addresses.shape.province,
+  },
+  description: supplierSchema.shape.description,
+  contactPerson: {
+    name: supplierSchema.shape.contactPerson.shape.name,
+    phone: supplierSchema.shape.contactPerson.shape.phone,
+    email: supplierSchema.shape.contactPerson.shape.email,
+  },
+  bankDetails: {
+    paymentTerms: supplierSchema.shape.bankDetails.shape.paymentTerms,
+    bankName: supplierSchema.shape.bankDetails.shape.bankName,
+    branch: supplierSchema.shape.bankDetails.shape.branch,
+    accountHolderName: supplierSchema.shape.bankDetails.shape.accountHolderName,
+    accountNumber: supplierSchema.shape.bankDetails.shape.accountNumber,
+  },
+  businessInfo: {
+    company: supplierSchema.shape.businessInfo.shape.company,
+    companyNumber: supplierSchema.shape.businessInfo.shape.companyNumber,
+    PAN: supplierSchema.shape.businessInfo.shape.PAN,
+  },
+  products: supplierSchema.shape.products,
+  logo: supplierSchema.shape.logo,
+};

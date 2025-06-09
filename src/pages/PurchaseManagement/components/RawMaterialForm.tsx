@@ -202,7 +202,7 @@ const NewProductForm = ({
                     </form.Field>
                   </div>
 
-                  <div className="grid gap-4 grid-cos-1 sm:grid-cols-2">
+                  <div className="grid gap-4 grid-cos-1 sm:grid-cols-3">
                     <form.Field name={`items[${index}].price`}>
                       {(field) => (
                         <div className="w-full">
