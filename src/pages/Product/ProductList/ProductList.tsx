@@ -21,6 +21,7 @@ import { productListColumns } from "../productObj";
 
 const ProductList: React.FC = () => {
   const { data: productsList, isSuccess, isLoading } = useGetAllProductsQuery();
+  console.log("PRODUCT LIST DATA", productsList);
   const productsData = useMemo(
     () => (isSuccess ? productsList : []),
     [isSuccess, productsList]
@@ -126,8 +127,9 @@ const ProductList: React.FC = () => {
   const tableData = productsData.map((product, index) => ({
     ...product,
     sn: index + 1,
+
     image: (
-      <div className="size-6">
+      <div className="size-6 text-center">
         {product.images && product.images.length > 0 ? (
           <img
             src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${
@@ -149,7 +151,8 @@ const ProductList: React.FC = () => {
     categ: get(product, "category.name", ""),
     subCate: get(product, "subCategory.name", ""),
     price: get(product, "price", 0),
-    stock: get(product, "-"),
+    stock: get(product, "variant[0].remainingStock", 0),
+    sold: get(product, "variant[0].usedStock", 0),
   }));
 
   return (

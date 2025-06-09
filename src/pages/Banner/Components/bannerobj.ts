@@ -6,8 +6,8 @@ export interface IBannerFormData {
   category: string;
   subCategory: string;
   priority: number;
-  image: File | null;
-  mobImage: File | null;
+  image: File[];
+  mobImage: File[];
   locations: string[]; // Adjust this based on actual usage (array or single string)
 }
 export const generateBannerFormDefaultValue = (
@@ -24,8 +24,8 @@ export const generateBannerFormDefaultValue = (
 
       // Price
       priority: 0,
-      image: null,
-      mobImage: null,
+      image: [],
+      mobImage: [],
       locations: [],
     };
   } else {
@@ -35,8 +35,8 @@ export const generateBannerFormDefaultValue = (
       category: get(editData, "category", ""),
       subCategory: get(editData, "subCategory", ""),
       priority: get(editData, "priority", 0),
-      image: get(editData, "image", null),
-      mobImage: get(editData, "mobImage", null),
+      image: get(editData, "image", []),
+      mobImage: get(editData, "mobImage", []),
 
       locations: get(editData, "locations", []),
     };

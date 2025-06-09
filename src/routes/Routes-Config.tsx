@@ -22,7 +22,7 @@ import OrderIndex from "../pages/OrderManagement/Order/OrderIndex";
 import AddOrderForm from "../pages/OrderManagement/Order/components/AddOrderPage";
 import AddBannerForm from "../pages/Banner/Components/AddBannerForm";
 import CustomerIndex from "../pages/Customer/CustomerIndex";
-import AddCustomerForm from "../pages/Customer/components/AddCustomerForm";
+// import AddCustomerForm from "../pages/Customer/components/AddCustomerForm";
 import Transaction from "../pages/transaction/Transaction";
 import VerifyCashPayment from "../pages/transaction/VerifyCashPayment";
 import Expenses from "../pages/financeandexpenses/Expenses";
@@ -111,8 +111,8 @@ export const routesConfig = [
     element: <ProductList />,
   },
   {
-    path:"/product/details/:id",
-    element:<ProductDescription/>
+    path: "/product/details/:id",
+    element: <ProductDescription />,
   },
   {
     path: "/product/:id",
@@ -141,10 +141,10 @@ export const routesConfig = [
 
     element: <CustomerDetails />,
   },
-  {
-    path: FrontendRoutes.ADDCUSTOMER,
-    element: <AddCustomerForm />,
-  },
+  // {
+  //   path: FrontendRoutes.ADDCUSTOMER,
+  //   element: <AddCustomerForm />,
+  // },
 
   {
     path: FrontendRoutes.INVENTORY,
@@ -221,8 +221,9 @@ export const routesConfig = [
   {
     path: FrontendRoutes.PROFILECONFIG,
     element: <EditProfileForm />,
-  },{
-    path:'/settings/attribute-config',
+  },
+  {
+    path: "/settings/attribute-config",
     element: <AttribConfig />,
   },
   //Analytics

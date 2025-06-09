@@ -3,7 +3,7 @@ import { useForm } from "@tanstack/react-form";
 import { InputField } from "../../../components/shared/form_components/InputField";
 
 import { z } from "zod";
-import FileDropInput from "../../../components/shared/form_components/FileDropInput";
+
 import { useStore } from "@tanstack/react-form";
 import { DropdownField } from "../../../components/shared/form_components/Dropdown";
 import {

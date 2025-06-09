@@ -129,7 +129,7 @@ const AttribConfig = () => {
       <Header text="Attribute Config">
         <button
           onClick={() => buttonObj[tab].handleClick()}
-         className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-sm text-white px-4 py-2 flex rounded-lg transition-colors duration-200"
+          className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-sm text-white px-4 py-2 flex rounded-lg transition-colors duration-200"
         >
           <Icon
             icon="material-symbols-light:add-rounded"

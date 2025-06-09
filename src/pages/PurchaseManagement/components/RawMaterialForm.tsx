@@ -53,6 +53,7 @@ const NewProductForm = ({
               quantity: 1,
               price: 0,
               paidAmount: 0,
+              wt: 0,
             },
           ])
         : [
@@ -61,6 +62,7 @@ const NewProductForm = ({
               quantity: 1,
               price: 0,
               paidAmount: 0,
+              wt: 0,
             },
           ],
       description: edit ? get(data, "description") : "",
@@ -68,9 +70,27 @@ const NewProductForm = ({
     validators: {
       onSubmit: RawMaterialSchema,
     },
+    // onSubmit: async ({ value }) => {
+    //   if (edit) updatePurchase({ id: data?._id ?? "", body: value });
+    //   else createPurchase(value);
+    // },
     onSubmit: async ({ value }) => {
-      if (edit) updatePurchase({ id: data?._id ?? "", body: value });
-      else createPurchase(value);
+      if (edit) {
+        updatePurchase(
+          { id: data?._id ?? "", body: value },
+          {
+            onSuccess: () => {
+              onClose();
+            },
+          }
+        );
+      } else {
+        createPurchase(value, {
+          onSuccess: () => {
+            onClose();
+          },
+        });
+      }
     },
   });
 
@@ -129,6 +149,7 @@ const NewProductForm = ({
                       quantity: 1,
                       price: 0,
                       paidAmount: 0,
+                      wt: 0,
                     })
                   }
                   className="px-3 py-2 text-sm flex items-center text-white bg-[#d49327] transition-transform duration-200 ease-in-out hover:scale-105 rounded-lg"
@@ -205,6 +226,25 @@ const NewProductForm = ({
                             label="Paid Price (Rs.)"
                             required
                             placeholder="176,000"
+                            value={field.state.value}
+                            onChange={(e) =>
+                              field.handleChange(Number(e.target.value))
+                            }
+                          />
+                          <FieldError field={field} />
+                        </div>
+                      )}
+                    </form.Field>
+
+                    <form.Field name={`items[${index}].wt`}>
+                      {(field) => (
+                        <div className="w-full">
+                          <InputField
+                            label="Weight"
+                            type="number"
+                            // min={0}
+                            placeholder="Enter weight"
+                            required
                             value={field.state.value}
                             onChange={(e) =>
                               field.handleChange(Number(e.target.value))

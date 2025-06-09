@@ -8,8 +8,7 @@ interface propTypes {
 }
 import { FieldError } from "../../auth/LoginPage";
 import { InputField } from "../../../components/shared/form_components/InputField";
-import { DropdownField } from "../../../components/shared/form_components/Dropdown";
-import FileDropInput from "../../../components/shared/form_components/FileDropInput";
+
 import { TextareaField } from "../../../components/shared/form_components/TextArea";
 import {
   useCreateExpenseCategoryMutation,

@@ -1,32 +1,17 @@
-import { Icon } from "@iconify/react/dist/iconify.js";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import MasterTable from "../../components/shared/MasterTable";
-import { ScrollableModal } from "../../components/shared/ScrollableModal";
-import Header from "../../components/shared/table_heading/Header";
-import { DynamicTab } from "../PurchaseManagement/components/DynamicTab";
 
-import {
-  buttonObj,
-  expenseTabOption,
-  ITable,
-} from "../financeandexpenses/components/expenseObj";
+import Header from "../../components/shared/table_heading/Header";
 
 import { get, map } from "lodash";
 import {
   IFetchExpenses,
   IFetchExpensesCategory,
-  useDeleteExpenseCategoryMutation,
-  useDeleteExpenseMutation,
-  useGetExpenseCategoryQuery,
-  useGetExpensesQuery,
 } from "../../server/api/expensesHook";
-import ExpenseForm from "../financeandexpenses/components/ExpenseForm";
-import ExpenseCategoryForm from "../financeandexpenses/components/ExpenseCategoryForm";
+
 import { SearchFilterSort } from "../../components/global/SearchFilterSort";
 
-import { updateExpenseState } from "../financeandexpenses/components/ExpenseStore";
-import { updateExpenseCategoryState } from "../financeandexpenses/components/ExpenseCategoryStore";
 import {
   useDeleteCustomerMutation,
   useGetCustomerQuery,
@@ -211,16 +196,6 @@ const CustomerIndex = () => {
     },
   ];
 
-  const [modal, setModal] = useState<IModalState>({
-    of: "",
-    edit: false,
-    data: null,
-  });
-  const closeModal = useCallback(
-    () => setModal({ of: "", edit: false, data: null }),
-    []
-  );
-
   return (
     <div className="container px-4 py-3 mx-auto ">
       <Header text="Customer List" />
@@ -248,17 +223,6 @@ const CustomerIndex = () => {
         }
         showAction
       />
-      {modal.of === "expenses" && (
-        <ScrollableModal onClose={closeModal} classname="w-[35rem]">
-          <ExpenseForm editData={modal.data} closeModal={closeModal} />
-        </ScrollableModal>
-      )}
-
-      {modal.of === "expensesCategory" && (
-        <ScrollableModal classname="w-[35rem]" onClose={closeModal}>
-          <ExpenseCategoryForm editData={modal.data} closeModal={closeModal} />
-        </ScrollableModal>
-      )}
     </div>
   );
 };

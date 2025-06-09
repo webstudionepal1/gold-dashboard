@@ -263,9 +263,9 @@ const ProfitandLoss = () => {
             columns={profitandlossColumns}
             loading={isfinancialRepLoading}
             // Enable hidden rows feature
-            hiddenRows={detailedTransactions}
-            showHiddenRowsToggle={true}
-            hiddenRowsLabel="Expenses"
+            // hiddenRows={detailedTransactions}
+            // showHiddenRowsToggle={true}
+            // hiddenRowsLabel="Expenses"
           />
         </div>
       </div>

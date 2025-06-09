@@ -301,7 +301,7 @@ const OrderDetails: React.FC = () => {
 
       <div className="py-4 bg-white rounded-md">
         {/* Order Header */}
-        <div className="border-2 border-[#d6dbe4] mx-3 rounded-xl">
+        {/* <div className="border-2 border-[#d6dbe4] mx-3 rounded-xl">
           <div className="flex items-center justify-between px-3 py-3">
             <div className="flex flex-col">
               <h1
@@ -333,7 +333,7 @@ const OrderDetails: React.FC = () => {
               </button>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-12 gap-4 mx-3 mt-4">

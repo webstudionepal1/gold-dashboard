@@ -36,7 +36,7 @@ export interface SupplierFormValues {
     paymentTerms: string;
     branch: string;
   };
-  logo: File | null;
+  logo: File[];
   products?: string[];
 }
 export const buttonObj: IButtonObj = {
@@ -90,7 +90,10 @@ export const supplierSchema = z.object({
     paymentTerms: z.string().min(1, "Payment Terms are required"),
     branch: z.string().min(1, "Branch is required"),
   }),
-  logo: z.instanceof(File).nullable(),
+  // logo: z.instanceof(File).nullable(),
+  logo: z
+    .array(z.instanceof(File))
+    .nonempty({ message: "At least one image is required" }),
   products: z.array(z.string()).optional(),
 });
 export const getSupplierInitialFormValues = (state: string, editData?: any) => {
@@ -124,7 +127,7 @@ export const getSupplierInitialFormValues = (state: string, editData?: any) => {
         paymentTerms: "",
         branch: "",
       },
-      logo: null,
+      logo: [],
       products: [""],
     };
 
@@ -157,7 +160,7 @@ export const getSupplierInitialFormValues = (state: string, editData?: any) => {
       paymentTerms: get(editData, "bankDetails.paymentTerms", ""),
       branch: get(editData, "bankDetails.branch", ""),
     },
-    logo: null,
+    logo: editData ? get(editData, "logo", []) : [],
     products: [],
   };
 };
@@ -305,11 +308,12 @@ export const viewPurchaseColumns = [
 export interface IRawMaterialForm {
   billNo: string;
   supplier: string;
-  phone_no: string;
+  // phone_no: string;
   items: {
     item: string;
     quantity: number;
     price: number;
+    wt: number;
     paidAmount: number;
   }[];
   description?: string;
@@ -317,13 +321,14 @@ export interface IRawMaterialForm {
 export const RawMaterialSchema = z.object({
   billNo: z.string().min(1, "**Bill No is required**"),
   supplier: z.string().min(1, "**Supplier name is required**"),
-  phone_no: z.string().min(1, "**Phone Number is required**"),
+  // phone_no: z.string().min(1, "**Phone Number is required**"),
   items: z
     .array(
       z.object({
         item: z.string().min(1, "**Item name is required**"),
         quantity: z.coerce.number().min(1, "**Quantity is required**"),
         price: z.coerce.number().min(1, "**Price is required**"),
+        wt: z.number().min(1, "** Weight is required **"),
         paidAmount: z.coerce.number().min(1, "**Paid Amount is required**"),
       })
     )

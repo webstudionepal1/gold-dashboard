@@ -580,7 +580,7 @@ import {
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { PriceInputField } from "../../../OrderManagement/Order/components/PriceInputField";
 import ChipInputInside from "../../ProductCategory/components/ChipInputInside";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Header from "../../../../components/shared/table_heading/Header";
 import { productStore } from "../../../../store/productStore";
 import {
@@ -593,6 +593,7 @@ import {
 
 const ProductForm = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const productData = useStore(productStore, (state) => state);
   console.log("productData", productData);
   const {
@@ -690,7 +691,10 @@ const ProductForm = () => {
   });
 
   useEffect(() => {
-    if (productCreateSuccess || productUpdateSuccess) form.reset();
+    if (productCreateSuccess || productUpdateSuccess) {
+      form.reset();
+      navigate("/product/product-list");
+    }
   }, [productCreateSuccess, productUpdateSuccess]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -750,7 +754,7 @@ const ProductForm = () => {
                         </label>
                         <textarea
                           placeholder="Enter short description"
-                          className="p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                          className="p-2 border rounded-md focus:outline-none resize-none "
                           value={field.state.value}
                           onChange={(e) => field.handleChange(e.target.value)}
                           rows={3}
@@ -818,7 +822,10 @@ const ProductForm = () => {
                       </button>
                     </div>
                     {field.state.value.map((_, i: number) => (
-                      <div key={i.toString()}>
+                      <div
+                        key={i.toString()}
+                        className="border rounded-md p-3 mb-2"
+                      >
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                           <form.Field name={`variant[${i}].price`}>
                             {(subField) => (
@@ -841,9 +848,10 @@ const ProductForm = () => {
                           <form.Field name={`variant[${i}].wt`}>
                             {(subField) => (
                               <div>
-                                <InputField
-                                  label="size"
+                                {/* <InputField
+                                  label="Size"
                                   required
+                                  step="0.1"
                                   placeholder="Enter in gram"
                                   value={subField.state.value}
                                   onChange={(e) =>
@@ -851,12 +859,44 @@ const ProductForm = () => {
                                       Number(e.target.value)
                                     )
                                   }
+                                /> */}
+
+                                <InputField
+                                  label="Size"
+                                  type="number" // Explicitly set type to "number"
+                                  required
+                                  step="any" // Allows two decimal places (e.g., 1.23)
+                                  min="0"
+                                  placeholder="Enter in gram"
+                                  value={subField.state.value}
+                                  onChange={(e) =>
+                                    subField.handleChange(
+                                      Number(e.target.value) || 0
+                                    )
+                                  } // Handle empty input
                                 />
                                 <FieldError field={subField} />
                               </div>
                             )}
                           </form.Field>
                         </div>
+                        {i > 0 && (
+                          <div className="flex justify-end mt-2">
+                            <button
+                              type="button"
+                              onClick={() => field.removeValue(i)}
+                              className="flex items-center gap-2 px-3 py-1 text-sm text-red-600 border border-red-600 rounded-md "
+                            >
+                              <Icon
+                                icon="mdi:delete"
+                                className="text-red"
+                                width="18"
+                                height="18"
+                              />
+                              Remove
+                            </button>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -1032,7 +1072,7 @@ const ProductForm = () => {
           </div>
 
           {/* Upload Photos */}
-          <div className="p-4 bg-white border rounded-lg">
+          {/* <div className="p-4 bg-white border rounded-lg">
             <h2 className="mb-4 font-medium text-gray-700">Upload Photos</h2>
 
             <div className="p-8 mb-4 text-center border-2 border-dashed rounded-lg">
@@ -1073,10 +1113,10 @@ const ProductForm = () => {
               >
                 Browse File
               </label>
-            </div>
+            </div> */}
 
-            {/* Preview of uploaded images */}
-            {uploadedImages.length > 0 && (
+          {/* Preview of uploaded images */}
+          {/* {uploadedImages.length > 0 && (
               <div className="grid grid-cols-4 gap-2">
                 {uploadedImages.map((img, index) => (
                   <div key={index} className="overflow-hidden border rounded">
@@ -1103,7 +1143,7 @@ const ProductForm = () => {
                 ))}
               </div>
             </div>
-          )}
+          )} */}
 
           {/* Submit Button */}
           <div className="text-right">

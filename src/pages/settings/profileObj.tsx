@@ -4,7 +4,7 @@ import { get } from "lodash";
 
 export const attributeObj = [
   {
-    label: "Calsp Type",
+    label: "Clasp Type",
     value: "clasp-type",
   },
   {
@@ -39,6 +39,49 @@ export const rawColumns = [
 ];
 const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
+// export const editCustomerSchema = z.object({
+//   shop_name: z.string().min(1, "Shop Name is required"),
+//   owner_name: z.string().min(1, "Owner Name is required"),
+//   email: z.string().min(1, "Email is required"),
+//   phone_no: z.string().min(1, "Phone Number is required"),
+//   registration_number: z.string().min(1, "Registration number is required"),
+//   street_address: z.string().min(1, "Street Address is required"),
+//   city: z.string().min(1, "City is required"),
+//   country: z.string().min(1, "Country is required"),
+//   zip_code: z.string().min(1, "Zip Code is required"),
+//   open_day: z.string().min(1, "Opening days are required"),
+//   opening_time: z
+//     .string()
+//     .regex(timeRegex, { message: "Invalid time format. Use 24 hour format" }),
+
+//   closing_time: z
+//     .string()
+//     .regex(timeRegex, { message: "Invalid time format. Use 24 hour format" }),
+
+//   payment_method: z.string().min(1, "Payment method is required"),
+//   bank_name: z.string().min(1, "Bank Name is required"),
+//   bank_account_number: z.string().min(1, "Bank Account Number is required"),
+//   account_name: z.string().min(1, "Account Name is required"),
+
+//   password: z
+//     .string()
+//     .min(1, "Password is required")
+//     .regex(
+//       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$/,
+//       "Password must be at least 8 characters long, and include uppercase, lowercase, number, and special character"
+//     ),
+//   terms_and_conditions: z.literal(true, {
+//     errorMap: () => ({ message: "Follow through the terms and conditions" }),
+//   }),
+
+//   profile_photo: z.instanceof(File, {
+//     message: "Profile photo is required",
+//   }),
+//   qrcode: z.instanceof(File, {
+//     message: "QR code is required",
+//   }),
+// });
+
 export const editCustomerSchema = z.object({
   shop_name: z.string().min(1, "Shop Name is required"),
   owner_name: z.string().min(1, "Owner Name is required"),
@@ -53,16 +96,13 @@ export const editCustomerSchema = z.object({
   opening_time: z
     .string()
     .regex(timeRegex, { message: "Invalid time format. Use 24 hour format" }),
-
   closing_time: z
     .string()
     .regex(timeRegex, { message: "Invalid time format. Use 24 hour format" }),
-
   payment_method: z.string().min(1, "Payment method is required"),
   bank_name: z.string().min(1, "Bank Name is required"),
   bank_account_number: z.string().min(1, "Bank Account Number is required"),
   account_name: z.string().min(1, "Account Name is required"),
-
   password: z
     .string()
     .min(1, "Password is required")
@@ -73,13 +113,18 @@ export const editCustomerSchema = z.object({
   terms_and_conditions: z.literal(true, {
     errorMap: () => ({ message: "Follow through the terms and conditions" }),
   }),
-
-  profile_photo: z.instanceof(File, {
-    message: "Profile photo is required",
-  }),
-  qrcode: z.instanceof(File, {
-    message: "QR code is required",
-  }),
+  profile_photo: z
+    .instanceof(File, { message: "Profile photo is required" })
+    .refine(
+      (file) => ["image/png", "image/jpeg", "image/jpg"].includes(file.type),
+      "Profile photo must be in PNG, JPEG, or JPG format"
+    ),
+  qrcode: z
+    .instanceof(File, { message: "QR code is required" })
+    .refine(
+      (file) => ["image/png", "image/jpeg", "image/jpg"].includes(file.type),
+      "QR code must be in PNG, JPEG, or JPG format"
+    ),
 });
 
 export const generateProfileValue = (data: IFetchCompany) => ({
