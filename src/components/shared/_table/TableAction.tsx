@@ -1,5 +1,6 @@
-import React, { FC, memo } from "react";
+import React, { FC, memo, useState } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { DeleteDialog } from "../DeleteDialog";
 
 export interface TableActionProps {
   viewAction?: (row: any) => void;
@@ -20,7 +21,8 @@ const TableAction: FC<TableActionProps> = ({
   onDelete,
   row,
 }) => {
-  // Check if row and row._id exist to avoid errors
+  const [showDialog, setShowDialog] = useState(false);
+
   if (!row) return null;
 
   return (
@@ -101,7 +103,7 @@ const TableAction: FC<TableActionProps> = ({
         <div
           key={`delete-${row._id || "unknown"}`}
           className="p-1 text-base text-black rounded cursor-pointer bg-red"
-          onClick={() => onDelete(row._id)}
+          onClick={() => setShowDialog(true)}
         >
           <Icon
             icon="material-symbols:delete-outline-rounded"
@@ -110,6 +112,14 @@ const TableAction: FC<TableActionProps> = ({
           />
         </div>
       )}
+      <DeleteDialog
+        confirmAction={showDialog}
+        onClose={() => setShowDialog(false)}
+        onConfirm={() => {
+          onDelete?.(row._id);
+          setShowDialog(false);
+        }}
+      />
     </div>
   );
 };

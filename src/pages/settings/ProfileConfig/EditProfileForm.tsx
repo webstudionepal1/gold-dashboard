@@ -36,7 +36,7 @@ const defaultValues = {
   branch: "",
   logo: null,
   qr: [],
-  existingImages: "",
+  existingQr: "",
 };
 
 const EditProfileForm = () => {
@@ -74,8 +74,12 @@ const EditProfileForm = () => {
       ];
       const formdata = new FormData();
       obj.forEach((item) => formdata.append(item, value[item] || ""));
-      value.logo.forEach((item: File) => formdata.append("logo", item));
-      value.qr.forEach((item: File) => formdata.append("qr", item));
+      if (value.logo) formdata.append("logo", value.logo);
+
+      if (Array.isArray(value.qr)) {
+        value.qr.forEach((item: File) => formdata.append("qr", item));
+      }
+      console.log("formdata", value);
       updateProfile({ id: companyData._id, body: formdata });
     },
   });
@@ -429,7 +433,7 @@ const EditProfileForm = () => {
                 {(field) => (
                   <MultiImageUploader
                     multiple
-                    existingFiles={form.getFieldValue("existingImages")}
+                    existingFiles={form.getFieldValue("existingQr")}
                     existingFileField="existingImages"
                     label="Upload Receipts"
                     value={field.state.value as File[]}

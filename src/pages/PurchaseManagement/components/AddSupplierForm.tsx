@@ -51,7 +51,12 @@ const AddSupplierForm = () => {
     onSubmit: async ({ value }) => {
       const formdata = new FormData();
       const formattedData = cleanObject(value);
+      delete formattedData["logo"];
+
       appendFormData(formdata, formattedData);
+      if (value.logo) {
+        formdata.append("logo", value.logo);
+      }
 
       if (page === "add") createSupplier(formdata);
       else updateSupplier({ id: editData?._id, body: formdata });
@@ -61,8 +66,7 @@ const AddSupplierForm = () => {
     if (createSuccess || updateSuccess) form.reset();
   }, [updateSuccess, createSuccess]);
 
-  console.log("editData", editData);
-  console.log(form.state.values, "values");
+  console.log("formdata", form.state.values);
   return (
     <>
       <div className="">
