@@ -14,6 +14,7 @@ import {
 import InfoSection from "./components/InfoSection";
 import OrderTracker from "./components/OrderTracker";
 import { order_details_columns, Ordertitle, StepperObj } from "./orderObj";
+import { Constants } from "../../../utils/constants";
 
 // Define proper TypeScript interfaces
 interface OrderedProduct {
@@ -100,8 +101,8 @@ const OrderDetails: React.FC = () => {
     return map(order.orderedProducts, (item) => ({
       name: get(item, "product.name", ""),
       qty: get(item, "selectedVariant.quantity", 0),
-      price: `$ ${get(item, "selectedVariant.price", 0).toFixed(2)}`,
-      total_price: `$ ${(
+      price: `${get(item, "selectedVariant.price", 0).toFixed(2)}`,
+      total_price: `${(
         Number(get(item, "selectedVariant.price", 0)) *
         Number(get(item, "selectedVariant.quantity", 0))
       ).toFixed(2)}`,
@@ -293,13 +294,13 @@ const OrderDetails: React.FC = () => {
   const orderNumber = get(order, "id", "").slice(-5);
 
   return (
-    <div className="container px-4 py-3 mx-auto">
+    <div className="container px-4 py-3 mx-auto ">
       <Header text={Ordertitle[page] || "Order Details"} />
 
       {/* Order Progress Tracker */}
       <OrderTracker steps={STEPS} currentStep={StepperObj[orderStatus] || 0} />
 
-      <div className="py-4 bg-white rounded-md">
+      <div className="py-4rounded-md grid grid-cols-1 md:grid-cols-3 mt-4 gap-4 lg:grid-cols-12">
         {/* Order Header */}
         {/* <div className="border-2 border-[#d6dbe4] mx-3 rounded-xl">
           <div className="flex items-center justify-between px-3 py-3">
@@ -336,7 +337,7 @@ const OrderDetails: React.FC = () => {
         </div> */}
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-12 gap-4 mx-3 mt-4">
+        <div className="md:col-span-2 flex flex-col gap-4 lg:col-span-8">
           {/* Order Items Table */}
           <div className="col-span-12 bg-white border-2 rounded-xl h-auto border-[#d5d9e4] lg:col-span-8">
             <MasterTable
@@ -345,8 +346,21 @@ const OrderDetails: React.FC = () => {
               canSearch={false}
             />
           </div>
-
+          <div className="col-span-12 bg-white border-2 rounded-xl border-[#d5d9e4] lg:col-span-8">
+            <InfoSection
+              title="Shipping Information"
+              info={shippingInformation}
+              showEdit={false}
+              onEditClick={() => {
+                /* Implement edit functionality */
+              }}
+            />
+          </div>
           {/* Side Panel */}
+        </div>
+
+        {/* Additional Information Section */}
+        <div className="lg:col-span-4 flex flex-col gap-4">
           <div className="col-span-12 space-y-4 lg:col-span-4">
             {/* Delivery Partner Card */}
             <div className="border-2 rounded-xl border-[#d5d9e4] bg-white">
@@ -381,7 +395,7 @@ const OrderDetails: React.FC = () => {
                       >
                         <p>{label}</p>
                         <p>
-                          $
+                          {Constants.currency}{" "}
                           {typeof value === "number" ? value.toFixed(2) : value}
                         </p>
                       </div>
@@ -392,29 +406,14 @@ const OrderDetails: React.FC = () => {
                 <div className="my-2 rounded-md border-2 border-[#d5d9e4]">
                   <div className="flex items-center justify-between px-3 py-1 font-semibold">
                     <h1>Total</h1>
-                    <p>${totalValue.toFixed(2)}</p>
+                    <p>
+                      {Constants.currency} {totalValue.toFixed(2)}
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Additional Information Section */}
-        <div className="grid grid-cols-12 gap-4 mx-3 mt-8">
-          {/* Shipping Information */}
-          <div className="col-span-12 bg-white border-2 rounded-xl border-[#d5d9e4] lg:col-span-8">
-            <InfoSection
-              title="Shipping Information"
-              info={shippingInformation}
-              showEdit={false}
-              onEditClick={() => {
-                /* Implement edit functionality */
-              }}
-            />
-          </div>
-
-          {/* Billing or Cancellation Info */}
           <div className="col-span-12 bg-white border-2 rounded-xl border-[#d5d9e4] lg:col-span-4">
             {page === "cancelled-order-details" ? (
               <InfoSection
@@ -436,14 +435,34 @@ const OrderDetails: React.FC = () => {
               />
             )}
           </div>
-        </div>
+          <div className="flex items-center justify-end gap-3">
+            {page === "order-details" && (
+              <>
+                <button
+                  onClick={() => handleOrderStatusUpdate("confirmed")}
+                  disabled={isPending}
+                  className={clsx(
+                    "bg-[#de8d29] px-4 py-2 text-white rounded-xl font-medium transition-all",
+                    isPending
+                      ? "opacity-70 cursor-not-allowed"
+                      : "hover:bg-[#c97d24]"
+                  )}
+                >
+                  {isPending ? "Processing..." : "Accept Order"}
+                </button>
+                <button
+                  className="bg-[#d1d1d1] px-4 py-2 text-[#878787] rounded-xl font-semibold hover:bg-[#c1c1c1] transition-all"
+                  onClick={() => handleOrderStatusUpdate("cancelled")}
+                  disabled={isPending}
+                >
+                  Cancel Order
+                </button>
+              </>
+            )}
 
-        {/* Action Buttons Based on Page Type */}
-        <div className="flex items-center justify-end gap-3 mx-3 mt-4 mb-2">
-          {page === "order-details" && (
-            <>
+            {page === "confirmed-order-details" && (
               <button
-                onClick={() => handleOrderStatusUpdate("confirmed")}
+                onClick={() => handleOrderStatusUpdate("assigned")}
                 disabled={isPending}
                 className={clsx(
                   "bg-[#de8d29] px-4 py-2 text-white rounded-xl font-medium transition-all",
@@ -452,32 +471,10 @@ const OrderDetails: React.FC = () => {
                     : "hover:bg-[#c97d24]"
                 )}
               >
-                {isPending ? "Processing..." : "Accept Order"}
+                {isPending ? "Processing..." : "Assign Delivery"}
               </button>
-              <button
-                className="bg-[#d1d1d1] px-4 py-2 text-[#878787] rounded-xl font-semibold hover:bg-[#c1c1c1] transition-all"
-                onClick={() => handleOrderStatusUpdate("cancelled")}
-                disabled={isPending}
-              >
-                Cancel Order
-              </button>
-            </>
-          )}
-
-          {page === "confirmed-order-details" && (
-            <button
-              onClick={() => handleOrderStatusUpdate("assigned")}
-              disabled={isPending}
-              className={clsx(
-                "bg-[#de8d29] px-4 py-2 text-white rounded-xl font-medium transition-all",
-                isPending
-                  ? "opacity-70 cursor-not-allowed"
-                  : "hover:bg-[#c97d24]"
-              )}
-            >
-              {isPending ? "Processing..." : "Assign Delivery"}
-            </button>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -161,6 +161,7 @@
 // };
 
 import { IFetchOrder } from "../../../server/api/orderHooks";
+import { Constants } from "../../../utils/constants";
 
 export const Ordertitle: Record<string, string> = {
   "order-details": "Order Details",
@@ -249,9 +250,9 @@ export const confirmedColumns = [
 export const order_details_columns = [
   { key: "name", title: "Item Name" },
   { key: "qty", title: "QTY" },
-  { key: "price", title: "Price" },
-  { key: "total_price", title: "Total Price" },
-  { key: "status", title: "Status" },
+  { key: "price", title: `Price (${Constants.currency})` },
+  { key: "total_price", title: `Total Price (${Constants.currency})` },
+  // { key: "status", title: "Status" },
 ];
 
 export const filterOptions = [

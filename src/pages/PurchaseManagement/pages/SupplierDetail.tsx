@@ -6,7 +6,6 @@ import { useGetSupplierByIdQuery } from "../../../server/api/supplierHooks";
 import ContactCard from "../components/ContactCard";
 import SupplierCard from "../components/SupplierDetailCard";
 
-
 const SupplierDetail = () => {
   let { id } = useParams();
   id ??= "";
@@ -65,7 +64,9 @@ const SupplierDetail = () => {
           <SupplierCard
             image={
               supplierData && supplierData?.logo.length > 0
-                ? supplierData?.logo[0]
+                ? `${import.meta.env.VITE_API_IMAGE_BASE_URL}${
+                    supplierData?.logo[0]
+                  }`
                 : "https://via.placeholder.com/150"
             }
             title={get(supplierData, "name", "-")}
@@ -100,38 +101,40 @@ const SupplierDetail = () => {
 
             <div className="flex flex-col space-y-4 w-[50%] ">
               <div className="flex items-center justify-between">
-                <div className="flex flex-col ">
-                  <p className="text-[#726f7e] ">Payment Terms</p>
-                  <p className="font-semibold text-[#585858]">
+                <div className="flex flex-col text-sm">
+                  <p className="text-gray-800 font-semibold text-sm ">
+                    Payment Terms
+                  </p>
+                  <p className=" text-gray-600">
                     {get(supplierData, "bankDetails.paymentTerms", "-")}
                   </p>
                 </div>
                 <div className="flex flex-col ">
-                  <p className="text-[#726f7e] ">Branch Name</p>
-                  <p className="font-semibold text-[#585858]">
+                  <p className="text-gray-800 text-sm ">Branch Name</p>
+                  <p className="font-semibold text-gray-600 text-sm">
                     {get(supplierData, "bankDetails.branch", "-")}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between text-sm">
                 <div className="flex flex-col ">
-                  <p className="text-[#726f7e] ">Bank Name</p>
+                  <p className="text-gray-800">Bank Name</p>
                   <p className="font-semibold text-[#585858]">
                     {get(supplierData, "bankDetails.bankName", "-")}
                   </p>
                 </div>
-                <div className="flex flex-col ">
-                  <p className="text-[#726f7e]  ">Account Name</p>
-                  <p className="font-semibold text-[#585858]">
+                <div className="flex flex-col text-sm ">
+                  <p className="text-gray-800">Account Name</p>
+                  <p className="font-semibold text-gray-600">
                     {get(supplierData, "bankDetails.accountHolderName")}
                   </p>
                 </div>
               </div>
             </div>
-            <div className="flex flex-col mt-4 ">
-              <p className="text-[#726f7e] ">Account Number</p>
-              <p className="font-semibold text-[#585858] ">
+            <div className="flex flex-col mt-4 text-sm  ">
+              <p className="text-gray-800 ">Account Number</p>
+              <p className="font-semibold text-gray-600 ">
                 {get(supplierData, "bankDetails.accountNumber", "-")}
               </p>
             </div>

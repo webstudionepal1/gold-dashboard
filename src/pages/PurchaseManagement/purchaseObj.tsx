@@ -14,12 +14,14 @@ interface IContactPerson {
 }
 export interface SupplierFormValues {
   name: string;
-  description?: string;
+  description: string;
   email: string;
   phone: string;
-  contactPerson: IContactPerson;
-  existingImages: string[];
-  // alternatePhone?: string;
+  contactPerson: {
+    name: string;
+    phone: string;
+    email: string;
+  };
   businessType: string;
   addresses: {
     district: string;
@@ -38,8 +40,9 @@ export interface SupplierFormValues {
     paymentTerms: string;
     branch: string;
   };
-  logo: File[];
-  products?: string[];
+  logo: File | null; // Optional logo file
+  existingLogo?: string; // Optional existing logo URL
+  products: string[];
 }
 export const buttonObj: IButtonObj = {
   purchase: {
@@ -96,7 +99,7 @@ export const supplierSchema = z.object({
     branch: z.string().min(1, "Branch is required"),
   }),
   // logo: z.instanceof(File).nullable(),
-  logo: z.array(z.instanceof(File)).optional(),
+  logo: z.instanceof(File).nullable(),
   products: z.array(z.string()).optional(),
 });
 export const getSupplierInitialFormValues = (state: string, editData?: any) => {
@@ -111,7 +114,6 @@ export const getSupplierInitialFormValues = (state: string, editData?: any) => {
         phone: "",
         email: "",
       },
-      // alternatePhone: "",
       businessType: "",
       addresses: {
         district: "",
@@ -130,13 +132,13 @@ export const getSupplierInitialFormValues = (state: string, editData?: any) => {
         paymentTerms: "",
         branch: "",
       },
-      logo: [],
+      logo: null, // Fix: null instead of File constructor
       products: [],
     };
 
   return {
     name: get(editData, "name", ""),
-    description: get(editData, "description"),
+    description: get(editData, "description", ""),
     email: get(editData, "email", ""),
     phone: get(editData, "phone", ""),
     contactPerson: {
@@ -144,7 +146,6 @@ export const getSupplierInitialFormValues = (state: string, editData?: any) => {
       phone: get(editData, "contactPerson.phone", ""),
       email: get(editData, "contactPerson.email", ""),
     },
-    // alternatePhone: get(editData, "alternatePhone", ""),
     businessType: get(editData, "businessType", ""),
     addresses: {
       district: get(editData, "addresses.district", ""),
@@ -163,11 +164,14 @@ export const getSupplierInitialFormValues = (state: string, editData?: any) => {
       paymentTerms: get(editData, "bankDetails.paymentTerms", ""),
       branch: get(editData, "bankDetails.branch", ""),
     },
-    logo: [],
-    existingImages: editData ? get(editData, "logo", []) : [],
-    products: [],
+    logo: null, // Fix: null instead of File constructor
+    existingLogo: editData ? get(editData, "logo", "") : "", // Fix: renamed from existingImages
+    products: get(editData, "products", []).map((item: { _id: string }) =>
+      get(item, "_id")
+    ),
   };
 };
+
 export function appendFormData(
   formData: FormData,
   data: Record<string, any>,

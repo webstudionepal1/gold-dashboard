@@ -1,21 +1,20 @@
 import { useForm } from "@tanstack/react-form";
 import { get } from "lodash";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { z } from "zod";
-interface propTypes {
-  editData?: any;
-  closeModal: () => void;
-}
-import { FieldError } from "../../auth/LoginPage";
-import { InputField } from "../../../components/shared/form_components/InputField";
 import { DropdownField } from "../../../components/shared/form_components/Dropdown";
-import FileDropInput from "../../../components/shared/form_components/FileDropInput";
+import MultiImageUploader from "../../../components/shared/form_components/FileDropInput";
+import { InputField } from "../../../components/shared/form_components/InputField";
 import {
   useCreateExpenseMutation,
   useGetExpenseCategoryQuery,
   useUpdateExpenseMutation,
 } from "../../../server/api/expensesHook";
-import MultiImageUploader from "../../../components/shared/form_components/FileDropInput";
+import { FieldError } from "../../auth/LoginPage";
+interface propTypes {
+  editData?: any;
+  closeModal: () => void;
+}
 
 const addExpenseSchema = z.object({
   date: z.coerce
@@ -212,10 +211,11 @@ const ExpenseForm = ({ editData, closeModal }: propTypes) => {
           <form.Field name="image">
             {(field) => (
               <MultiImageUploader
+                multiple={false}
                 form={form}
                 label="Upload Receipts"
-                value={field.state.value as File[]}
-                onChange={(files: File[]) => field.handleChange(files)}
+                value={field.state.value}
+                onChange={(files) => field.handleChange(files)}
               />
             )}
           </form.Field>
