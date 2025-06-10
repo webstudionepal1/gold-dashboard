@@ -17,25 +17,21 @@ interface propTypes {
 }
 
 const addExpenseSchema = z.object({
-  date: z.coerce
-    .date()
-    .refine((date) => date.getFullYear() >= 1950, {
-      message: "The year cannot be lower than 1950",
-    })
-    .refine((date) => date <= new Date(), {
-      message: "The year cannot be above the present date.",
-    }),
+  date: z.string(),
   expenseCategory: z.string().min(1, "Category is required"),
   amount: z.number().min(0, "Amount cannot be negative"),
   description: z.string().min(1, "Description is required"),
-  // image: z
-  //   .instanceof(File)
-  //   .nullable()
-  //   .refine((file) => file !== null, { message: "Image is required" }),
-  image: z
-    .array(z.instanceof(File))
-    .nonempty({ message: "At least one image is required" }),
+  image: z.array(z.instanceof(File)),
+  existingImages: z.array(z.string()),
 });
+interface IExpenseForm {
+  date: string;
+  expenseCategory: string;
+  amount: number;
+  description: string;
+  image: File[];
+  existingImages: string[];
+}
 const ExpenseForm = ({ editData, closeModal }: propTypes) => {
   {
     console.log("EDIIIIITTTT EXPENSE", editData);
@@ -63,9 +59,9 @@ const ExpenseForm = ({ editData, closeModal }: propTypes) => {
       expenseCategory: editData ? get(editData, "expenseCategory._id", "") : "",
       amount: editData ? get(editData, "amount", 0) : 0,
       description: editData ? get(editData, "description", "") : "",
-      // image: editData ? get(editData, "image", null) : null,
-      image: editData ? get(editData, "image", []) : [],
-    },
+      image: [],
+      existingImages: get(editData, "images", []),
+    } as IExpenseForm,
     validators: {
       onSubmit: addExpenseSchema,
     },
@@ -80,9 +76,11 @@ const ExpenseForm = ({ editData, closeModal }: propTypes) => {
       formData.append("description", value.description);
 
       // formData.append("images", value.image);
-      value.image.forEach((file: any) => {
-        formData.append("images", file);
-      });
+      if (Array.isArray(value.image)) {
+        value.image.forEach((file: any) => {
+          formData.append("images", file);
+        });
+      }
 
       if (editData) {
         updateExpense({ id: editData._id, body: formData });
@@ -92,6 +90,8 @@ const ExpenseForm = ({ editData, closeModal }: propTypes) => {
     },
   });
 
+  console.log(editData, "data");
+  console.log("values", form.state.values);
   useEffect(() => {
     if (ExpenseSuccess) form.reset();
   }, [ExpenseSuccess]);
@@ -181,38 +181,13 @@ const ExpenseForm = ({ editData, closeModal }: propTypes) => {
             )}
           </form.Field>
 
-          {/* <form.Field name="image">
-            {(field) => (
-              <div className="w-full">
-                <FileDropInput
-                  label="Invoice"
-                  value={field.state.value as unknown as File}
-                  onChange={(file) => {
-                    field.handleChange(file); // store the file directly
-                  }}
-                />
-                <FieldError field={field} />
-              </div>
-            )}
-          </form.Field> */}
-
-          {/* <form.Field name="image">
-            {(field) => (
-              <div className="w-full">
-                <MultiImageUploader
-                  label="Invoice Images"
-                  value={field.state.value as File[]}
-                  onChange={(files: File[]) => field.handleChange(files)}
-                />
-                <FieldError field={field} />
-              </div>
-            )}
-          </form.Field> */}
           <form.Field name="image">
             {(field) => (
               <MultiImageUploader
-                multiple={false}
+                existingFiles={form.getFieldValue("existingImages")}
+                multiple={true}
                 form={form}
+                existingFileField="existingImages"
                 label="Upload Receipts"
                 value={field.state.value}
                 onChange={(files) => field.handleChange(files)}

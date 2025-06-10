@@ -165,7 +165,7 @@ export const getSupplierInitialFormValues = (state: string, editData?: any) => {
       branch: get(editData, "bankDetails.branch", ""),
     },
     logo: null, // Fix: null instead of File constructor
-    existingLogo: editData ? get(editData, "logo", "") : "", // Fix: renamed from existingImages
+    existingLogo: get(editData, "logo[0]"),
     products: get(editData, "products", []).map((item: { _id: string }) =>
       get(item, "_id")
     ),

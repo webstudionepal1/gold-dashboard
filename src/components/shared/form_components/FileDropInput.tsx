@@ -139,8 +139,7 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
       previewUrl = isImage ? URL.createObjectURL(file) : "/placeholder.svg";
       fileName = file.name;
     } else if (typeof file === "string") {
-      previewUrl = isImage ? getFileUrl(file) : "/placeholder.svg";
-      fileName = file.split("/").pop() || "File";
+      previewUrl = `${import.meta.env.VITE_API_IMAGE_BASE_URL}${file}`;
     }
 
     return (
@@ -155,11 +154,11 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
             className="w-full h-24 object-cover rounded-md border"
           />
         ) : (
-          <div className="w-full h-24 bg-gray-100 rounded-md border flex items-center justify-center">
-            <span className="text-gray-500 text-xs text-center px-2">
-              {fileName}
-            </span>
-          </div>
+          <img
+            src={previewUrl}
+            alt={`preview-${index}`}
+            className="w-full h-24 object-cover rounded-md border"
+          />
         )}
         <button
           onClick={() =>
@@ -188,7 +187,6 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
               {renderFilePreview(singleProps.existingFile, 0, true)}
             </div>
           )}
-          form.getFieldValue(props.existingFileField);
           {/* Selected file preview */}
           {singleProps.value && (
             <div className="mb-4">
