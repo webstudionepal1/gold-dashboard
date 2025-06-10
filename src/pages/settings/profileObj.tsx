@@ -148,9 +148,8 @@ export interface IProfileValue {
   accountHolder: string;
   logo: null | File;
   qr: File[];
-  existingImages: any[];
+  existingQr: string[];
 }
-
 export const generateProfileValue = (data: IFetchCompany): IProfileValue => ({
   name: get(data, "name", ""),
   ownerNo: get(data, "ownerNo", ""),
@@ -172,5 +171,5 @@ export const generateProfileValue = (data: IFetchCompany): IProfileValue => ({
   accountHolder: get(data, "accountHolder", ""),
   logo: null,
   qr: [] as File[],
-  existingImages: get(data, "qr", []),
+  existingQr: get(data, "qr", []),
 });

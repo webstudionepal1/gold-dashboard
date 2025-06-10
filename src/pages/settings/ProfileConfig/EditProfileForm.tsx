@@ -36,7 +36,7 @@ const defaultValues = {
   branch: "",
   logo: null,
   qr: [],
-  existingImages: "",
+  existingQr: "",
 };
 
 const EditProfileForm = () => {
@@ -433,7 +433,7 @@ const EditProfileForm = () => {
                 {(field) => (
                   <MultiImageUploader
                     multiple
-                    existingFiles={form.getFieldValue("existingImages")}
+                    existingFiles={form.getFieldValue("existingQr")}
                     existingFileField="existingImages"
                     label="Upload Receipts"
                     value={field.state.value as File[]}
