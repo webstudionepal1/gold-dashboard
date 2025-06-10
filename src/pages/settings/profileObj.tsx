@@ -127,7 +127,31 @@ export const editCustomerSchema = z.object({
     ),
 });
 
-export const generateProfileValue = (data: IFetchCompany) => ({
+export interface IProfileValue {
+  name: string;
+  ownerNo: string;
+  phone: string;
+  email: string;
+  registrationNo: string;
+  address: string;
+  city: string;
+  country: string;
+  zipCode: string;
+  openDay: string;
+  openTime: string;
+  closeTime: string;
+  paymentMode?: string;
+  companyName?: string;
+  bankName: string;
+  branch: string;
+  accountNo: string;
+  accountHolder: string;
+  logo: null | File;
+  qr: File[];
+  existingImages: any[];
+}
+
+export const generateProfileValue = (data: IFetchCompany): IProfileValue => ({
   name: get(data, "name", ""),
   ownerNo: get(data, "ownerNo", ""),
   phone: get(data, "phone", ""),
@@ -146,6 +170,7 @@ export const generateProfileValue = (data: IFetchCompany) => ({
   branch: get(data, "branch", ""),
   accountNo: get(data, "accountNo", ""),
   accountHolder: get(data, "accountHolder", ""),
-  logo: [] as File[],
+  logo: null,
   qr: [] as File[],
+  existingImages: get(data, "qr", []),
 });

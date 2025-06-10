@@ -1,6 +1,7 @@
 // components/ui/ContactCard.tsx
 import React from "react";
 import { cn } from "../../../lib/utils";
+import { get } from "lodash";
 
 interface ContactInfo {
   subtitle: string;
@@ -28,12 +29,12 @@ const ContactCard: React.FC<ContactCardProps> = ({
 
         <div className="flex flex-col gap-4">
           {contacts.map((contact, idx) => (
-            <div key={idx}>
-              <h2 className="text-[#726f80] font-semibold text-sm">
+            <div key={idx} className="">
+              <h2 className="text-gray-800 font-semibold text-sm">
                 {contact.subtitle}
               </h2>
-              <p className="text-[#585858] font-semibold text-lg">
-                {contact.text}
+              <p className="text-gray-600 font-semibold text-sm">
+                {get(contact, "text") !== "" ? get(contact, "text") : "-"}
               </p>
             </div>
           ))}
