@@ -386,7 +386,7 @@ const OrderReport = () => {
 
   const todayFilter = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
   const initialTabFilters: Record<string, TabFilter> = {
-    topOrderProducts: { date: todayFilter, period: "Monthly" },
+    topOrderProducts: { date: todayFilter, period: "Yearly" },
   };
 
   const [tabFilters, setTabFilters] = useState(initialTabFilters);
