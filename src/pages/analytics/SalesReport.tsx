@@ -1,16 +1,634 @@
-import { Icon } from "@iconify/react/dist/iconify.js";
+// import { Icon } from "@iconify/react/dist/iconify.js";
+// import { useCallback, useMemo, useState } from "react";
+// import { useNavigate } from "react-router-dom";
+// import MasterTable from "../../components/shared/MasterTable";
+// import { ScrollableModal } from "../../components/shared/ScrollableModal";
+// import Header from "../../components/shared/table_heading/Header";
+// import { DynamicTab } from "../PurchaseManagement/components/DynamicTab";
+
+// import { salesReportTabOption, ITable } from "../analytics/SalesReportObj";
+
+// import { map } from "lodash";
+// import {
+//   IFetchExpenses,
+//   useDeleteExpenseMutation,
+//   useGetExpenseCategoryQuery,
+//   useGetExpensesQuery,
+// } from "../../server/api/expensesHook";
+
+// import { SearchFilterSort } from "../../components/global/SearchFilterSort";
+// import { filterOptions, sortOptions } from "../../constants/DropDownOptions";
+// import {
+//   useGetCategoryWiseDataQuery,
+//   useGetProductWiseDataQuery,
+//   useGetSubCategoryWiseDataQuery,
+// } from "../../server/api/salesReportHook";
+// import { useGetOrderCategoryQuery } from "../../server/api/orderReportHook";
+// import {
+//   DateFilter,
+//   PeriodOption,
+// } from "../../components/shared/DatePeriodFilter";
+
+// interface IEditModal {
+//   state: boolean;
+//   editData?: IFetchExpenses | null;
+// }
+
+// interface FilterState {
+//   searchQuery: string;
+//   filterValue: string;
+//   sortValue: string;
+// }
+
+// type TabFilter = {
+//   date: string;
+//   period: PeriodOption;
+// };
+
+// const SalesReport = () => {
+//   const navigate = useNavigate();
+//   const [selectedTab, setSelectedTab] = useState("productWise");
+//   const todayFilter = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+//   const initialTabFilters: Record<string, TabFilter> = {
+//     productWise: { date: todayFilter, period: "Yearly" },
+//     categoryWise: { date: todayFilter, period: "Yearly" },
+//     subCategoryWise: { date: todayFilter, period: "Yearly" },
+//   };
+
+//   const [tabFilters, setTabFilters] = useState(initialTabFilters);
+//   const handleTabFilterChange = (updatedFilter: TabFilter) => {
+//     setTabFilters((prev) => ({
+//       ...prev,
+//       [selectedTab]: updatedFilter,
+//     }));
+//   };
+//   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState<IEditModal>({
+//     state: false,
+//     editData: null,
+//   });
+
+//   const today = new Date();
+//   const sevenDaysAgo = new Date();
+//   sevenDaysAgo.setDate(today.getDate() - 7);
+
+//   const formatDate = (date: Date) => date.toISOString().split("T")[0];
+
+//   const [startDate, setStartDate] = useState<string>(formatDate(sevenDaysAgo));
+//   const [endDate, setEndDate] = useState<string>(formatDate(today));
+
+//   // const [filter, setFilter] = useState<{ date: string; period: PeriodOption }>({
+//   //   date: "",
+//   //   period: "Daily",
+//   // });
+
+//   const [filterState, setFilterState] = useState<FilterState>({
+//     searchQuery: "",
+//     filterValue: "",
+//     sortValue: "",
+//   });
+
+//   const {
+//     data: ProductWiseData,
+//     isSuccess: isProductWiseDataSuccess,
+//     isLoading: isProductWiseDataLoading,
+//   } = useGetProductWiseDataQuery({
+//     date: tabFilters.productWise.date,
+//     period: tabFilters.productWise.period.toLowerCase(), // lowercase for `monthly`
+//   });
+//   console.log("PRODUCT WISE DATA", ProductWiseData);
+
+//   const {
+//     data: categoryWiseDataList,
+//     isLoading: isCategoryWiseDataLoading,
+//     isSuccess: isCategoryWiseDataSuccess,
+//   } = useGetCategoryWiseDataQuery({
+//     date: tabFilters.categoryWise.date,
+//     period: tabFilters.categoryWise.period.toLowerCase(),
+//   });
+
+//   const {
+//     data: subCategoryWiseDataList,
+//     isLoading: isSubCategoryWiseDataLoading,
+//     isSuccess: isSubCategoryWiseDataSuccess,
+//   } = useGetSubCategoryWiseDataQuery({
+//     date: tabFilters.subCategoryWise.date,
+//     period: tabFilters.subCategoryWise.period.toLowerCase(),
+//   });
+
+//   console.log("Sub category data", subCategoryWiseDataList);
+
+//   const { mutate: deleteExpense } = useDeleteExpenseMutation();
+//   const {
+//     data: expensesList,
+//     isLoading: expensesLoading,
+//     isSuccess: expensesSuccess,
+//   } = useGetExpensesQuery();
+
+//   const {
+//     data: expenseCategories,
+//     isLoading: expenseCatLoading,
+//     isSuccess: expenseCatSuccess,
+//   } = useGetExpenseCategoryQuery();
+
+//   const expenseData = useMemo(
+//     () => (expensesSuccess ? expensesList : []),
+//     [expensesSuccess, expensesList]
+//   );
+
+//   const filteredExpenses = useMemo(() => {
+//     if (!expenseData || expenseData.length === 0) return [];
+
+//     let result = [...expenseData];
+
+//     if (filterState.searchQuery) {
+//       const query = filterState.searchQuery.toLowerCase();
+//       result = result.filter(
+//         (item) =>
+//           (item.expenseCategory.name &&
+//             item.expenseCategory.name.toLowerCase().includes(query)) ||
+//           (typeof item.expenseCategory.name === "string" &&
+//             item.expenseCategory.name.toLowerCase().includes(query)) ||
+//           (item.description && item.description.toLowerCase().includes(query))
+//       );
+//     }
+//     if (filterState.filterValue) {
+//       result = result.filter(
+//         (item) =>
+//           (typeof item.expenseCategory.name === "string" &&
+//             item.expenseCategory.name === filterState.filterValue) ||
+//           (item.description && item.description === filterState.filterValue)
+//       );
+//     }
+
+//     // if (filterState.sortValue) {
+//     //   switch (filterState.sortValue) {
+//     //     case "title_asc":
+//     //       result.sort((a, b) =>
+//     //         a.name && b.name ? a.name.localeCompare(b.name) : 0
+//     //       );
+//     //       break;
+//     //     case "title_desc":
+//     //       result.sort((a, b) =>
+//     //         a.name && b.name ? b.name.localeCompare(a.name) : 0
+//     //       );
+//     //       break;
+//     //     case "price_asc":
+//     //       result.sort((a, b) => (a.price && b.price ? a.price - b.price : 0));
+//     //       break;
+//     //     case "price_desc":
+//     //       result.sort((a, b) => (a.price && b.price ? b.price - a.price : 0));
+//     //       break;
+//     //     case "rating_asc":
+//     //       result.sort((a, b) =>
+//     //         a.ratings && b.ratings ? a.ratings - b.ratings : 0
+//     //       );
+//     //       break;
+//     //     case "rating_desc":
+//     //       result.sort((a, b) =>
+//     //         a.ratings && b.ratings ? b.ratings - a.ratings : 0
+//     //       );
+//     //       break;
+//     //   }
+//     // }
+
+//     return result;
+//   }, [expenseData, filterState]);
+
+//   const handleSearch = (query: string) => {
+//     setFilterState((prev) => ({ ...prev, searchQuery: query }));
+//   };
+
+//   const handleFilter = (filter: string) => {
+//     setFilterState((prev) => ({ ...prev, filterValue: filter }));
+//   };
+
+//   const handleSort = (sort: string) => {
+//     setFilterState((prev) => ({ ...prev, sortValue: sort }));
+//   };
+
+//   const productWiseTableData = useMemo(
+//     () => ({
+//       columns: [
+//         { key: "category", title: "Category" },
+//         { key: "subCategory", title: "Sub Category" },
+//         { key: "product", title: "Products" },
+//         { key: "totalRevenue", title: "Revenue" },
+//       ],
+//       rows: map(ProductWiseData, (item) => ({
+//         ...item,
+//       })),
+//     }),
+//     [ProductWiseData, isProductWiseDataSuccess]
+//   );
+//   const categoryWiseTableData = useMemo(
+//     () => ({
+//       columns: [
+//         { key: "category", title: "Category" },
+//         { key: "totalOrders", title: "Total Orders" },
+//         { key: "totalRevenue", title: "Revenue" },
+//         { key: "percentageSharee", title: "Percentage Share" },
+//       ],
+//       rows: map(categoryWiseDataList, (item) => ({
+//         ...item,
+//         percentageSharee: <div>{item.percentageShare} %</div>,
+//       })),
+//     }),
+//     [categoryWiseDataList, isCategoryWiseDataSuccess]
+//   );
+
+//   const subCategoryTableData = useMemo(
+//     () => ({
+//       columns: [
+//         { key: "subCategory", title: "Sub Category" },
+//         { key: "totalOrders", title: "Total Orders" },
+//         { key: "totalRevenue", title: "Revenue" },
+//         { key: "percentageSharee", title: "Percentage Share" },
+//       ],
+//       rows: map(subCategoryWiseDataList, (item) => ({
+//         ...item,
+//         percentageSharee: <div>{item.percentageShare} %</div>,
+//       })),
+//     }),
+//     [subCategoryWiseDataList, isSubCategoryWiseDataSuccess]
+//   );
+//   // const returnTableData = useMemo(
+//   //   () => ({
+//   //     columns: [{ key: "name", title: "Name" }],
+//   //     rows: map(returnList, (item) => ({
+//   //       ...item,
+//   //     })),
+//   //   }),
+//   //   [returnList, returnSuccess]
+//   // );
+
+//   const tableDataObj: ITable = {
+//     productWise: productWiseTableData,
+//     categoryWise: categoryWiseTableData,
+//     subCategoryWise: subCategoryTableData,
+//   };
+//   const [modal, setModal] = useState({
+//     of: "",
+//     edit: false,
+//     data: null,
+//   });
+//   const closeModal = useCallback(
+//     () => setModal({ of: "", edit: false, data: null }),
+//     []
+//   );
+
+//   return (
+//     <div className="container px-4 py-3 mx-auto ">
+//       <Header text="Sales Report" />
+
+//       <DateFilter
+//         value={tabFilters[selectedTab]}
+//         onChange={handleTabFilterChange}
+//       />
+//       <MasterTable
+//         loading={expensesLoading || expenseCatLoading}
+//         tabsOptions={
+//           <DynamicTab
+//             selectedTab={selectedTab}
+//             setSelectedTab={setSelectedTab}
+//             tabOptions={salesReportTabOption}
+//           />
+//         }
+//         // filterSection={
+//         //   <SearchFilterSort
+//         //     onFilter={handleFilter}
+//         //     onSort={handleSort}
+//         //     onViewChange={() => {}}
+//         //     showFilter={true}
+//         //     showSort={true}
+//         //     showView={true}
+//         //     filterOptions={filterOptions}
+//         //     sortOptions={sortOptions}
+//         //     placeholder="Search products..."
+//         //   />
+//         // }
+//         rows={tableDataObj[selectedTab].rows || []}
+//         columns={tableDataObj[selectedTab].columns}
+//         canSelect
+//       />
+//     </div>
+//   );
+// };
+
+// export default SalesReport;
+
+// Second
+
+// import { useCallback, useMemo, useState } from "react";
+// import { useNavigate } from "react-router-dom";
+// import MasterTable from "../../components/shared/MasterTable";
+// import Header from "../../components/shared/table_heading/Header";
+// import { DynamicTab } from "../PurchaseManagement/components/DynamicTab";
+
+// import { salesReportTabOption, type ITable } from "../analytics/SalesReportObj";
+
+// import { map } from "lodash";
+// import {
+//   type IFetchExpenses,
+//   useDeleteExpenseMutation,
+//   useGetExpenseCategoryQuery,
+//   useGetExpensesQuery,
+// } from "../../server/api/expensesHook";
+
+// import { SearchFilterSort } from "../../components/global/SearchFilterSort";
+// import { filterOptions, sortOptions } from "../../constants/DropDownOptions";
+// import {
+//   useGetCategoryWiseDataQuery,
+//   useGetProductWiseDataQuery,
+//   useGetSubCategoryWiseDataQuery,
+// } from "../../server/api/salesReportHook";
+// import {
+//   DateFilter,
+//   type PeriodOption,
+// } from "../../components/shared/DatePeriodFilter";
+
+// interface IEditModal {
+//   state: boolean;
+//   editData?: IFetchExpenses | null;
+// }
+
+// interface FilterState {
+//   searchQuery: string;
+//   filterValue: string;
+//   sortValue: string;
+// }
+
+// type TabFilter = {
+//   date: string;
+//   period: PeriodOption;
+// };
+
+// const SalesReport = () => {
+//   const navigate = useNavigate();
+//   const [selectedTab, setSelectedTab] = useState("productWise");
+//   const todayFilter = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+//   const initialTabFilters: Record<string, TabFilter> = {
+//     productWise: { date: todayFilter, period: "Yearly" },
+//     categoryWise: { date: todayFilter, period: "Yearly" },
+//     subCategoryWise: { date: todayFilter, period: "Yearly" },
+//   };
+
+//   const [tabFilters, setTabFilters] = useState(initialTabFilters);
+//   const handleTabFilterChange = (updatedFilter: TabFilter) => {
+//     setTabFilters((prev) => ({
+//       ...prev,
+//       [selectedTab]: updatedFilter,
+//     }));
+//   };
+//   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState<IEditModal>({
+//     state: false,
+//     editData: null,
+//   });
+
+//   const today = new Date();
+//   const sevenDaysAgo = new Date();
+//   sevenDaysAgo.setDate(today.getDate() - 7);
+
+//   const formatDate = (date: Date) => date.toISOString().split("T")[0];
+
+//   const [startDate, setStartDate] = useState<string>(formatDate(sevenDaysAgo));
+//   const [endDate, setEndDate] = useState<string>(formatDate(today));
+
+//   const [filterState, setFilterState] = useState<FilterState>({
+//     searchQuery: "",
+//     filterValue: "",
+//     sortValue: "",
+//   });
+
+//   const {
+//     data: ProductWiseData,
+//     isSuccess: isProductWiseDataSuccess,
+//     isLoading: isProductWiseDataLoading,
+//   } = useGetProductWiseDataQuery({
+//     date: tabFilters.productWise.date,
+//     period: tabFilters.productWise.period.toLowerCase(), // lowercase for `monthly`
+//   });
+
+//   const {
+//     data: categoryWiseDataList,
+//     isLoading: isCategoryWiseDataLoading,
+//     isSuccess: isCategoryWiseDataSuccess,
+//   } = useGetCategoryWiseDataQuery({
+//     date: tabFilters.categoryWise.date,
+//     period: tabFilters.categoryWise.period.toLowerCase(),
+//   });
+
+//   const {
+//     data: subCategoryWiseDataList,
+//     isLoading: isSubCategoryWiseDataLoading,
+//     isSuccess: isSubCategoryWiseDataSuccess,
+//   } = useGetSubCategoryWiseDataQuery({
+//     date: tabFilters.subCategoryWise.date,
+//     period: tabFilters.subCategoryWise.period.toLowerCase(),
+//   });
+
+//   const { mutate: deleteExpense } = useDeleteExpenseMutation();
+//   const {
+//     data: expensesList,
+//     isLoading: expensesLoading,
+//     isSuccess: expensesSuccess,
+//   } = useGetExpensesQuery();
+
+//   const {
+//     data: expenseCategories,
+//     isLoading: expenseCatLoading,
+//     isSuccess: expenseCatSuccess,
+//   } = useGetExpenseCategoryQuery();
+
+//   const expenseData = useMemo(
+//     () => (expensesSuccess ? expensesList : []),
+//     [expensesSuccess, expensesList]
+//   );
+
+//   const filteredExpenses = useMemo(() => {
+//     if (!expenseData || expenseData.length === 0) return [];
+
+//     let result = [...expenseData];
+
+//     if (filterState.searchQuery) {
+//       const query = filterState.searchQuery.toLowerCase();
+//       result = result.filter(
+//         (item) =>
+//           (item.expenseCategory.name &&
+//             item.expenseCategory.name.toLowerCase().includes(query)) ||
+//           (typeof item.expenseCategory.name === "string" &&
+//             item.expenseCategory.name.toLowerCase().includes(query)) ||
+//           (item.description && item.description.toLowerCase().includes(query))
+//       );
+//     }
+//     if (filterState.filterValue) {
+//       result = result.filter(
+//         (item) =>
+//           (typeof item.expenseCategory.name === "string" &&
+//             item.expenseCategory.name === filterState.filterValue) ||
+//           (item.description && item.description === filterState.filterValue)
+//       );
+//     }
+
+//     return result;
+//   }, [expenseData, filterState]);
+
+//   const handleSearch = (query: string) => {
+//     setFilterState((prev) => ({ ...prev, searchQuery: query }));
+//   };
+
+//   const handleFilter = (filter: string) => {
+//     setFilterState((prev) => ({ ...prev, filterValue: filter }));
+//   };
+
+//   const handleSort = (sort: string) => {
+//     setFilterState((prev) => ({ ...prev, sortValue: sort }));
+//   };
+
+//   const productWiseTableData = useMemo(
+//     () => ({
+//       columns: [
+//         { key: "category", title: "Category" },
+//         { key: "subCategory", title: "Sub Category" },
+//         { key: "product", title: "Products" },
+//         { key: "totalRevenue", title: "Revenue" },
+//       ],
+//       rows: map(ProductWiseData, (item) => ({
+//         ...item,
+//       })),
+//     }),
+//     [ProductWiseData, isProductWiseDataSuccess]
+//   );
+//   const categoryWiseTableData = useMemo(
+//     () => ({
+//       columns: [
+//         { key: "category", title: "Category" },
+//         { key: "totalOrders", title: "Total Orders" },
+//         { key: "totalRevenue", title: "Revenue" },
+//         { key: "percentageSharee", title: "Percentage Share" },
+//       ],
+//       rows: map(categoryWiseDataList, (item) => ({
+//         ...item,
+//         percentageSharee: <div>{item.percentageShare} %</div>,
+//       })),
+//     }),
+//     [categoryWiseDataList, isCategoryWiseDataSuccess]
+//   );
+
+//   const subCategoryTableData = useMemo(
+//     () => ({
+//       columns: [
+//         { key: "subCategory", title: "Sub Category" },
+//         { key: "totalOrders", title: "Total Orders" },
+//         { key: "totalRevenue", title: "Revenue" },
+//         { key: "percentageSharee", title: "Percentage Share" },
+//       ],
+//       rows: map(subCategoryWiseDataList, (item) => ({
+//         ...item,
+//         percentageSharee: <div>{item.percentageShare} %</div>,
+//       })),
+//     }),
+//     [subCategoryWiseDataList, isSubCategoryWiseDataSuccess]
+//   );
+
+//   const tableDataObj: ITable = {
+//     productWise: productWiseTableData,
+//     categoryWise: categoryWiseTableData,
+//     subCategoryWise: subCategoryTableData,
+//   };
+//   const [modal, setModal] = useState({
+//     of: "",
+//     edit: false,
+//     data: null,
+//   });
+//   const closeModal = useCallback(
+//     () => setModal({ of: "", edit: false, data: null }),
+//     []
+//   );
+
+//   return (
+//     <div className="container px-4 py-3 mx-auto">
+//       {/* Improved header section with better layout */}
+//       <div className="mb-6">
+//         <Header text="Sales Report" />
+//       </div>
+
+//       {/* Improved layout for date and period filters */}
+//       <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+//         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+//           <div className="flex-1">
+//             <h3 className="text-sm font-medium text-gray-700 mb-2">
+//               Report Settings
+//             </h3>
+//             <DateFilter
+//               value={tabFilters[selectedTab]}
+//               onChange={handleTabFilterChange}
+//             />
+//           </div>
+//           <div className="flex items-center gap-2">
+//             <div className="px-3 py-1.5 bg-gray-100 rounded-md text-sm">
+//               <span className="font-medium">Current Period:</span>{" "}
+//               <span>{tabFilters[selectedTab].period}</span>
+//             </div>
+//             <div className="px-3 py-1.5 bg-gray-100 rounded-md text-sm">
+//               <span className="font-medium">Date:</span>{" "}
+//               <span>
+//                 {new Date(tabFilters[selectedTab].date).toLocaleDateString()}
+//               </span>
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+
+//       {/* Optional: Add search and filter section */}
+//       <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+//         <SearchFilterSort
+//           onSearch={handleSearch}
+//           onFilter={handleFilter}
+//           onSort={handleSort}
+//           onViewChange={() => {}}
+//           showFilter={true}
+//           showSort={true}
+//           showView={false}
+//           filterOptions={filterOptions}
+//           sortOptions={sortOptions}
+//           placeholder="Search products..."
+//         />
+//       </div>
+
+//       {/* Table with tabs */}
+//       <div className="bg-white rounded-lg shadow-sm">
+//         <MasterTable
+//           loading={expensesLoading || expenseCatLoading}
+//           tabsOptions={
+//             <DynamicTab
+//               selectedTab={selectedTab}
+//               setSelectedTab={setSelectedTab}
+//               tabOptions={salesReportTabOption}
+//             />
+//           }
+//           rows={tableDataObj[selectedTab].rows || []}
+//           columns={tableDataObj[selectedTab].columns}
+//           canSelect
+//         />
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default SalesReport;
+
+"use client";
 import { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import MasterTable from "../../components/shared/MasterTable";
-import { ScrollableModal } from "../../components/shared/ScrollableModal";
 import Header from "../../components/shared/table_heading/Header";
 import { DynamicTab } from "../PurchaseManagement/components/DynamicTab";
 
-import { salesReportTabOption, ITable } from "../analytics/SalesReportObj";
+import { salesReportTabOption, type ITable } from "../analytics/SalesReportObj";
 
 import { map } from "lodash";
 import {
-  IFetchExpenses,
+  type IFetchExpenses,
   useDeleteExpenseMutation,
   useGetExpenseCategoryQuery,
   useGetExpensesQuery,
@@ -23,10 +641,9 @@ import {
   useGetProductWiseDataQuery,
   useGetSubCategoryWiseDataQuery,
 } from "../../server/api/salesReportHook";
-import { useGetOrderCategoryQuery } from "../../server/api/orderReportHook";
 import {
   DateFilter,
-  PeriodOption,
+  type PeriodOption,
 } from "../../components/shared/DatePeriodFilter";
 
 interface IEditModal {
@@ -76,11 +693,6 @@ const SalesReport = () => {
   const [startDate, setStartDate] = useState<string>(formatDate(sevenDaysAgo));
   const [endDate, setEndDate] = useState<string>(formatDate(today));
 
-  // const [filter, setFilter] = useState<{ date: string; period: PeriodOption }>({
-  //   date: "",
-  //   period: "Daily",
-  // });
-
   const [filterState, setFilterState] = useState<FilterState>({
     searchQuery: "",
     filterValue: "",
@@ -95,7 +707,6 @@ const SalesReport = () => {
     date: tabFilters.productWise.date,
     period: tabFilters.productWise.period.toLowerCase(), // lowercase for `monthly`
   });
-  console.log("PRODUCT WISE DATA", ProductWiseData);
 
   const {
     data: categoryWiseDataList,
@@ -114,8 +725,6 @@ const SalesReport = () => {
     date: tabFilters.subCategoryWise.date,
     period: tabFilters.subCategoryWise.period.toLowerCase(),
   });
-
-  console.log("Sub category data", subCategoryWiseDataList);
 
   const { mutate: deleteExpense } = useDeleteExpenseMutation();
   const {
@@ -159,37 +768,6 @@ const SalesReport = () => {
           (item.description && item.description === filterState.filterValue)
       );
     }
-
-    // if (filterState.sortValue) {
-    //   switch (filterState.sortValue) {
-    //     case "title_asc":
-    //       result.sort((a, b) =>
-    //         a.name && b.name ? a.name.localeCompare(b.name) : 0
-    //       );
-    //       break;
-    //     case "title_desc":
-    //       result.sort((a, b) =>
-    //         a.name && b.name ? b.name.localeCompare(a.name) : 0
-    //       );
-    //       break;
-    //     case "price_asc":
-    //       result.sort((a, b) => (a.price && b.price ? a.price - b.price : 0));
-    //       break;
-    //     case "price_desc":
-    //       result.sort((a, b) => (a.price && b.price ? b.price - a.price : 0));
-    //       break;
-    //     case "rating_asc":
-    //       result.sort((a, b) =>
-    //         a.ratings && b.ratings ? a.ratings - b.ratings : 0
-    //       );
-    //       break;
-    //     case "rating_desc":
-    //       result.sort((a, b) =>
-    //         a.ratings && b.ratings ? b.ratings - a.ratings : 0
-    //       );
-    //       break;
-    //   }
-    // }
 
     return result;
   }, [expenseData, filterState]);
@@ -251,15 +829,6 @@ const SalesReport = () => {
     }),
     [subCategoryWiseDataList, isSubCategoryWiseDataSuccess]
   );
-  // const returnTableData = useMemo(
-  //   () => ({
-  //     columns: [{ key: "name", title: "Name" }],
-  //     rows: map(returnList, (item) => ({
-  //       ...item,
-  //     })),
-  //   }),
-  //   [returnList, returnSuccess]
-  // );
 
   const tableDataObj: ITable = {
     productWise: productWiseTableData,
@@ -277,39 +846,70 @@ const SalesReport = () => {
   );
 
   return (
-    <div className="container px-4 py-3 mx-auto ">
-      <Header text="Sales Report" />
+    <div className="container px-4 py-3 mx-auto">
+      {/* Improved header section with better layout */}
+      <div className="mb-6">
+        <Header text="Sales Report" />
+      </div>
 
-      <DateFilter
-        value={tabFilters[selectedTab]}
-        onChange={handleTabFilterChange}
-      />
-      <MasterTable
-        loading={expensesLoading || expenseCatLoading}
-        tabsOptions={
-          <DynamicTab
-            selectedTab={selectedTab}
-            setSelectedTab={setSelectedTab}
-            tabOptions={salesReportTabOption}
-          />
-        }
-        // filterSection={
-        //   <SearchFilterSort
-        //     onFilter={handleFilter}
-        //     onSort={handleSort}
-        //     onViewChange={() => {}}
-        //     showFilter={true}
-        //     showSort={true}
-        //     showView={true}
-        //     filterOptions={filterOptions}
-        //     sortOptions={sortOptions}
-        //     placeholder="Search products..."
-        //   />
-        // }
-        rows={tableDataObj[selectedTab].rows || []}
-        columns={tableDataObj[selectedTab].columns}
-        canSelect
-      />
+      {/* Improved layout for date and period filters */}
+      <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex-1">
+            <h3 className="text-sm font-medium text-gray-700 mb-2">
+              Report Settings
+            </h3>
+            <DateFilter
+              value={tabFilters[selectedTab]}
+              onChange={handleTabFilterChange}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="px-3 py-1.5 bg-gray-100 rounded-md text-sm">
+              <span className="font-medium">Current Period:</span>{" "}
+              <span>{tabFilters[selectedTab].period}</span>
+            </div>
+            <div className="px-3 py-1.5 bg-gray-100 rounded-md text-sm">
+              <span className="font-medium">Date:</span>{" "}
+              <span>
+                {new Date(tabFilters[selectedTab].date).toLocaleDateString()}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Optional: Add search and filter section */}
+
+      {/* Table with tabs */}
+      <div className="bg-white rounded-lg shadow-sm">
+        <MasterTable
+          loading={expensesLoading || expenseCatLoading}
+          tabsOptions={
+            <DynamicTab
+              selectedTab={selectedTab}
+              setSelectedTab={setSelectedTab}
+              tabOptions={salesReportTabOption}
+            />
+          }
+          rows={tableDataObj[selectedTab].rows || []}
+          columns={tableDataObj[selectedTab].columns}
+          canSelect
+          filterSection={
+            <SearchFilterSort
+              onFilter={handleFilter}
+              onSort={handleSort}
+              onViewChange={() => {}}
+              showFilter={true}
+              showSort={true}
+              showView={false}
+              filterOptions={filterOptions}
+              sortOptions={sortOptions}
+              placeholder="Search products..."
+            />
+          }
+        />
+      </div>
     </div>
   );
 };
