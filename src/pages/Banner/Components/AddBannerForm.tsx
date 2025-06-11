@@ -373,6 +373,7 @@ import {
   type IBannerFormData,
 } from "./bannerobj";
 import MultiImageUploader from "../../../components/shared/form_components/FileDropInput";
+import { cleanObject } from "../../../utils/cleanObject";
 
 const AddBannerSchema = z.object({
   title: z.string().min(1, "Banner Title is required"),
@@ -450,9 +451,18 @@ const AddBannerForm = () => {
   // UseForm with inferred types from defaultValues
   const form = useForm({
     defaultValues: generateBannerFormDefaultValue(formState, bannerData),
+    validators: {
+      onSubmit: AddBannerSchema,
+    },
     onSubmit: async ({ value }) => {
       try {
         const formData = new FormData();
+        const formattedData = cleanObject(value);
+
+        delete formattedData["image"];
+        delete formattedData["existingImage"];
+        delete formattedData["mobImage"];
+        delete formattedData["existingMobImage"];
 
         formData.append("title", value.title);
         formData.append("description", value.description);
@@ -661,8 +671,11 @@ const AddBannerForm = () => {
                     label=""
                     value={field.state.value}
                     existingFileField="existingImage"
+                    accept={{
+                      "image/*": [".png", ".jpg", ".jpeg", ".svg"],
+                    }}
                     existingFile={form.getFieldValue("existingImage")}
-                    onChange={(file: File | null) => field.handleChange(file)}
+                    onChange={(file) => field.handleChange(file)}
                   />
                 )}
               </form.Field>
@@ -683,7 +696,12 @@ const AddBannerForm = () => {
                     form={form}
                     label=""
                     value={field.state.value}
-                    onChange={(file: File | null) => field.handleChange(file)}
+                    existingFileField="existingMobImage"
+                    accept={{
+                      "image/*": [".png", ".jpg", ".jpeg", ".svg", ".webp"],
+                    }}
+                    existingFile={form.getFieldValue("existingMobImage")}
+                    onChange={(file) => field.handleChange(file)}
                   />
                 )}
               </form.Field>
