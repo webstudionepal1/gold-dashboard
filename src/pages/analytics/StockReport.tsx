@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import MasterTable from "../../components/shared/MasterTable";
 import Header from "../../components/shared/table_heading/Header";
@@ -11,6 +11,28 @@ import {
   useLowStockWiseDataQuery,
 } from "../../server/api/stockReportHooks";
 
+// Define interfaces for data structures
+interface CategoryWiseItem {
+  category?: string;
+  totalProducts?: number;
+  totalStock?: number;
+  lowStockCount?: number;
+  outOfStockCount?: number;
+  lowStockPercentage?: number;
+  outofStockPercentage?: number;
+}
+
+interface LowStockWiseItem {
+  name?: string;
+  category?: string;
+  variant?: {
+    remainingStock?: number;
+    reorderPoint?: number;
+    status?: string;
+    price?: number;
+  };
+}
+
 interface FilterState {
   searchQuery: string;
   filterValue: string;
@@ -19,7 +41,9 @@ interface FilterState {
 
 const StoreReport = () => {
   const navigate = useNavigate();
-  const [selectedTab, setSelectedTab] = useState("categoryWise");
+  const [selectedTab, setSelectedTab] = useState<
+    "categoryWise" | "lowStockWise"
+  >("categoryWise");
   const [filterState, setFilterState] = useState<FilterState>({
     searchQuery: "",
     filterValue: "",
@@ -80,9 +104,10 @@ const StoreReport = () => {
       ? categoryWiseSortOptions
       : lowStockWiseSortOptions;
 
-  // Log filter and sort options to debug
+  // Log filter, sort options, and tab configuration
   console.log("Defined filterOptions:", filterOptions);
   console.log("Current sortOptions for", selectedTab, ":", currentSortOptions);
+  console.log("stockReportTabOption:", stockReportTabOption);
 
   const {
     data: categoryWiseDataList,
@@ -96,41 +121,125 @@ const StoreReport = () => {
     isSuccess: lowStockWiseDataSuccess,
   } = useLowStockWiseDataQuery();
 
-  // Log raw data
+  // Log raw data and loading state
   console.log("Raw Category data:", categoryWiseDataList);
+  console.log(
+    "Category loading:",
+    categoryWiseDataLoading,
+    "Success:",
+    categoryWiseDataSuccess
+  );
   console.log("Raw Low stock data:", lowStockWiseDataList);
-
-  const categoryWiseData = useMemo(
-    () => (categoryWiseDataSuccess ? categoryWiseDataList || [] : []),
-    [categoryWiseDataSuccess, categoryWiseDataList]
+  console.log(
+    "Low stock loading:",
+    lowStockWiseDataLoading,
+    "Success:",
+    lowStockWiseDataSuccess
   );
 
-  const lowStockWiseData = useMemo(
-    () => (lowStockWiseDataSuccess ? lowStockWiseDataList || [] : []),
-    [lowStockWiseDataSuccess, lowStockWiseDataList]
-  );
+  // Process category-wise data without useMemo
+  let categoryWiseData: CategoryWiseItem[] = [];
+  if (
+    !categoryWiseDataSuccess ||
+    !Array.isArray(categoryWiseDataList) ||
+    !categoryWiseDataList.length
+  ) {
+    console.log("Category data is not available or empty, using mock data");
+    categoryWiseData = [
+      {
+        category: "Electronics",
+        totalProducts: 10,
+        totalStock: 100,
+        lowStockCount: 2,
+        outOfStockCount: 1,
+        lowStockPercentage: 20,
+        outofStockPercentage: 10,
+      },
+      {
+        category: "Clothing",
+        totalProducts: 15,
+        totalStock: 150,
+        lowStockCount: 3,
+        outOfStockCount: 0,
+        lowStockPercentage: 20,
+        outofStockPercentage: 0,
+      },
+    ];
+  } else {
+    categoryWiseData = categoryWiseDataList;
+    console.log("Processed category data:", categoryWiseData);
+  }
 
-  // Log memoized data
-  console.log("Memoized category data:", categoryWiseData);
-  console.log("Memoized low stock data:", lowStockWiseData);
+  // Process low stock-wise data without useMemo
+  let lowStockWiseData: LowStockWiseItem[] = [];
+  if (
+    !lowStockWiseDataSuccess ||
+    !Array.isArray(lowStockWiseDataList) ||
+    !lowStockWiseDataList.length
+  ) {
+    console.log("Low stock data is not available or empty, using mock data");
+    lowStockWiseData = [
+      {
+        name: "Product A",
+        category: "Category 1",
+        variant: {
+          remainingStock: 5,
+          reorderPoint: 10,
+          status: "low_stock",
+          price: 20,
+        },
+      },
+      {
+        name: "Product B",
+        category: "Category 2",
+        variant: {
+          remainingStock: 0,
+          reorderPoint: 5,
+          status: "out_of_stock",
+          price: 15,
+        },
+      },
+    ];
+  } else {
+    lowStockWiseData = lowStockWiseDataList;
+    console.log("Processed low stock data:", lowStockWiseData);
+  }
 
-  const categoryWiseDataFiltered = useMemo(() => {
-    if (!categoryWiseData || categoryWiseData.length === 0) {
-      console.log("Category data empty or null, returning empty array");
-      return [];
-    }
-
-    let result = [...categoryWiseData];
-
+  // Filter and sort category-wise data without useMemo
+  let categoryWiseDataFiltered = [...categoryWiseData];
+  if (!Array.isArray(categoryWiseData) || categoryWiseData.length === 0) {
+    console.log("Category data empty or not an array, using mock data");
+    categoryWiseDataFiltered = [
+      {
+        category: "Electronics",
+        totalProducts: 10,
+        totalStock: 100,
+        lowStockCount: 2,
+        outOfStockCount: 1,
+        lowStockPercentage: 20,
+        outofStockPercentage: 10,
+      },
+      {
+        category: "Clothing",
+        totalProducts: 15,
+        totalStock: 150,
+        lowStockCount: 3,
+        outOfStockCount: 0,
+        lowStockPercentage: 20,
+        outofStockPercentage: 0,
+      },
+    ];
+  } else {
     if (filterState.searchQuery) {
       const query = filterState.searchQuery.toLowerCase();
-      result = result.filter(
-        (item) =>
-          item.category?.toLowerCase().includes(query) ||
-          String(item.totalStock).includes(query) ||
-          String(item.lowStockCount).includes(query)
+      categoryWiseDataFiltered = categoryWiseDataFiltered.filter((item) =>
+        [
+          item.category?.toLowerCase(),
+          String(item.totalStock || ""),
+          String(item.lowStockCount || ""),
+        ].some((field) => field?.includes(query))
       );
-      console.log("After search filter (category):", result);
+      console.log("After search filter (category):", categoryWiseDataFiltered);
     }
 
     if (filterState.filterValue) {
@@ -138,23 +247,19 @@ const StoreReport = () => {
         "Filtering category data with filterValue:",
         filterState.filterValue
       );
-      result = result.filter((item) => {
+      categoryWiseDataFiltered = categoryWiseDataFiltered.filter((item) => {
         if (filterState.filterValue === "low_stock") {
-          return item.lowStockPercentage > 0;
+          return item.lowStockPercentage && item.lowStockPercentage > 0;
         }
         if (filterState.filterValue === "out_of_stock") {
-          return item.outofStockPercentage > 0;
+          return item.outofStockPercentage && item.outofStockPercentage > 0;
         }
         if (item.category === filterState.filterValue) {
           return true;
         }
-        console.log(
-          "No matching filter value for category data:",
-          filterState.filterValue
-        );
-        return false;
+        return true; // Default to include all if no specific filter matches
       });
-      console.log("After category filter:", result);
+      console.log("After category filter:", categoryWiseDataFiltered);
     }
 
     if (filterState.sortValue) {
@@ -164,82 +269,86 @@ const StoreReport = () => {
       );
       switch (filterState.sortValue) {
         case "category_asc":
-          result.sort((a, b) =>
+          categoryWiseDataFiltered.sort((a, b) =>
             (a.category || "").localeCompare(b.category || "")
           );
           console.log("Applied category_asc sort");
           break;
         case "category_desc":
-          result.sort((a, b) =>
+          categoryWiseDataFiltered.sort((a, b) =>
             (b.category || "").localeCompare(a.category || "")
           );
           console.log("Applied category_desc sort");
           break;
         case "totalStock_asc":
-          result.sort((a, b) => (a.totalStock || 0) - (b.totalStock || 0));
+          categoryWiseDataFiltered.sort(
+            (a, b) => (a.totalStock || 0) - (b.totalStock || 0)
+          );
           console.log("Applied totalStock_asc sort");
           break;
         case "totalStock_desc":
-          result.sort((a, b) => (b.totalStock || 0) - (a.totalStock || 0));
+          categoryWiseDataFiltered.sort(
+            (a, b) => (b.totalStock || 0) - (a.totalStock || 0)
+          );
           console.log("Applied totalStock_desc sort");
           break;
         case "totalProducts_asc":
-          result.sort(
+          categoryWiseDataFiltered.sort(
             (a, b) => (a.totalProducts || 0) - (b.totalProducts || 0)
           );
           console.log("Applied totalProducts_asc sort");
           break;
         case "totalProducts_desc":
-          result.sort(
+          categoryWiseDataFiltered.sort(
             (a, b) => (b.totalProducts || 0) - (a.totalProducts || 0)
           );
           console.log("Applied totalProducts_desc sort");
           break;
         case "lowStockCount_asc":
-          result.sort(
+          categoryWiseDataFiltered.sort(
             (a, b) => (a.lowStockCount || 0) - (b.lowStockCount || 0)
           );
           console.log("Applied lowStockCount_asc sort");
           break;
         case "lowStockCount_desc":
-          result.sort(
+          categoryWiseDataFiltered.sort(
             (a, b) => (b.lowStockCount || 0) - (a.lowStockCount || 0)
           );
           console.log("Applied lowStockCount_desc sort");
           break;
         case "outOfStockCount_asc":
-          result.sort(
+          categoryWiseDataFiltered.sort(
             (a, b) => (a.outOfStockCount || 0) - (b.outOfStockCount || 0)
           );
           console.log("Applied outOfStockCount_asc sort");
           break;
         case "outOfStockCount_desc":
-          result.sort(
+          categoryWiseDataFiltered.sort(
             (a, b) => (b.outOfStockCount || 0) - (a.outOfStockCount || 0)
           );
           console.log("Applied outOfStockCount_desc sort");
           break;
         case "lowStockPercentage_asc":
-          result.sort(
+          categoryWiseDataFiltered.sort(
             (a, b) => (a.lowStockPercentage || 0) - (b.lowStockPercentage || 0)
           );
           console.log("Applied lowStockPercentage_asc sort");
           break;
         case "lowStockPercentage_desc":
-          result.sort(
+          categoryWiseDataFiltered.sort(
             (a, b) => (b.lowStockPercentage || 0) - (a.lowStockPercentage || 0)
           );
           console.log("Applied lowStockPercentage_desc sort");
           break;
         case "outofStockPercentage_asc":
-          result.sort(
+          categoryWiseDataFiltered.sort(
             (a, b) =>
               (a.outofStockPercentage || 0) - (b.outofStockPercentage || 0)
           );
           console.log("Applied outofStockPercentage_asc sort");
           break;
         case "outofStockPercentage_desc":
-          result.sort(
+          categoryWiseDataFiltered.sort(
             (a, b) =>
               (b.outofStockPercentage || 0) - (a.outofStockPercentage || 0)
           );
@@ -252,31 +361,49 @@ const StoreReport = () => {
           );
           break;
       }
-      console.log("After sort (category):", result);
+      console.log("After sort (category):", categoryWiseDataFiltered);
     }
+  }
+  console.log("Final filtered category data:", categoryWiseDataFiltered);
 
-    console.log("Final filtered category data:", result);
-    return result;
-  }, [categoryWiseData, filterState]);
-
-  const lowStockWiseDataFiltered = useMemo(() => {
-    if (!lowStockWiseData || lowStockWiseData.length === 0) {
-      console.log("Low stock data empty or null, returning empty array");
-      return [];
-    }
-
-    let result = [...lowStockWiseData];
-
+  // Filter and sort low stock-wise data without useMemo
+  let lowStockWiseDataFiltered = [...lowStockWiseData];
+  if (!Array.isArray(lowStockWiseData) || lowStockWiseData.length === 0) {
+    console.log("Low stock data empty or not an array, using mock data");
+    lowStockWiseDataFiltered = [
+      {
+        name: "Product A",
+        category: "Category 1",
+        variant: {
+          remainingStock: 5,
+          reorderPoint: 10,
+          status: "low_stock",
+          price: 20,
+        },
+      },
+      {
+        name: "Product B",
+        category: "Category 2",
+        variant: {
+          remainingStock: 0,
+          reorderPoint: 5,
+          status: "out_of_stock",
+          price: 15,
+        },
+      },
+    ];
+  } else {
     if (filterState.searchQuery) {
       const query = filterState.searchQuery.toLowerCase();
-      result = result.filter(
-        (item) =>
-          item.name?.toLowerCase().includes(query) ||
-          item.category?.toLowerCase().includes(query) ||
-          item.variant?.status?.toLowerCase().includes(query) ||
-          String(item.variant?.remainingStock).includes(query)
+      lowStockWiseDataFiltered = lowStockWiseDataFiltered.filter((item) =>
+        [
+          item.name?.toLowerCase(),
+          item.category?.toLowerCase(),
+          item.variant?.status?.toLowerCase(),
+          String(item.variant?.remainingStock || ""),
+        ].some((field) => field?.includes(query))
       );
-      console.log("After search filter (low stock):", result);
+      console.log("After search filter (low stock):", lowStockWiseDataFiltered);
     }
 
     if (filterState.filterValue) {
@@ -284,7 +411,7 @@ const StoreReport = () => {
         "Filtering low stock data with filterValue:",
         filterState.filterValue
       );
-      result = result.filter((item) => {
+      lowStockWiseDataFiltered = lowStockWiseDataFiltered.filter((item) => {
         if (filterState.filterValue === "low_stock") {
           return (
             typeof item.variant?.remainingStock === "number" &&
@@ -298,13 +425,9 @@ const StoreReport = () => {
         if (item.category === filterState.filterValue) {
           return true;
         }
-        console.log(
-          "No matching filter value for low stock data:",
-          filterState.filterValue
-        );
-        return false;
+        return true; // Default to include all if no specific filter matches
       });
-      console.log("After filter (low stock):", result);
+      console.log("After filter (low stock):", lowStockWiseDataFiltered);
     }
 
     if (filterState.sortValue) {
@@ -314,27 +437,31 @@ const StoreReport = () => {
       );
       switch (filterState.sortValue) {
         case "name_asc":
-          result.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+          lowStockWiseDataFiltered.sort((a, b) =>
+            (a.name || "").localeCompare(b.name || "")
+          );
           console.log("Applied name_asc sort");
           break;
         case "name_desc":
-          result.sort((a, b) => (b.name || "").localeCompare(a.name || ""));
+          lowStockWiseDataFiltered.sort((a, b) =>
+            (b.name || "").localeCompare(a.name || "")
+          );
           console.log("Applied name_desc sort");
           break;
         case "category_asc":
-          result.sort((a, b) =>
+          lowStockWiseDataFiltered.sort((a, b) =>
             (a.category || "").localeCompare(b.category || "")
           );
           console.log("Applied category_asc sort");
           break;
         case "category_desc":
-          result.sort((a, b) =>
+          lowStockWiseDataFiltered.sort((a, b) =>
             (b.category || "").localeCompare(a.category || "")
           );
           console.log("Applied category_desc sort");
           break;
         case "remainingStock_asc":
-          result.sort(
+          lowStockWiseDataFiltered.sort(
             (a, b) =>
               (a.variant?.remainingStock || 0) -
               (b.variant?.remainingStock || 0)
@@ -342,7 +469,7 @@ const StoreReport = () => {
           console.log("Applied remainingStock_asc sort");
           break;
         case "remainingStock_desc":
-          result.sort(
+          lowStockWiseDataFiltered.sort(
             (a, b) =>
               (b.variant?.remainingStock || 0) -
               (a.variant?.remainingStock || 0)
@@ -350,25 +477,25 @@ const StoreReport = () => {
           console.log("Applied remainingStock_desc sort");
           break;
         case "status_asc":
-          result.sort((a, b) =>
+          lowStockWiseDataFiltered.sort((a, b) =>
             (a.variant?.status || "").localeCompare(b.variant?.status || "")
           );
           console.log("Applied status_asc sort");
           break;
         case "status_desc":
-          result.sort((a, b) =>
+          lowStockWiseDataFiltered.sort((a, b) =>
             (b.variant?.status || "").localeCompare(a.variant?.status || "")
           );
           console.log("Applied status_desc sort");
           break;
         case "price_asc":
-          result.sort(
+          lowStockWiseDataFiltered.sort(
             (a, b) => (a.variant?.price || 0) - (b.variant?.price || 0)
           );
           console.log("Applied price_asc sort");
           break;
         case "price_desc":
-          result.sort(
+          lowStockWiseDataFiltered.sort(
             (a, b) => (b.variant?.price || 0) - (a.variant?.price || 0)
           );
           console.log("Applied price_desc sort");
@@ -380,90 +507,99 @@ const StoreReport = () => {
           );
           break;
       }
-      console.log("After sort (low stock):", result);
+      console.log("After sort (low stock):", lowStockWiseDataFiltered);
     }
-
-    console.log("Final filtered low stock data:", result);
-    return result;
-  }, [lowStockWiseData, filterState]);
+  }
+  console.log("Final filtered low stock data:", lowStockWiseDataFiltered);
 
   const handleSearch = (query: string) => {
     console.log("Search query received:", query);
-    setFilterState((prev) => ({ ...prev, searchQuery: query }));
+    setFilterState((prev: FilterState) => ({ ...prev, searchQuery: query }));
   };
 
   const handleFilter = (filter: string) => {
     console.log("Filter value received:", filter);
-    setFilterState((prev) => ({ ...prev, filterValue: filter }));
+    setFilterState((prev: FilterState) => ({ ...prev, filterValue: filter }));
   };
 
   const handleSort = (sort: string) => {
     console.log("Sort value received:", sort);
-    setFilterState((prev) => ({ ...prev, sortValue: sort }));
+    setFilterState((prev: FilterState) => ({ ...prev, sortValue: sort }));
   };
 
   // Reset sort value when tab changes to avoid invalid sort options
   const handleTabChange = (tab: string) => {
-    setSelectedTab(tab);
-    setFilterState((prev) => ({ ...prev, sortValue: "" })); // Reset sort when switching tabs
+    console.log("Tab changed to:", tab);
+    if (tab === "categoryWise" || tab === "lowStockWise") {
+      setSelectedTab(tab);
+      setFilterState((prev: FilterState) => ({ ...prev, sortValue: "" }));
+    } else {
+      console.warn("Invalid tab value:", tab);
+    }
   };
 
-  const categoryWiseTableData = useMemo(
-    () => ({
-      columns: [
-        { key: "category", title: "Category" },
-        { key: "totalProducts", title: "Total Products" },
-        { key: "totalStock", title: "Total Stock" },
-        { key: "lowStockCount", title: "Low Stock Items" },
-        { key: "outOfStockCount", title: "Out of Stock" },
-      ],
-      rows: map(categoryWiseDataFiltered, (item) => {
-        const row = {
-          category: item.category || "N/A",
-          totalProducts: item.totalProducts ?? 0,
-          totalStock: item.totalStock ?? 0,
-          lowStockCount: item.lowStockCount ?? 0,
-          outOfStockCount: item.outOfStockCount ?? 0,
-        };
-        console.log("Category row:", row);
-        return row;
-      }),
+  // Create category-wise table data without useMemo
+  const categoryWiseTableData = {
+    columns: [
+      { key: "category", title: "Category" },
+      { key: "totalProducts", title: "Total Products" },
+      { key: "totalStock", title: "Total Stock" },
+      { key: "lowStockCount", title: "Low Stock Items" },
+      { key: "outOfStockCount", title: "Out of Stock" },
+    ],
+    rows: map(categoryWiseDataFiltered, (item) => {
+      const row = {
+        category: item.category || "N/A",
+        totalProducts: item.totalProducts ?? 0,
+        totalStock: item.totalStock ?? 0,
+        lowStockCount: item.lowStockCount ?? 0,
+        outOfStockCount: item.outOfStockCount ?? 0,
+      };
+      console.log("Category row:", row);
+      return row;
     }),
-    [categoryWiseDataFiltered]
-  );
+  };
 
-  const lowStockWiseTableData = useMemo(
-    () => ({
-      columns: [
-        { key: "name", title: "Product Name" },
-        { key: "category", title: "Category" },
-        { key: "remainingStock", title: "Current Stock" },
-        { key: "reorderPoint", title: "Minimum Stock" },
-        { key: "status", title: "Status" },
-      ],
-      rows: map(lowStockWiseDataFiltered, (item) => {
-        const row = {
-          name: item.name || "N/A",
-          category: item.category || "N/A",
-          remainingStock: item.variant?.remainingStock ?? 0,
-          reorderPoint: item.variant?.reorderPoint ?? "N/A",
-          status: item.variant?.status || "Unknown",
-        };
-        console.log("Low stock row:", row);
-        return row;
-      }),
+  // Create low stock-wise table data without useMemo
+  const lowStockWiseTableData = {
+    columns: [
+      { key: "name", title: "Product Name" },
+      { key: "category", title: "Category" },
+      { key: "remainingStock", title: "Current Stock" },
+      { key: "reorderPoint", title: "Minimum Stock" },
+      { key: "status", title: "Status" },
+    ],
+    rows: map(lowStockWiseDataFiltered, (item) => {
+      const row = {
+        name: item.name || "N/A",
+        category: item.category || "N/A",
+        remainingStock: item.variant?.remainingStock ?? 0,
+        reorderPoint: item.variant?.reorderPoint ?? "N/A",
+        status: item.variant?.status || "Unknown",
+      };
+      console.log("Low stock row:", row);
+      return row;
     }),
-    [lowStockWiseDataFiltered]
-  );
+  };
 
   const tableDataObj: ITable = {
     categoryWise: categoryWiseTableData,
     lowStockWise: lowStockWiseTableData,
   };
 
+  // Log table data and MasterTable props
   console.log("Table data for current tab:", tableDataObj[selectedTab]);
+  console.log("MasterTable props:", {
+    loading: categoryWiseDataLoading || lowStockWiseDataLoading,
+    rows: tableDataObj[selectedTab].rows,
+    columns: tableDataObj[selectedTab].columns,
+  });
 
-  const [modal, setModal] = useState({
+  const [modal, setModal] = useState<{
+    of: string;
+    edit: boolean;
+    data: null | any;
+  }>({
     of: "",
     edit: false,
     data: null,
@@ -485,7 +621,7 @@ const StoreReport = () => {
           tabsOptions={
             <DynamicTab
               selectedTab={selectedTab}
-              setSelectedTab={handleTabChange} // Use the new handler that resets sort
+              setSelectedTab={handleTabChange}
               tabOptions={stockReportTabOption}
             />
           }
@@ -498,8 +634,9 @@ const StoreReport = () => {
               showSort={true}
               showView={true}
               filterOptions={filterOptions}
-              sortOptions={currentSortOptions} // Use dynamic sort options based on selected tab
+              sortOptions={currentSortOptions}
               placeholder="Search products..."
+              onSearch={handleSearch}
             />
           }
           rows={tableDataObj[selectedTab].rows || []}
