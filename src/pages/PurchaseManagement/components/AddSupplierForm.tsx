@@ -52,6 +52,7 @@ const AddSupplierForm = () => {
       const formdata = new FormData();
       const formattedData = cleanObject(value);
       delete formattedData["logo"];
+      delete formattedData["existingLogo"];
 
       appendFormData(formdata, formattedData);
       if (value.logo) {
