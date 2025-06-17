@@ -331,7 +331,14 @@ const CustomerDetails = () => {
       <div className="bg-[#ffffff] shadow-lg rounded-xl h-full w-full pb-4     ">
         <div className="flex items-center justify-between mx-6 py-6">
           <div className="flex items-center gap-3">
-            <img src="/yellowgirl.png" />
+            {/* <img src={customer?.image} /> */}
+            <img
+              src={
+                customer?.image || "https://via.placeholder.com/150?text=User"
+              }
+              alt={customer?.name || "Customer"}
+              // className="w-16 h-16 rounded-full object-cover"
+            />
             <div className="flex flex-col ">
               <h1 className="font-semibold text-2xl">{customer?.name} </h1>
               <div className="flex items-center gap-4 my-2">
@@ -421,7 +428,10 @@ const CustomerDetails = () => {
             ]}
             onView={handleView}
             viewAllButton={
-              <Link to={FrontendRoutes.ORDER} className="bg-white border-2 border-[#F1D097] text-[#F1D097] px-2 py-[3px] rounded-md lg:text-base md:text-sm text-xs hover:bg-[#F1D097] hover:text-white transition-colors">
+              <Link
+                to={FrontendRoutes.ORDER}
+                className="bg-white border-2 border-[#F1D097] text-[#F1D097] px-2 py-[3px] rounded-md lg:text-base md:text-sm text-xs hover:bg-[#F1D097] hover:text-white transition-colors"
+              >
                 View All
               </Link>
             }
