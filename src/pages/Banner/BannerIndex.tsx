@@ -1,368 +1,951 @@
-import type React from "react";
-import { useState } from "react";
-import { SearchFilterSort } from "../../components/global/SearchFilterSort";
-import {
-  Table,
-  type ColumnConfig,
-  type TableData,
-} from "../../components/shared/Table";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "../../components/shared/tab";
+// import React, { useState, useMemo } from "react";
+// import { useNavigate } from "react-router-dom";
+// import { Icon } from "@iconify/react/dist/iconify.js";
+// import { SearchFilterSort } from "../../components/global/SearchFilterSort";
+// import Header from "../../components/shared/table_heading/Header";
+// import { ScrollableModal } from "../../components/shared/ScrollableModal";
+// import { DynamicTab } from "../PurchaseManagement/components/DynamicTab";
+// import MasterTable from "../../components/shared/MasterTable";
+// import {
+//   IFetchBanner,
+//   useDeleteBannerMutation,
+//   useGetAllBannerQuery,
+// } from "../../server/api/bannerHook";
+// import { updateBannerState } from "./Components/bannerStore";
+
+// interface BannerItem {
+//   _id: string;
+//   title: string;
+//   banner_type: string;
+//   image: string[];
+//   mobImage: string[];
+//   category: string;
+//   subCategory: string;
+//   banner_title?: string;
+//   description?: string;
+//   select_by?: string;
+//   priority?: number;
+//   locations?: string[];
+//   type: string;
+// }
+
+// const bannerTabOptions = [
+//   { value: "homepage", label: "Home Page" },
+//   { value: "category-page", label: "Category Page" },
+//   { value: "product-page", label: "Product Page" },
+// ];
+
+// const filterOptions = [
+//   { value: "", label: "All Banners" },
+//   { value: "active", label: "Active" },
+//   { value: "inactive", label: "Inactive" },
+// ];
+
+// const sortOptions = [
+//   { value: "", label: "Default" },
+//   { value: "title-asc", label: "Title (A-Z)" },
+//   { value: "title-desc", label: "Title (Z-A)" },
+//   { value: "priority-high", label: "Priority (High)" },
+//   { value: "priority-low", label: "Priority (Low)" },
+// ];
+
+// interface FilterState {
+//   searchQuery: string;
+//   filterValue: string;
+//   sortValue: string;
+// }
+
+// interface ITable {
+//   [key: string]: {
+//     columns: { key: string; title: string }[];
+//     rows: any[];
+//   };
+// }
+
+// const BannerIndex: React.FC = () => {
+//   const navigate = useNavigate();
+//   const [selectedTab, setSelectedTab] = useState("homepage");
+//   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+//   const [editingItem, setEditingItem] = useState<IFetchBanner | null>(null);
+//   const [filterState, setFilterState] = useState<FilterState>({
+//     searchQuery: "",
+//     filterValue: "",
+//     sortValue: "",
+//   });
+//   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+//   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+//   const { data: banners = [], isLoading, error } = useGetAllBannerQuery();
+//   const { mutate: deleteBanner } = useDeleteBannerMutation();
+
+//   const handleSearch = (query: string) => {
+//     setFilterState((prev) => ({ ...prev, searchQuery: query }));
+//   };
+
+//   const handleFilter = (filter: string) => {
+//     setFilterState((prev) => ({ ...prev, filterValue: filter }));
+//   };
+
+//   const handleSort = (sort: string) => {
+//     setFilterState((prev) => ({ ...prev, sortValue: sort }));
+//   };
+
+//   const handleImageClick = (imageUrl: string) => {
+//     setSelectedImage(imageUrl);
+//     setIsImageModalOpen(true);
+//   };
+
+//   const handleDownloadImage = async (imageUrl: string) => {
+//     try {
+//       const response = await fetch(imageUrl, {
+//         mode: "cors",
+//         credentials: "same-origin",
+//       });
+//       if (!response.ok) {
+//         throw new Error("Failed to fetch image");
+//       }
+//       const blob = await response.blob();
+//       const blobUrl = window.URL.createObjectURL(blob);
+//       const link = document.createElement("a");
+//       link.href = blobUrl;
+//       const filename = imageUrl.split("/").pop() || "banner-image";
+//       const extension = filename.split(".").pop() || "jpg";
+//       link.download = `${
+//         filename.split(".")[0] || "banner-image"
+//       }.${extension}`;
+//       document.body.appendChild(link);
+//       link.click();
+//       document.body.removeChild(link);
+//       window.URL.revokeObjectURL(blobUrl);
+//     } catch (error) {
+//       console.error("Download failed:", error);
+//       const link = document.createElement("a");
+//       link.href = imageUrl;
+//       const filename = imageUrl.split("/").pop() || "banner-image";
+//       const extension = filename.split(".").pop() || "jpg";
+//       link.download = `${
+//         filename.split(".")[0] || "banner-image"
+//       }.${extension}`;
+//       document.body.appendChild(link);
+//       link.click();
+//       document.body.removeChild(link);
+//     }
+//   };
+
+//   const filteredBanners = useMemo(() => {
+//     let result = banners.filter((item) =>
+//       item.locations?.includes(selectedTab)
+//     );
+
+//     if (filterState.searchQuery) {
+//       const query = filterState.searchQuery.toLowerCase();
+//       result = result.filter(
+//         (item) =>
+//           (item.title && item.title.toLowerCase().includes(query)) ||
+//           (item._id && item._id.toLowerCase().includes(query))
+//       );
+//     }
+
+//     if (filterState.filterValue) {
+//       result = result.filter((item) => item.status === filterState.filterValue);
+//     }
+
+//     if (filterState.sortValue) {
+//       switch (filterState.sortValue) {
+//         case "title-asc":
+//           result.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
+//           break;
+//         case "title-desc":
+//           result.sort((a, b) => (b.title || "").localeCompare(a.title || ""));
+//           break;
+//         case "priority-high":
+//           result.sort((a, b) => (b.priority || 0) - (a.priority || 0));
+//           break;
+//         case "priority-low":
+//           result.sort((a, b) => (a.priority || 0) - (b.priority || 0));
+//           break;
+//       }
+//     }
+
+//     return result;
+//   }, [banners, selectedTab, filterState]);
+
+//   const tableDataObj: ITable = useMemo(
+//     () => ({
+//       homepage: {
+//         columns: [
+//           { key: "title", title: "Title" },
+//           { key: "type", title: "Banner Type" },
+//           { key: "image", title: "Web Image" },
+//           { key: "mobImage", title: "Mobile Image" },
+//         ],
+//         rows: filteredBanners.map((banner) => ({
+//           id: banner._id,
+//           _id: banner._id,
+//           title: banner.title,
+//           type: banner.type,
+//           image: banner.image?.length ? (
+//             <div className="flex justify-center items-center p-2">
+//               {banner.image.map((item, index) => (
+//                 <img
+//                   key={index}
+//                   src={`https://gold-api.webstudiomatrix.com/${item}`}
+//                   width={120}
+//                   className="rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+//                   alt={banner.title}
+//                   onClick={() =>
+//                     handleImageClick(
+//                       `https://gold-api.webstudiomatrix.com/${item}`
+//                     )
+//                   }
+//                 />
+//               ))}
+//             </div>
+//           ) : (
+//             <div className="flex justify-center items-center p-2">No Image</div>
+//           ),
+//           mobImage: banner.mobImage?.length ? (
+//             <div className="flex justify-center items-center p-2">
+//               {banner.mobImage.map((item, index) => (
+//                 <img
+//                   key={index}
+//                   src={`https://gold-api.webstudiomatrix.com/${item}`}
+//                   width={120}
+//                   className="rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+//                   alt={banner.title}
+//                   onClick={() =>
+//                     handleImageClick(
+//                       `https://gold-api.webstudiomatrix.com/${item}`
+//                     )
+//                   }
+//                 />
+//               ))}
+//             </div>
+//           ) : (
+//             <div className="flex justify-center items-center p-2">No Image</div>
+//           ),
+//           original: banner,
+//         })),
+//       },
+//       "category-page": {
+//         columns: [
+//           { key: "title", title: "Title" },
+//           { key: "type", title: "Banner Type" },
+//           { key: "image", title: "Web Image" },
+//           { key: "mobImage", title: "Mobile Image" },
+//         ],
+//         rows: filteredBanners.map((banner) => ({
+//           id: banner._id,
+//           _id: banner._id,
+//           title: banner.title,
+//           type: banner.type,
+//           image: banner.image?.length ? (
+//             <div className="flex justify-center items-center p-2">
+//               {banner.image.map((item, index) => (
+//                 <img
+//                   key={index}
+//                   src={`https://gold-api.webstudiomatrix.com/${item}`}
+//                   width={120}
+//                   className="rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+//                   alt={banner.title}
+//                   onClick={() =>
+//                     handleImageClick(
+//                       `https://gold-api.webstudiomatrix.com/${item}`
+//                     )
+//                   }
+//                 />
+//               ))}
+//             </div>
+//           ) : (
+//             <div className="flex justify-center items-center p-2">No Image</div>
+//           ),
+//           mobImage: banner.mobImage?.length ? (
+//             <div className="flex justify-center items-center p-2">
+//               {banner.mobImage.map((item, index) => (
+//                 <img
+//                   key={index}
+//                   src={`https://gold-api.webstudiomatrix.com/${item}`}
+//                   width={120}
+//                   className="rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+//                   alt={banner.title}
+//                   onClick={() =>
+//                     handleImageClick(
+//                       `https://gold-api.webstudiomatrix.com/${item}`
+//                     )
+//                   }
+//                 />
+//               ))}
+//             </div>
+//           ) : (
+//             <div className="flex justify-center items-center p-2">No Image</div>
+//           ),
+//           original: banner,
+//         })),
+//       },
+//       "product-page": {
+//         columns: [
+//           { key: "title", title: "Title" },
+//           { key: "type", title: "Banner Type" },
+//           { key: "image", title: "Web Image" },
+//           { key: "mobImage", title: "Mobile Image" },
+//         ],
+//         rows: filteredBanners.map((banner) => ({
+//           id: banner._id,
+//           _id: banner._id,
+//           title: banner.title,
+//           type: banner.type,
+//           image: banner.image?.length ? (
+//             <div className="flex justify-center items-center p-2">
+//               {banner.image.map((item, index) => (
+//                 <img
+//                   key={index}
+//                   src={`https://gold-api.webstudiomatrix.com/${item}`}
+//                   width={120}
+//                   className="rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+//                   alt={banner.title}
+//                   onClick={() =>
+//                     handleImageClick(
+//                       `https://gold-api.webstudiomatrix.com/${item}`
+//                     )
+//                   }
+//                 />
+//               ))}
+//             </div>
+//           ) : (
+//             <div className="flex justify-center items-center p-2">No Image</div>
+//           ),
+//           mobImage: banner.mobImage?.length ? (
+//             <div className="flex justify-center items-center p-2">
+//               {banner.mobImage.map((item, index) => (
+//                 <img
+//                   key={index}
+//                   src={`https://gold-api.webstudiomatrix.com/${item}`}
+//                   width={120}
+//                   className="rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+//                   alt={banner.title}
+//                   onClick={() =>
+//                     handleImageClick(
+//                       `https://gold-api.webstudiomatrix.com/${item}`
+//                     )
+//                   }
+//                 />
+//               ))}
+//             </div>
+//           ) : (
+//             <div className="flex justify-center items-center p-2">No Image</div>
+//           ),
+//           original: banner,
+//         })),
+//       },
+//     }),
+//     [filteredBanners]
+//   );
+
+//   const handleViewItem = (row: any) => {
+//     setEditingItem(row.original);
+//     setIsViewModalOpen(true);
+//   };
+
+//   const handleEditItem = (row: any) => {
+//     updateBannerState(row.original);
+//     navigate(`/banner/edit`);
+//   };
+
+//   const handleDeleteItem = (id: string) => {
+//     deleteBanner(id);
+//   };
+
+//   const handleMultipleDelete = (ids: Array<string | number>) => {
+//     ids.forEach((id) => deleteBanner(id as string));
+//   };
+
+//   return (
+//     <div className="container mx-auto px-4 py-3">
+//       <Header text="Banner">
+//         <button className="px-3 py-2 flex items-center text-white bg-[#d49327] transition-transform duration-200 ease-in-out hover:scale-105 rounded-lg">
+//           <a className="flex items-center" href="/banner/add">
+//             <Icon
+//               icon="material-symbols-light:add-rounded"
+//               width="24"
+//               height="24"
+//               className="fill-white"
+//             />
+//             Add Banner
+//           </a>
+//         </button>
+//       </Header>
+
+//       <MasterTable
+//         loading={isLoading}
+//         tabsOptions={
+//           <DynamicTab
+//             selectedTab={selectedTab}
+//             setSelectedTab={setSelectedTab}
+//             tabOptions={bannerTabOptions}
+//           />
+//         }
+//         filterSection={
+//           <SearchFilterSort
+//             onSearch={handleSearch}
+//             onFilter={handleFilter}
+//             onSort={handleSort}
+//             filterOptions={filterOptions}
+//             sortOptions={sortOptions}
+//             placeholder="Search banners..."
+//           />
+//         }
+//         rows={tableDataObj[selectedTab]?.rows || []}
+//         columns={tableDataObj[selectedTab]?.columns || []}
+//         canSelect={true}
+//         showAction={true}
+//         // viewAction={handleViewItem}
+//         editAction={handleEditItem}
+//         onDelete={handleDeleteItem}
+//         onMultipleDelete={handleMultipleDelete}
+//         entriesPerPage={10}
+//       />
+
+//       {/* {isImageModalOpen && selectedImage && (
+//         <ScrollableModal
+//           classname="w-[50%]"
+//           onClose={() => setIsImageModalOpen(false)}
+//         >
+//           <div className="p-4">
+//             <h2 className="text-xl font-bold mb-4">Image Preview</h2>
+//             <div className="flex flex-col items-center space-y-4">
+//               <img
+//                 src={selectedImage}
+//                 alt="Preview"
+//                 className="max-w-full max-h-[60vh] rounded-md object-contain"
+//               />
+//               <div className="flex space-x-4">
+//                 <button
+//                   onClick={() => handleDownloadImage(selectedImage)}
+//                   className="bg-[#d49327] text-white py-2 px-4 rounded transition-transform duration-200 ease-in-out hover:scale-105"
+//                 >
+//                   Download
+//                 </button>
+//                 <button
+//                   onClick={() => setIsImageModalOpen(false)}
+//                   className="bg-[#e48a28] text-white py-2 px-4 rounded transition-transform duration-200 ease-in-out hover:scale-105"
+//                 >
+//                   Close
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//         </ScrollableModal>
+//       )} */}
+
+//       {isImageModalOpen && selectedImage && (
+//         <ScrollableModal
+//           classname="w-[35%] max-w-md"
+//           onClose={() => setIsImageModalOpen(false)}
+//         >
+//           <div className="bg-white rounded-lg shadow-lg">
+//             {/* Header with Title and Icons */}
+//             <div className="flex items-center justify-between p-4 border-b border-gray-200">
+//               <h2 className="text-lg font-bold text-gray-800">
+//                 {selectedImage.includes("mobImage")
+//                   ? "Mobile Image"
+//                   : "Web Image"}
+//               </h2>
+//               <div className="flex items-center gap-3">
+//                 <button
+//                   onClick={() => handleDownloadImage(selectedImage)}
+//                   className="text-gray-600 hover:text-gray-800 transition-colors"
+//                   title="Download"
+//                 >
+//                   <Icon
+//                     icon="material-symbols:download"
+//                     width="24"
+//                     height="24"
+//                   />
+//                 </button>
+//                 <button
+//                   onClick={() => setIsImageModalOpen(false)}
+//                   className=" hover:text-red rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors"
+//                   title="Close"
+//                 >
+//                   <Icon icon="material-symbols:close" width="16" height="16" />
+//                 </button>
+//               </div>
+//             </div>
+//             {/* Image Display */}
+//             <div className="p-4 flex justify-center">
+//               <img
+//                 src={selectedImage}
+//                 alt="Preview"
+//                 className="max-w-full max-h-[70vh] rounded-md object-contain shadow-md"
+//               />
+//             </div>
+//           </div>
+//         </ScrollableModal>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default BannerIndex;
+
+// Second
+
+import React, { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { Modal } from "../../components/shared";
-import { HomePageBannerForm } from "./Components/HomePageBannerForm";
-import { OtherPageBannerForm } from "./Components/OtherPageBannerForm";
+import { SearchFilterSort } from "../../components/global/SearchFilterSort";
+import Header from "../../components/shared/table_heading/Header";
+import { ScrollableModal } from "../../components/shared/ScrollableModal";
+import { DynamicTab } from "../PurchaseManagement/components/DynamicTab";
+import MasterTable from "../../components/shared/MasterTable";
+import {
+  IFetchBanner,
+  useDeleteBannerMutation,
+  useGetAllBannerQuery,
+} from "../../server/api/bannerHook";
+import { updateBannerState } from "./Components/bannerStore";
 
 interface BannerItem {
   _id: string;
   title: string;
   banner_type: string;
-  web_image: string;
-  mobile_image: string;
-
+  image: string[];
+  mobImage: string[];
+  category: string;
+  subCategory: string;
   banner_title?: string;
   description?: string;
   select_by?: string;
   priority?: number;
+  locations?: string[];
+  type: string;
+}
+
+const bannerTabOptions = [
+  { value: "homepage", label: "Home Page" },
+  { value: "category-page", label: "Category Page" },
+  { value: "product-page", label: "Product Page" },
+];
+
+const filterOptions = [
+  { value: "", label: "All Banners" },
+  { value: "active", label: "Active" },
+  { value: "inactive", label: "Inactive" },
+];
+
+const sortOptions = [
+  { value: "", label: "Default" },
+  { value: "title-asc", label: "Title (A-Z)" },
+  { value: "title-desc", label: "Title (Z-A)" },
+  { value: "priority-high", label: "Priority (High)" },
+  { value: "priority-low", label: "Priority (Low)" },
+];
+
+interface FilterState {
+  searchQuery: string;
+  filterValue: string;
+  sortValue: string;
+}
+
+interface ITable {
+  [key: string]: {
+    columns: { key: string; title: string }[];
+    rows: any[];
+  };
 }
 
 const BannerIndex: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [selectedFilter, setSelectedFilter] = useState("");
-  console.log(selectedFilter);
-  const [selectedSort, setSelectedSort] = useState("");
-  console.log(selectedSort);
+  const navigate = useNavigate();
+  const [selectedTab, setSelectedTab] = useState("homepage");
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<IFetchBanner | null>(null);
+  const [filterState, setFilterState] = useState<FilterState>({
+    searchQuery: "",
+    filterValue: "",
+    sortValue: "",
+  });
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<{
+    url: string | null;
+    type: "web" | "mobile" | null;
+  }>({ url: null, type: null });
 
-  const [selectedTab, setSelectedTab] = useState("home_page");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isViewModalOpen, setisViewModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<BannerItem | null>(null);
-
-  const handleAddBannerClick = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setEditingItem(null);
-  };
-
-  // Sample inventory data for different tabs
-  const [bannerItems] = useState<BannerItem[]>([
-    {
-      _id: "1",
-      title: "Wedding Season Sale",
-      banner_type: "Silver",
-      web_image: "/testimg.jpg",
-      mobile_image: "/testimg.jpg",
-    },
-    {
-      _id: "2",
-      title: "Wedding Season Sale",
-      banner_type: "Gold",
-      web_image: "/testimg.jpg",
-      mobile_image: "/testimg.jpg",
-    },
-    {
-      _id: "3",
-      title: "Wedding Season Sale",
-      banner_type: "Pasni Set",
-      web_image: "/testimg.jpg",
-      mobile_image: "/testimg.jpg",
-    },
-  ]);
-
-  // Filter options for the dropdown
-  const filterOptions = [
-    { value: "", label: "All Customers" },
-    { value: "active", label: "Active" },
-    { value: "inactive", label: "Inactive" },
-  ];
-
-  // Sort options for the dropdown
-  const sortOptions = [
-    { value: "", label: "Default" },
-    { value: "name-asc", label: "Name (A-Z)" },
-    { value: "name-desc", label: "Name (Z-A)" },
-    { value: "orders-high", label: "Orders (High)" },
-    { value: "orders-low", label: "Orders (Low)" },
-  ];
-
-  const [otherPageItems] = useState<BannerItem[]>([
-    {
-      _id: "1",
-      title: "Wedding Season Sale",
-      banner_type: "Silver",
-      web_image: "/testimg.jpg",
-      mobile_image: "/testimg.jpg",
-    },
-    {
-      _id: "2",
-      title: "Wedding Season Sale",
-      banner_type: "Gold",
-      web_image: "/testimg.jpg",
-      mobile_image: "/testimg.jpg",
-    },
-  ]);
-
-  const filterItems = (items: BannerItem[]) => {
-    return items.filter(
-      (item) =>
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item._id?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  };
-
-  const handleViewItem = (item: TableData<BannerItem>) => {
-    if (selectedTab === "home_page") {
-      setEditingItem(item);
-    } else if (selectedTab === "other_page") {
-      setEditingItem(item);
-    }
-    setisViewModalOpen(true);
-  };
-
-  const handleEditItem = (item: TableData<BannerItem>) => {
-    // Check which tab is selected and set the editing item accordingly
-    if (selectedTab === "home_page") {
-      setEditingItem(item); // Set the item for the Home Page Banner
-    } else if (selectedTab === "other_page") {
-      setEditingItem(item); // Set the item for the Other Page Banner
-    }
-    setIsModalOpen(true); // Open the modal for either banner
-  };
-
-  const handleDeleteItem = (item: TableData<BannerItem>) => {
-    console.log("Delete item:", item);
-  };
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  const handleItemsPerPageChange = (limit: number) => {
-    setItemsPerPage(limit);
-    setCurrentPage(1);
-  };
+  const { data: banners = [], isLoading, error } = useGetAllBannerQuery();
+  const { mutate: deleteBanner } = useDeleteBannerMutation();
 
   const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    setCurrentPage(1);
+    setFilterState((prev: FilterState) => ({ ...prev, searchQuery: query }));
   };
 
   const handleFilter = (filter: string) => {
-    setSelectedFilter(filter);
-    setCurrentPage(1);
+    setFilterState((prev: FilterState) => ({ ...prev, filterValue: filter }));
   };
 
   const handleSort = (sort: string) => {
-    setSelectedSort(sort);
-    setCurrentPage(1);
+    setFilterState((prev: FilterState) => ({ ...prev, sortValue: sort }));
   };
 
-  const columns: ColumnConfig<BannerItem>[] = [
-    {
-      header: "Title",
-      key: "title",
-    },
-    {
-      header: "Banner Type",
-      key: "banner_type",
-    },
-    {
-      header: "Web Image",
-      key: "web_image",
-      render: (_, row) => (
-        <img
-          src={row.web_image}
-          alt={row.title}
-          className="w-28 h-14 aspect-w-2 aspect-h-3 rounded-md mr-3 object-cover"
-        />
-      ),
-    },
+  const handleImageClick = (imageUrl: string, imageType: "web" | "mobile") => {
+    setSelectedImage({ url: imageUrl, type: imageType });
+    setIsImageModalOpen(true);
+  };
 
-    {
-      header: "Mobile Image",
-      key: "mobile_image",
-      render: (_, row) => (
-        <img
-          src={row.mobile_image}
-          alt={row.title}
-          className="w-28 h-14 aspect-w-2 aspect-h-3 rounded-md mr-3 object-cover"
-        />
-      ),
-    },
-  ];
+  const handleDownloadImage = async (imageUrl: string) => {
+    try {
+      const response = await fetch(imageUrl, {
+        mode: "cors",
+        credentials: "same-origin",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch image");
+      }
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      const filename = imageUrl.split("/").pop() || "banner-image";
+      const extension = filename.split(".").pop() || "jpg";
+      link.download = `${
+        filename.split(".")[0] || "banner-image"
+      }.${extension}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error("Download failed:", error);
+      const link = document.createElement("a");
+      link.href = imageUrl;
+      const filename = imageUrl.split("/").pop() || "banner-image";
+      const extension = filename.split(".").pop() || "jpg";
+      link.download = `${
+        filename.split(".")[0] || "banner-image"
+      }.${extension}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
 
-  const renderBannerTable = (items: BannerItem[]) => {
-    const filteredItems = filterItems(items);
-
-    return (
-      <Table
-        columns={columns}
-        data={filteredItems}
-        showEdit={true}
-        showDelete={true}
-        showView={true}
-        showAction={true}
-        showSelectAll={true}
-        viewRow={handleViewItem}
-        editRow={handleEditItem}
-        deleteRow={handleDeleteItem}
-        showPagination={true}
-        paginationDetails={{
-          currentPage,
-          limit: itemsPerPage,
-          totalCount: filteredItems.length,
-        }}
-        onItemsPerPageChange={handleItemsPerPageChange}
-        onPageChange={handlePageChange}
-        showBg={true}
-      />
+  const filteredBanners = useMemo(() => {
+    let result = banners.filter((item) =>
+      item.locations?.includes(selectedTab)
     );
+
+    if (filterState.searchQuery) {
+      const query = filterState.searchQuery.toLowerCase();
+      result = result.filter(
+        (item) =>
+          (item.title && item.title.toLowerCase().includes(query)) ||
+          (item._id && item._id.toLowerCase().includes(query))
+      );
+    }
+
+    if (filterState.filterValue) {
+      result = result.filter((item) => item.status === filterState.filterValue);
+    }
+
+    if (filterState.sortValue) {
+      switch (filterState.sortValue) {
+        case "title-asc":
+          result.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
+          break;
+        case "title-desc":
+          result.sort((a, b) => (b.title || "").localeCompare(a.title || ""));
+          break;
+        case "priority-high":
+          result.sort((a, b) => (b.priority || 0) - (a.priority || 0));
+          break;
+        case "priority-low":
+          result.sort((a, b) => (a.priority || 0) - (b.priority || 0));
+          break;
+      }
+    }
+
+    return result;
+  }, [banners, selectedTab, filterState]);
+
+  const tableDataObj: ITable = useMemo(
+    () => ({
+      homepage: {
+        columns: [
+          { key: "title", title: "Title" },
+          { key: "type", title: "Banner Type" },
+          { key: "image", title: "Web Image" },
+          { key: "mobImage", title: "Mobile Image" },
+        ],
+        rows: filteredBanners.map((banner) => ({
+          id: banner._id,
+          _id: banner._id,
+          title: banner.title,
+          type: banner.type,
+          image: banner.image?.length ? (
+            <div className="flex justify-center items-center p-2">
+              {banner.image.map((item, index) => (
+                <img
+                  key={index}
+                  src={`https://gold-api.webstudiomatrix.com/${item}`}
+                  width={120}
+                  className="rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+                  alt={banner.title}
+                  onClick={() =>
+                    handleImageClick(
+                      `https://gold-api.webstudiomatrix.com/${item}`,
+                      "web"
+                    )
+                  }
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="flex justify-center items-center p-2">No Image</div>
+          ),
+          mobImage: banner.mobImage?.length ? (
+            <div className="flex justify-center items-center p-2">
+              {banner.mobImage.map((item, index) => (
+                <img
+                  key={index}
+                  src={`https://gold-api.webstudiomatrix.com/${item}`}
+                  width={120}
+                  className="rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+                  alt={banner.title}
+                  onClick={() =>
+                    handleImageClick(
+                      `https://gold-api.webstudiomatrix.com/${item}`,
+                      "mobile"
+                    )
+                  }
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="flex justify-center items-center p-2">No Image</div>
+          ),
+          original: banner,
+        })),
+      },
+      "category-page": {
+        columns: [
+          { key: "title", title: "Title" },
+          { key: "type", title: "Banner Type" },
+          { key: "image", title: "Web Image" },
+          { key: "mobImage", title: "Mobile Image" },
+        ],
+        rows: filteredBanners.map((banner) => ({
+          id: banner._id,
+          _id: banner._id,
+          title: banner.title,
+          type: banner.type,
+          image: banner.image?.length ? (
+            <div className="flex justify-center items-center p-2">
+              {banner.image.map((item, index) => (
+                <img
+                  key={index}
+                  src={`https://gold-api.webstudiomatrix.com/${item}`}
+                  width={120}
+                  className="rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+                  alt={banner.title}
+                  onClick={() =>
+                    handleImageClick(
+                      `https://gold-api.webstudiomatrix.com/${item}`,
+                      "web"
+                    )
+                  }
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="flex justify-center items-center p-2">No Image</div>
+          ),
+          mobImage: banner.mobImage?.length ? (
+            <div className="flex justify-center items-center p-2">
+              {banner.mobImage.map((item, index) => (
+                <img
+                  key={index}
+                  src={`https://gold-api.webstudiomatrix.com/${item}`}
+                  width={120}
+                  className="rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+                  alt={banner.title}
+                  onClick={() =>
+                    handleImageClick(
+                      `https://gold-api.webstudiomatrix.com/${item}`,
+                      "mobile"
+                    )
+                  }
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="flex justify-center items-center p-2">No Image</div>
+          ),
+          original: banner,
+        })),
+      },
+      "product-page": {
+        columns: [
+          { key: "title", title: "Title" },
+          { key: "type", title: "Banner Type" },
+          { key: "image", title: "Web Image" },
+          { key: "mobImage", title: "Mobile Image" },
+        ],
+        rows: filteredBanners.map((banner) => ({
+          id: banner._id,
+          _id: banner._id,
+          title: banner.title,
+          type: banner.type,
+          image: banner.image?.length ? (
+            <div className="flex justify-center items-center p-2">
+              {banner.image.map((item, index) => (
+                <img
+                  key={index}
+                  src={`https://gold-api.webstudiomatrix.com/${item}`}
+                  width={120}
+                  className="rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+                  alt={banner.title}
+                  onClick={() =>
+                    handleImageClick(
+                      `https://gold-api.webstudiomatrix.com/${item}`,
+                      "web"
+                    )
+                  }
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="flex justify-center items-center p-2">No Image</div>
+          ),
+          mobImage: banner.mobImage?.length ? (
+            <div className="flex justify-center items-center p-2">
+              {banner.mobImage.map((item, index) => (
+                <img
+                  key={index}
+                  src={`https://gold-api.webstudiomatrix.com/${item}`}
+                  width={120}
+                  className="rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+                  alt={banner.title}
+                  onClick={() =>
+                    handleImageClick(
+                      `https://gold-api.webstudiomatrix.com/${item}`,
+                      "mobile"
+                    )
+                  }
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="flex justify-center items-center p-2">No Image</div>
+          ),
+          original: banner,
+        })),
+      },
+    }),
+    [filteredBanners]
+  );
+
+  const handleViewItem = (row: any) => {
+    setEditingItem(row.original);
+    setIsViewModalOpen(true);
+  };
+
+  const handleEditItem = (row: any) => {
+    updateBannerState(row.original);
+    navigate(`/banner/edit`);
+  };
+
+  const handleDeleteItem = (id: string) => {
+    deleteBanner(id);
+  };
+
+  const handleMultipleDelete = (ids: Array<string | number>) => {
+    ids.forEach((id) => deleteBanner(id as string));
   };
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 ">Banner List</h1>
-        <button
-          onClick={handleAddBannerClick}
-          className="bg-[#e38b29] flex items-center transition-transform duration-200 ease-in-out hover:scale-105 text-white rounded-lg px-3 py-2"
-        >
-          <Icon
-            icon="material-symbols-light:add-rounded"
-            width="24"
-            height="24"
-            className="fill-white"
-          />{" "}
-          {selectedTab === "home_page"
-            ? "Add Home Page Banner"
-            : "Add Other Page Banner"}
+    <div className="container mx-auto px-4 py-3">
+      <Header text="Banner">
+        <button className="px-3 py-2 flex items-center text-white bg-[#d49327] transition-transform duration-200 ease-in-out hover:scale-105 rounded-lg">
+          <a className="flex items-center" href="/banner/add">
+            <Icon
+              icon="material-symbols-light:add-rounded"
+              width="24"
+              height="24"
+              className="fill-white"
+            />
+            Add Banner
+          </a>
         </button>
-      </div>
-      <div className="bg-white rounded-lg shadow">
-        <Tabs
-          defaultValue="home_page"
-          value={selectedTab}
-          onValueChange={(value) => setSelectedTab(value)}
-          className="w-full"
-        >
-          {/* Container for both TabsList and SearchFilterSort */}
-          <div className="flex items-center justify-between border-b">
-            <TabsList className="bg-transparent p-0 h-auto">
-              <TabsTrigger
-                value="home_page"
-                className="px-4 py-3 rounded-none data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:text-[#DF8D28] data-[state=active]:border-b-2 data-[state=active]:border-[#DF8D28] text-gray-500"
-              >
-                Home Page
-              </TabsTrigger>
-              <TabsTrigger
-                value="other_page"
-                className="px-4 py-3 rounded-none data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:text-[#DF8D28] data-[state=active]:border-b-2 data-[state=active]:border-[#DF8D28] text-gray-500"
-              >
-                Other Page
-              </TabsTrigger>
-            </TabsList>
+      </Header>
 
-            {/* SearchFilterSort moved here and aligned to the right */}
-            <div className="p-4">
-              <SearchFilterSort
-                onSearch={handleSearch}
-                onFilter={handleFilter}
-                onSort={handleSort}
-                filterOptions={filterOptions}
-                sortOptions={sortOptions}
-                placeholder="Search here..."
+      <MasterTable
+        loading={isLoading}
+        tabsOptions={
+          <DynamicTab
+            selectedTab={selectedTab}
+            setSelectedTab={setSelectedTab}
+            tabOptions={bannerTabOptions}
+          />
+        }
+        filterSection={
+          <SearchFilterSort
+            onSearch={handleSearch}
+            onFilter={handleFilter}
+            onSort={handleSort}
+            filterOptions={filterOptions}
+            sortOptions={sortOptions}
+            placeholder="Search banners..."
+          />
+        }
+        rows={tableDataObj[selectedTab]?.rows || []}
+        columns={tableDataObj[selectedTab]?.columns || []}
+        canSelect={true}
+        showAction={true}
+        // viewAction={handleViewItem}
+        editAction={handleEditItem}
+        onDelete={handleDeleteItem}
+        onMultipleDelete={handleMultipleDelete}
+        entriesPerPage={10}
+      />
+
+      {isImageModalOpen && selectedImage.url && (
+        <ScrollableModal
+          classname="w-[35%] max-w-md"
+          onClose={() => setIsImageModalOpen(false)}
+        >
+          <div className="bg-white rounded-lg shadow-lg">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <h2 className="text-lg font-bold text-gray-800">
+                {selectedImage.type === "mobile" ? "Mobile Image" : "Web Image"}
+              </h2>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => handleDownloadImage(selectedImage.url!)}
+                  className="text-gray-600 hover:text-gray-800 transition-colors"
+                  title="Download"
+                >
+                  <Icon
+                    icon="material-symbols:download"
+                    width="24"
+                    height="24"
+                  />
+                </button>
+                <button
+                  onClick={() => setIsImageModalOpen(false)}
+                  className="hover:text-red-600 rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-100 transition-colors"
+                  title="Close"
+                >
+                  <Icon icon="material-symbols:close" width="16" height="16" />
+                </button>
+              </div>
+            </div>
+            <div className="p-4 flex justify-center">
+              <img
+                src={selectedImage.url}
+                alt="Preview"
+                className="max-w-full max-h-[70vh] rounded-md object-contain shadow-md"
               />
             </div>
           </div>
-
-          {/* Tab content remains unchanged */}
-          <TabsContent value="home_page" className="px-4 pb-4 ">
-            {renderBannerTable(bannerItems)}
-          </TabsContent>
-          <TabsContent value="other_page" className="px-4 pb-4">
-            {renderBannerTable(otherPageItems)}
-          </TabsContent>
-        </Tabs>
-      </div>
-      {isModalOpen && (
-        <Modal>
-          {selectedTab === "home_page" ? (
-            <HomePageBannerForm
-              closeModal={handleCloseModal}
-              initialValues={{
-                banner_title: "",
-                description: "",
-                select_by: "",
-                priority: 0,
-                web_image: undefined,
-                mobile_image: undefined,
-              }}
-              onSubmit={(data) => console.log(data)}
-            />
-          ) : (
-            <OtherPageBannerForm
-              initialValues={{
-                banner_title: "",
-                description: "",
-                select_by: "",
-                priority: 0,
-                web_image: undefined,
-                mobile_image: undefined,
-              }}
-              closeModal={handleCloseModal}
-              onSubmit={(data) => console.log(data)}
-            />
-          )}
-        </Modal>
-      )}
-
-      {isViewModalOpen && (
-        <Modal>
-          <div className="p-4">
-            <h2 className="text-xl font-bold mb-4">Banner Details</h2>
-            {editingItem && (
-              <div className="space-y-2">
-                <div>
-                  <strong>Title:</strong> {editingItem.title}
-                </div>
-                <div>
-                  <strong>Banner Type:</strong> {editingItem.banner_type}
-                </div>
-                <div>
-                  <strong>Web Image:</strong>{" "}
-                  <img
-                    src={editingItem.web_image}
-                    alt={editingItem.title}
-                    className="w-28 h-14 aspect-w-2 aspect-h-3 rounded-md object-cover"
-                  />
-                </div>
-                <div>
-                  <strong>Mobile Image:</strong>{" "}
-                  <img
-                    src={editingItem.mobile_image}
-                    alt={editingItem.title}
-                    className="w-28 h-14 aspect-w-2 aspect-h-3 rounded-md object-cover"
-                  />
-                </div>
-              </div>
-            )}
-            <button
-              onClick={() => setisViewModalOpen(false)}
-              className="mt-4 bg-red-500 text-white bg-[#e48a28] transition-transform duration-200 ease-in-out hover:scale-105 py-2 px-4 rounded"
-            >
-              Close
-            </button>
-          </div>
-        </Modal>
+        </ScrollableModal>
       )}
     </div>
   );

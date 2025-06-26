@@ -1,165 +1,197 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { Icon } from '@iconify/react/dist/iconify.js';
-import { SearchFilterSort } from '../../../components/global/SearchFilterSort';
-import { useNavigate } from 'react-router-dom';
-import { ProductGridView } from './component/GridView';
-import { filterOptions, sortOptions } from '../../../constants/DropDownOptions';
-import AddProductDialog from './component/AddproductDialog';
+import { Icon } from "@iconify/react/dist/iconify.js";
+import { get } from "lodash";
+import React, { useCallback, useMemo } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import MasterTable from "../../../components/shared/MasterTable";
+import Header from "../../../components/shared/table_heading/Header";
+import {
+  IFetchProduct,
+  useDeleteProductsMutation,
+  useGetAllProductsQuery,
+} from "../../../server/api/productHooks";
+import { updateProductState } from "../../../store/productStore";
+import { productListColumns } from "../productObj";
 
-// Updated Product interface to match ProductDescription
-interface Product {
-    id: string;
-    title: string;
-    price: number;
-    originalPrice: number;
-    rating: number;
-    category: string;
-    onSale: boolean;
-    image: string;
-    status?: string;           // Added optional status
-    description?: string;      // Added optional description
-}
+// Filter state interface
+// interface FilterState {
+//   searchQuery: string;
+//   filterValue: string;
+//   sortValue: string;
+// }
 
 const ProductList: React.FC = () => {
-    const navigate = useNavigate();
-    const [isEditing, setIsEditing] = useState(false);
-    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-    const [products, setProducts] = useState<Product[]>([
-        // Updated initial data with description
-        ...Array(8).fill(null).map((_, index) => ({
-            id: (index + 1).toString(),
-            title: "Gold Studs",
-            price: 1425.0,
-            originalPrice: 1420.0,
-            rating: 3,
-            category: "Gold",
-            onSale: true,
-            image: "https://media.istockphoto.com/id/154956296/photo/gold-ring.jpg?b=1&s=612x612&w=0&k=20&c=Kl8MUlh_s8ECE2nSpKqSX9OE4DiJSOUWTk5iTWRuDY8=",
-            status: 'Active',
-            description: "Elegant gold studs perfect for any occasion. Crafted with 18K gold and featuring a secure clasp."
-        }))
-    ]);
-    const [filteredData, setFilteredData] = useState<Product[]>(products);
-    const [addProductDialog, setAddProductDialog] = useState<boolean>(false);
-    const [newProduct, setNewProduct] = useState<Omit<Product, 'id'>>({
-        title: '',
-        price: 0,
-        originalPrice: 0,
-        rating: 0,
-        category: '',
-        onSale: false,
-        image: '',
-        status: '',
-        description: ''
-    });
+  const { data: productsList, isSuccess, isLoading } = useGetAllProductsQuery();
+  console.log("PRODUCT LIST DATA", productsList);
+  const productsData = useMemo(
+    () => (isSuccess ? productsList : []),
+    [isSuccess, productsList]
+  );
+  const { mutate: deleteProduct } = useDeleteProductsMutation();
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        setFilteredData(products);
-    }, [products]);
+  // Consolidated filter state
+  // const [filterState, setFilterState] = useState<FilterState>({
+  //   searchQuery: "",
+  //   filterValue: "",
+  //   sortValue: "",
+  // });
+  const viewAction = useCallback((row: IFetchProduct) => {
+    navigate(`/product/details/${row._id}`);
+  }, []);
+  const onEdit = useCallback((row: IFetchProduct) => {
+    updateProductState(row);
+    navigate(`/product/edit`);
+  }, []);
+  // const filteredProducts = useMemo(() => {
+  //   if (!productsData || productsData.length === 0) return [];
 
-    const handleSearch = useCallback((query: string) => {
-        const filtered = products.filter(item =>
-            item.title.toLowerCase().includes(query.toLowerCase()) ||
-            item.category.toLowerCase().includes(query.toLowerCase()) ||
-            (item.description && item.description.toLowerCase().includes(query.toLowerCase()))
-        );
-        setFilteredData(filtered);
-    }, [products]);
+  //   let result = [...productsData];
 
-    const handleFilter = useCallback((filter: string) => {
-        const filtered = filter
-            ? products.filter(item => item.category === filter || item.status === filter)
-            : products;
-        setFilteredData(filtered);
-    }, [products]);
+  //   // Apply search
+  //   if (filterState.searchQuery) {
+  //     const query = filterState.searchQuery.toLowerCase();
+  //     result = result.filter(
+  //       (item) =>
+  //         (item.name && item.name.toLowerCase().includes(query)) ||
+  //         (typeof item.category === "string" &&
+  //           item.category.toLowerCase().includes(query)) ||
+  //         (item.description && item.description.toLowerCase().includes(query))
+  //     );
+  //   }
 
-    const handleSort = useCallback((sort: string) => {
-        const dataToSort = [...filteredData];
-        switch (sort) {
-            case 'title_asc':
-                dataToSort.sort((a, b) => a.title.localeCompare(b.title));
-                break;
-            case 'title_desc':
-                dataToSort.sort((a, b) => b.title.localeCompare(a.title));
-                break;
-            case 'price_asc':
-                dataToSort.sort((a, b) => a.price - b.price);
-                break;
-            case 'price_desc':
-                dataToSort.sort((a, b) => b.price - a.price);
-                break;
-            case 'rating_asc':
-                dataToSort.sort((a, b) => a.rating - b.rating);
-                break;
-            case 'rating_desc':
-                dataToSort.sort((a, b) => b.rating - a.rating);
-                break;
-        }
-        setFilteredData(dataToSort);
-    }, [filteredData]);
+  //   // Apply filter
+  //   if (filterState.filterValue) {
+  //     result = result.filter(
+  //       (item) =>
+  //         (typeof item.category === "string" &&
+  //           item.category === filterState.filterValue) ||
+  //         (item.visibleAs && item.visibleAs === filterState.filterValue)
+  //     );
+  //   }
 
+  //   // Apply sort
+  //   if (filterState.sortValue) {
+  //     switch (filterState.sortValue) {
+  //       case "title_asc":
+  //         result.sort((a, b) =>
+  //           a.name && b.name ? a.name.localeCompare(b.name) : 0
+  //         );
+  //         break;
+  //       case "title_desc":
+  //         result.sort((a, b) =>
+  //           a.name && b.name ? b.name.localeCompare(a.name) : 0
+  //         );
+  //         break;
+  //       case "price_asc":
+  //         result.sort((a, b) => (a.price && b.price ? a.price - b.price : 0));
+  //         break;
+  //       case "price_desc":
+  //         result.sort((a, b) => (a.price && b.price ? b.price - a.price : 0));
+  //         break;
+  //       case "rating_asc":
+  //         result.sort((a, b) =>
+  //           a.ratings && b.ratings ? a.ratings - b.ratings : 0
+  //         );
+  //         break;
+  //       case "rating_desc":
+  //         result.sort((a, b) =>
+  //           a.ratings && b.ratings ? b.ratings - a.ratings : 0
+  //         );
+  //         break;
+  //     }
+  //   }
 
-    const handleAddProduct = () => {
-        // setNewProduct({
-        //     title: '',
-        //     price: 0,
-        //     originalPrice: 0,
-        //     rating: 0,
-        //     category: '',
-        //     onSale: false,
-        //     image: '',
-        //     status: '',
-        //     description: ''
-        // });
-        setAddProductDialog(true);
-        setIsEditing(false);
-    };
+  //   return result;
+  // }, [productsData, filterState]);
 
-    const handleDialogClose = () => {
-        setAddProductDialog(false);
-    }
+  // const handleSearch = (query: string) => {
+  //   setFilterState((prev) => ({ ...prev, searchQuery: query }));
+  // };
 
-    const handleAddSubmit = () => {
-        console.log("submitted");
-    }
-    const handleCardClick = (product: Product) => {
-        navigate(`/product/${product.id}`, { state: { product } });
-    };
+  // const handleFilter = (filter: string) => {
+  //   setFilterState((prev) => ({ ...prev, filterValue: filter }));
+  // };
 
-    return (
-        <div className="container pl-10 pr-4 mx-auto py-auto">
-            <div className="flex items-center justify-between mb-6">
-                <h1 className="text-2xl font-bold text-gray-800">Products</h1>
-                <button
-                    onClick={handleAddProduct}
-                    className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-white px-4 py-2 flex rounded-lg transition-colors duration-200"
-                >
-                    <Icon icon="ic:outline-add" fontSize={24} />New Product
-                </button>
-            </div>
+  // const handleSort = (sort: string) => {
+  //   setFilterState((prev) => ({ ...prev, sortValue: sort }));
+  // };
 
-            <div className='p-4 bg-white'>
-                <SearchFilterSort
-                    onSearch={handleSearch}
-                    onFilter={handleFilter}
-                    onSort={handleSort}
-                    onViewChange={() => { }}
-                    showFilter={true}
-                    showSort={true}
-                    showView={true}
-                    filterOptions={filterOptions}
-                    sortOptions={sortOptions}
-                    placeholder="Search products..."
-                />
+  // const handleCardClick = (product: IFetchProduct) => {
+  //   navigate(`/product/${product._id}`, { state: { product } });
+  // };
 
-                <ProductGridView filteredData={filteredData} handleCardClick={handleCardClick} />
-            </div>
-            {addProductDialog &&
-                <AddProductDialog onClose={handleDialogClose} onSubmit={handleAddSubmit} />
-            }
-        </div>
-    );
+  // if (isLoading) {
+  //   return <Icon icon="svg-spinners:ring-resize" width="24" height="24" />;
+  // }
 
+  const tableData = productsData.map((product, index) => ({
+    ...product,
+    sn: index + 1,
+
+    image: (
+      <div className="size-6 text-center">
+        {product.images && product.images.length > 0 ? (
+          <img
+            src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${
+              product.images[0]
+            }`}
+            alt={"product image"}
+            className="w-full h-full rounded-sm object fite aspect-square"
+          />
+        ) : (
+          <img
+            src={"/no-image.png"}
+            alt={"product image"}
+            className="w-full h-full rounded-sm object fite aspect-square"
+          />
+        )}
+      </div>
+    ),
+    product: get(product, "name", ""),
+    categ: get(product, "category.name", ""),
+    subCate: get(product, "subCategory.name", ""),
+    price: get(product, "price", 0),
+    stock: get(product, "variant[0].remainingStock", 0),
+    sold: get(product, "variant[0].usedStock", 0),
+  }));
+
+  return (
+    <div className="">
+      <Header text="Products">
+        <Link to="/product/add">
+          <button className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-sm text-white px-4 py-2 flex rounded-lg transition-colors duration-200">
+            <Icon icon="ic:outline-add" fontSize={18} />
+            New Product
+          </button>
+        </Link>
+      </Header>
+      <div className="p-4 bg-white border-2 rounded-lg">
+        <MasterTable
+          columns={productListColumns}
+          onDelete={(id) => deleteProduct(id)}
+          editAction={onEdit}
+          viewAction={viewAction}
+          loading={isLoading}
+          // filterSection={
+          //   <SearchFilterSort
+          //     onSearch={handleSearch}
+          //     onFilter={handleFilter}
+          //     onSort={handleSort}
+          //     onViewChange={() => {}}
+          //     showFilter={true}
+          //     showSort={true}
+          //     showView={true}
+          //     filterOptions={filterOptions}
+          //     sortOptions={sortOptions}
+          //     placeholder="Search products..."
+          //   />
+          // }
+          rows={tableData}
+          showAction
+        />
+      </div>
+    </div>
+  );
 };
 
 export default ProductList;

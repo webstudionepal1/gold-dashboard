@@ -12,15 +12,34 @@ export const FrontendRoutes = {
   CANCELLEDORDER: "/order/cancelled-order",
   COMPLETEDORDER: "/order/completed-order",
   ORDER: "/order/orders",
+  ORDERDETAILS: "/order/order-details",
   CUSTOMER: "/customer/customer-list",
-  CUSTOMERVIEW: "/customer-view/:id",
-  ADDCUSTOMER: "/add-customer",
+  CUSTOMERDETAILS: "/customer/customer-details/:id",
+  ADDCUSTOMER: "/customer/add-customer",
   INVENTORY: "/inventory/inventory-overview",
   PURCHASE: "/inventory/purchase",
   PURCHASERETURN: "/inventory/purchase-return",
   SUPPLIERS: "/inventory/suppliers",
-  ATTRIBUTES: "/attribute",
+  ADDSUPPLIERS: "/inventory/suppliers/:page",
+  SUPPLIERDETAIL: "/inventory/supplier/:id",
+  SUPPLIERHISTORY: "/inventory/suppliers/supplier-history",
+
   BANNER: "/banner",
+  ADDBANNER: "/banner/add-banner",
   NOTIFICATION: "/notification",
   MYPOSTBUSINESS: "/my-post-business",
+
+  TRANSACTION: "/transaction",
+  VERIFY_CASH: "/transaction/verify-cash-payment",
+
+  EXPENSE: "/expenses",
+  CASHFLOW: "/cashflow",
+  PROFIT_LOSS: "/profit&loss",
+
+  ORDER_REPORT: "/order-report",
+  SALES_REPORT: "/sales-report",
+  STOCK_REPORT: "/stock-report",
+
+  SETTINGS: "/settings",
+  PROFILECONFIG: "/settings/profile-config",
 };

@@ -1,49 +1,33 @@
-import { Outlet } from 'react-router-dom';
-import { Navbar, SideBar,  } from './components/shared';
-import { useEffect, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { initializeAuth } from './hooks/useAuth';
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { Outlet } from "react-router-dom";
+import { Navbar } from "./components/shared";
+import Sidebar, { SidebarInset } from "./components/shared/sidebar/Sidebar";
+import { SidebarProvider } from "./components/shared/sidebar/SidebarContext";
+import { initializeAuth } from "./hooks/useAuth";
+import { SidebarConfig } from "./routes/Sidebar";
 
 export default function App() {
   const queryClient = useQueryClient();
-  const [miniSidebar, setMiniSidebar] = useState(true);
 
   useEffect(() => {
     const authData = initializeAuth();
-    queryClient.setQueryData(['auth'], authData);
+    queryClient.setQueryData(["auth"], authData);
   }, [queryClient]);
 
   return (
-    <div className="flex bg-gray-50">
-      {/* Sidebar */}
-      <aside
-        className={`fixed left-0  bg-white ${!miniSidebar ? 'w-20' : 'w-72 z-[30]'} h-screen overflow-y-auto`}
-      >
-        <SideBar miniSidebar={miniSidebar} setMiniSidebar={setMiniSidebar} />
-      </aside>
-      {/* <div
-        className="absolute top-16 left-[270px] text-xl z-[99999] bg-white p-1 border-border border rounded-md"
-        onClick={() => setMiniSidebar((prev) => !prev)}
-      >
-        <Icon icon={'mdi-light:unfold-more-vertical'} />
-      </div> */}
-
-      {/* Main Content */}
-      <div
-        className={`flex-1 flex flex-col ${!miniSidebar ? 'pl-20' : 'pl-72'}`}
-      >
-        {/* Navbar */}
-        <header
-          className={`fixed top-0 right-0 ${miniSidebar ? ' left-[286px]' : 'left-[80px]'}  bg-white z-20`}
-        >
+    <SidebarProvider>
+      <div className="flex">
+        <Sidebar config={SidebarConfig} />
+        <SidebarInset className="max-h-screen p-2 space-y-2 overflow-y-auto bg-gray-50">
           <Navbar />
-        </header>
 
-        {/* Page Content */}
-        <main className="flex-1 overflow-auto mt-16 pt-4 bg-bg min-h-screen">
-          <Outlet />
-        </main>
+          {/* Page Content */}
+          <main className="flex-1 overflow-y-auto">
+            <Outlet />
+          </main>
+        </SidebarInset>
       </div>
-    </div>
+    </SidebarProvider>
   );
 }

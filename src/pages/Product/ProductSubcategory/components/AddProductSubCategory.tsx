@@ -1,92 +1,163 @@
-import { useForm } from "@tanstack/react-form"
-import { Modal } from "../../../../components/shared"
-
-interface propTypes{
-    modalRef: React.RefObject<HTMLDivElement | null>
-    editData?: any
-    setOpenModal:React.Dispatch<React.SetStateAction<boolean>>
+import { useForm } from "@tanstack/react-form";
+import { useEffect, useMemo } from "react";
+import * as z from "zod";
+import { Modal } from "../../../../components/shared";
+import {
+  IFetchSubCategory,
+  useCreateProductSubCategoryMutation,
+  useGetAllProductCategoriesQuery,
+  useUpdateProductSubCategoryMutation,
+} from "../../../../server/api/productHooks";
+import { DropdownField } from "../../../../components/shared/form_components/Dropdown";
+import { FieldError } from "../../../auth/LoginPage";
+import { get } from "lodash";
+interface propTypes {
+  modalRef: React.RefObject<HTMLDivElement | null>;
+  editData?: IFetchSubCategory | null;
+  closeModal: () => void;
 }
 
+const validationSchema = z.object({
+  name: z.string().min(1, "**Name is required"),
+  category: z.string().min(1, "**Category is required"),
+  description: z.string().optional(),
+});
+interface ISubCategorForm {
+  name: string;
+  category: string;
+  description?: string;
+}
+export const AddProductSubCategory = ({
+  modalRef,
+  closeModal,
+  editData,
+}: propTypes) => {
+  const { data: categories, isSuccess: categorySuccess } =
+    useGetAllProductCategoriesQuery();
+  const { mutate: createSubCategory, isSuccess } =
+    useCreateProductSubCategoryMutation();
+  const { mutate: updateSubCategory, isSuccess: isUpdateSuccess } =
+    useUpdateProductSubCategoryMutation();
 
-
-export const AddProductSubCategory = ({ modalRef, setOpenModal, editData }: propTypes) => {
-    
-
-    const form = useForm({
-          defaultValues: {
-              subcategory: editData?.subcategory ??" ",
-              description:editData?.description ??" ",
-        },
-        validators: {
-        },
-
+  const categoriesList = useMemo(
+    () =>
+      categorySuccess
+        ? categories?.map((item) => ({ label: item.name, value: item._id }))
+        : [],
+    [categorySuccess, categories]
+  );
+  console.log(categoriesList);
+  const form = useForm({
+    defaultValues: {
+      name: editData ? get(editData, "name", "") : "",
+      category: editData ? get(editData, "category._id", "") : "",
+      description: editData ? get(editData, "description", "") : "",
+    } as ISubCategorForm,
+    validators: {
+      onSubmit: validationSchema,
+    },
     onSubmit: async ({ value }) => {
-        console.log(value)
+      if (editData) updateSubCategory({ id: editData._id, body: value });
+      else createSubCategory(value);
     },
   });
-
-
-    return  <Modal classname="w-[400px]  h-auto" ref={modalRef}>
-                    <form className="p-6" onSubmit={(e) => { e.preventDefault(); form.handleSubmit() }}>
-                        <h2 className="text-xl font-semibold mb-6">
-                            {editData ? 'Edit Subcategory' : 'Add New Subcategory'}
-                        </h2>
-                        <div className="space-y-6">
-                            <div>
-                                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                                    Sub-category
-                    </label>
-                    <form.Field name="subcategory">
-                        {(field) =>
-                        
-                        
-                                <input
-                                    id="sub-category"
-                                    type="text"
-                                    value={field.state.value}
-                                onChange={(e) => field.handleChange(e.target.value)}
-                                    className={`border border-gray-300 rounded-md p-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
-                                    placeholder="Enter subcategory name"
-                            />
-                        }
-                    </form.Field>
-                             
-                            </div>
-                            <div>
-                                <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-                                    Description *
-                    </label>
-                    <form.Field name="description">
-                        {(field) =>
-                        
-                                <textarea
-                                    id="description"
-                                    value={field.state.value}
-                                onChange={(e) => field.handleChange(e.target.value)}
-                                    className={`border border-gray-300 rounded-md p-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 `}
-                                    rows={3}
-                                    placeholder="Enter description"
-                            />
-                        }
-                    </form.Field>
-                             
-                            </div>
-                        </div>
-                        <div className="mt-6 flex justify-between gap-3">
-                <button
-                    type="submit"
-                                onClick={() => setOpenModal(false)}
-                                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="submit"
-                                className="px-7 py-2 bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-white rounded-md text-sm font-medium transition-colors duration-200"
-                            >
-                                {editData ? 'Update' : 'Add'}
-                            </button>
-                        </div>
-                    </form>
-                </Modal>
-}
+  useEffect(() => {
+    if (isSuccess || isUpdateSuccess) {
+      form.reset();
+      closeModal();
+    }
+  }, [isSuccess, isUpdateSuccess]);
+  return (
+    <Modal classname="w-[400px]  h-auto" ref={modalRef}>
+      <form
+        className="p-6"
+        onSubmit={(e) => {
+          e.preventDefault();
+          form.handleSubmit();
+        }}
+      >
+        <h2 className="mb-6 text-xl font-semibold">
+          {editData ? "Edit Subcategory" : "Add New Subcategory"}
+        </h2>
+        <div className="space-y-6">
+          <div>
+            <label
+              htmlFor="name"
+              className="block mb-1 text-sm font-medium text-gray-700"
+            >
+              Name
+            </label>
+            <form.Field name="name">
+              {(field) => (
+                <div>
+                  <input
+                    id="sub-category"
+                    type="text"
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    className={`border border-gray-300 rounded-md p-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                    placeholder="Enter subcategory name"
+                  />
+                  <FieldError field={field} />
+                </div>
+              )}
+            </form.Field>
+          </div>
+          <form.Field name="category">
+            {(field) => (
+              <div>
+                <DropdownField
+                  label="Category"
+                  required
+                  firstInput="Select Category"
+                  options={categoriesList}
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+                <FieldError field={field} />
+              </div>
+            )}
+          </form.Field>
+          <div>
+            <label
+              htmlFor="description"
+              className="block mb-1 text-sm font-medium text-gray-700"
+            >
+              Description *
+            </label>
+            <form.Field name="description">
+              {(field) => (
+                <div>
+                  <textarea
+                    id="description"
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    className={`border border-gray-300 rounded-md p-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 `}
+                    rows={3}
+                    placeholder="Enter description"
+                  />
+                  <FieldError field={field} />
+                </div>
+              )}
+            </form.Field>
+          </div>
+        </div>
+        <div className="flex justify-between gap-3 mt-6">
+          <button
+            type="submit"
+            onClick={closeModal}
+            className="px-4 py-2 text-sm font-medium text-gray-700 transition-colors duration-200 border border-gray-300 rounded-md hover:bg-gray-50"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="px-7 py-2 bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-white rounded-md text-sm font-medium transition-colors duration-200"
+          >
+            {editData ? "Update" : "Add"}
+          </button>
+        </div>
+      </form>
+    </Modal>
+  );
+};

@@ -1,196 +1,303 @@
-import React, { useState } from "react";
+import React, { memo, useState } from "react";
 import { Icon } from "@iconify/react";
 
 interface SearchFilterSortProps {
-  onSearch: (query: string) => void;
-  onFilter: (filter: string) => void;
+  onFilter?: (filter: string) => void;
   onSort: (sort: string) => void;
   filterOptions?: { value: string; label: string }[];
   sortOptions?: { value: string; label: string }[];
   placeholder?: string;
   onViewChange?: (view: "grid" | "column") => void;
-  showSearch?: boolean; // Control search input visibility
   showFilter?: boolean; // Control filter dropdown visibility
   showView?: boolean; // Control view select visibility
   showSort?: boolean; // Control sort dropdown visibility
+  onSearch?: (s?: any) => void;
 }
 
-export const SearchFilterSort: React.FC<SearchFilterSortProps> = ({
-  onSearch,
-  onFilter,
-  onSort,
-  filterOptions = [],
-  sortOptions = [],
-  placeholder = "Search",
-  onViewChange,
-  showSearch = true, // Default to true for each
-  showFilter = true,
-  showView = true,
-  showSort = true,
-}) => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedFilter, setSelectedFilter] = useState("");
-  const [selectedSort, setSelectedSort] = useState("");
-  const [view, setView] = useState<"grid" | "column">("grid");
+export const SearchFilterSort: React.FC<SearchFilterSortProps> = memo(
+  ({
+    onFilter,
+    onSort,
+    filterOptions = [],
+    sortOptions = [],
+    onViewChange,
+    showFilter = true,
+    showView = false,
+    showSort = true,
+  }) => {
+    const [selectedFilter, setSelectedFilter] = useState("");
+    const [selectedSort, setSelectedSort] = useState("");
+    const [view, setView] = useState<"grid" | "column">("grid");
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-    onSearch(query);
-  };
+    const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const filter = e.target.value;
+      setSelectedFilter(filter);
+      onFilter?.(filter);
+    };
 
-  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const filter = e.target.value;
-    setSelectedFilter(filter);
-    onFilter(filter);
-  };
+    const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const sort = e.target.value;
+      setSelectedSort(sort);
+      onSort(sort);
+    };
 
-  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const sort = e.target.value;
-    setSelectedSort(sort);
-    onSort(sort);
-  };
+    const handleViewChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const newView = e.target.value as "grid" | "column";
+      setView(newView);
+      if (onViewChange) onViewChange(newView);
+    };
+    return (
+      <div className="container">
+        <div className="flex flex-row justify-between gap-4 text-sm md:flex-row ">
+          <div className="flex items-center border divide-x-2 rounded-lg">
+            {/* Filter Dropdown */}
+            {showFilter && filterOptions.length > 0 && (
+              <div className="relative flex justify-center w-auto">
+                {" "}
+                {/* Set equal width */}
+                <label htmlFor="filter-select" className="sr-only">
+                  Filter
+                </label>
+                <select
+                  id="filter-select"
+                  value={selectedFilter}
+                  onChange={handleFilterChange}
+                  className="w-auto px-3 py-2 pl-8 pr-6 text-sm text-black bg-white outline-none appearance-none"
+                >
+                  <option value="">Filter</option>
+                  {filterOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 flex items-center pointer-events-none left-2">
+                  <Icon
+                    icon="rivet-icons:filter"
+                    fontSize={16}
+                    className="text-black"
+                  />
+                </div>
+                <div className="absolute inset-y-0 flex items-center pointer-events-none right-2">
+                  <Icon
+                    icon="mdi:chevron-down"
+                    fontSize={16}
+                    className="text-black"
+                  />
+                </div>
+              </div>
+            )}
 
-  const handleViewChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newView = e.target.value as "grid" | "column";
-    setView(newView);
-    if (onViewChange) onViewChange(newView);
-  };
-  return (
-    <div className="container my-4">
-      <div className="flex  justify-between flex-row gap-x-40 md:flex-row">
-        {/* Search Input */}
-        <div className="flex flex-row w-full">
-          {showSearch && (
-            <div className="relative flex-grow ">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Icon
-                  icon="mynaui:search"
-                  fontSize={16}
-                  className="text-gray-400 size-auto"
-                />
+            {/* Grid/Column View Select */}
+            {showView && (
+              <div className="relative flex justify-center w-auto">
+                {/* Equal width */}
+                <label htmlFor="view-select" className="sr-only">
+                  View
+                </label>
+                <select
+                  id="view-select"
+                  value={view}
+                  onChange={handleViewChange}
+                  className="w-auto px-3 py-2 pl-8 pr-6 text-sm text-black bg-white outline-none appearance-none"
+                >
+                  <option value="grid">Grid</option>
+                  <option value="column">Column</option>
+                </select>
+                <div className="absolute inset-y-0 flex items-center pointer-events-none left-2">
+                  <Icon
+                    icon={
+                      view === "grid" ? "mdi:view-grid-outline" : "mynaui:rows"
+                    }
+                    fontSize={16}
+                    className="text-black"
+                  />
+                </div>
+                <div className="absolute inset-y-0 flex items-center pointer-events-none right-2">
+                  <Icon
+                    icon="mdi:chevron-down"
+                    fontSize={16}
+                    className="text-black"
+                  />
+                </div>
               </div>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={handleSearchChange}
-                placeholder={placeholder}
-                className="pl-10 pr-4 py-3 border rounded-md w-full  text-sm  text-fade-black outline-none"
-              />
-            </div>
-          )}
-        </div>
+            )}
 
-        <div className="flex items-center divide-x-2 border rounded-lg">
-          {/* Filter Dropdown */}
-          {showFilter && filterOptions.length > 0 && (
-            <div className="relative w-auto flex justify-center">
-              {" "}
-              {/* Set equal width */}
-              <label htmlFor="filter-select" className="sr-only">
-                Filter
-              </label>
-              <select
-                id="filter-select"
-                value={selectedFilter}
-                onChange={handleFilterChange}
-                className="appearance-none pl-8 pr-6  w-auto text-sm text-black outline-none"
-              >
-                <option value="">Filter</option>
-                {filterOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <div className="absolute inset-y-0 left-2 flex items-center pointer-events-none">
-                <Icon
-                  icon="rivet-icons:filter"
-                  fontSize={16}
-                  className="text-black"
-                />
+            {/* Sort Dropdown */}
+            {showSort && sortOptions.length > 0 && (
+              <div className="relative flex justify-center w-auto">
+                {/* Equal width */}
+                <label htmlFor="sort-select" className="sr-only">
+                  Sort
+                </label>
+                <select
+                  id="sort-select"
+                  value={selectedSort}
+                  onChange={handleSortChange}
+                  className="w-auto px-3 py-2 pl-8 pr-6 text-sm text-black bg-white outline-none appearance-none"
+                >
+                  <option value="">Sort</option>
+                  {sortOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 flex items-center pointer-events-none left-2">
+                  <Icon
+                    icon="lucide:sort-desc"
+                    fontSize={16}
+                    className="text-black"
+                  />
+                </div>
+                <div className="absolute inset-y-0 flex items-center pointer-events-none right-2">
+                  <Icon
+                    icon="mdi:chevron-down"
+                    className="text-lg text-black"
+                  />
+                </div>
               </div>
-              <div className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
-                <Icon
-                  icon="mdi:chevron-down"
-                  fontSize={16}
-                  className="text-black"
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Grid/Column View Select */}
-          {showView && (
-            <div className="relative w-auto flex justify-center">
-              {" "}
-              {/* Equal width */}
-              <label htmlFor="view-select" className="sr-only">
-                View
-              </label>
-              <select
-                id="view-select"
-                value={view}
-                onChange={handleViewChange}
-                className="appearance-none pl-8 pr-6  w-auto text-sm outline-none text-black"
-              >
-                <option value="grid">Grid</option>
-                <option value="column">Column</option>
-              </select>
-              <div className="absolute inset-y-0 left-2 flex items-center pointer-events-none">
-                <Icon
-                  icon={
-                    view === "grid" ? "mdi:view-grid-outline" : "mynaui:rows"
-                  }
-                  fontSize={16}
-                  className="text-black"
-                />
-              </div>
-              <div className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
-                <Icon
-                  icon="mdi:chevron-down"
-                  fontSize={16}
-                  className="text-black"
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Sort Dropdown */}
-          {showSort && sortOptions.length > 0 && (
-            <div className="relative w-auto flex justify-center">
-              {" "}
-              {/* Equal width */}
-              <label htmlFor="sort-select" className="sr-only">
-                Sort
-              </label>
-              <select
-                id="sort-select"
-                value={selectedSort}
-                onChange={handleSortChange}
-                className="appearance-none pl-8 pr-6  w-auto text-sm outline-none text-black"
-              >
-                <option value="">Sort</option>
-                {sortOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <div className="absolute inset-y-0 left-2 flex items-center pointer-events-none">
-                <Icon
-                  icon="lucide:sort-desc"
-                  fontSize={16}
-                  className="text-black"
-                />
-              </div>
-              <div className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
-                <Icon icon="mdi:chevron-down" className="text-black text-lg" />
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  }
+);
+
+// import React, { memo, useState } from "react";
+// import { Icon } from "@iconify/react";
+// import { ScrollableModal } from "../shared/ScrollableModal";
+
+// interface SearchFilterSortProps {
+//   onFilter?: (filter: any) => void;
+//   onSort: (sort: string) => void;
+//   sortOptions?: { value: string; label: string }[];
+//   placeholder?: string;
+//   onViewChange?: (view: "grid" | "column") => void;
+//   showView?: boolean;
+//   showSort?: boolean;
+//   showFilter?: boolean;
+//   renderFilterModalContent?: (
+//     close: () => void,
+//     onApply: (val: any) => void
+//   ) => React.ReactNode;
+// }
+
+// export const SearchFilterSort: React.FC<SearchFilterSortProps> = memo(
+//   ({
+//     onFilter,
+//     onSort,
+//     sortOptions = [],
+//     onViewChange,
+//     showView = false,
+//     showSort = true,
+//     showFilter = true,
+//     renderFilterModalContent,
+//   }) => {
+//     const [selectedSort, setSelectedSort] = useState("");
+//     const [view, setView] = useState<"grid" | "column">("grid");
+//     const [isFilterModalOpen, setFilterModalOpen] = useState(false);
+
+//     const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+//       const sort = e.target.value;
+//       setSelectedSort(sort);
+//       onSort(sort);
+//     };
+
+//     const handleViewChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+//       const newView = e.target.value as "grid" | "column";
+//       setView(newView);
+//       onViewChange?.(newView);
+//     };
+
+//     return (
+//       <div className="container">
+//         <div className="flex flex-row justify-between gap-4 text-sm md:flex-row">
+//           <div className="flex items-center border divide-x-2 rounded-lg">
+//             {/* Filter Modal Button */}
+//             {showFilter && renderFilterModalContent && (
+//               <button
+//                 onClick={() => setFilterModalOpen(true)}
+//                 className="flex items-center gap-1 px-3 py-2 text-sm text-black bg-white"
+//               >
+//                 <Icon icon="rivet-icons:filter" fontSize={16} />
+//                 <span>Filter</span>
+//               </button>
+//             )}
+
+//             {/* Grid/Column View */}
+//             {showView && (
+//               <div className="relative flex justify-center w-auto">
+//                 <label htmlFor="view-select" className="sr-only">
+//                   View
+//                 </label>
+//                 <select
+//                   id="view-select"
+//                   value={view}
+//                   onChange={handleViewChange}
+//                   className="w-auto px-3 py-2 pl-8 pr-6 text-sm text-black bg-white outline-none appearance-none"
+//                 >
+//                   <option value="grid">Grid</option>
+//                   <option value="column">Column</option>
+//                 </select>
+//                 <div className="absolute left-2 inset-y-0 flex items-center pointer-events-none">
+//                   <Icon
+//                     icon={
+//                       view === "grid" ? "mdi:view-grid-outline" : "mynaui:rows"
+//                     }
+//                     fontSize={16}
+//                   />
+//                 </div>
+//                 <div className="absolute right-2 inset-y-0 flex items-center pointer-events-none">
+//                   <Icon icon="mdi:chevron-down" fontSize={16} />
+//                 </div>
+//               </div>
+//             )}
+
+//             {/* Sort Dropdown */}
+//             {showSort && sortOptions.length > 0 && (
+//               <div className="relative flex justify-center w-auto">
+//                 <label htmlFor="sort-select" className="sr-only">
+//                   Sort
+//                 </label>
+//                 <select
+//                   id="sort-select"
+//                   value={selectedSort}
+//                   onChange={handleSortChange}
+//                   className="w-auto px-3 py-2 pl-8 pr-6 text-sm text-black bg-white outline-none appearance-none"
+//                 >
+//                   <option value="">Sort</option>
+//                   {sortOptions.map((option) => (
+//                     <option key={option.value} value={option.value}>
+//                       {option.label}
+//                     </option>
+//                   ))}
+//                 </select>
+//                 <div className="absolute left-2 inset-y-0 flex items-center pointer-events-none">
+//                   <Icon icon="lucide:sort-desc" fontSize={16} />
+//                 </div>
+//                 <div className="absolute right-2 inset-y-0 flex items-center pointer-events-none">
+//                   <Icon icon="mdi:chevron-down" fontSize={16} />
+//                 </div>
+//               </div>
+//             )}
+//           </div>
+//         </div>
+
+//         {/* Filter Modal */}
+//         {isFilterModalOpen && (
+//           <ScrollableModal onClose={() => setFilterModalOpen(false)}>
+//             {renderFilterModalContent?.(
+//               () => setFilterModalOpen(false),
+//               (value) => {
+//                 onFilter?.(value);
+//                 setFilterModalOpen(false);
+//               }
+//             )}
+//           </ScrollableModal>
+//         )}
+//       </div>
+//     );
+//   }
+// );

@@ -5,6 +5,7 @@ import { DeleteDialog } from "./DeleteDialog";
 
 export type TableData<T = Record<string, any>> = {
   _id: string;
+  _rowStyle?: string; // Custom property for row styling
 } & T;
 
 export type ColumnConfig<T> = {
@@ -21,12 +22,14 @@ type TableProps<T extends Record<string, any>> = {
   viewRow?: (row: TableData<T>) => void;
   editRow?: (row: TableData<T>) => void;
   deleteRow?: (row: TableData<T>) => void;
+  returnRow?: (row: TableData<T>) => void;
   onToggle?: (row: TableData<T>, isSingle?: boolean) => void;
   onButtonClick?: (row: TableData<T>) => void;
   buttonTitle?: string;
   showDelete?: boolean;
   showEdit?: boolean;
   showView?: boolean;
+  showReturn?: boolean;
   showButton?: boolean;
   showToggle?: boolean;
   showAction?: boolean;
@@ -55,9 +58,11 @@ export const Table = <T extends Record<string, any>>({
   editRow,
   onToggle,
   deleteRow,
+  returnRow,
   showDelete = false,
   showEdit,
   showView,
+  showReturn = false,
   showToggle,
   showAction = true,
   showSelectAll = true,
@@ -80,6 +85,7 @@ export const Table = <T extends Record<string, any>>({
   );
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [rowToDelete, setRowToDelete] = useState<TableData<T> | null>(null);
+  const [rowToReturn, setRowToReturn] = useState<TableData<T> | null>(null);
 
   const handleRowSelect = (row: TableData<T>) => {
     const newSelectedRows = new Set(selectedRows);
@@ -121,6 +127,10 @@ export const Table = <T extends Record<string, any>>({
     setShowDeleteDialog(true);
   };
 
+  const handleReturn = (row: TableData<T>) => {
+    setRowToReturn(row);
+  };
+
   const handleDeleteConfirm = () => {
     if (rowToDelete && deleteRow) {
       deleteRow(rowToDelete);
@@ -132,21 +142,21 @@ export const Table = <T extends Record<string, any>>({
   const [_, setToggledRows] = useState(new Set());
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full ">
       <div className="w-full overflow-auto">
-        <div className="min-w-full max-w-screen-md w-full h-fit ">
-          <section className="rounded-lg w-full">
-            <table className="min-w-full  w-full">
+        <div className="w-full max-w-screen-md min-w-full h-fit ">
+          <section className=" w-full rounded-xl overflow-hidden border border-[#e0e2e5] ">
+            <table className="w-full min-w-full ">
               <thead className={showBg ? "bg-fade-bg" : ""}>
-                <tr className="justify-between">
+                <tr className="justify-between border border-[#e0e2e5]  bg-[#f8f9fd]">
                   {showSelectAll && (
                     <th
                       scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium"
+                      className="px-6 py-3 text-xs font-medium text-center"
                     >
                       <input
                         type="checkbox"
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 rounded"
+                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                         checked={selectedRows.size === data?.length}
                         onChange={handleSelectAll}
                         aria-label="Select all rows"
@@ -159,7 +169,7 @@ export const Table = <T extends Record<string, any>>({
                       scope="col"
                       className={`${
                         hasPadding ? "px-6" : ""
-                      } py-3 text-left text-sm text-nowrap font-semibold text-fade-black tracking-wider ${
+                      } py-3   text-center text-sm text-nowrap font-semibold text-fade-black tracking-wider ${
                         column.width ? `w-[${column.width}]` : ""
                       }`}
                     >
@@ -169,7 +179,7 @@ export const Table = <T extends Record<string, any>>({
                   {showAction && (
                     <th
                       scope="col"
-                      className="px-6 py-3 text-left text-sm font-semibold text-fade-black tracking-wider"
+                      className="flex justify-end px-6 py-3 mr-4 text-sm font-semibold tracking-wider text-center text-fade-black"
                     >
                       Action
                     </th>
@@ -177,20 +187,21 @@ export const Table = <T extends Record<string, any>>({
                 </tr>
               </thead>
 
-              <tbody className="bg-white">
+              <tbody className="bg-white ">
                 {data?.length ? (
                   data.map((row, index) => (
                     <tr
                       key={`${row._id}-${index}`}
-                      className={`${
+                      className={`border border-[#e0e2e5] ${
+                        row._rowStyle ? row._rowStyle :
                         index % 2 === 0 && showBg ? "bg-fade-bg" : ""
                       }`}
                     >
                       {showSelectAll && (
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="flex items-center justify-center px-6 py-4 whitespace-nowrap ">
                           <input
                             type="checkbox"
-                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 rounded"
+                            className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                             checked={selectedRows?.has(row._id)}
                             onChange={() => handleRowSelect(row)}
                             aria-label={`Select row ${row._id}`}
@@ -202,8 +213,8 @@ export const Table = <T extends Record<string, any>>({
                         <td
                           key={`${row._id}-${index}`}
                           className={`${
-                            hasPadding && "px-6 cursor-pointer"
-                          } py-4 whitespace-nowrap`}
+                            hasPadding && "px-6  cursor-pointer"
+                          } py-4 whitespace-nowrap text-center`}
                           onClick={() => viewRow?.(row)}
                         >
                           {column.render
@@ -217,7 +228,7 @@ export const Table = <T extends Record<string, any>>({
                       ))}
 
                       {showAction && (
-                        <td className="px-6 flex md:min-w-[10rem] w-full gap-3 py-8 place-items-center text-right text-sm font-medium">
+                        <td className="px-6 flex justify-end md:min-w-[10rem] w-full gap-3 py-4 place-items-center text-right text-sm font-medium ">
                           {showToggle && (
                             <div
                               key={`toggle-${row._id}`}
@@ -226,7 +237,7 @@ export const Table = <T extends Record<string, any>>({
                             >
                               <label
                                 htmlFor={`toggle-${row._id}`}
-                                className="flex cursor-pointer relative"
+                                className="relative flex cursor-pointer"
                               >
                                 <input
                                   type="checkbox"
@@ -257,7 +268,7 @@ export const Table = <T extends Record<string, any>>({
                           {!conditionRendering && showButton && (
                             <button
                               key={`button-${row._id}`}
-                              className="px-2 py-1 bg-lynch-400 text-white rounded text-xs"
+                              className="px-2 py-1 text-xs text-white rounded bg-lynch-400"
                               onClick={() => onButtonClick?.(row)}
                             >
                               {buttonTitle}
@@ -267,7 +278,7 @@ export const Table = <T extends Record<string, any>>({
                           {showView && (
                             <div
                               key={`view-${row._id}`}
-                              className="text-xl text-black cursor-pointer bg-primary-blue rounded p-1"
+                              className="p-1 text-xl text-black rounded cursor-pointer bg-primary-blue"
                               onClick={() => viewRow?.(row)}
                             >
                               <Icon
@@ -281,13 +292,28 @@ export const Table = <T extends Record<string, any>>({
                           {showEdit && (
                             <div
                               key={`edit-${row._id}`}
-                              className="text-xl text-black cursor-pointer bg-green rounded p-1"
+                              className="p-1 text-xl text-black rounded cursor-pointer bg-green"
                               onClick={() => editRow?.(row)}
                             >
                               <Icon
                                 icon="lucide:pen-line"
                                 fontSize={16}
                                 color="white"
+                              />
+                            </div>
+                          )}
+
+                          {showReturn && (
+                            <div
+                              key={`return-${row._id}`}
+                              className="text-xl text-black cursor-pointer bg-[#df8d29] rounded p-1"
+                              onClick={() => returnRow?.(row)}
+                            >
+                              <Icon
+                                icon="carbon:return"
+                                width="16"
+                                height="16"
+                                className="text-white"
                               />
                             </div>
                           )}
@@ -309,7 +335,7 @@ export const Table = <T extends Record<string, any>>({
                           {showDelete && (
                             <div
                               key={`delete-${row._id}`}
-                              className="text-xl text-black cursor-pointer bg-red rounded p-1"
+                              className="p-1 text-xl text-black rounded cursor-pointer bg-red"
                               onClick={() => handleDelete(row)}
                             >
                               <Icon
@@ -331,20 +357,48 @@ export const Table = <T extends Record<string, any>>({
                         (showSelectAll ? 1 : 0) +
                         (showAction ? 1 : 0)
                       }
-                      className="text-center py-8"
+                      className="py-8 text-center"
                     >
                       No data was found
                     </td>
                   </tr>
                 )}
               </tbody>
+              {showPagination && (
+                <tfoot>
+                  <tr>
+                    <td
+                      colSpan={
+                        columns.length +
+                        (showSelectAll ? 1 : 0) +
+                        (showAction ? 1 : 0)
+                      }
+                      className="py-4"
+                    >
+                      <div className="flex items-center justify-between w-full px-6">
+                        <Pagination
+                          currentPage={paginationDetails?.currentPage ?? 1}
+                          itemsPerPage={paginationDetails?.limit ?? 10}
+                          totalItems={
+                            paginationDetails?.totalCount ?? totalCount ?? 0
+                          }
+                          onItemsPerPageChange={(page: number) =>
+                            onItemsPerPageChange?.(page)
+                          }
+                          onPageChange={(page: number) => onPageChange?.(page)}
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                </tfoot>
+              )}
             </table>
           </section>
         </div>
       </div>
 
-      {showPagination && (
-        <section className="flex flex-col bg-bg pt-6 " id="pagination">
+      {/* {showPagination && (
+        <section className="flex flex-col bg-[#ffffff] mt-2 " id="pagination">
           <Pagination
             currentPage={paginationDetails?.currentPage ?? 1}
             itemsPerPage={paginationDetails?.limit ?? 10}
@@ -355,7 +409,7 @@ export const Table = <T extends Record<string, any>>({
             onPageChange={(page: number) => onPageChange?.(page)}
           />
         </section>
-      )}
+      )} */}
 
       <DeleteDialog
         confirmAction={showDeleteDialog}
@@ -365,3 +419,5 @@ export const Table = <T extends Record<string, any>>({
     </div>
   );
 };
+
+//
