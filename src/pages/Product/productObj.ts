@@ -96,7 +96,11 @@ export const generateProductDefaultValue = (state: string, editData?: any) => {
       length: get(editData, "length", 0),
       claspType: (() => {
         const claspTypeValue = get(editData, "claspType", "");
-        if (claspTypeValue && typeof claspTypeValue === "object" && claspTypeValue._id) {
+        if (
+          claspTypeValue &&
+          typeof claspTypeValue === "object" &&
+          claspTypeValue._id
+        ) {
           return claspTypeValue._id;
         }
         return claspTypeValue || "";
@@ -116,7 +120,7 @@ export const productFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().min(1, "Description is required"),
   category: z.string().min(1, "Category is required"),
-  subCategory: z.string().min(1, "Sub Category is required"),
+  subCategory: z.string(),
 
   // Price
   variant: z

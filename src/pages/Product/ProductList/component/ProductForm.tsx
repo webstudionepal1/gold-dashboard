@@ -232,7 +232,6 @@ const ProductForm = () => {
                       <div>
                         <DropdownField
                           label="Product Sub-Category"
-                          required
                           firstInput="Select Sub Category"
                           options={subCategoriesList}
                           value={field.state.value}
