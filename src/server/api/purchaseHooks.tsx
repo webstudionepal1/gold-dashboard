@@ -24,7 +24,7 @@ export interface IFetchPurchase {
   billNo: string;
   items: IItem[];
   products: IProducts[];
-  supplier: IFetchSupplier;
+  supplier: string;
   discount: number;
   discountType: string;
   totalAmount: number;
@@ -117,55 +117,21 @@ export const useDeletePurchaseMutation = () => {
   });
 };
 
-///purchase raw material
-
-export const useCreatePurchaseRawMaterialMutation = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationKey: ["purchases"],
-    mutationFn: async (body: IPurchase) => {
-      const res = await apiClient.post("purchase", body);
-      return res?.data?.data;
-    },
-    onSuccess() {
-      toast.success("Purchase created successfully");
-      queryClient.invalidateQueries({ queryKey: ["purchases"] });
-    },
-    onError(err: string) {
-      toast.error(err || "Error creating purchase");
-    },
-  });
-};
-
-export const useUpdatePurchaseRawMaterialMutation = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationKey: ["purchases"],
-    mutationFn: async ({ id, body }: IUpdateProps) => {
-      const res = await apiClient.patch(`purchase/${id}`, body);
-      return res?.data?.data;
-    },
-    onSuccess() {
-      toast.success("Purchase updated successfully");
-      queryClient.invalidateQueries({ queryKey: ["purchases"] });
-    },
-    onError(err: string) {
-      toast.error(err || "Error updating purchase");
-    },
-  });
-};
 // getraw materials
 export interface IItems {
   name?: string;
   usedStock?: number;
+  unit?: string;
   remainingStock?: number;
   totalStock?: number;
 }
 export interface IFetchItems {
   name: string;
+  unit?: string;
   usedStock: number;
   remainingStock: number;
   totalStock: number;
+  _id: string;
 }
 export const useGetRawMaterialsQuery = (params = {}) => {
   return useQuery({
@@ -200,7 +166,7 @@ export const useUpdateRawItemsMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ["rawitem"],
-    mutationFn: async ({ id, body }: IUpdateProps) => {
+    mutationFn: async ({ id, body }: { id: string; body: IItems }) => {
       const res = await apiClient.patch(`rawitem/${id}`, body);
       return res?.data?.data;
     },

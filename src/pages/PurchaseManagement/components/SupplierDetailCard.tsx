@@ -36,12 +36,12 @@ const SupplierCard: React.FC<SupplierCardProps> = ({
               <h1 className="text-2xl font-bold">{title}</h1>
               <div className="flex items-center gap-4 text-[#585858]">
                 <div className="flex items-center gap-2">
-                  <Icon icon="mdi:building" width={24} height={24} />
-                  <p>{supplierType}</p>
+                  <Icon icon="mdi:building" width={16} height={16} />
+                  <p className="text-sm">{supplierType}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Icon icon="proicons:location" width={24} height={24} />
-                  <p>{location}</p>
+                  <Icon icon="proicons:location" width={16} height={16} />
+                  <p className="text-sm">{location}</p>
                 </div>
               </div>
             </div>
@@ -53,15 +53,15 @@ const SupplierCard: React.FC<SupplierCardProps> = ({
               >
                 {buttonText}
               </button>
-              <button className="text-[#726f82] border-2 border-[#cfcfcf] px-3 py-2 rounded-md flex items-center gap-2">
-                <Icon icon="lucide:edit" width={24} height={24} /> Edit
+              <button className="text-[#726f82] border-2 border-[#cfcfcf] px-3 py-2 text-sm rounded-md flex items-center gap-2">
+                <Icon icon="lucide:edit" width={16} height={16} /> Edit
               </button>
             </div>
           </div>
 
           <div className="border-2 border-[#c8d2db] rounded-xl">
             <div className="px-5 py-3">
-              <h1 className="text-2xl font-semibold mb-2">Items Supplied</h1>
+              <h1 className="text-xl font-semibold mb-2">Items Supplied</h1>
               <div className="flex items-center gap-2 flex-wrap">
                 {itemsSupplied.map((item, index) => {
                   const isPink = pinkItems.includes(item);
@@ -69,7 +69,7 @@ const SupplierCard: React.FC<SupplierCardProps> = ({
                     <p
                       key={index}
                       className={cn(
-                        "px-3 py-2 rounded-xl",
+                        "px-3 py-2 text-sm rounded-xl",
                         isPink
                           ? "bg-[#fef2f2] text-[#d02b51]"
                           : "bg-[#f4ebfc] text-[#9850cb]"

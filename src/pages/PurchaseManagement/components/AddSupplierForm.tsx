@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Breadcrumbs from "../../../components/shared/Breadcrumb";
 import { DropdownTagField } from "../../../components/shared/form_components/DropdownTags";
-import FileDropInput from "../../../components/shared/form_components/FileDropInput";
+import MultiImageUploader from "../../../components/shared/form_components/FileDropInput";
 import { InputField } from "../../../components/shared/form_components/InputField";
 import Header from "../../../components/shared/table_heading/Header";
 import { useGetAllProductsQuery } from "../../../server/api/productHooks";
@@ -18,8 +18,8 @@ import {
   appendFormData,
   getSupplierInitialFormValues,
   SupplierFormValues,
-  supplierSchema,
 } from "../purchaseObj";
+import { cleanObject } from "../../../utils/cleanObject";
 
 const AddSupplierForm = () => {
   const { page = "add" } = useParams();
@@ -39,28 +39,35 @@ const AddSupplierForm = () => {
     : [];
 
   const editData = useStore(supplierStore, (state) => state);
-  console.log("editData", editData);
   const form = useForm({
     defaultValues: getSupplierInitialFormValues(
       page,
       editData
     ) as SupplierFormValues,
-    validators: {
-      onChange: supplierSchema,
-    },
+    // validators: {
+    //   onChange: supplierSchema,
+    // },
 
     onSubmit: async ({ value }) => {
       const formdata = new FormData();
-      appendFormData(formdata, value);
+      const formattedData = cleanObject(value);
+      delete formattedData["logo"];
+      delete formattedData["existingLogo"];
+
+      appendFormData(formdata, formattedData);
+      if (value.logo) {
+        formdata.append("logo", value.logo);
+      }
+
       if (page === "add") createSupplier(formdata);
       else updateSupplier({ id: editData?._id, body: formdata });
     },
   });
-  console.log("page", page);
   useEffect(() => {
     if (createSuccess || updateSuccess) form.reset();
   }, [updateSuccess, createSuccess]);
 
+  console.log("formdata", form.state.values);
   return (
     <>
       <div className="">
@@ -69,7 +76,7 @@ const AddSupplierForm = () => {
         </Header>
 
         <form
-          className="grid grid-cols-1 gap-4 md:grid-cols-6 "
+          className="grid grid-cols-1 gap-4 lg:grid-cols-6 "
           onSubmit={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -82,20 +89,53 @@ const AddSupplierForm = () => {
               <div className="border-b border-[#dedde2] w-full my-2"></div>
             </div>
             <div className="w-full">
-              <form.Field name="name">
-                {(field) => (
-                  <div className="w-full">
-                    <InputField
-                      label="Supplier Name"
-                      required
-                      placeholder="Enter Supplier Name"
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                    />
-                    <FieldError field={field} />
-                  </div>
-                )}
-              </form.Field>
+              <div className="flex items-center justify-between gap-4">
+                <form.Field name="name">
+                  {(field) => (
+                    <div className="w-full">
+                      <InputField
+                        label="Supplier Name"
+                        required
+                        placeholder="Enter Supplier Name"
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                      />
+                      <FieldError field={field} />
+                    </div>
+                  )}
+                </form.Field>
+
+                <form.Field name="email">
+                  {(field) => (
+                    <div className="w-full">
+                      <InputField
+                        label="Email"
+                        type="email"
+                        required
+                        placeholder="Enter Email Address"
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                      />
+                      <FieldError field={field} />
+                    </div>
+                  )}
+                </form.Field>
+
+                <form.Field name="phone">
+                  {(field) => (
+                    <div className="w-full">
+                      <InputField
+                        label="Phone No"
+                        required
+                        placeholder="Enter Phone No."
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                      />
+                      <FieldError field={field} />
+                    </div>
+                  )}
+                </form.Field>
+              </div>
 
               <form.Field name="businessType">
                 {(field) => (
@@ -113,7 +153,7 @@ const AddSupplierForm = () => {
               </form.Field>
 
               <div className="flex items-center justify-between gap-4">
-                <form.Field name="addresses.district">
+                <form.Field name="addresses.address">
                   {(field) => (
                     <div className="w-full">
                       <InputField
@@ -182,7 +222,7 @@ const AddSupplierForm = () => {
               <div className="border-b border-[#dedde2] w-full my-2"></div>
             </div>
             <div className="flex items-center justify-between gap-4">
-              <form.Field name="name">
+              <form.Field name="contactPerson.name">
                 {(field) => (
                   <div className="w-full">
                     <InputField
@@ -197,7 +237,7 @@ const AddSupplierForm = () => {
                 )}
               </form.Field>
 
-              <form.Field name="phone">
+              <form.Field name="contactPerson.phone">
                 {(field) => (
                   <div className="w-full">
                     <InputField
@@ -211,23 +251,9 @@ const AddSupplierForm = () => {
                   </div>
                 )}
               </form.Field>
-
-              <form.Field name="alternatePhone">
-                {(field) => (
-                  <div className="w-full">
-                    <InputField
-                      label="Alternate Phone"
-                      placeholder="Enter Alternate Phone"
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                    />
-                    <FieldError field={field} />
-                  </div>
-                )}
-              </form.Field>
             </div>
 
-            <form.Field name="email">
+            <form.Field name="contactPerson.email">
               {(field) => (
                 <div className="w-full">
                   <InputField
@@ -334,20 +360,27 @@ const AddSupplierForm = () => {
               </div>
               <form.Field name="logo">
                 {(field) => (
-                  <div className="w-full">
-                    <FileDropInput
+                  <div>
+                    <MultiImageUploader
+                      multiple={false}
+                      onChange={(file) => field.handleChange(file)}
                       value={field.state.value}
-                      onChange={(file) => {
-                        field.handleChange(file);
+                      existingFile={form.getFieldValue("existingLogo")}
+                      existingFileField="existingLogo"
+                      label="Upload Profile Photo"
+                      form={form}
+                      accept={{
+                        "image/*": [".png", ".jpg", ".jpeg", ".svg", ".webp"],
                       }}
+                      placeholder="Upload company logo (optional)"
                     />
-                    <FieldError field={field} />
+                    {field.state.meta.isTouched && <FieldError field={field} />}
                   </div>
                 )}
               </form.Field>
             </div>
             <div className="w-full mb-[2rem]">
-              <div className="bg-[#ffffff] border-[#eeeeee] border-2 shadow-lg rounded-xl w-full">
+              <div className="bg-[#ffffff] border-[#eeeeee] border-2  rounded-xl w-full">
                 <div className="mx-6 my-4">
                   <div>
                     <h1 className="text-xl font-semibold">

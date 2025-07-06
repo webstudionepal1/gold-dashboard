@@ -23,7 +23,7 @@ export const FrontendRoutes = {
   ADDSUPPLIERS: "/inventory/suppliers/:page",
   SUPPLIERDETAIL: "/inventory/supplier/:id",
   SUPPLIERHISTORY: "/inventory/suppliers/supplier-history",
-  // ATTRIBUTES: "/attribute",
+
   BANNER: "/banner",
   ADDBANNER: "/banner/add-banner",
   NOTIFICATION: "/notification",
@@ -41,4 +41,5 @@ export const FrontendRoutes = {
   STOCK_REPORT: "/stock-report",
 
   SETTINGS: "/settings",
+  PROFILECONFIG: "/settings/profile-config",
 };

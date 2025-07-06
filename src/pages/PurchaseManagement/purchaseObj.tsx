@@ -1,17 +1,27 @@
 import { get } from "lodash";
 import * as z from "zod";
+import { Constants } from "../../utils/constants";
 interface IButtonObj {
   [key: string]: {
     text?: string;
     show: boolean;
   };
 }
+interface IContactPerson {
+  name: string;
+  phone: string;
+  email: string;
+}
 export interface SupplierFormValues {
   name: string;
-  description?: string;
+  description: string;
   email: string;
   phone: string;
-  alternatePhone?: string;
+  contactPerson: {
+    name: string;
+    phone: string;
+    email: string;
+  };
   businessType: string;
   addresses: {
     district: string;
@@ -30,8 +40,9 @@ export interface SupplierFormValues {
     paymentTerms: string;
     branch: string;
   };
-  logo: File | null;
-  products?: string[];
+  logo: File | null; // Optional logo file
+  existingLogo?: string; // Optional existing logo URL
+  products: string[];
 }
 export const buttonObj: IButtonObj = {
   purchase: {
@@ -60,7 +71,15 @@ export const supplierSchema = z.object({
   description: z.string().optional(),
   email: z.string().email("Invalid email format").min(1, "Email is required"),
   phone: z.string().min(1, "Phone is required"),
-  alternatePhone: z.string().optional(),
+  contactPerson: z.object({
+    name: z.string().min(1, "Contact person name is required"),
+    phone: z
+      .string()
+      .regex(/^\d+$/, "Only digits are allowed")
+      .min(1, "Phone is required"),
+    email: z.string().email("Invalid email format").min(1, "Email is required"),
+  }),
+  // alternatePhone: z.string().optional(),
   businessType: z.string().min(1, "Business Type is required"),
   addresses: z.object({
     district: z.string().min(1, "District is required"),
@@ -79,6 +98,7 @@ export const supplierSchema = z.object({
     paymentTerms: z.string().min(1, "Payment Terms are required"),
     branch: z.string().min(1, "Branch is required"),
   }),
+  // logo: z.instanceof(File).nullable(),
   logo: z.instanceof(File).nullable(),
   products: z.array(z.string()).optional(),
 });
@@ -89,7 +109,11 @@ export const getSupplierInitialFormValues = (state: string, editData?: any) => {
       description: "",
       email: "",
       phone: "",
-      alternatePhone: "",
+      contactPerson: {
+        name: "",
+        phone: "",
+        email: "",
+      },
       businessType: "",
       addresses: {
         district: "",
@@ -108,16 +132,20 @@ export const getSupplierInitialFormValues = (state: string, editData?: any) => {
         paymentTerms: "",
         branch: "",
       },
-      logo: null,
-      products: [""],
+      logo: null, // Fix: null instead of File constructor
+      products: [],
     };
 
   return {
     name: get(editData, "name", ""),
-    description: get(editData, "description"),
+    description: get(editData, "description", ""),
     email: get(editData, "email", ""),
     phone: get(editData, "phone", ""),
-    alternatePhone: get(editData, "alternatePhone", ""),
+    contactPerson: {
+      name: get(editData, "contactPerson.name", ""),
+      phone: get(editData, "contactPerson.phone", ""),
+      email: get(editData, "contactPerson.email", ""),
+    },
     businessType: get(editData, "businessType", ""),
     addresses: {
       district: get(editData, "addresses.district", ""),
@@ -136,10 +164,14 @@ export const getSupplierInitialFormValues = (state: string, editData?: any) => {
       paymentTerms: get(editData, "bankDetails.paymentTerms", ""),
       branch: get(editData, "bankDetails.branch", ""),
     },
-    logo: null,
-    products: [],
+    logo: null, // Fix: null instead of File constructor
+    existingLogo: get(editData, "logo[0]"),
+    products: get(editData, "products", []).map((item: { _id: string }) =>
+      get(item, "_id")
+    ),
   };
 };
+
 export function appendFormData(
   formData: FormData,
   data: Record<string, any>,
@@ -182,11 +214,11 @@ export const supplierColumns = [
     key: "phone",
   },
   {
-    title: "Contact No",
+    title: "Contact Person No",
     key: "contactNo",
   },
   {
-    title: "Lead Time",
+    title: "Lead Time (Days)",
     key: "leadTime",
   },
 ];
@@ -213,7 +245,7 @@ export const purchaseReturnColumns = [
   { key: "date", title: "Date" },
   {
     title: "Return No",
-    key: "return",
+    key: "returnNo",
   },
   {
     key: "totalAmount",
@@ -258,25 +290,118 @@ export const returnColumns = [
   { key: "name", title: "Item Name" },
   {
     key: "price",
-    title: "Cost per unit",
+    title: `Cost per unit (${Constants.currency})`,
   },
   { key: "quantity", title: "QTY" },
   {
     key: "total",
-    title: "Total",
+    title: `Total (${Constants.currency})`,
   },
 ];
 
 export const viewPurchaseColumns = [
   { key: "name", title: "Item Name" },
-  { key: "unit", title: "Unit" },
   {
     key: "costPerUnit",
-    title: "Cost per unit",
+    title: `Cost per unit (${Constants.currency})`,
   },
   { key: "quantity", title: "QTY" },
+  { key: "wt", title: "Weight" },
   {
     key: "total",
-    title: "Total",
+    title: `Total (${Constants.currency})`,
   },
 ];
+
+export interface IRawMaterialForm {
+  billNo: string;
+  supplier: string;
+  // phone_no: string;
+  items: {
+    item: string;
+    quantity: number;
+    price: number;
+    wt: number;
+    paidAmount: number;
+  }[];
+  description?: string;
+}
+export const RawMaterialSchema = z.object({
+  billNo: z.string().min(1, "**Bill No is required**"),
+  supplier: z.string().min(1, "**Supplier name is required**"),
+  // phone_no: z.string().min(1, "**Phone Number is required**"),
+  items: z
+    .array(
+      z.object({
+        item: z.string().min(1, "**Item name is required**"),
+        quantity: z.coerce.number().min(1, "**Quantity is required**"),
+        price: z.coerce.number().min(1, "**Price is required**"),
+        wt: z.number().min(1, "** Weight is required **"),
+        paidAmount: z.coerce.number().min(1, "**Paid Amount is required**"),
+      })
+    )
+    .min(1, "**At least one item is required**"),
+  description: z.string().optional(),
+});
+
+export interface IPurchaseForm {
+  billNo: string;
+  supplier: string;
+  // phone_no: string;
+  products: {
+    product: string;
+    quantity: number;
+    price: number;
+    paidAmount: number;
+    wt: number;
+  }[];
+  description?: string;
+}
+export const PurchaseSchema = z.object({
+  billNo: z.string().min(1, "**Bill No is required**"),
+  supplier: z.string().min(1, "**Supplier name is required**"),
+  // phone_no: z.string().min(1, "**Phone Number is required**"),
+  products: z
+    .array(
+      z.object({
+        product: z.string().min(1, "**Product name is required**"),
+        quantity: z.coerce.number().min(1, "**Quantity is required**"),
+        price: z.coerce.number().min(1, "**Price is required**"),
+        paidAmount: z.coerce.number().min(1, "**Paid Amount is required**"),
+        wt: z.coerce.number().min(1, "**Weight is required**"),
+      })
+    )
+    .min(1, "**At least one item is required**"),
+  description: z.string().optional(),
+});
+export const supplierfieldSchemas = {
+  name: supplierSchema.shape.name,
+  email: supplierSchema.shape.email,
+  phone: supplierSchema.shape.phone,
+  businessType: supplierSchema.shape.businessType,
+  addresses: {
+    address: supplierSchema.shape.addresses.shape.address,
+    district: supplierSchema.shape.addresses.shape.district,
+    province: supplierSchema.shape.addresses.shape.province,
+  },
+  description: supplierSchema.shape.description,
+  contactPerson: {
+    name: supplierSchema.shape.contactPerson.shape.name,
+    phone: supplierSchema.shape.contactPerson.shape.phone,
+    email: supplierSchema.shape.contactPerson.shape.email,
+  },
+  bankDetails: {
+    paymentTerms: supplierSchema.shape.bankDetails.shape.paymentTerms,
+    bankName: supplierSchema.shape.bankDetails.shape.bankName,
+    branch: supplierSchema.shape.bankDetails.shape.branch,
+    accountHolderName: supplierSchema.shape.bankDetails.shape.accountHolderName,
+    accountNumber: supplierSchema.shape.bankDetails.shape.accountNumber,
+  },
+  businessInfo: {
+    company: supplierSchema.shape.businessInfo.shape.company,
+    companyNumber: supplierSchema.shape.businessInfo.shape.companyNumber,
+    PAN: supplierSchema.shape.businessInfo.shape.PAN,
+  },
+  products: supplierSchema.shape.products,
+  logo: supplierSchema.shape.logo,
+};

@@ -1,5 +1,322 @@
+// import * as z from "zod";
+// type VisibilityType =
+//   | "featured"
+//   | "bestsellers"
+//   | "newarrivals"
+//   | "recommended"
+//   | "";
+
+// type ProductVariant = {
+//   price: number;
+//   wt: number;
+//   unit?: string;
+// };
+
+// export interface IProductFormValues {
+//   name: string;
+//   description: string;
+//   category: string;
+//   subCategory: string;
+//   variant: ProductVariant[];
+//   length: number;
+//   claspType?: string;
+//   rhodoumFinishes: boolean;
+//   shape: string;
+//   clarity: string;
+//   dimension: number;
+//   visibleAs: VisibilityType;
+//   tags: string[];
+// }
+
+// export interface UploadedImage {
+//   name: string;
+//   url: string;
+//   file: File;
+// }
+
+// export const categoryColumns = [
+//   { title: "S.N", key: "sn" },
+//   {
+//     title: "Name",
+//     key: "name",
+//   },
+//   {
+//     title: "Description",
+//     key: "description",
+//   },
+//   {
+//     title: "Total Products",
+//     key: "totalProducts",
+//   },
+// ];
+
+// export const subCategoryColumns = [
+//   { title: "S.N", key: "sn" },
+//   {
+//     title: "Name",
+//     key: "name",
+//   },
+//   {
+//     title: "Category",
+//     key: "category",
+//   },
+//   {
+//     title: "Description",
+//     key: "description",
+//   },
+//   {
+//     title: "Total Products",
+//     key: "totalProducts",
+//   },
+// ];
+
+// import { get } from "lodash";
+// export const generateProductDefaultValue = (state: string, editData?: any) => {
+//   if (state === "add") {
+//     return {
+//       name: "",
+//       description: "",
+//       category: "",
+//       subCategory: "",
+//       variant: [{ price: 0, wt: 0, unit: "gm" }],
+//       length: 0,
+//       claspType: "",
+//       rhodoumFinishes: true,
+//       shape: "",
+//       clarity: "",
+//       dimension: 0,
+//       visibleAs: "featured",
+//       tags: ["Featured"],
+//     };
+//   } else {
+//     console.log("editDat", editData);
+//     const cata = {
+//       name: get(editData, "name", ""),
+//       description: get(editData, "description", ""),
+//       category: get(editData, "category._id", ""),
+//       subCategory: get(editData, "subCategory._id", ""),
+//       variant: get(editData, "variant", [{ price: 0, wt: 0, unit: "gm" }]),
+//       length: get(editData, "length", 0),
+//       claspType: get(editData, "claspType._id", ""),
+//       rhodoumFinishes: get(editData, "rhodoumFinishes", true),
+//       shape: get(editData, "shape", ""),
+//       clarity: get(editData, "clarity", ""),
+//       dimension: get(editData, "dimension", 0),
+//       visibleAs: get(editData, "visibleAs", "featured"),
+//       tags: get(editData, "tags", ["Featured"]),
+//     };
+//     console.log(cata);
+//     return cata;
+//   }
+// };
+
+// export const productFormSchema = z.object({
+//   // General Information
+//   name: z.string().min(1, "Name is required"),
+//   description: z.string().min(1, "Description is required"),
+//   category: z.string().min(1, "Category is required"),
+//   // subCategory: z.string().min(1, "Sub Category is required"),
+
+//   // Price
+//   variant: z
+//     .array(
+//       z.object({
+//         price: z.number().min(1),
+//         wt: z.number().min(1, "Size is required"),
+//       })
+//     )
+//     .min(1, "At least one variant is required"),
+
+//   // Product Specification
+//   length: z.number().min(1, "Length is required"),
+//   claspType: z.string().optional(),
+//   rhodoumFinishes: z.boolean(),
+
+//   // Material Information
+//   shape: z.string().min(1, "Shape is required"),
+//   clarity: z.string().min(1, "Clarity is required"),
+//   dimension: z.number().min(1, "Dimension is required"),
+
+//   // Visibility Option (single selection)
+//   visibleAs: z.enum([
+//     "",
+//     "featured",
+//     "bestsellers",
+//     "newarrivals",
+//     "recommended",
+//   ]),
+
+//   // Tags
+//   tags: z.array(z.string()).min(1, "At least one tag is required"),
+// });
+
+// export const productListColumns = [
+//   { title: "S.N", key: "sn" },
+//   { title: "IMage", key: "image" },
+//   {
+//     title: "Product",
+//     key: "product",
+//   },
+//   {
+//     title: "Category",
+//     key: "categ",
+//   },
+//   {
+//     title: "Sub Category",
+//     key: "subCateg",
+//   },
+//   {
+//     title: "Price",
+//     key: "price",
+//   },
+//   {
+//     title: "Stock",
+//     key: "stock",
+//   },
+// ];
+
+// import * as z from "zod";
+// import { get } from "lodash";
+
+// type VisibilityType =
+//   | "featured"
+//   | "bestsellers"
+//   | "newarrivals"
+//   | "recommended"
+//   | "";
+
+// type ProductVariant = {
+//   price: number;
+//   wt: number;
+//   unit?: string;
+// };
+
+// export interface IProductFormValues {
+//   name: string;
+//   description: string;
+//   category: string;
+//   subCategory: string;
+//   variant: ProductVariant[];
+//   length: number;
+//   claspType?: string;
+//   rhodoumFinishes: boolean;
+//   shape: string;
+//   clarity: string;
+//   dimension: number;
+//   visibleAs: VisibilityType;
+//   tags: string[];
+// }
+
+// export interface UploadedImage {
+//   name: string;
+//   url: string;
+//   file: File;
+// }
+
+// export const productFormSchema = z.object({
+//   // General Information
+//   name: z.string().min(1, "Name is required"),
+//   description: z.string().min(1, "Description is required"),
+//   category: z.string().min(1, "Category is required"),
+//   subCategory: z.string().min(1, "Sub Category is required"), // Added
+//   // Price
+//   variant: z
+//     .array(
+//       z.object({
+//         price: z.number().min(1, "Price must be at least 1"),
+//         wt: z.number().min(1, "Size is required"),
+//         unit: z.string().optional().default("gm"), // Added to match ProductVariant
+//       })
+//     )
+//     .min(1, "At least one variant is required"),
+//   // Product Specification
+//   length: z.number().min(1, "Length is required"),
+//   claspType: z.string().optional(),
+//   rhodoumFinishes: z.boolean(),
+//   // Material Information
+//   shape: z.string().min(1, "Shape is required"),
+//   clarity: z.string().min(1, "Clarity is required"),
+//   dimension: z.number().min(1, "Dimension is required"),
+//   // Visibility Option (single selection)
+//   visibleAs: z.enum([
+//     "",
+//     "featured",
+//     "bestsellers",
+//     "newarrivals",
+//     "recommended",
+//   ]),
+//   // Tags
+//   tags: z.array(z.string()).min(1, "At least one tag is required"),
+// });
+
+// export const categoryColumns = [
+//   { title: "S.N", key: "sn" },
+//   { title: "Name", key: "name" },
+//   { title: "Description", key: "description" },
+//   { title: "Total Products", key: "totalProducts" },
+// ];
+
+// export const subCategoryColumns = [
+//   { title: "S.N", key: "sn" },
+//   { title: "Name", key: "name" },
+//   { title: "Category", key: "category" },
+//   { title: "Description", key: "description" },
+//   { title: "Total Products", key: "totalProducts" },
+// ];
+
+// export const generateProductDefaultValue = (state: string, editData?: any) => {
+//   if (state === "add") {
+//     return {
+//       name: "",
+//       description: "",
+//       category: "",
+//       subCategory: "",
+//       variant: [{ price: 0, wt: 0, unit: "gm" }],
+//       length: 0,
+//       claspType: "",
+//       rhodoumFinishes: true,
+//       shape: "",
+//       clarity: "",
+//       dimension: 0,
+//       visibleAs: "featured",
+//       tags: ["Featured"],
+//     };
+//   } else {
+//     console.log("editDat", editData);
+//     const cata = {
+//       name: get(editData, "name", ""),
+//       description: get(editData, "description", ""),
+//       category: get(editData, "category._id", ""),
+//       subCategory: get(editData, "subCategory._id", ""),
+//       variant: get(editData, "variant", [{ price: 0, wt: 0, unit: "gm" }]),
+//       length: get(editData, "length", 0),
+//       claspType: get(editData, "claspType._id", ""),
+//       rhodoumFinishes: get(editData, "rhodoumFinishes", true),
+//       shape: get(editData, "shape", ""),
+//       clarity: get(editData, "clarity", ""),
+//       dimension: get(editData, "dimension", 0),
+//       visibleAs: get(editData, "visibleAs", "featured"),
+//       tags: get(editData, "tags", ["Featured"]),
+//     };
+//     console.log(cata);
+//     return cata;
+//   }
+// };
+
+// export const productListColumns = [
+//   { title: "S.N", key: "sn" },
+//   { title: "Image", key: "image" }, // Fixed typo
+//   { title: "Product", key: "product" },
+//   { title: "Category", key: "categ" },
+//   { title: "Sub Category", key: "subCateg" },
+//   { title: "Price", key: "price" },
+//   { title: "Stock", key: "stock" },
+// ];
+
 import * as z from "zod";
-type VisibilityType =
+import { get } from "lodash";
+
+export type VisibilityType =
   | "featured"
   | "bestsellers"
   | "newarrivals"
@@ -8,8 +325,8 @@ type VisibilityType =
 
 type ProductVariant = {
   price: number;
-  size: string;
-  unit: string;
+  wt: number;
+  unit?: string;
 };
 
 export interface IProductFormValues {
@@ -34,41 +351,57 @@ export interface UploadedImage {
   file: File;
 }
 
+export const productFormSchema = z.object({
+  // General Information
+  name: z.string().min(1, "Name is required"),
+  description: z.string().min(1, "Description is required"),
+  category: z.string().min(1, "Category is required"),
+  subCategory: z.string(),
+  // Price
+  variant: z
+    .array(
+      z.object({
+        price: z.number().min(1, "Price must be at least 1"),
+        wt: z.number().min(1, "Size is required"),
+        unit: z.string().optional().default("gm"),
+      })
+    )
+    .min(1, "At least one variant is required"),
+  // Product Specification
+  length: z.number().min(1, "Length is required"),
+  claspType: z.string().optional(),
+  rhodoumFinishes: z.boolean(),
+  // Material Information
+  shape: z.string().min(1, "Shape is required"),
+  clarity: z.string().min(1, "Clarity is required"),
+  dimension: z.number().min(1, "Dimension is required"),
+  // Visibility Option (single selection)
+  visibleAs: z.enum([
+    "",
+    "featured",
+    "bestsellers",
+    "newarrivals",
+    "recommended",
+  ]),
+  // Tags
+  tags: z.array(z.string()).min(1, "At least one tag is required"),
+});
+
 export const categoryColumns = [
-  {
-    title: "Name",
-    key: "name",
-  },
-  {
-    title: "Description",
-    key: "description",
-  },
-  {
-    title: "Total Products",
-    key: "totalProducts",
-  },
+  { title: "S.N", key: "sn" },
+  { title: "Name", key: "name" },
+  { title: "Description", key: "description" },
+  { title: "Total Products", key: "totalProducts" },
 ];
 
 export const subCategoryColumns = [
-  {
-    title: "Name",
-    key: "name",
-  },
-  {
-    title: "Category",
-    key: "category",
-  },
-  {
-    title: "Description",
-    key: "description",
-  },
-  {
-    title: "Total Products",
-    key: "totalProducts",
-  },
+  { title: "S.N", key: "sn" },
+  { title: "Name", key: "name" },
+  { title: "Category", key: "category" },
+  { title: "Description", key: "description" },
+  { title: "Total Products", key: "totalProducts" },
 ];
 
-import { get } from "lodash";
 export const generateProductDefaultValue = (state: string, editData?: any) => {
   if (state === "add") {
     return {
@@ -76,7 +409,7 @@ export const generateProductDefaultValue = (state: string, editData?: any) => {
       description: "",
       category: "",
       subCategory: "",
-      variant: [{ price: 0, size: "", unit: "gm" }],
+      variant: [{ price: 0, wt: 0, unit: "gm" }],
       length: 0,
       claspType: "",
       rhodoumFinishes: true,
@@ -87,12 +420,13 @@ export const generateProductDefaultValue = (state: string, editData?: any) => {
       tags: ["Featured"],
     };
   } else {
-    return {
+    console.log("editDat", editData);
+    const cata = {
       name: get(editData, "name", ""),
       description: get(editData, "description", ""),
-      category: get(editData, "category", ""),
-      subCategory: get(editData, "subCategory", ""),
-      variant: get(editData, "variant", [{ price: 0, size: "", unit: "gm" }]),
+      category: get(editData, "category._id", ""),
+      subCategory: get(editData, "subCategory._id", ""),
+      variant: get(editData, "variant", [{ price: 0, wt: 0, unit: "gm" }]),
       length: get(editData, "length", 0),
       claspType: (() => {
         const claspTypeValue = get(editData, "claspType", "");
@@ -112,42 +446,18 @@ export const generateProductDefaultValue = (state: string, editData?: any) => {
       visibleAs: get(editData, "visibleAs", "featured"),
       tags: get(editData, "tags", ["Featured"]),
     };
+    console.log(cata);
+    return cata;
   }
 };
 
-export const productFormSchema = z.object({
-  // General Information
-  name: z.string().min(1, "Name is required"),
-  description: z.string().min(1, "Description is required"),
-  category: z.string().min(1, "Category is required"),
-  subCategory: z.string(),
-
-  // Price
-  variant: z
-    .array(
-      z.object({ price: z.number().min(1), size: z.string(), unit: z.string() })
-    )
-    .min(1, "At least one variant is required"),
-
-  // Product Specification
-  length: z.number().min(1, "Length is required"),
-  claspType: z.string().optional(),
-  rhodoumFinishes: z.boolean(),
-
-  // Material Information
-  shape: z.string().min(1, "Shape is required"),
-  clarity: z.string().min(1, "Clarity is required"),
-  dimension: z.number().min(1, "Dimension is required"),
-
-  // Visibility Option (single selection)
-  visibleAs: z.enum([
-    "",
-    "featured",
-    "bestsellers",
-    "newarrivals",
-    "recommended",
-  ]),
-
-  // Tags
-  tags: z.array(z.string()).min(1, "At least one tag is required"),
-});
+export const productListColumns = [
+  { title: "S.N", key: "sn" },
+  { title: "Image", key: "image" },
+  { title: "Product", key: "product" },
+  { title: "Category", key: "categ" },
+  { title: "Sub Category", key: "subCate" },
+  { title: "Price", key: "price" },
+  { title: "Stock", key: "stock" },
+  { title: "Sold", key: "sold" },
+];

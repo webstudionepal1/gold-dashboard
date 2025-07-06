@@ -24,23 +24,19 @@ export interface IFetchExpenses {
   description: string;
   amount: number;
   images: string[];
-
-  //   items: IItem[];
-  //   products: IProducts[];
-  //   supplier: string;
-  //   discount: number;
-  //   discountType: string;
-  //   totalAmount: number;
-  //   paid: number;
-  //   createdAt: Date;
-  //   updatedAt: Date;
-  //   createdBy: string;
 }
-interface IFetchExpensesCategory {
-  _id: string;
+export interface IFetchExpensesCategory {
+  _id?: string;
   name: string;
+  description: string;
 }
 interface IUpdateProps {
+  id: string;
+  body: FormData;
+  headers?: { [key: string]: string };
+}
+
+interface IUpdateCategoryProps {
   id: string;
   body: IFetchExpensesCategory;
 }
@@ -73,38 +69,78 @@ export const useGetExpenseCategoryQuery = (params = {}) => {
   });
 };
 
-export const useCreatePurchaseMutation = () => {
+export const useCreateExpenseMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["purchases"],
-    mutationFn: async (body: IFetchExpensesCategory) => {
-      const res = await apiClient.post("purchase", body);
+    mutationKey: ["expense"],
+    mutationFn: async (body: FormData) => {
+      const res = await apiClient.post("expense", body, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Purchase created successfully");
-      queryClient.invalidateQueries({ queryKey: ["purchases"] });
+      toast.success("Expense created successfully");
+      queryClient.invalidateQueries({ queryKey: ["expense"] });
     },
     onError(err: string) {
-      toast.error(err || "Error creating purchase");
+      toast.error(err || "Error creating expense");
     },
   });
 };
 
-export const useUpdatePurchaseMutation = () => {
+export const useCreateExpenseCategoryMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["purchases"],
-    mutationFn: async ({ id, body }: IUpdateProps) => {
-      const res = await apiClient.patch(`purchase/${id}`, body);
+    mutationKey: ["expense/category"],
+    mutationFn: async (body: IFetchExpensesCategory) => {
+      const res = await apiClient.post("expense/category", body, {});
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Purchase updated successfully");
-      queryClient.invalidateQueries({ queryKey: ["purchases"] });
+      toast.success("Expense Category created successfully");
+      queryClient.invalidateQueries({ queryKey: ["expense/category"] });
     },
     onError(err: string) {
-      toast.error(err || "Error updating purchase");
+      toast.error(err || "Error creating expense category");
+    },
+  });
+};
+
+export const useUpdateExpenseMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["expense"],
+    mutationFn: async ({ id, body }: { id: string; body: FormData }) => {
+      const res = await apiClient.patch(`expense/${id}`, body, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      return res?.data?.data;
+    },
+    onSuccess() {
+      toast.success("Expense updated successfully");
+      queryClient.invalidateQueries({ queryKey: ["expense"] });
+    },
+    onError(err: string) {
+      toast.error(err || "Error updating Expense");
+    },
+  });
+};
+
+export const useUpdateExpenseCategoryMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["expense/category"],
+    mutationFn: async ({ id, body }: IUpdateCategoryProps) => {
+      const res = await apiClient.patch(`expense/category/${id}`, body);
+      return res?.data?.data;
+    },
+    onSuccess() {
+      toast.success("Expense Category updated successfully");
+      queryClient.invalidateQueries({ queryKey: ["expense/category"] });
+    },
+    onError(err: string) {
+      toast.error(err || "Error updating Expense Category");
     },
   });
 };
@@ -127,214 +163,20 @@ export const useDeleteExpenseMutation = () => {
   });
 };
 
-///purchase raw material
-
-export const useCreatePurchaseRawMaterialMutation = () => {
+export const useDeleteExpenseCategoryMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["purchases"],
-    mutationFn: async (body: IFetchExpensesCategory) => {
-      const res = await apiClient.post("purchase", body);
-      return res?.data?.data;
-    },
-    onSuccess() {
-      toast.success("Purchase created successfully");
-      queryClient.invalidateQueries({ queryKey: ["purchases"] });
-    },
-    onError(err: string) {
-      toast.error(err || "Error creating purchase");
-    },
-  });
-};
-
-export const useUpdatePurchaseRawMaterialMutation = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationKey: ["purchases"],
-    mutationFn: async ({ id, body }: IUpdateProps) => {
-      const res = await apiClient.patch(`purchase/${id}`, body);
-      return res?.data?.data;
-    },
-    onSuccess() {
-      toast.success("Purchase updated successfully");
-      queryClient.invalidateQueries({ queryKey: ["purchases"] });
-    },
-    onError(err: string) {
-      toast.error(err || "Error updating purchase");
-    },
-  });
-};
-// getraw materials
-export interface IItems {
-  name?: string;
-  usedStock?: number;
-  remainingStock?: number;
-  totalStock?: number;
-}
-export interface IFetchItems {
-  name: string;
-  usedStock: number;
-  remainingStock: number;
-  totalStock: number;
-}
-export const useGetRawMaterialsQuery = (params = {}) => {
-  return useQuery({
-    queryKey: ["rawitem", params],
-    queryFn: async () => {
-      const res = await apiClient.get<{ data: IFetchItems[] }>("rawitem", {
-        params,
-      });
-      return res?.data?.data;
-    },
-  });
-};
-
-export const useCreateRawMaterialMutation = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationKey: ["rawitem"],
-    mutationFn: async (body: IItems) => {
-      const res = await apiClient.post("rawitem", body);
-      return res?.data?.data;
-    },
-    onSuccess() {
-      toast.success("Raw Material created successfully");
-      queryClient.invalidateQueries({ queryKey: ["rawitem"] });
-    },
-    onError(err: string) {
-      toast.error(err || "Error creating raw material");
-    },
-  });
-};
-export const useUpdateRawItemsMutation = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationKey: ["rawitem"],
-    mutationFn: async ({ id, body }: IUpdateProps) => {
-      const res = await apiClient.patch(`rawitem/${id}`, body);
-      return res?.data?.data;
-    },
-    onSuccess() {
-      toast.success("Raw Material updated successfully");
-      queryClient.invalidateQueries({ queryKey: ["rawitem"] });
-    },
-    onError(err: string) {
-      toast.error(err || "Error updating raw material");
-    },
-  });
-};
-export const useDeleteRawMaterial = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationKey: ["rawitem"],
+    mutationKey: ["expense/category"],
     mutationFn: async (id: string) => {
-      const res = await apiClient.delete(`rawitem/${id}`);
+      const res = await apiClient.delete(`expense/category/${id}`);
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Raw Material deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["rawitem"] });
+      toast.success("Expense category deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["expense/category"] });
     },
     onError(err: string) {
-      toast.error(err || "Error deleting raw material");
-    },
-  });
-};
-// purchase - return hooks
-export interface IReturnItem {
-  item: string;
-  quantity: number;
-  reason: string;
-}
-export interface IFetchPurchaseReturn {
-  _id: string;
-  purchase: IFetchExpenses;
-  returnNo: string;
-  items: IReturnItem[];
-  totalReturnAmount: number;
-  refundAmount: number;
-  reason: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-export interface IPurchaseReturn {
-  _id?: string;
-  purchase?: IFetchExpenses;
-  returnNo?: string;
-  items?: IReturnItem[];
-  totalReturnAmount?: number;
-  refundAmount?: number;
-  reason?: string;
-}
-interface IUpdatePurchaseReturn {
-  id: string;
-  body: IPurchaseReturn;
-}
-export const useGetPurchaseReturnQuery = (params = {}) => {
-  return useQuery({
-    queryKey: ["purchase-return", params],
-    queryFn: async () => {
-      const res = await apiClient.get<{ data: IFetchPurchaseReturn[] }>(
-        "purchase/return",
-        {
-          params,
-        }
-      );
-      return res?.data?.data;
-    },
-  });
-};
-
-export const useCreatePurchaseReturnMutation = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationKey: ["purchase-return"],
-    mutationFn: async (body: IPurchaseReturn) => {
-      const res = await apiClient.post("purchase/return", body);
-      return res?.data?.data;
-    },
-    onSuccess() {
-      toast.success("Purchase return created successfully");
-      queryClient.invalidateQueries({ queryKey: ["purchase-return"] });
-    },
-    onError(err: string) {
-      toast.error(err || "Error creating purchase return");
-    },
-  });
-};
-
-export const useUpdatePurchaseReturnMutation = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationKey: ["purchase-return"],
-    mutationFn: async ({ id, body }: IUpdatePurchaseReturn) => {
-      const res = await apiClient.patch(`purchase/return/${id}`, body);
-      return res?.data?.data;
-    },
-    onSuccess() {
-      toast.success("Purchase return updated successfully");
-      queryClient.invalidateQueries({ queryKey: ["purchase-return"] });
-    },
-    onError(err: string) {
-      toast.error(err || "Error updating purchase return");
-    },
-  });
-};
-
-export const useDeletePurchasReturnMutation = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationKey: ["purchase-return"],
-    mutationFn: async (id: string) => {
-      const res = await apiClient.delete(`purchase/return/${id}`);
-      return res?.data?.data;
-    },
-    onSuccess() {
-      toast.success("Purchase return deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["purchase-return"] });
-    },
-    onError(err: string) {
-      toast.error(err || "Error deleting purchase return");
+      toast.error(err || "Error deleting expense category");
     },
   });
 };

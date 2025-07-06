@@ -1,36 +1,77 @@
-import { Product } from "../../../../../types/Products.interface"
-import { DropdownSection } from "./DropDownSection"
-import { Inventory } from "./Inventory"
+import { get } from "lodash";
+import { IFetchProduct } from "../../../../../server/api/productHooks";
+import { DropdownSection } from "./DropDownSection";
+import { ReviewsSection } from "./ReviewSection";
+import { useGetAllReviews } from "../../../../../server/api/reviewHooks";
+import { Inventory } from "./Inventory";
 
-export const ProductDetails: React.FC<{
-    product: Product
-    isSpecsOpen: boolean
-    isNaturalOpen: boolean
-    toggleSpecs: () => void
-    toggleNatural: () => void
-}> = ({ product, isSpecsOpen, isNaturalOpen, toggleSpecs, toggleNatural }) => (
-    <div className="space-y-4 rounded-md bg-white p-4">
-        <div className="flex flex-col items-start gap-2">
-            <div className="flex items-center gap-3">
-                <h1 className="text-2xl font-bold text-gray-800">{product.title}</h1>
-                <span className="rounded bg-amber-500 px-2 py-1 text-xs text-white">{product.status}</span>
+interface ProductDetailsProps {
+  product: IFetchProduct;
+}
+export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
+  const specifications = {
+    Length: get(product, "length", 0),
+    "Clasp Type": get(product, "claspType.name", "-"),
+    "Rhodoum Finishes": get(product, "rhodoumFinishes", "false"),
+  };
+  const natural = {
+    Shape: get(product, "shape", "-"),
+    Color: get(product, "color", "-"),
+    Quantity: get(product, "quantity", "-"),
+    Clarity: get(product, "clarity", "-"),
+  };
+  //   const inventory = {
+  //  "Stock QTY":get(product, ''), "Reorder Level":""
+  //   }
+  const inventories = product.variant.map((item) => ({
+    Weight: `${get(item, "wt", 0)} ${get(item, "unit", "")}`,
+    "Stock Qty": get(item, "remainingStock", 0),
+    "Reorder Level": get(item, "reorderPoint", 0),
+  }));
+
+  return (
+    <div className="p-4 space-y-4 bg-white rounded-md">
+      <div className="flex flex-col items-start gap-2">
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-gray-800">
+            {get(product, "name", "-")}
+          </h1>
+          <span className="px-2 py-1 text-xs text-white rounded bg-amber-500">
+            {get(product, "status", "-")}
+          </span>
+        </div>
+        <p className="text-sm font-semibold text-amber-500">
+          {get(product, "category.name", "-")}
+        </p>
+      </div>
+      <p className="text-xs text-gray-600">
+        {get(product, "description", "-")}
+      </p>
+      <div className="flex gap-2">
+        {product.tags?.map((tag, index) => (
+          <span
+            key={index}
+            className="px-2 py-1 text-xs text-gray-500 bg-gray-100 rounded"
+          >
+            u #{tag.replace(/\s+/g, "")}
+          </span>
+        ))}
+      </div>
+      {product.variant.length > 0 && (
+        <div className="flex items-center gap-4">
+          {product.variant.map((item) => (
+            <div className="w-28 flex flex-col bg-white border-2 p-4 rounded-lg py-2">
+              <span className="text-gray-900 text-center font-semibold text-">{`$ ${item?.price} /-`}</span>
+              <span className=" text-gray-500 text-xs font-bold text-center">
+                {`${item?.wt} ${item?.unit}`}
+              </span>
             </div>
-            <p className="text-sm font-semibold text-amber-500">{product.category}</p>
+          ))}
         </div>
-        <p className="text-xs text-gray-600">{product.description}</p>
-        <div className="flex gap-2">
-            {product.tags?.map((tag, index) => (
-                <span key={index} className="text-xs text-gray-500">
-                    #{tag.replace(/\s+/g, "")}
-                </span>
-            ))}
-        </div>
-        <div className="flex items-center gap-3 py-4">
-            <span className="text-md font-bold text-gray-900">${product.price.toFixed(2)}</span>
-            {product.originalPrice > product.price && <span className="text-xs text-gray-500 line-through">${product.originalPrice.toFixed(2)}</span>}
-        </div>
-        <Inventory inventory={product.inventory} />
-        <DropdownSection title="Specifications" isOpen={isSpecsOpen} toggle={toggleSpecs} data={product.specifications} />
-        <DropdownSection title="Natural Gold Information" isOpen={isNaturalOpen} toggle={toggleNatural} data={product.natural} />
+      )}
+      <Inventory inventory={inventories} />
+      <DropdownSection title="Specifications" data={specifications} />
+      <DropdownSection title="Natural Gold Information" data={natural} />
     </div>
-)
+  );
+};

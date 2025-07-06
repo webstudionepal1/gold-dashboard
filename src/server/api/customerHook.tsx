@@ -68,7 +68,7 @@ export const useDeleteCustomerMutation = () => {
     },
     onSuccess() {
       toast.success("Customer Deleted Successfully");
-      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      queryClient.invalidateQueries({ queryKey: ["user"] });
     },
     onError(err: string) {
       toast.error(err || "Error deleting Customers");

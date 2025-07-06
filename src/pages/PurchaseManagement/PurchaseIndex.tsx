@@ -31,6 +31,7 @@ import {
 import { updateSuplierState } from "../../store/supplierStore";
 import { IFetchProduct } from "../../server/api/productHooks";
 import dayjs from "dayjs";
+import { Constants } from "../../utils/constants";
 
 interface IModalState {
   of: string;
@@ -61,7 +62,7 @@ const PurchaseIndex = () => {
         date: dayjs(item.createdAt).format("MMM-DD-YYYY"),
         supplier: get(item, "supplier.name", "-"),
         billNo: get(item, "billNo", "-"),
-        totalCost: `$ ${
+        totalCost: `${Constants.currency} ${
           item?.items.length > 0
             ? item.items.reduce((acc, item) => acc + item.price, 0)
             : item?.products.reduce((acc, item) => acc + item.price, 0)
@@ -71,6 +72,13 @@ const PurchaseIndex = () => {
         setModal({
           of: "purchase-view",
           edit: false,
+          data: row,
+        });
+      },
+      editAction(row: IFetchProduct) {
+        setModal({
+          of: "purchase",
+          edit: true,
           data: row,
         });
       },
@@ -92,9 +100,12 @@ const PurchaseIndex = () => {
       columns: supplierColumns,
       rows: map(supplierList, (item) => ({
         ...item,
+        contactPerson: item.contactPerson?.name || "-",
+        contactNo: get(item, "contactPerson.phone"),
+        leadTime: dayjs().diff(dayjs(get(item, "updatedAt")), "days"),
       })),
       viewAction(row: IFetchSupplier) {
-       navigate(`/inventory/supplier/${row._id}`);
+        navigate(`/inventory/supplier/${row._id}`);
       },
 
       editAction(row: IFetchSupplier) {
@@ -112,7 +123,6 @@ const PurchaseIndex = () => {
       columns: purchaseReturnColumns,
       rows: map(returnList, (item) => ({
         ...item,
-        return: get(item, "returnNO", "-"),
         reason: get(item, "reason", "-"),
         date: dayjs(get(item, "createdAt", "-")).format("MMM-DD-YYYY"),
         totalAmount: get(item, "totalReturnAmount", 0),
@@ -137,7 +147,7 @@ const PurchaseIndex = () => {
   );
 
   return (
-    <div className="container px-4 py-3 mx-auto ">
+    <div>
       <Header text="Purchase Management">
         {buttonObj[selectedTab]?.show && (
           <button
@@ -161,39 +171,45 @@ const PurchaseIndex = () => {
           </button>
         )}
       </Header>
-      <MasterTable
-        showAction
-        tabsOptions={
-          <DynamicTab
-            selectedTab={selectedTab}
-            setSelectedTab={setSelectedTab}
-            tabOptions={purchaseTabOption}
-          />
-        }
-        {...tableDataObj[selectedTab]}
-        rows={tableDataObj[selectedTab].rows}
-        columns={tableDataObj[selectedTab].columns}
-      />
+      <div className="p-4 bg-white border-2 rounded-lg">
+        <MasterTable
+          showAction
+          tabsOptions={
+            <DynamicTab
+              selectedTab={selectedTab}
+              setSelectedTab={setSelectedTab}
+              tabOptions={purchaseTabOption}
+            />
+          }
+          {...tableDataObj[selectedTab]}
+          rows={tableDataObj[selectedTab].rows}
+          columns={tableDataObj[selectedTab].columns}
+        />
+      </div>
       {modal.of === "purchase" && (
-        <ScrollableModal onClose={closeModal}>
-          <PurchaseForm onClose={closeModal} />
+        <ScrollableModal classname="w-full max-w-xl" onClose={closeModal}>
+          <PurchaseForm
+            onClose={closeModal}
+            edit={modal.edit}
+            data={modal.data}
+          />
         </ScrollableModal>
       )}
 
       {modal.of === "purchase-view" && modal.data && (
-        <ScrollableModal onClose={closeModal} classname="w-[35rem]">
+        <ScrollableModal classname="w-full max-w-2xl" onClose={closeModal}>
           <PurchaseDetailsCard data={modal.data} />
         </ScrollableModal>
       )}
 
       {modal.of === "purchase-return" && modal.data && (
-        <ScrollableModal classname="w-[35rem]" onClose={closeModal}>
+        <ScrollableModal classname="w-full max-w-2xl" onClose={closeModal}>
           <PurchaseDetailsCard summary="refund" data={modal.data} />
         </ScrollableModal>
       )}
 
       {modal.of === "purchase-return-form" && (
-        <ScrollableModal onClose={closeModal}>
+        <ScrollableModal classname="w-full max-w-2xl" onClose={closeModal}>
           <PurchaseReturnForm data={modal.data} onClose={closeModal} />
         </ScrollableModal>
       )}

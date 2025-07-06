@@ -40,8 +40,7 @@ export const DeleteDialog = ({
                 {title ?? "Delete"}
               </h1>
               <h2 className="text-center text-[#64748B]">
-                {des ??
-                  "Are you sure you want to Delete? This action cannot be undone"}
+                {des ?? "Are you sure you? This action cannot be undone"}
               </h2>
             </div>
             <div className="flex gap-4 justify-center items-center">

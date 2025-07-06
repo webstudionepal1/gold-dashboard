@@ -30,6 +30,10 @@ interface SidebarSection {
   routes: Route[];
 }
 
+const CompanyLogo = () => {
+  return;
+};
+
 const SidebarHeader: React.FC = () => {
   const { isCollapsed } = useSidebar();
 
@@ -41,7 +45,7 @@ const SidebarHeader: React.FC = () => {
       )}
     >
       <img
-        src="/companylogo.png"
+        src="/barun2.png"
         alt="company-logo"
         className={clsx(
           isCollapsed ? "h-[50px] w-[44px]" : "h-full w-full",
@@ -88,7 +92,6 @@ const SubRouteItem: React.FC<{
   );
 };
 
-
 const RouteItem: React.FC<{
   route: Route;
   isActive: boolean;
@@ -110,8 +113,7 @@ const RouteItem: React.FC<{
             isCollapsed ? "justify-center" : "justify-between"
           } rounded-lg transition-colors duration-200`,
           isCollapsed ? "px-2 py-3" : "px-6 py-2 gap-5",
-         isActive &&
-            "bg-[#FCF4EA] text-white rounded-lg",
+          isActive && "bg-[#FCF4EA] text-white rounded-lg",
           !pathname.startsWith(route.path) &&
             `hover:bg-[${COLORS.navHoverColor}]`
         )}

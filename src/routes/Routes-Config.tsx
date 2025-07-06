@@ -13,7 +13,7 @@ import ProductDescription from "../pages/Product/ProductList/[id]/ProdectDescrip
 import ProductList from "../pages/Product/ProductList/ProductList";
 import ProductCategory from "../pages/Product/ProductCategory/ProductCategory";
 import Productsubcategory from "../pages/Product/ProductSubcategory/ProductSubCategory";
-import AttributeIndex from "../pages/Attribute/AttributeIndex";
+
 import BannerIndex from "../pages/Banner/BannerIndex";
 import NotificationIndex from "../pages/Notification/NotificationIndex";
 import MyPostBusinessIndex from "../pages/MyPostBusiness/MyPostBusinessIndex";
@@ -22,16 +22,16 @@ import OrderIndex from "../pages/OrderManagement/Order/OrderIndex";
 import AddOrderForm from "../pages/OrderManagement/Order/components/AddOrderPage";
 import AddBannerForm from "../pages/Banner/Components/AddBannerForm";
 import CustomerIndex from "../pages/Customer/CustomerIndex";
-import AddCustomerForm from "../pages/Customer/components/AddCustomerForm";
+// import AddCustomerForm from "../pages/Customer/components/AddCustomerForm";
 import Transaction from "../pages/transaction/Transaction";
 import VerifyCashPayment from "../pages/transaction/VerifyCashPayment";
 import Expenses from "../pages/financeandexpenses/Expenses";
 import Cashflow from "../pages/financeandexpenses/Cashflow";
 import ProfitandLoss from "../pages/financeandexpenses/ProfitandLoss";
-import SettingForm from "../pages/settings/SettingForm";
+
 import OrderReport from "../pages/analytics/OrderReport";
 import SalesReport from "../pages/analytics/SalesReport";
-import StoreReport from "../pages/analytics/StoreReport";
+import StoreReport from "../pages/analytics/StockReport";
 import ProductForm from "../pages/Product/ProductList/component/ProductForm";
 import CustomerDetails from "../pages/Customer/components/CustomerDetails";
 import OrderDetails from "../pages/OrderManagement/Order/OrderDetails";
@@ -41,6 +41,8 @@ import AddSupplierForm from "../pages/PurchaseManagement/components/AddSupplierF
 import SupplierDetail from "../pages/PurchaseManagement/pages/SupplierDetail";
 import SupplierHistory from "../pages/PurchaseManagement/pages/SupplierHistory";
 import AttribConfig from "../pages/settings/components/AttribConfig";
+import EditProfileForm from "../pages/settings/ProfileConfig/EditProfileForm";
+import { ProductDetails } from "../pages/Product/ProductList/[id]/components/ProductDetails";
 
 export const routesConfig = [
   {
@@ -109,13 +111,17 @@ export const routesConfig = [
     element: <ProductList />,
   },
   {
+    path: "/product/details/:id",
+    element: <ProductDescription />,
+  },
+  {
     path: "/product/:id",
     element: <ProductForm />,
   },
-  {
-    path: FrontendRoutes.PRODUCTDESCRIPTION,
-    element: <ProductDescription />,
-  },
+  // {
+  //   path: FrontendRoutes.PRODUCTDESCRIPTION,
+  //   element: <ProductDescription />,
+  // },
   {
     path: FrontendRoutes.PRODUCTCATEGORY,
     element: <ProductCategory />,
@@ -135,10 +141,10 @@ export const routesConfig = [
 
     element: <CustomerDetails />,
   },
-  {
-    path: FrontendRoutes.ADDCUSTOMER,
-    element: <AddCustomerForm />,
-  },
+  // {
+  //   path: FrontendRoutes.ADDCUSTOMER,
+  //   element: <AddCustomerForm />,
+  // },
 
   {
     path: FrontendRoutes.INVENTORY,
@@ -169,11 +175,6 @@ export const routesConfig = [
   //   element: <Suppliers />,
   // },
 
-  // Attributes
-  // {
-  //   path: FrontendRoutes.ATTRIBUTES,
-  //   element: <AttributeIndex />,
-  // },
   // Banner
   {
     path: FrontendRoutes.BANNER,
@@ -217,12 +218,14 @@ export const routesConfig = [
     element: <ProfitandLoss />,
   },
 
-  //Settings
   {
-    path: FrontendRoutes.SETTINGS,
-    element: <SettingForm />,
+    path: FrontendRoutes.PROFILECONFIG,
+    element: <EditProfileForm />,
   },
-
+  {
+    path: "/settings/attribute-config",
+    element: <AttribConfig />,
+  },
   //Analytics
   {
     path: FrontendRoutes.ORDER_REPORT,

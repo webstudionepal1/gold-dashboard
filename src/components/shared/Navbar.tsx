@@ -290,12 +290,16 @@ export const Navbar = () => {
           </section>
         </section>
 
-        <section>
+        {/* <section>
           <Icon icon="mdi-light:settings" fontSize={28} />
-        </section>
+        </section> */}
         <div className="block md:hidden">
           <Icon
-            icon={isSidebarOpen?"oui:cross":"iconamoon:menu-burger-horizontal-light"}
+            icon={
+              isSidebarOpen
+                ? "oui:cross"
+                : "iconamoon:menu-burger-horizontal-light"
+            }
             onClick={toggleSidebar}
             fontSize={24}
           />

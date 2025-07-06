@@ -206,7 +206,7 @@ const CustomerDetails = () => {
   // totalPrice: item.quantity * item.selectedVariant.price,
   //   }))
   // );
-  console.log(selectedOrder, "selected");
+
   const fla = selectedOrder
     ? selectedOrder?.orderedProducts.map((item) => ({
         // name: item?.product?.name || "name",
@@ -221,8 +221,6 @@ const CustomerDetails = () => {
       }))
     : [];
 
-  console.log("FLAAAAA", fla);
-  console.log("orders", orders);
   interface customerData {
     _id: string;
     customer_name: string;
@@ -333,7 +331,14 @@ const CustomerDetails = () => {
       <div className="bg-[#ffffff] shadow-lg rounded-xl h-full w-full pb-4     ">
         <div className="flex items-center justify-between mx-6 py-6">
           <div className="flex items-center gap-3">
-            <img src="/yellowgirl.png" />
+            {/* <img src={customer?.image} /> */}
+            <img
+              src={
+                customer?.image || "https://via.placeholder.com/150?text=User"
+              }
+              alt={customer?.name || "Customer"}
+              // className="w-16 h-16 rounded-full object-cover"
+            />
             <div className="flex flex-col ">
               <h1 className="font-semibold text-2xl">{customer?.name} </h1>
               <div className="flex items-center gap-4 my-2">
@@ -409,7 +414,6 @@ const CustomerDetails = () => {
                 key: "orderStatus",
                 header: "Status",
                 render: (value: string) => {
-                  console.log("Status value", value); // Log the value to inspect it
                   return (
                     <span
                       className={`px-3 py-[6px] rounded-full text-xs ${getStatusColor(
@@ -424,7 +428,10 @@ const CustomerDetails = () => {
             ]}
             onView={handleView}
             viewAllButton={
-              <Link to={FrontendRoutes.ORDER} className="bg-white border-2 border-[#F1D097] text-[#F1D097] px-2 py-[3px] rounded-md lg:text-base md:text-sm text-xs hover:bg-[#F1D097] hover:text-white transition-colors">
+              <Link
+                to={FrontendRoutes.ORDER}
+                className="bg-white border-2 border-[#F1D097] text-[#F1D097] px-2 py-[3px] rounded-md lg:text-base md:text-sm text-xs hover:bg-[#F1D097] hover:text-white transition-colors"
+              >
                 View All
               </Link>
             }
@@ -714,7 +721,7 @@ const CustomerDetails = () => {
                 customerPhone: selectedOrder.shippingAddress.phone,
                 customerAddress: customer?.address,
                 items: selectedOrder.orderedProducts.map((orderedProduct) => ({
-                  name: orderedProduct.product.name,
+                  name: orderedProduct.product?.name,
                   weight: orderedProduct.selectedVariant.wt,
                   purity: "",
                   makingCharge: 0,

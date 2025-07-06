@@ -168,6 +168,7 @@ import FileDropInput from "../../../../components/shared/form_components/FileDro
 
 import ToggleSlider from "../../../../components/shared/form_components/ToggleSlider";
 import { useState } from "react";
+import MultiImageUploader from "../../../../components/shared/form_components/FileDropInput";
 
 const AddOrderSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -594,7 +595,15 @@ export default function AddOrderForm() {
               </div>
 
               <div>
-                <FileDropInput label="Upload Photo" />
+                {/* <form.Field name="image">
+                  {(field) => (
+                    <MultiImageUploader
+                      label="Upload Receipts"
+                      value={field.state.value as File[]}
+                      onChange={(files: File[]) => field.handleChange(files)}
+                    />
+                  )}
+                </form.Field> */}
               </div>
 
               <div>
