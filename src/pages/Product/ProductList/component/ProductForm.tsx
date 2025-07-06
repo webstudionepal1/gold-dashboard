@@ -110,7 +110,10 @@ const ProductForm = () => {
       formData.append("name", value.name);
       formData.append("description", value.description);
       formData.append("category", value.category);
-      formData.append("subCategory", value.subCategory);
+      // formData.append("subCategory", value.subCategory);
+      if (value.subCategory && value.subCategory.trim() !== "") {
+        formData.append("subCategory", value.subCategory);
+      }
 
       value.variant.forEach((v, index: number) => {
         formData.append(`variant[${index}][price]`, String(v.price));
