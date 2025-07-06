@@ -33,6 +33,8 @@ interface IButtonObj {
 const AttribConfig = () => {
   const [tab, setTab] = useState("clasp-type");
   const { data: claspsType, isLoading } = useGetAllProductClaspsQuery();
+
+  console.log("CLAS DATA", claspsType);
   const { data: rawmaterial, isLoading: materialLoading } =
     useGetRawMaterialsQuery();
   const { mutate: deleteClasp } = useDeleteProductClaspsMutation();

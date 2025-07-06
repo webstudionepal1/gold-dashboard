@@ -311,7 +311,8 @@ export const DropdownTagField: React.FC<CustomDropdownProps> = ({
   // Filtered options based on input and excluding selected values
   const filteredOptions = options.filter(
     (opt) =>
-      opt.label.toLowerCase().includes(inputValue.toLowerCase()) &&
+      opt?.label?.toLowerCase()?.includes(inputValue.toLowerCase()) &&
+      opt?.value &&
       !safeValues.includes(opt.value)
   );
 
@@ -471,8 +472,8 @@ export const DropdownTagField: React.FC<CustomDropdownProps> = ({
           {safeValues.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {safeValues.map((value) => {
-                const option = options.find((opt) => opt.value === value);
-                const displayLabel = option ? option.label : value;
+                const option = options.find((opt) => opt?.value === value);
+                const displayLabel = option?.label || value;
                 return (
                   <span
                     key={value}
