@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useMemo, useState } from "react";
 import { useForm, useStore } from "@tanstack/react-form";
 import { InputField } from "../../../../components/shared/form_components/InputField";
@@ -25,6 +23,7 @@ import {
   type VisibilityType,
 } from "../../productObj";
 import MultiImageUploader from "../../../../components/shared/form_components/FileDropInput";
+import { cleanObject } from "../../../../utils/cleanObject";
 
 const ProductForm = () => {
   const { id } = useParams();
@@ -123,6 +122,9 @@ const ProductForm = () => {
 
       try {
         const formData = new FormData();
+        const formattedData = cleanObject(value);
+        // delete formattedData["image"];
+        delete formattedData["existingImage"];
         formData.append("name", value.name);
         formData.append("description", value.description);
         formData.append("category", value.category);
@@ -156,11 +158,12 @@ const ProductForm = () => {
 
         if (formstate !== "add") {
           // Handle existing images for update
-          if (productData.images && productData.images.length > 0) {
-            productData.images.forEach((img) =>
-              formData.append(`existingImages`, img)
-            );
-          }
+          // if (productData.images && productData.images.length > 0) {
+          //   productData.images.forEach((img) =>
+          //     formData.append(`existingImages`, img)
+          //   );
+          // }
+
           updateProduct({ id: productData._id, body: formData });
         } else {
           createProduct(formData);
@@ -249,11 +252,11 @@ const ProductForm = () => {
                     <div>
                       <div className="flex flex-col">
                         <label className="mb-1 text-sm font-medium text-gray-700">
-                          Description <span className="text-red-500">*</span>
+                          Description <span className="text-red">*</span>
                         </label>
                         <textarea
                           placeholder="Enter short description"
-                          className="p-2 border rounded-md focus:outline-none resize-none"
+                          className="p-2 border rounded-md focus:outline-none bg-[#f6f7f9] resize-none"
                           value={field.state.value}
                           onChange={(e) => field.handleChange(e.target.value)}
                           rows={3}
@@ -642,7 +645,7 @@ const ProductForm = () => {
                     form={form}
                     label=""
                     value={field.state.value}
-                    existingFileField="existingImage"
+                    // existingFileField="existingImage"
                     accept={{
                       "image/*": [".png", ".jpg", ".jpeg", ".svg", ".webp"],
                     }}
