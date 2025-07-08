@@ -47,7 +47,7 @@ export const InputField = React.forwardRef<
           } rounded-xl ${
             readonly
               ? "placeholder:text-[#95949a] cursor-auto"
-              : "text-[#86878d]"
+              : "text-gray-800"
           } outline-none w-full ${inputClassName} bg-[#f6f7f9]`
         )}
         readOnly={readonly}

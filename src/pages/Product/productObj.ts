@@ -98,7 +98,7 @@ export const categoryColumns = [
 export const subCategoryColumns = [
   { title: "S.N", key: "sn" },
   { title: "Name", key: "name" },
-  { title: "Category", key: "category" },
+  // { title: "Category", key: "category" },
   { title: "Description", key: "description" },
   { title: "Total Products", key: "totalProducts" },
 ];

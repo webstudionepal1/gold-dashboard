@@ -178,7 +178,6 @@ const NewProductForm = ({
                           <InputField
                             label="Quantity"
                             type="number"
-                            required
                             value={field.state.value}
                             onChange={(e) =>
                               field.handleChange(Number(e.target.value))
@@ -228,7 +227,6 @@ const NewProductForm = ({
                         <div className="w-full">
                           <InputField
                             label="Weight"
-                            required
                             placeholder="Weight"
                             value={field.state.value}
                             onChange={(e) =>

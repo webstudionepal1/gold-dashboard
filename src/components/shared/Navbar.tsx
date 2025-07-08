@@ -245,7 +245,9 @@ export const Navbar = () => {
           onClick={() => setShowLogout((prev) => !prev)}
         >
           <div className="flex gap-3 place-items-center">
-            <img src="/avatar.png" alt="profile" className="w-8" />
+            {/* <div className="rounded-full bg-gray- p-3"> */}
+            <img src="/avatar.webp" alt="profile" className="w-8" />
+            {/* </div> */}
             <section className="flex flex-col gap-1">
               <Text variant="silver-950" size="body-sm-default">
                 {userInfo?.data?.user?.name}

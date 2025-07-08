@@ -10,6 +10,8 @@ const SupplierDetail = () => {
   let { id } = useParams();
   id ??= "";
   const { data: supplierData } = useGetSupplierByIdQuery(id);
+
+  console.log("Supplier ata", supplierData);
   const navigate = useNavigate();
   const contactDataList = [
     {
@@ -23,7 +25,10 @@ const SupplierDetail = () => {
           subtitle: "Contact Number",
           text: get(supplierData, "contactPerson.phone", "-"),
         },
-        { subtitle: "Email Address", text: get(supplierData, "email", "-") },
+        {
+          subtitle: "Email Address",
+          text: get(supplierData, "contactPerson.email", "-"),
+        },
       ],
     },
     {

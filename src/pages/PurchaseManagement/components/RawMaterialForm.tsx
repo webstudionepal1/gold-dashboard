@@ -190,7 +190,6 @@ const NewProductForm = ({
                           <InputField
                             label="Quantity"
                             type="number"
-                            required
                             value={field.state.value}
                             onChange={(e) =>
                               field.handleChange(Number(e.target.value))
@@ -244,7 +243,6 @@ const NewProductForm = ({
                             type="number"
                             // min={0}
                             placeholder="Enter weight"
-                            required
                             value={field.state.value}
                             onChange={(e) =>
                               field.handleChange(Number(e.target.value))

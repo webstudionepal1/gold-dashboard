@@ -6,17 +6,17 @@ import { IFetchProduct } from "./productHooks";
 
 export interface IItem {
   item: string;
-  quantity: number;
+  quantity?: number;
   price: number;
   paidAmount: number;
 }
 
 export interface IProducts {
   product: string;
-  quantity: number;
+  quantity?: number;
   price: number;
   paidAmount: number;
-  wt: number;
+  wt?: number;
 }
 
 export interface IFetchPurchase {

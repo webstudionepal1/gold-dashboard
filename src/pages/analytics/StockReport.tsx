@@ -632,7 +632,7 @@ const StoreReport = () => {
               onViewChange={() => {}}
               showFilter={true}
               showSort={true}
-              showView={true}
+              showView={false}
               filterOptions={filterOptions}
               sortOptions={currentSortOptions}
               placeholder="Search products..."
