@@ -123,7 +123,7 @@ const ProductForm = () => {
       try {
         const formData = new FormData();
         const formattedData = cleanObject(value);
-        delete formattedData["image"];
+        // delete formattedData["image"];
         delete formattedData["existingImage"];
         formData.append("name", value.name);
         formData.append("description", value.description);
@@ -158,11 +158,11 @@ const ProductForm = () => {
 
         if (formstate !== "add") {
           // Handle existing images for update
-          if (productData.images && productData.images.length > 0) {
-            productData.images.forEach((img) =>
-              formData.append(`existingImages`, img)
-            );
-          }
+          // if (productData.images && productData.images.length > 0) {
+          //   productData.images.forEach((img) =>
+          //     formData.append(`existingImages`, img)
+          //   );
+          // }
 
           updateProduct({ id: productData._id, body: formData });
         } else {
@@ -649,7 +649,7 @@ const ProductForm = () => {
                     accept={{
                       "image/*": [".png", ".jpg", ".jpeg", ".svg", ".webp"],
                     }}
-                    // existingFile={form.getFieldValue("existingImage")}
+                    existingFile={form.getFieldValue("existingImage")}
                     onChange={(file) => field.handleChange(file)}
                   />
                 )}
