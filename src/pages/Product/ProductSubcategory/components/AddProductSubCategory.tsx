@@ -47,7 +47,6 @@ export const AddProductSubCategory = ({
         : [],
     [categorySuccess, categories]
   );
-  console.log(categoriesList);
   const form = useForm({
     defaultValues: {
       name: editData ? get(editData, "name", "") : "",

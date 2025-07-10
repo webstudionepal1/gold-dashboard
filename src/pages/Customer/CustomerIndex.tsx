@@ -161,7 +161,6 @@ const CustomerIndex = () => {
   //   [filteredCustomers, customerSuccess]
   // );
 
-  console.log("FILTERED", filteredCustomers);
   const tableData = filteredCustomers.map((customer) => ({
     ...customer,
     customerName: get(customer, "name", "-"),

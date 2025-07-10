@@ -32,7 +32,6 @@ const Productsubcategory: React.FC = () => {
     isLoading,
   } = useGetAllProductSubCategoriesQuery();
 
-  console.log(subCategories, "ASDFSDFSDF");
   const { mutate: deleteSubCategory } = useDeleteProductSubCategoryMutation();
   const subCategoriesData = useMemo(
     () =>

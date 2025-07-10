@@ -139,8 +139,6 @@ const SalesReport = () => {
       : subCategoryWiseSortOptions;
 
   // Log filter and sort options to debug
-  console.log("Defined filterOptions:", filterOptions);
-  console.log("Current sortOptions for", selectedTab, ":", currentSortOptions);
 
   const {
     data: ProductWiseData,
@@ -169,11 +167,6 @@ const SalesReport = () => {
     period: tabFilters.subCategoryWise.period.toLowerCase(),
   });
 
-  // Log raw data
-  console.log("Raw ProductWiseData:", ProductWiseData);
-  console.log("Raw categoryWiseDataList:", categoryWiseDataList);
-  console.log("Raw subCategoryWiseDataList:", subCategoryWiseDataList);
-
   const { mutate: deleteExpense } = useDeleteExpenseMutation();
   const {
     data: expensesList,
@@ -194,7 +187,6 @@ const SalesReport = () => {
 
   const productWiseDataFiltered = useMemo(() => {
     if (!ProductWiseData || ProductWiseData.length === 0) {
-      console.log("Product wise data empty or null, returning empty array");
       return [];
     }
 
@@ -211,14 +203,9 @@ const SalesReport = () => {
           String(item.totalRevenue).includes(query) ||
           String(item.averagePrice).includes(query)
       );
-      console.log("After search filter (product wise):", result);
     }
 
     if (filterState.filterValue) {
-      console.log(
-        "Filtering product wise data with filterValue:",
-        filterState.filterValue
-      );
       result = result.filter((item) => {
         if (filterState.filterValue === "Uncategorized") {
           return item.category === "Uncategorized";
@@ -226,80 +213,60 @@ const SalesReport = () => {
         if (filterState.filterValue === "Uncategorized_sub") {
           return item.subCategory === "Uncategorized";
         }
-        console.log(
-          "No matching filter value for product wise data:",
-          filterState.filterValue
-        );
+
         return false;
       });
-      console.log("After filter (product wise):", result);
     }
 
     if (filterState.sortValue) {
-      console.log(
-        "Sorting product wise data with sortValue:",
-        filterState.sortValue
-      );
       switch (filterState.sortValue) {
         case "category_asc":
           result.sort((a, b) =>
             (a.category || "").localeCompare(b.category || "")
           );
-          console.log("Applied category_asc sort");
           break;
         case "category_desc":
           result.sort((a, b) =>
             (b.category || "").localeCompare(a.category || "")
           );
-          console.log("Applied category_desc sort");
           break;
         case "subCategory_asc":
           result.sort((a, b) =>
             (a.subCategory || "").localeCompare(b.subCategory || "")
           );
-          console.log("Applied subCategory_asc sort");
           break;
         case "subCategory_desc":
           result.sort((a, b) =>
             (b.subCategory || "").localeCompare(a.subCategory || "")
           );
-          console.log("Applied subCategory_desc sort");
           break;
         case "product_asc":
           result.sort((a, b) =>
             (a.product || "").localeCompare(b.product || "")
           );
-          console.log("Applied product_asc sort");
           break;
         case "product_desc":
           result.sort((a, b) =>
             (b.product || "").localeCompare(a.product || "")
           );
-          console.log("Applied product_desc sort");
           break;
         case "unitsSold_asc":
           result.sort((a, b) => (a.unitsSold || 0) - (b.unitsSold || 0));
-          console.log("Applied unitsSold_asc sort");
           break;
         case "unitsSold_desc":
           result.sort((a, b) => (b.unitsSold || 0) - (a.unitsSold || 0));
-          console.log("Applied unitsSold_desc sort");
           break;
         case "totalRevenue_asc":
           result.sort((a, b) => (a.totalRevenue || 0) - (b.totalRevenue || 0));
-          console.log("Applied totalRevenue_asc sort");
           break;
         case "totalRevenue_desc":
           result.sort((a, b) => (b.totalRevenue || 0) - (a.totalRevenue || 0));
-          console.log("Applied totalRevenue_desc sort");
           break;
         case "averagePrice_asc":
           result.sort((a, b) => (a.averagePrice || 0) - (b.averagePrice || 0));
-          console.log("Applied averagePrice_asc sort");
           break;
         case "averagePrice_desc":
           result.sort((a, b) => (b.averagePrice || 0) - (a.averagePrice || 0));
-          console.log("Applied averagePrice_desc sort");
           break;
         default:
           console.log(
@@ -308,10 +275,8 @@ const SalesReport = () => {
           );
           break;
       }
-      console.log("After sort (product wise):", result);
     }
 
-    console.log("Final filtered product wise data:", result);
     return result;
   }, [ProductWiseData, filterState]);
 
@@ -321,7 +286,6 @@ const SalesReport = () => {
       !categoryWiseDataList.data ||
       categoryWiseDataList.data.length === 0
     ) {
-      console.log("Category wise data empty or null, returning empty array");
       return [];
     }
 
@@ -338,88 +302,63 @@ const SalesReport = () => {
           String(item.averagePrice).includes(query) ||
           String(item.percentageShare).includes(query)
       );
-      console.log("After search filter (category wise):", result);
     }
 
     if (filterState.filterValue) {
-      console.log(
-        "Filtering category wise data with filterValue:",
-        filterState.filterValue
-      );
       result = result.filter((item) => {
         if (filterState.filterValue === "Uncategorized") {
           return item.category === "Uncategorized";
         }
-        console.log(
-          "No matching filter value for category wise data:",
-          filterState.filterValue
-        );
+
         return false;
       });
-      console.log("After filter (category wise):", result);
     }
 
     if (filterState.sortValue) {
-      console.log(
-        "Sorting category wise data with sortValue:",
-        filterState.sortValue
-      );
       switch (filterState.sortValue) {
         case "category_asc":
           result.sort((a, b) =>
             (a.category || "").localeCompare(b.category || "")
           );
-          console.log("Applied category_asc sort");
           break;
         case "category_desc":
           result.sort((a, b) =>
             (b.category || "").localeCompare(a.category || "")
           );
-          console.log("Applied category_desc sort");
           break;
         case "unitsSold_asc":
           result.sort((a, b) => (a.unitsSold || 0) - (b.unitsSold || 0));
-          console.log("Applied unitsSold_asc sort");
           break;
         case "unitsSold_desc":
           result.sort((a, b) => (b.unitsSold || 0) - (a.unitsSold || 0));
-          console.log("Applied unitsSold_desc sort");
           break;
         case "totalOrders_asc":
           result.sort((a, b) => (a.totalOrders || 0) - (b.totalOrders || 0));
-          console.log("Applied totalOrders_asc sort");
           break;
         case "totalOrders_desc":
           result.sort((a, b) => (b.totalOrders || 0) - (a.totalOrders || 0));
-          console.log("Applied totalOrders_desc sort");
           break;
         case "totalRevenue_asc":
           result.sort((a, b) => (a.totalRevenue || 0) - (b.totalRevenue || 0));
-          console.log("Applied totalRevenue_asc sort");
           break;
         case "totalRevenue_desc":
           result.sort((a, b) => (b.totalRevenue || 0) - (a.totalRevenue || 0));
-          console.log("Applied totalRevenue_desc sort");
           break;
         case "averagePrice_asc":
           result.sort((a, b) => (a.averagePrice || 0) - (b.averagePrice || 0));
-          console.log("Applied averagePrice_asc sort");
           break;
         case "averagePrice_desc":
           result.sort((a, b) => (b.averagePrice || 0) - (a.averagePrice || 0));
-          console.log("Applied averagePrice_desc sort");
           break;
         case "percentageShare_asc":
           result.sort(
             (a, b) => (a.percentageShare || 0) - (b.percentageShare || 0)
           );
-          console.log("Applied percentageShare_asc sort");
           break;
         case "percentageShare_desc":
           result.sort(
             (a, b) => (b.percentageShare || 0) - (a.percentageShare || 0)
           );
-          console.log("Applied percentageShare_desc sort");
           break;
         default:
           console.log(
@@ -428,10 +367,8 @@ const SalesReport = () => {
           );
           break;
       }
-      console.log("After sort (category wise):", result);
     }
 
-    console.log("Final filtered category wise data:", result);
     return result;
   }, [categoryWiseDataList, filterState]);
 
@@ -441,7 +378,6 @@ const SalesReport = () => {
       !subCategoryWiseDataList.data ||
       subCategoryWiseDataList.data.length === 0
     ) {
-      console.log("Subcategory wise data empty or null, returning empty array");
       return [];
     }
 
@@ -458,88 +394,63 @@ const SalesReport = () => {
           String(item.averagePrice).includes(query) ||
           String(item.percentageShare).includes(query)
       );
-      console.log("After search filter (subcategory wise):", result);
     }
 
     if (filterState.filterValue) {
-      console.log(
-        "Filtering subcategory wise data with filterValue:",
-        filterState.filterValue
-      );
       result = result.filter((item) => {
         if (filterState.filterValue === "Uncategorized_sub") {
           return item.subCategory === "Uncategorized";
         }
-        console.log(
-          "No matching filter value for subcategory wise data:",
-          filterState.filterValue
-        );
+
         return false;
       });
-      console.log("After filter (subcategory wise):", result);
     }
 
     if (filterState.sortValue) {
-      console.log(
-        "Sorting subcategory wise data with sortValue:",
-        filterState.sortValue
-      );
       switch (filterState.sortValue) {
         case "subCategory_asc":
           result.sort((a, b) =>
             (a.subCategory || "").localeCompare(b.subCategory || "")
           );
-          console.log("Applied subCategory_asc sort");
           break;
         case "subCategory_desc":
           result.sort((a, b) =>
             (b.subCategory || "").localeCompare(a.subCategory || "")
           );
-          console.log("Applied subCategory_desc sort");
           break;
         case "unitsSold_asc":
           result.sort((a, b) => (a.unitsSold || 0) - (b.unitsSold || 0));
-          console.log("Applied unitsSold_asc sort");
           break;
         case "unitsSold_desc":
           result.sort((a, b) => (b.unitsSold || 0) - (a.unitsSold || 0));
-          console.log("Applied unitsSold_desc sort");
           break;
         case "totalOrders_asc":
           result.sort((a, b) => (a.totalOrders || 0) - (b.totalOrders || 0));
-          console.log("Applied totalOrders_asc sort");
           break;
         case "totalOrders_desc":
           result.sort((a, b) => (b.totalOrders || 0) - (a.totalOrders || 0));
-          console.log("Applied totalOrders_desc sort");
           break;
         case "totalRevenue_asc":
           result.sort((a, b) => (a.totalRevenue || 0) - (b.totalRevenue || 0));
-          console.log("Applied totalRevenue_asc sort");
           break;
         case "totalRevenue_desc":
           result.sort((a, b) => (b.totalRevenue || 0) - (a.totalRevenue || 0));
-          console.log("Applied totalRevenue_desc sort");
           break;
         case "averagePrice_asc":
           result.sort((a, b) => (a.averagePrice || 0) - (b.averagePrice || 0));
-          console.log("Applied averagePrice_asc sort");
           break;
         case "averagePrice_desc":
           result.sort((a, b) => (b.averagePrice || 0) - (a.averagePrice || 0));
-          console.log("Applied averagePrice_desc sort");
           break;
         case "percentageShare_asc":
           result.sort(
             (a, b) => (a.percentageShare || 0) - (b.percentageShare || 0)
           );
-          console.log("Applied percentageShare_asc sort");
           break;
         case "percentageShare_desc":
           result.sort(
             (a, b) => (b.percentageShare || 0) - (a.percentageShare || 0)
           );
-          console.log("Applied percentageShare_desc sort");
           break;
         default:
           console.log(
@@ -548,25 +459,20 @@ const SalesReport = () => {
           );
           break;
       }
-      console.log("After sort (subcategory wise):", result);
     }
 
-    console.log("Final filtered subcategory wise data:", result);
     return result;
   }, [subCategoryWiseDataList, filterState]);
 
   const handleSearch = (query: string) => {
-    console.log("Search query received:", query);
     setFilterState((prev) => ({ ...prev, searchQuery: query }));
   };
 
   const handleFilter = (filter: string) => {
-    console.log("Filter value received:", filter);
     setFilterState((prev) => ({ ...prev, filterValue: filter }));
   };
 
   const handleSort = (sort: string) => {
-    console.log("Sort value received:", sort);
     setFilterState((prev) => ({ ...prev, sortValue: sort }));
   };
 
@@ -591,7 +497,6 @@ const SalesReport = () => {
           product: item.product || "N/A",
           totalRevenue: item.totalRevenue ?? 0,
         };
-        console.log("Product wise table row:", row);
         return row;
       }),
     }),
@@ -613,7 +518,6 @@ const SalesReport = () => {
           totalRevenue: item.totalRevenue ?? 0,
           percentageSharee: <div>{item.percentageShare ?? 0} %</div>,
         };
-        console.log("Category wise table row:", row);
         return row;
       }),
     }),
@@ -635,7 +539,6 @@ const SalesReport = () => {
           totalRevenue: item.totalRevenue ?? 0,
           percentageSharee: <div>{item.percentageShare ?? 0} %</div>,
         };
-        console.log("Subcategory wise table row:", row);
         return row;
       }),
     }),
@@ -647,8 +550,6 @@ const SalesReport = () => {
     categoryWise: categoryWiseTableData,
     subCategoryWise: subCategoryTableData,
   };
-
-  console.log("Table data for current tab:", tableDataObj[selectedTab]);
 
   const [modal, setModal] = useState({
     of: "",

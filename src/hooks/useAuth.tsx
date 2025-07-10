@@ -13,9 +13,7 @@ interface JwtPayload {
 export const initializeAuth = () => {
   let token: string | null | undefined = Cookies.get("_UPLFMMATRIX");
   let user: string | null | undefined = Cookies.get("user");
-  console.log('hellow')
 
-  console.log("inside initializeAut, toke, user", token, user);
   // Check if token exists
   if (token && user) {
     try {

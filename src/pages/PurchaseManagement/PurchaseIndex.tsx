@@ -155,7 +155,6 @@ const PurchaseIndex = () => {
               if (selectedTab === "purchase") {
                 setModal((prev) => ({ ...prev, of: "purchase" }));
               } else {
-                console.log(buttonObj[selectedTab]);
                 navigate("/inventory/suppliers/add");
               }
             }}

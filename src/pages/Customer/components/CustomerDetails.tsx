@@ -96,6 +96,7 @@ const CustomerDetails = () => {
     isLoading,
     error,
   } = useGetCustomerQuery({ role: "customer" });
+
   const [selectedOrder, setSelectedOrder] = useState<IFetchOrder | null>(null);
   const {
     data: orders,

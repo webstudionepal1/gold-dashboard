@@ -16,7 +16,6 @@ const ProductDescription: React.FC = () => {
   const images = product.images.map(
     (item) => `${import.meta.env.VITE_API_IMAGE_BASE_URL}${item}`
   );
-  console.log(images);
   return (
     <div>
       <Header text="Product Description" />

@@ -29,7 +29,6 @@ const ProductForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const productData = useStore(productStore, (state) => state);
-  console.log("productData", productData);
 
   const {
     mutate: createProduct,
@@ -104,7 +103,6 @@ const ProductForm = () => {
         });
       }
       setFormErrors(errors);
-      console.log("Validation errors:", errors);
       return false;
     }
   };
@@ -118,8 +116,6 @@ const ProductForm = () => {
       onSubmit: productFormSchema, // Re-enabled validation
     },
     onSubmit: async ({ value }) => {
-      console.log("Form submitted with values:", value);
-
       try {
         const formData = new FormData();
         const formattedData = cleanObject(value);
@@ -187,9 +183,6 @@ const ProductForm = () => {
   };
 
   // Debug: Log form state
-  console.log("Form state:", form.state);
-  console.log("Form values:", form.state.values);
-  console.log("Form errors:", formErrors);
 
   return (
     <div className="p-2">
@@ -213,7 +206,6 @@ const ProductForm = () => {
         onSubmit={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          console.log("Form submit triggered");
           form.handleSubmit();
         }}
         className="grid grid-cols-1 gap-4 lg:grid-cols-3"

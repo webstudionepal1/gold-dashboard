@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { apiClient } from "../utils/ApiGateway";
-import { IFetchSupplier } from "./supplierHooks";
+// import { IFetchSupplier } from "./supplierHooks";
 import { IFetchProduct } from "./productHooks";
 
 export interface IItem {

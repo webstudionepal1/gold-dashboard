@@ -33,7 +33,6 @@ const PurchaseReturnForm: React.FC<IPurchaseReturnForm> = ({
   data,
   onClose,
 }) => {
-  console.log("data", data);
   const { mutate: createPurchaseReturn } = useCreatePurchaseReturnMutation();
   const [dynamicForm, setDynamicForm] = useState({
     product: "",

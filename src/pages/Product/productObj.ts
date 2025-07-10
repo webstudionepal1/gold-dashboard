@@ -122,7 +122,6 @@ export const generateProductDefaultValue = (state: string, editData?: any) => {
       images: null, // Changed from 'image' to 'images'
     };
   } else {
-    console.log("editData", editData);
     const data = {
       name: get(editData, "name", ""),
       description: get(editData, "description", ""),
@@ -150,7 +149,6 @@ export const generateProductDefaultValue = (state: string, editData?: any) => {
       images: null, // Changed from 'image' to 'images'
       existingImage: get(editData, "images[0]", undefined),
     };
-    console.log("Generated default values:", data);
     return data;
   }
 };

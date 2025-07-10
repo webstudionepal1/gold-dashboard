@@ -15,11 +15,13 @@ import { useGetSupplierQuery } from "../../../server/api/supplierHooks";
 import { FieldError } from "../../auth/LoginPage";
 import { IPurchaseForm, PurchaseSchema } from "../purchaseObj";
 import { useEffect } from "react";
+
 interface NewProductProps {
   onClose: () => void;
   edit?: boolean;
   data?: IBaseProduct | null;
 }
+
 const NewProductForm = ({
   onClose,
   edit = false,
@@ -41,6 +43,7 @@ const NewProductForm = ({
   const productList = productSuccess
     ? products?.map((item) => ({ label: item.name, value: item._id }))
     : [];
+
   const form = useForm({
     defaultValues: {
       billNo: edit ? get(data, "billNo") : "",
@@ -71,7 +74,6 @@ const NewProductForm = ({
       onSubmit: PurchaseSchema,
     },
     onSubmit: async ({ value }) => {
-      console.log("Order Submitted", value);
       if (edit) updatePurchase({ id: data?._id ?? "", body: value });
       else createPurchase(value);
     },
@@ -81,7 +83,8 @@ const NewProductForm = ({
     if (createSuccess || updateSuccess) {
       onClose();
     }
-  }, [createSuccess, updateSuccess]);
+  }, [createSuccess, updateSuccess, onClose]);
+
   return (
     <div>
       <form
@@ -156,7 +159,7 @@ const NewProductForm = ({
                   key={index.toString()}
                   className="bg-[#ffffff] border-[#e7e7e7] border-2 rounded-xl px-3 py-2"
                 >
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 ">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <form.Field name={`products[${index}].product`}>
                       {(field) => (
                         <div className="w-full">
@@ -244,7 +247,7 @@ const NewProductForm = ({
                     <div className="flex items-center justify-end px-2 py-2">
                       <button
                         type="button"
-                        onClick={() => {}}
+                        onClick={() => field.removeValue(index)} // Fix applied here
                         className="px-3 py-1 border-[#de8d28] border-2 text-[#de8d28] rounded-xl"
                       >
                         Remove
@@ -266,14 +269,14 @@ const NewProductForm = ({
               <textarea
                 value={field.state.value}
                 onChange={(e) => field.handleChange(e.target.value)}
-                className="resize-none bg-[#f6f7f9] border-2 border-[#d3dae4] focus:outline-none rounded-xl px-3 py-1   placeholder:text-[#858492]"
-                placeholder="Enter Short Description"
+                className="resize-none bg-[#f6f7f9] border-2 border-[#d3dae4] focus:outline-none rounded-xl px-3 py-1 placeholder:text-[#858492]"
+                placeholder="Enter Short Hypothetical Description"
               ></textarea>
             </div>
           )}
         </form.Field>
 
-        <div className="border-b border-[#dedde2] w-full   "></div>
+        <div className="border-b border-[#dedde2] w-full"></div>
 
         <div className="flex items-center gap-3">
           <button

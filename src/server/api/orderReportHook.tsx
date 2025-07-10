@@ -83,7 +83,6 @@ export const useGetOrderCategoryQuery = (params = {}) => {
           params,
         }
       );
-      console.log("res", res);
       return res?.data.data;
     },
   });

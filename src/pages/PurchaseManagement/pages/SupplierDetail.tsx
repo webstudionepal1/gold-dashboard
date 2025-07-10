@@ -11,7 +11,6 @@ const SupplierDetail = () => {
   id ??= "";
   const { data: supplierData } = useGetSupplierByIdQuery(id);
 
-  console.log("Supplier ata", supplierData);
   const navigate = useNavigate();
   const contactDataList = [
     {
