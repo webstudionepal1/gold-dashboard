@@ -1656,7 +1656,7 @@ const PurchaseReturnForm: React.FC<IPurchaseReturnForm> = ({
               </label>
               <textarea
                 value={field.state.value}
-                onChange={(e) => field.handleChange(e.target.value.trim())}
+                onChange={(e) => field.handleChange(e.target.value)}
                 className="resize-none bg-[#f6f7f9] border-2 border-[#d3dae4] focus:outline-none rounded-xl px-3 py-1 placeholder:text-[#858492]"
                 placeholder="Enter reason for return"
               />
