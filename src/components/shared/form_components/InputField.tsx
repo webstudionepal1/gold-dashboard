@@ -32,7 +32,7 @@ export const InputField = React.forwardRef<
     ref
   ) => (
     <div className="flex flex-col gap-2 w-full">
-      <label className="flex gap-1">
+      <label className="flex gap-1 text-nowrap">
         <p className="text-[#95949a]">{label}</p>
         {required && <span className="text-red">*</span>}
       </label>
