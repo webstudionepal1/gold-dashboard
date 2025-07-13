@@ -237,7 +237,6 @@ const ClaspModel: React.FC<IClaspProps> = ({ onClose, data, edit = false }) => {
       onSubmit: schema,
     },
     onSubmit: async ({ value }: { value: any }) => {
-      console.log("value", JSON.stringify(value));
       const formdata = new FormData();
       formdata.append("name", value.name);
       formdata.append("existingImages", value.existingImages);

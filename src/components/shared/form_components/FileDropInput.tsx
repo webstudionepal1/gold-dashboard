@@ -85,14 +85,13 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
 
     if (props.multiple && "existingFiles" in props && props.existingFiles) {
       if (typeof index === "number" && props.existingFileField) {
-        console.log("removeing", index);
         const newFiles = [
           ...props.existingFiles.slice(0, index),
           ...props.existingFiles.slice(index + 1),
         ];
-        console.log("newFile", newFiles);
+
         form.setFieldValue(props.existingFileField, newFiles);
-        console.log(form.getFieldValue(props.existingFileField));
+        // console.log(form.getFieldValue(props.existingFileField));
       }
     } else if (
       !props.multiple &&
@@ -204,7 +203,7 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
       const multiProps = props as MultiFileProps & BaseProps;
       const existingFiles = multiProps.existingFiles || [];
       const selectedFiles = multiProps.value || [];
-      console.log("existingFiel", existingFiles);
+
       if (existingFiles.length === 0 && selectedFiles.length === 0) {
         return null;
       }

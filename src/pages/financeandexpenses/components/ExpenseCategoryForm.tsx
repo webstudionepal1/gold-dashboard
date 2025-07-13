@@ -20,9 +20,6 @@ const addExpenseCategorySchema = z.object({
   description: z.string().min(1, "Description is required"),
 });
 const ExpenseCategoryForm = ({ editData, closeModal }: propTypes) => {
-  {
-    console.log("CAT#EROERE EIDT ", editData);
-  }
   const {
     mutate: createExpenseCategory,
     isPending: createExpenseCatPending,
@@ -43,7 +40,6 @@ const ExpenseCategoryForm = ({ editData, closeModal }: propTypes) => {
       onSubmit: addExpenseCategorySchema,
     },
     onSubmit: async ({ value }) => {
-      console.log("Order Submitted", value);
       if (editData) {
         updateExpenseCategory({ id: editData._id, body: value });
       } else {

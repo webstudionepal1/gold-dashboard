@@ -55,7 +55,6 @@ const ProfitandLoss = () => {
     isSuccess: isfinancialRepSuccess,
     isLoading: isfinancialRepLoading,
   } = useGetFinancialReportQuery({ startDate, endDate });
-  console.log("DATA", FinancialReport);
 
   // State for controlling hidden rows toggle visibility
   const [showHiddenRows, setShowHiddenRows] = useState(false);
@@ -66,7 +65,6 @@ const ProfitandLoss = () => {
         : [],
     [isfinancialRepSuccess, FinancialReport]
   );
-  console.log("DATA FINANCIAL", financialReportList);
 
   const financiallReportList = useMemo(
     () =>
@@ -75,7 +73,6 @@ const ProfitandLoss = () => {
         : [],
     [isfinancialRepSuccess, FinancialReport]
   );
-  console.log("finadkfsdfs", financiallReportList);
 
   const navigate = useNavigate();
 
@@ -177,7 +174,6 @@ const ProfitandLoss = () => {
       balance: item.balance,
     }));
   }, [financiallReportList]);
-  console.log("DETAIED TRANSCSTIONS ", detailedTransactions);
 
   // const detailedTransactions = useMemo(() => {
   //   // Generate detailed transaction rows based on the main transactions

@@ -11,6 +11,7 @@ import {
 import { DropdownField } from "../../../../components/shared/form_components/Dropdown";
 import { FieldError } from "../../../auth/LoginPage";
 import { get } from "lodash";
+import { InputField } from "../../../../components/shared/form_components/InputField";
 interface propTypes {
   modalRef: React.RefObject<HTMLDivElement | null>;
   editData?: IFetchSubCategory | null;
@@ -18,8 +19,8 @@ interface propTypes {
 }
 
 const validationSchema = z.object({
-  name: z.string().min(1, "**Name is required"),
-  category: z.string().min(1, "**Category is required"),
+  name: z.string().min(1, "Name is required"),
+  category: z.string().min(1, "Category is required"),
   description: z.string().optional(),
 });
 interface ISubCategorForm {
@@ -46,7 +47,6 @@ export const AddProductSubCategory = ({
         : [],
     [categorySuccess, categories]
   );
-  console.log(categoriesList);
   const form = useForm({
     defaultValues: {
       name: editData ? get(editData, "name", "") : "",
@@ -67,6 +67,7 @@ export const AddProductSubCategory = ({
       closeModal();
     }
   }, [isSuccess, isUpdateSuccess]);
+
   return (
     <Modal classname="w-[400px]  h-auto" ref={modalRef}>
       <form
@@ -81,13 +82,13 @@ export const AddProductSubCategory = ({
         </h2>
         <div className="space-y-6">
           <div>
-            <label
+            {/* <label
               htmlFor="name"
               className="block mb-1 text-sm font-medium text-gray-700"
             >
               Name
-            </label>
-            <form.Field name="name">
+            </label> */}
+            {/* <form.Field name="name">
               {(field) => (
                 <div>
                   <input
@@ -95,10 +96,30 @@ export const AddProductSubCategory = ({
                     type="text"
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    className={`border border-gray-300 rounded-md p-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                    className={`border border-gray-300 bg-[#f6f7f9] rounded-md p-2 w-full focus:ring-2 `}
                     placeholder="Enter subcategory name"
                   />
                   <FieldError field={field} />
+                </div>
+              )}
+            </form.Field> */}
+
+            <form.Field name="name">
+              {(field) => (
+                <div>
+                  <InputField
+                    label="Name"
+                    required
+                    placeholder="Enter product name"
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                  />
+                  <FieldError field={field} />
+                  {/* {getFieldError("name").length > 0 && (
+                    <div className="text-red-500 text-sm mt-1">
+                      {getFieldError("name").join(", ")}
+                    </div>
+                  )} */}
                 </div>
               )}
             </form.Field>
@@ -118,29 +139,25 @@ export const AddProductSubCategory = ({
               </div>
             )}
           </form.Field>
-          <div>
-            <label
-              htmlFor="description"
-              className="block mb-1 text-sm font-medium text-gray-700"
-            >
-              Description *
-            </label>
-            <form.Field name="description">
-              {(field) => (
-                <div>
+          <form.Field name="description">
+            {(field) => (
+              <div>
+                <div className="flex flex-col">
+                  <label className="mb-1 text-sm font-medium text-gray-700">
+                    Description <span className="text-red">*</span>
+                  </label>
                   <textarea
-                    id="description"
+                    placeholder="Enter short description"
+                    className="p-2 border rounded-md focus:outline-none bg-[#f6f7f9] resize-none"
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    className={`border border-gray-300 rounded-md p-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 `}
                     rows={3}
-                    placeholder="Enter description"
                   />
-                  <FieldError field={field} />
                 </div>
-              )}
-            </form.Field>
-          </div>
+                <FieldError field={field} />
+              </div>
+            )}
+          </form.Field>
         </div>
         <div className="flex justify-between gap-3 mt-6">
           <button

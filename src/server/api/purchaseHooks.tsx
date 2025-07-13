@@ -1,22 +1,22 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { apiClient } from "../utils/ApiGateway";
-import { IFetchSupplier } from "./supplierHooks";
+// import { IFetchSupplier } from "./supplierHooks";
 import { IFetchProduct } from "./productHooks";
 
 export interface IItem {
   item: string;
-  quantity: number;
+  quantity?: number;
   price: number;
   paidAmount: number;
 }
 
 export interface IProducts {
   product: string;
-  quantity: number;
+  quantity?: number;
   price: number;
   paidAmount: number;
-  wt: number;
+  wt?: number;
 }
 
 export interface IFetchPurchase {
@@ -233,7 +233,7 @@ interface IUpdatePurchaseReturn {
 }
 export const useGetPurchaseReturnQuery = (params = {}) => {
   return useQuery({
-    queryKey: ["purchase-return", params],
+    queryKey: ["purchase/return", params],
     queryFn: async () => {
       const res = await apiClient.get<{ data: IFetchPurchaseReturn[] }>(
         "purchase/return",
@@ -249,14 +249,14 @@ export const useGetPurchaseReturnQuery = (params = {}) => {
 export const useCreatePurchaseReturnMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["purchase-return"],
+    mutationKey: ["purchase/return"],
     mutationFn: async (body: IPurchaseReturn) => {
       const res = await apiClient.post("purchase/return", body);
       return res?.data?.data;
     },
     onSuccess() {
       toast.success("Purchase return created successfully");
-      queryClient.invalidateQueries({ queryKey: ["purchase-return"] });
+      queryClient.invalidateQueries({ queryKey: ["purchase/return"] });
     },
     onError(err: string) {
       toast.error(err || "Error creating purchase return");

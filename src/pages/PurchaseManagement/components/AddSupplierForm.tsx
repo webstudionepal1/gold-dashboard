@@ -67,7 +67,6 @@ const AddSupplierForm = () => {
     if (createSuccess || updateSuccess) form.reset();
   }, [updateSuccess, createSuccess]);
 
-  console.log("formdata", form.state.values);
   return (
     <>
       <div className="">

@@ -78,7 +78,7 @@ const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
                     type="text"
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    className={`border border-gray-300 rounded-md p-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500}`}
+                    className={`border border-gray-300 rounded-md p-2 w-full focus:ring-2 bg-[#f6f7f9] focus:ring-blue-500 focus:border-blue-500}`}
                     placeholder="Enter Category name"
                   />
                   <FieldError field={field} />
@@ -87,29 +87,25 @@ const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
             </form.Field>
           </div>
 
-          <div>
-            <label
-              htmlFor="description"
-              className="block mb-1 text-sm font-medium text-gray-700"
-            >
-              Description *
-            </label>
-            <form.Field name="description">
-              {(field) => (
-                <div>
+          <form.Field name="description">
+            {(field) => (
+              <div>
+                <div className="flex flex-col">
+                  <label className="mb-1 text-sm font-medium text-gray-700">
+                    Description <span className="text-red">*</span>
+                  </label>
                   <textarea
-                    id="description"
+                    placeholder="Enter short description"
+                    className="p-2 border rounded-md focus:outline-none bg-[#f6f7f9] resize-none"
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    className={`border border-gray-300 rounded-md p-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
                     rows={3}
-                    placeholder="Enter short description"
                   />
-                  <FieldError field={field} />
                 </div>
-              )}
-            </form.Field>
-          </div>
+                <FieldError field={field} />
+              </div>
+            )}
+          </form.Field>
         </div>
         <div className="flex justify-between gap-3 mt-6">
           <button
