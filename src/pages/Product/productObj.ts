@@ -38,55 +38,62 @@ export interface UploadedImage {
   file: File;
 }
 
-export const productFormSchema = z.object({
-  // General Information
-  name: z.string().min(1, "Name is required"),
-  description: z.string().min(1, "Description is required"),
-  category: z.string().min(1, "Category is required"),
-  subCategory: z.string().optional(),
+export const productFormSchema = z
+  .object({
+    // General Information
+    name: z.string().min(1, "Name is required"),
+    description: z.string().min(1, "Description is required"),
+    category: z.string().min(1, "Category is required"),
+    subCategory: z.string().optional(),
 
-  // Price - Fixed validation
-  variant: z
-    .array(
-      z.object({
-        price: z.number().min(0.01, "Price must be greater than 0"),
-        wt: z.number().min(0.01, "Weight must be greater than 0"),
-        unit: z.string().optional().default("gm"),
-      })
-    )
-    .min(1, "At least one variant is required"),
+    // Price - Fixed validation
+    variant: z
+      .array(
+        z.object({
+          price: z.number().min(0.01, "Price must be greater than 0"),
+          wt: z.number().min(0.01, "Weight must be greater than 0"),
+          unit: z.string().optional().default("gm"),
+        })
+      )
+      .min(1, "At least one variant is required"),
 
-  // Product Specification
-  length: z.number().min(0.01, "Length must be greater than 0"),
-  claspType: z.string().optional(),
-  rhodoumFinishes: z.boolean(),
+    // Product Specification
+    length: z.number().min(0.01, "Length must be greater than 0"),
+    claspType: z.string().optional(),
+    rhodoumFinishes: z.boolean(),
 
-  // Material Information
-  shape: z.string().min(1, "Shape is required"),
-  clarity: z.string().min(1, "Clarity is required"),
-  dimension: z.number().min(0.01, "Dimension must be greater than 0"),
+    // Material Information
+    shape: z.string().min(1, "Shape is required"),
+    clarity: z.string().min(1, "Clarity is required"),
+    dimension: z.number().min(0.01, "Dimension must be greater than 0"),
 
-  // Image - Fixed field name
-  images: z
-    .instanceof(File)
-    .nullable()
-    .refine((val) => val !== null, {
+    // Image - Fixed field name
+    images: z.instanceof(File).nullable(),
+    existingImage: z.string().optional(),
+
+    // Visibility Option (single selection) - Fixed enum
+    visibleAs: z.enum([
+      "featured",
+      "bestsellers",
+      "newarrivals",
+      "recommended",
+      "popular",
+    ]),
+
+    // Tags
+    tags: z.array(z.string()).min(1, "At least one tag is required"),
+  })
+  .refine(
+    (data) => {
+      // For new products, require an image
+      // For updates, allow either new image or existing image
+      return data.images !== null || data.existingImage;
+    },
+    {
       message: "At least one image is required",
-    }),
-  existingImage: z.string().optional(),
-
-  // Visibility Option (single selection) - Fixed enum
-  visibleAs: z.enum([
-    "featured",
-    "bestsellers",
-    "newarrivals",
-    "recommended",
-    "popular",
-  ]),
-
-  // Tags
-  tags: z.array(z.string()).min(1, "At least one tag is required"),
-});
+      path: ["images"],
+    }
+  );
 
 export const categoryColumns = [
   { title: "S.N", key: "sn" },
