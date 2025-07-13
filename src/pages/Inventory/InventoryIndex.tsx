@@ -190,7 +190,6 @@ const InventoryIndex = () => {
   const [selectedSort, setSelectedSort] = useState("");
 
   const { data: products = [], isLoading, error } = useGetAllProductsQuery({});
-  console.log("products", products);
   // Transform products to inventory items
   const inventoryItems = useMemo(
     () => products.flatMap(transformProductToInventoryItems),
@@ -228,11 +227,10 @@ const InventoryIndex = () => {
   const filterOptions = [...categoryOptions, ...STATUS_OPTIONS];
 
   if (error) return <div>Error loading inventory</div>;
-  console.log("processed Items", processedItems);
   return (
     <div className="container mx-auto px-4 py-3">
       <Header text="Inventory">
-        <Link
+        {/* <Link
           to="/product/add"
           className="px-3 py-2 flex items-center text-white bg-[#d49327] transition-transform duration-200 ease-in-out hover:scale-105 rounded-lg"
         >
@@ -243,7 +241,7 @@ const InventoryIndex = () => {
             className="fill-white"
           />
           New Product
-        </Link>
+        </Link> */}
       </Header>
 
       <div className="bg-white border-[#dcdddf] pb-4 border rounded-xl">

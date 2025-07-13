@@ -34,7 +34,6 @@ interface IExpenseForm {
 }
 const ExpenseForm = ({ editData, closeModal }: propTypes) => {
   {
-    console.log("EDIIIIITTTT EXPENSE", editData);
   }
   const {
     mutate: createExpense,
@@ -66,8 +65,6 @@ const ExpenseForm = ({ editData, closeModal }: propTypes) => {
       onSubmit: addExpenseSchema,
     },
     onSubmit: async ({ value }) => {
-      console.log("Order Submitted", value);
-
       const formData = new FormData();
 
       formData.append("date", value.date);
@@ -90,8 +87,6 @@ const ExpenseForm = ({ editData, closeModal }: propTypes) => {
     },
   });
 
-  console.log(editData, "data");
-  console.log("values", form.state.values);
   useEffect(() => {
     if (ExpenseSuccess) form.reset();
   }, [ExpenseSuccess]);

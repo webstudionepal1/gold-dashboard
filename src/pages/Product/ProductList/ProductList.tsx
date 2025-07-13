@@ -21,7 +21,6 @@ import { productListColumns } from "../productObj";
 
 const ProductList: React.FC = () => {
   const { data: productsList, isSuccess, isLoading } = useGetAllProductsQuery();
-  console.log("PRODUCT LIST DATA", productsList);
   const productsData = useMemo(
     () => (isSuccess ? productsList : []),
     [isSuccess, productsList]

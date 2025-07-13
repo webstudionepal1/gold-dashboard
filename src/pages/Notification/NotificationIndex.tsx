@@ -3,7 +3,6 @@ import Header from "../../components/shared/table_heading/Header";
 import { useGetNotifications } from "../../server/api/push-notifications";
 const NotificationIndex = () => {
   const { data } = useGetNotifications();
-  console.log("data", data);
   return (
     <>
       <div className="mx-4 my-3">

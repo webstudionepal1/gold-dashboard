@@ -11,7 +11,7 @@ import { AddProductSubCategory } from "./components/AddProductSubCategory";
 import Header from "../../../components/shared/table_heading/Header";
 import { subCategoryColumns } from "../productObj";
 import MasterTable from "../../../components/shared/MasterTable";
-import { get } from "lodash";
+// import { get } from "lodash";
 
 interface IEditModal {
   state: boolean;
@@ -31,6 +31,7 @@ const Productsubcategory: React.FC = () => {
     isSuccess,
     isLoading,
   } = useGetAllProductSubCategoriesQuery();
+
   const { mutate: deleteSubCategory } = useDeleteProductSubCategoryMutation();
   const subCategoriesData = useMemo(
     () =>
@@ -38,7 +39,7 @@ const Productsubcategory: React.FC = () => {
         ? subCategories?.map((item, index: number) => ({
             ...item,
             sn: index + 1,
-            category: get(item, "category.name", "-"),
+            // category: get(item, "category._id", "-"),
           }))
         : [],
     [isSuccess, subCategories]
@@ -54,7 +55,7 @@ const Productsubcategory: React.FC = () => {
               editData: null,
             });
           }}
-         className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-sm text-white px-4 py-2 flex rounded-lg transition-colors duration-200"
+          className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-sm text-white px-4 py-2 flex rounded-lg transition-colors duration-200"
         >
           <Icon icon="ic:outline-add" fontSize={24} />
           New Subcategory

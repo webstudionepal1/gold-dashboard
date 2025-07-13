@@ -79,12 +79,10 @@ const EditProfileForm = () => {
       if (Array.isArray(value.qr)) {
         value.qr.forEach((item: File) => formdata.append("qr", item));
       }
-      console.log("formdata", value);
       updateProfile({ id: companyData._id, body: formdata });
     },
   });
 
-  console.log("form", form.state.values);
   return (
     <div>
       <div className="flex items-center justify-between">
