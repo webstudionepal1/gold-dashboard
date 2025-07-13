@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useForm, useStore } from "@tanstack/react-form";
 import { InputField } from "../../../../components/shared/form_components/InputField";
 import { DropdownField } from "../../../../components/shared/form_components/Dropdown";
@@ -24,6 +24,10 @@ import {
 } from "../../productObj";
 import MultiImageUploader from "../../../../components/shared/form_components/FileDropInput";
 import { cleanObject } from "../../../../utils/cleanObject";
+import {
+  formatNumberInputValue,
+  parseNumberInputValue,
+} from "../../../../utils/numberInputHelpers";
 
 const ProductForm = () => {
   const { id } = useParams();
@@ -73,8 +77,6 @@ const ProductForm = () => {
     [claspsSuccess, clasps]
   );
 
-  const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
-
   const visibilityOptions = [
     { value: "featured", label: "Featured" },
     { value: "bestsellers", label: "Best Sellers" },
@@ -84,28 +86,6 @@ const ProductForm = () => {
   ];
 
   const formstate = id ?? "add";
-
-  // Custom validation function
-  const validateForm = (values: IProductFormValues) => {
-    try {
-      productFormSchema.parse(values);
-      setFormErrors({});
-      return true;
-    } catch (error: any) {
-      const errors: Record<string, string[]> = {};
-      if (error.errors) {
-        error.errors.forEach((err: any) => {
-          const path = err.path.join(".");
-          if (!errors[path]) {
-            errors[path] = [];
-          }
-          errors[path].push(err.message);
-        });
-      }
-      setFormErrors(errors);
-      return false;
-    }
-  };
 
   const form = useForm({
     defaultValues: generateProductDefaultValue(
@@ -150,16 +130,12 @@ const ProductForm = () => {
         // Handle image upload - Fix the field name mismatch
         if (value.images) {
           formData.append("images", value.images);
+        } else if (formstate !== "add" && value.existingImage) {
+          // For updates without new image, include existing image info
+          formData.append("existingImage", value.existingImage);
         }
 
         if (formstate !== "add") {
-          // Handle existing images for update
-          // if (productData.images && productData.images.length > 0) {
-          //   productData.images.forEach((img) =>
-          //     formData.append(`existingImages`, img)
-          //   );
-          // }
-
           updateProduct({ id: productData._id, body: formData });
         } else {
           createProduct(formData);
@@ -178,8 +154,8 @@ const ProductForm = () => {
   }, [productCreateSuccess, productUpdateSuccess]);
 
   // Helper function to get field errors
-  const getFieldError = (fieldPath: string) => {
-    return formErrors[fieldPath] || [];
+  const getFieldError = (_fieldPath: string) => {
+    return [];
   };
 
   // Debug: Log form state
@@ -349,10 +325,12 @@ const ProductForm = () => {
                                   placeholder="Enter base price"
                                   type="number"
                                   required
-                                  value={subField.state.value}
+                                  value={formatNumberInputValue(
+                                    subField.state.value
+                                  )}
                                   onChange={(e) =>
                                     subField.handleChange(
-                                      Number(e.target.value)
+                                      Number(e.target.value) || 0
                                     )
                                   }
                                 />
@@ -378,12 +356,14 @@ const ProductForm = () => {
                                   step="any"
                                   min="0"
                                   placeholder="Enter in gram"
-                                  value={subField.state.value}
-                                  onChange={(e) =>
+                                  value={formatNumberInputValue(
+                                    subField.state.value
+                                  )}
+                                  onChange={(e) => {
                                     subField.handleChange(
-                                      Number(e.target.value) || 0
-                                    )
-                                  }
+                                      parseNumberInputValue(e.target.value)
+                                    );
+                                  }}
                                 />
                                 <FieldError field={subField} />
                                 {getFieldError(`variant.${i}.wt`).length >
@@ -435,11 +415,13 @@ const ProductForm = () => {
                         label="Length"
                         required
                         type="number"
-                        placeholder="0"
-                        value={String(field.state.value)}
-                        onChange={(e) =>
-                          field.handleChange(Number(e.target.value))
-                        }
+                        placeholder="Enter length"
+                        value={formatNumberInputValue(field.state.value)}
+                        onChange={(e) => {
+                          field.handleChange(
+                            parseNumberInputValue(e.target.value)
+                          );
+                        }}
                       />
                       <FieldError field={field} />
                       {getFieldError("length").length > 0 && (
@@ -552,11 +534,13 @@ const ProductForm = () => {
                         label="Dimension"
                         required
                         type="number"
-                        placeholder="0"
-                        value={String(field.state.value)}
-                        onChange={(e) =>
-                          field.handleChange(Number(e.target.value))
-                        }
+                        placeholder="Enter dimension"
+                        value={formatNumberInputValue(field.state.value)}
+                        onChange={(e) => {
+                          field.handleChange(
+                            parseNumberInputValue(e.target.value)
+                          );
+                        }}
                       />
                       <FieldError field={field} />
                       {getFieldError("dimension").length > 0 && (
