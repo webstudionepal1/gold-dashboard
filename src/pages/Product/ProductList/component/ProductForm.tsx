@@ -24,10 +24,7 @@ import {
 } from "../../productObj";
 import MultiImageUploader from "../../../../components/shared/form_components/FileDropInput";
 import { cleanObject } from "../../../../utils/cleanObject";
-import {
-  formatNumberInputValue,
-  parseNumberInputValue,
-} from "../../../../utils/numberInputHelpers";
+import { useClearableNumberInput } from "../../../../utils/numberInputHelpers";
 
 const ProductForm = () => {
   const { id } = useParams();
@@ -317,64 +314,63 @@ const ProductForm = () => {
                       >
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                           <form.Field name={`variant[${i}].price`}>
-                            {(subField) => (
-                              <div>
-                                <PriceInputField
-                                  label="Base Price"
-                                  placeholder="Enter base price"
-                                  type="number"
-                                  required
-                                  value={formatNumberInputValue(
-                                    subField.state.value
+                            {(subField) => {
+                              const priceInput = useClearableNumberInput(
+                                subField.state.value,
+                                subField.handleChange
+                              );
+                              return (
+                                <div>
+                                  <PriceInputField
+                                    label="Base Price"
+                                    placeholder="Enter base price"
+                                    type="number"
+                                    required
+                                    min="0"
+                                    {...priceInput}
+                                  />
+                                  {getFieldError(`variant.${i}.price`).length >
+                                    0 && (
+                                    <div className="text-red-500 text-sm mt-1">
+                                      {getFieldError(`variant.${i}.price`).join(
+                                        ", "
+                                      )}
+                                    </div>
                                   )}
-                                  onChange={(e) =>
-                                    subField.handleChange(
-                                      Number(e.target.value) || 0
-                                    )
-                                  }
-                                />
-                                {getFieldError(`variant.${i}.price`).length >
-                                  0 && (
-                                  <div className="text-red-500 text-sm mt-1">
-                                    {getFieldError(`variant.${i}.price`).join(
-                                      ", "
-                                    )}
-                                  </div>
-                                )}
-                              </div>
-                            )}
+                                </div>
+                              );
+                            }}
                           </form.Field>
 
                           <form.Field name={`variant[${i}].wt`}>
-                            {(subField) => (
-                              <div>
-                                <InputField
-                                  label="Size"
-                                  type="number"
-                                  required
-                                  step="any"
-                                  min="0"
-                                  placeholder="Enter in gram"
-                                  value={formatNumberInputValue(
-                                    subField.state.value
+                            {(subField) => {
+                              const weightInput = useClearableNumberInput(
+                                subField.state.value,
+                                subField.handleChange
+                              );
+                              return (
+                                <div>
+                                  <InputField
+                                    label="Size"
+                                    type="number"
+                                    required
+                                    step="any"
+                                    min="0"
+                                    placeholder="Enter in gram"
+                                    {...weightInput}
+                                  />
+                                  <FieldError field={subField} />
+                                  {getFieldError(`variant.${i}.wt`).length >
+                                    0 && (
+                                    <div className="text-red-500 text-sm mt-1">
+                                      {getFieldError(`variant.${i}.wt`).join(
+                                        ", "
+                                      )}
+                                    </div>
                                   )}
-                                  onChange={(e) => {
-                                    subField.handleChange(
-                                      parseNumberInputValue(e.target.value)
-                                    );
-                                  }}
-                                />
-                                <FieldError field={subField} />
-                                {getFieldError(`variant.${i}.wt`).length >
-                                  0 && (
-                                  <div className="text-red-500 text-sm mt-1">
-                                    {getFieldError(`variant.${i}.wt`).join(
-                                      ", "
-                                    )}
-                                  </div>
-                                )}
-                              </div>
-                            )}
+                                </div>
+                              );
+                            }}
                           </form.Field>
                         </div>
                         {i > 0 && (
@@ -408,28 +404,30 @@ const ProductForm = () => {
               </h2>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <form.Field name="length">
-                  {(field) => (
-                    <div>
-                      <InputField
-                        label="Length"
-                        required
-                        type="number"
-                        placeholder="Enter length"
-                        value={formatNumberInputValue(field.state.value)}
-                        onChange={(e) => {
-                          field.handleChange(
-                            parseNumberInputValue(e.target.value)
-                          );
-                        }}
-                      />
-                      <FieldError field={field} />
-                      {getFieldError("length").length > 0 && (
-                        <div className="text-red-500 text-sm mt-1">
-                          {getFieldError("length").join(", ")}
-                        </div>
-                      )}
-                    </div>
-                  )}
+                  {(field) => {
+                    const lengthInput = useClearableNumberInput(
+                      field.state.value,
+                      field.handleChange
+                    );
+                    return (
+                      <div>
+                        <InputField
+                          label="Length"
+                          required
+                          type="number"
+                          placeholder="Enter length"
+                          min="0"
+                          {...lengthInput}
+                        />
+                        <FieldError field={field} />
+                        {getFieldError("length").length > 0 && (
+                          <div className="text-red-500 text-sm mt-1">
+                            {getFieldError("length").join(", ")}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }}
                 </form.Field>
 
                 <form.Field name="claspType">
@@ -527,28 +525,30 @@ const ProductForm = () => {
                 </form.Field>
 
                 <form.Field name="dimension">
-                  {(field) => (
-                    <div>
-                      <InputField
-                        label="Dimension"
-                        required
-                        type="number"
-                        placeholder="Enter dimension"
-                        value={formatNumberInputValue(field.state.value)}
-                        onChange={(e) => {
-                          field.handleChange(
-                            parseNumberInputValue(e.target.value)
-                          );
-                        }}
-                      />
-                      <FieldError field={field} />
-                      {getFieldError("dimension").length > 0 && (
-                        <div className="text-red-500 text-sm mt-1">
-                          {getFieldError("dimension").join(", ")}
-                        </div>
-                      )}
-                    </div>
-                  )}
+                  {(field) => {
+                    const dimensionInput = useClearableNumberInput(
+                      field.state.value,
+                      field.handleChange
+                    );
+                    return (
+                      <div>
+                        <InputField
+                          label="Dimension"
+                          required
+                          type="number"
+                          placeholder="Enter dimension"
+                          min="0"
+                          {...dimensionInput}
+                        />
+                        <FieldError field={field} />
+                        {getFieldError("dimension").length > 0 && (
+                          <div className="text-red-500 text-sm mt-1">
+                            {getFieldError("dimension").join(", ")}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }}
                 </form.Field>
               </div>
             </div>
