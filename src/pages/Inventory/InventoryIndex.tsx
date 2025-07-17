@@ -9,7 +9,12 @@ import {
   Table,
   type TableData,
 } from "../../components/shared/Table";
-import { useGetAllProductsQuery, IFetchProduct, IProductCategory, IBaseProductSubCategory } from "../../server/api/productHooks";
+import {
+  useGetAllProductsQuery,
+  IFetchProduct,
+  IProductCategory,
+  IBaseProductSubCategory,
+} from "../../server/api/productHooks";
 
 interface InventoryItem {
   _id: string;
@@ -46,7 +51,11 @@ const InventoryIndex = () => {
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
 
   // Fetch products from API
-  const { data: products, isLoading: productsLoading, error: productsError } = useGetAllProductsQuery({});
+  const {
+    data: products,
+    isLoading: productsLoading,
+    error: productsError,
+  } = useGetAllProductsQuery({});
 
   console.log(
     isModalOpen,
@@ -79,38 +88,42 @@ const InventoryIndex = () => {
     if (selectedFilter) {
       // Check if it's a status filter
       if (["On Stock", "Low Stock", "Out of Stock"].includes(selectedFilter)) {
-        filteredItems = filteredItems.filter(item => item.status === selectedFilter);
+        filteredItems = filteredItems.filter(
+          (item) => item.status === selectedFilter
+        );
       } else {
         // It's a category filter
-        filteredItems = filteredItems.filter(item => item.category === selectedFilter);
+        filteredItems = filteredItems.filter(
+          (item) => item.category === selectedFilter
+        );
       }
     }
 
     // Then apply sorting
     if (selectedSort) {
       switch (selectedSort) {
-        case 'name-asc':
+        case "name-asc":
           filteredItems.sort((a, b) => a.name.localeCompare(b.name));
           break;
-        case 'name-desc':
+        case "name-desc":
           filteredItems.sort((a, b) => b.name.localeCompare(a.name));
           break;
-        case 'price-high':
+        case "price-high":
           filteredItems.sort((a, b) => (b.price || 0) - (a.price || 0));
           break;
-        case 'price-low':
+        case "price-low":
           filteredItems.sort((a, b) => (a.price || 0) - (b.price || 0));
           break;
-        case 'weight-high':
+        case "weight-high":
           filteredItems.sort((a, b) => (b.wt || 0) - (a.wt || 0));
           break;
-        case 'weight-low':
+        case "weight-low":
           filteredItems.sort((a, b) => (a.wt || 0) - (b.wt || 0));
           break;
-        case 'stock-high':
+        case "stock-high":
           filteredItems.sort((a, b) => b.remainingStock - a.remainingStock);
           break;
-        case 'stock-low':
+        case "stock-low":
           filteredItems.sort((a, b) => a.remainingStock - b.remainingStock);
           break;
         default:
@@ -162,7 +175,7 @@ const InventoryIndex = () => {
       subCategory: item.subCategory,
       price: item.price,
       wt: item.wt,
-      isActive: item.isActive
+      isActive: item.isActive,
     };
     setEditingItem(inventoryItem);
     setIsModalOpen(true);
@@ -183,8 +196,12 @@ const InventoryIndex = () => {
   };
 
   // Get unique categories from products for filter options
-  const [categoryOptions, setCategoryOptions] = useState<{ value: string; label: string }[]>([]);
-  const [statusOptions, setStatusOptions] = useState<{ value: string; label: string }[]>([
+  const [categoryOptions, setCategoryOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [statusOptions, setStatusOptions] = useState<
+    { value: string; label: string }[]
+  >([
     { value: "", label: "All Status" },
     { value: "On Stock", label: "On Stock" },
     { value: "Low Stock", label: "Low Stock" },
@@ -196,8 +213,12 @@ const InventoryIndex = () => {
       // Extract unique categories
       const categories = new Set<string>();
       products.forEach((product) => {
-        if (product.category && typeof product.category === 'object' &&
-            'name' in product.category && product.category.name) {
+        if (
+          product.category &&
+          typeof product.category === "object" &&
+          "name" in product.category &&
+          product.category.name
+        ) {
           categories.add(product.category.name);
         }
       });
@@ -213,8 +234,10 @@ const InventoryIndex = () => {
   }, [products]);
 
   const filterOptions = [
-    ...(categoryOptions.length > 0 ? categoryOptions : [{ value: "", label: "All Products" }]),
-    ...statusOptions
+    ...(categoryOptions.length > 0
+      ? categoryOptions
+      : [{ value: "", label: "All Products" }]),
+    ...statusOptions,
   ];
 
   const sortOptions = [
@@ -248,41 +271,62 @@ const InventoryIndex = () => {
     if (products) {
       const transformedItems = products.flatMap((product) => {
         // Get category and subcategory names
-        const categoryName = typeof product.category === 'object' && product.category && 'name' in product.category ?
-          product.category.name as string : '';
-        const subCategoryName = typeof product.subCategory === 'object' && product.subCategory && 'name' in product.subCategory ?
-          product.subCategory.name as string : '';
+        const categoryName =
+          typeof product.category === "object" &&
+          product.category &&
+          "name" in product.category
+            ? (product.category.name as string)
+            : "";
+        const subCategoryName =
+          typeof product.subCategory === "object" &&
+          product.subCategory &&
+          "name" in product.subCategory
+            ? (product.subCategory.name as string)
+            : "";
 
         // If no variants, create a single item with default values
-        if (!product.variant || !Array.isArray(product.variant) || product.variant.length < 1) {
-          return [{
-            _id: product._id || "",
-            name: product.name || "",
-            totalStock: 0,
-            remainingStock: 0,
-            usedStock: 0,
-            unit: "",
-            reorder_point: 0,
-            status: "Out of Stock" as const,
-            image: product.images && Array.isArray(product.images) && product.images.length > 0 ? product.images[0] : undefined,
-            category: categoryName,
-            subCategory: subCategoryName,
-            price: 0,
-            wt: 0
-          }];
+        if (
+          !product.variant ||
+          !Array.isArray(product.variant) ||
+          product.variant.length < 1
+        ) {
+          return [
+            {
+              _id: product._id || "",
+              name: product.name || "",
+              totalStock: 0,
+              remainingStock: 0,
+              usedStock: 0,
+              unit: "",
+              reorder_point: 0,
+              status: "Out of Stock" as const,
+              image:
+                product.images &&
+                Array.isArray(product.images) &&
+                product.images.length > 0
+                  ? product.images[0]
+                  : undefined,
+              category: categoryName,
+              subCategory: subCategoryName,
+              price: 0,
+              wt: 0,
+            },
+          ];
         }
 
         // Create an inventory item for each variant
-        return product.variant.map((variant, index) => {
+        return product.variants.map((variant, index) => {
           // Determine status based on stock levels
           let status: "On Stock" | "Low Stock" | "Out of Stock" = "On Stock";
           const remainingStock = variant.remainingStock || 0;
           const totalStock = variant.totalStock || 0;
-          const reorderPoint = variant.reorderPoint || Math.floor(totalStock * 0.2); // Use variant's reorderPoint if available
+          const reorderPoint =
+            variant.reorderPoint || Math.floor(totalStock * 0.2); // Use variant's reorderPoint if available
 
           if (remainingStock <= 0) {
             status = "Out of Stock";
-          } else if (remainingStock <= reorderPoint) { // Less than reorder point
+          } else if (remainingStock <= reorderPoint) {
+            // Less than reorder point
             status = "Low Stock";
           }
 
@@ -295,11 +339,16 @@ const InventoryIndex = () => {
             unit: variant.unit || "",
             reorder_point: reorderPoint,
             status: status,
-            image: product.images && Array.isArray(product.images) && product.images.length > 0 ? product.images[0] : undefined,
+            image:
+              product.images &&
+              Array.isArray(product.images) &&
+              product.images.length > 0
+                ? product.images[0]
+                : undefined,
             category: categoryName,
             subCategory: subCategoryName,
             price: variant.price || 0,
-            wt: variant.wt || 0
+            wt: variant.wt || 0,
           };
         });
       });
@@ -317,14 +366,18 @@ const InventoryIndex = () => {
         <div className="flex items-center">
           <img
             src={
-              row.image ? row.image : "https://imgs.search.brave.com/N7iiPmgTwP6DQJtXQfwaAm-6xOmlKftSIdIkAcau0yk/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvMTE5/ODI1MjY3Mi9waG90/by9lbmdhZ2VtZW50/LWRpYW1vbmQtcmlu/Zy1qZXdlbHJ5LWlz/b2xhdGVkLW9uLXdo/aXQlRDElODMtYmFj/a2dyb3VuZC5qcGc_/cz02MTJ4NjEyJnc9/MCZrPTIwJmM9cDFu/Q2o0SDBkWnFURlBs/YTVxT0hMSnRDQUZJ/Y0F6NW5zeGU2UDJs/cWdXMD0"
+              row.image
+                ? row.image
+                : "https://imgs.search.brave.com/N7iiPmgTwP6DQJtXQfwaAm-6xOmlKftSIdIkAcau0yk/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvMTE5/ODI1MjY3Mi9waG90/by9lbmdhZ2VtZW50/LWRpYW1vbmQtcmlu/Zy1qZXdlbHJ5LWlz/b2xhdGVkLW9uLXdo/aXQlRDElODMtYmFj/a2dyb3VuZC5qcGc_/cz02MTJ4NjEyJnc9/MCZrPTIwJmM9cDFu/Q2o0SDBkWnFURlBs/YTVxT0hMSnRDQUZJ/Y0F6NW5zeGU2UDJs/cWdXMD0"
             }
             alt={row.name}
             className="w-10 h-10 rounded-md mr-3 object-cover"
           />
           <div>
             <h1 className="font-medium text-gray-900">{row.name}</h1>
-            <p className=" text-[#8795a8]">ID:{row._id.split('-')[0].substring(0, 8)}</p>
+            <p className=" text-[#8795a8]">
+              ID:{row._id.split("-")[0].substring(0, 8)}
+            </p>
           </div>
         </div>
       ),
@@ -334,15 +387,15 @@ const InventoryIndex = () => {
       header: "Price",
       key: "price",
       render: (value, row) => (
-        <span className="font-medium text-blue-600">${row.price?.toFixed(2) || '0.00'}</span>
+        <span className="font-medium text-blue-600">
+          ${row.price?.toFixed(2) || "0.00"}
+        </span>
       ),
     },
     {
       header: "Weight",
       key: "wt",
-      render: (value, row) => (
-        <span>{row.wt || '0'}</span>
-      ),
+      render: (value, row) => <span>{row.wt || "0"}</span>,
     },
     {
       header: "Total Stock",
@@ -361,7 +414,11 @@ const InventoryIndex = () => {
         } else if (row.remainingStock <= row.reorder_point) {
           colorClass = "text-yellow-600";
         }
-        return <span className={`font-medium ${colorClass}`}>{row.remainingStock}</span>;
+        return (
+          <span className={`font-medium ${colorClass}`}>
+            {row.remainingStock}
+          </span>
+        );
       },
     },
     {
@@ -379,7 +436,10 @@ const InventoryIndex = () => {
         const isLowStock = row.remainingStock <= row.reorder_point;
         return (
           <div className="flex items-center">
-            <span className={`font-medium ${isLowStock ? 'text-yellow-600' : 'text-gray-600'}`}>
+            <span
+              className={`font-medium ${
+                isLowStock ? "text-yellow-600" : "text-gray-600"
+              }`}>
               {row.reorder_point}
             </span>
             {isLowStock && (
@@ -398,7 +458,7 @@ const InventoryIndex = () => {
         const statusIcons: Record<string, string> = {
           "On Stock": "mdi:check-circle",
           "Low Stock": "mdi:alert-circle",
-          "Out of Stock": "mdi:close-circle"
+          "Out of Stock": "mdi:close-circle",
         };
 
         return (
@@ -406,8 +466,7 @@ const InventoryIndex = () => {
             <span
               className={`px-5 py-1 rounded-full text-xs ${getStatusColor(
                 row.status
-              )}`}
-            >
+              )}`}>
               {row.status}
             </span>
             <span className="ml-2">
@@ -415,7 +474,11 @@ const InventoryIndex = () => {
                 icon={statusIcons[row.status] || "mdi:help-circle"}
                 width="16"
                 height="16"
-                className={getStatusColor(row.status).includes("text-") ? getStatusColor(row.status).split("text-")[1].split(" ")[0] : ""}
+                className={
+                  getStatusColor(row.status).includes("text-")
+                    ? getStatusColor(row.status).split("text-")[1].split(" ")[0]
+                    : ""
+                }
               />
             </span>
           </div>
@@ -428,23 +491,24 @@ const InventoryIndex = () => {
     const filteredAndSortedItems = applyFiltersAndSort(items);
 
     // Add a custom property to each row to determine background color
-    const dataWithRowStyles: TableData<InventoryItem>[] = filteredAndSortedItems.map(item => {
-      let rowStyle = '';
+    const dataWithRowStyles: TableData<InventoryItem>[] =
+      filteredAndSortedItems.map((item) => {
+        let rowStyle = "";
 
-      // Apply red background for out of stock items
-      if (item.remainingStock <= 0) {
-        rowStyle = 'bg-fade-red';
-      }
-      // Apply yellow background for low stock items (at or below reorder point)
-      else if (item.remainingStock <= item.reorder_point) {
-        rowStyle = 'bg-fade-yellow';
-      }
+        // Apply red background for out of stock items
+        if (item.remainingStock <= 0) {
+          rowStyle = "bg-fade-red";
+        }
+        // Apply yellow background for low stock items (at or below reorder point)
+        else if (item.remainingStock <= item.reorder_point) {
+          rowStyle = "bg-fade-yellow";
+        }
 
-      return {
-        ...item,
-        _rowStyle: rowStyle // Add custom property for styling
-      };
-    });
+        return {
+          ...item,
+          _rowStyle: rowStyle, // Add custom property for styling
+        };
+      });
 
     return (
       <Table
@@ -495,7 +559,12 @@ const InventoryIndex = () => {
   const renderEmpty = () => {
     return (
       <div className="flex flex-col justify-center items-center h-40">
-        <Icon icon="mdi:inventory" width="48" height="48" className="text-gray-400 mb-2" />
+        <Icon
+          icon="mdi:inventory"
+          width="48"
+          height="48"
+          className="text-gray-400 mb-2"
+        />
         <p className="text-gray-500">No inventory items found</p>
       </div>
     );
@@ -530,15 +599,17 @@ const InventoryIndex = () => {
             />
           </div>
           <div className="mx-2">
-            {productsLoading ? (
-              renderLoading()
-            ) : productsError ? (
-              renderError(typeof productsError === 'string' ? productsError : 'Failed to load products')
-            ) : inventoryItems.length === 0 ? (
-              renderEmpty()
-            ) : (
-              renderInventoryTable(inventoryItems)
-            )}
+            {productsLoading
+              ? renderLoading()
+              : productsError
+              ? renderError(
+                  typeof productsError === "string"
+                    ? productsError
+                    : "Failed to load products"
+                )
+              : inventoryItems.length === 0
+              ? renderEmpty()
+              : renderInventoryTable(inventoryItems)}
           </div>
         </div>
       </div>

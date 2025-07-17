@@ -13,6 +13,7 @@ import ProductDescription from "../pages/Product/ProductList/[id]/ProdectDescrip
 import ProductList from "../pages/Product/ProductList/ProductList";
 import ProductCategory from "../pages/Product/ProductCategory/ProductCategory";
 import Productsubcategory from "../pages/Product/ProductSubcategory/ProductSubCategory";
+import ProductOccasion from "../pages/Product/ProductOccasion/ProductOccasion";
 import AttributeIndex from "../pages/Attribute/AttributeIndex";
 import BannerIndex from "../pages/Banner/BannerIndex";
 import NotificationIndex from "../pages/Notification/NotificationIndex";
@@ -21,6 +22,11 @@ import ConfirmedOrder from "../pages/OrderManagement/ConfirmedOrder/ConfirmedOrd
 import OrderIndex from "../pages/OrderManagement/Order/OrderIndex";
 import AddOrderForm from "../pages/OrderManagement/Order/components/AddOrderPage";
 import AddBannerForm from "../pages/Banner/Components/AddBannerForm";
+import CollectionIndex from "../pages/Collection/CollectionIndex";
+import CollectionForm from "../pages/Collection/components/CollectionForm";
+import CollectionDetails from "../pages/Collection/components/CollectionDetails";
+
+import NewCollectionForm from "../pages/Collection/components/NewCollectionForm";
 import CustomerIndex from "../pages/Customer/CustomerIndex";
 import AddCustomerForm from "../pages/Customer/components/AddCustomerForm";
 import Transaction from "../pages/transaction/Transaction";
@@ -125,6 +131,10 @@ export const routesConfig = [
     path: FrontendRoutes.PRODUCTSUBCATEGORY,
     element: <Productsubcategory />,
   },
+  {
+    path: FrontendRoutes.PRODUCTOCCASION,
+    element: <ProductOccasion />,
+  },
 
   {
     path: FrontendRoutes.CUSTOMER,
@@ -184,6 +194,25 @@ export const routesConfig = [
     path: "/banner/:id",
     element: <AddBannerForm />,
   },
+
+  // Collections
+  {
+    path: FrontendRoutes.COLLECTION,
+    element: <CollectionIndex />,
+  },
+  {
+    path: FrontendRoutes.ADDCOLLECTION,
+    element: <NewCollectionForm />,
+  },
+  {
+    path: FrontendRoutes.EDITCOLLECTION,
+    element: <NewCollectionForm />,
+  },
+  {
+    path: FrontendRoutes.COLLECTIONDETAILS,
+    element: <CollectionDetails />,
+  },
+
   {
     path: FrontendRoutes.NOTIFICATION,
     element: <NotificationIndex />,

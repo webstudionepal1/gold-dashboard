@@ -5,6 +5,7 @@ export const FrontendRoutes = {
   PRODUCTDESCRIPTION: "/product/:productId",
   PRODUCTCATEGORY: "/product/product-category",
   PRODUCTSUBCATEGORY: "/product/sub-category",
+  PRODUCTOCCASION: "/product/product-occasion",
   ASSIGNEDORDER: "/order/assigned-order",
   CONFIRMEDORDER: "/order/confirmed-order",
   ADDORDER: "/order/add-order",
@@ -26,6 +27,10 @@ export const FrontendRoutes = {
   // ATTRIBUTES: "/attribute",
   BANNER: "/banner",
   ADDBANNER: "/banner/add-banner",
+  COLLECTION: "/collection",
+  ADDCOLLECTION: "/collection/add",
+  EDITCOLLECTION: "/collection/edit/:id",
+  COLLECTIONDETAILS: "/collection/details/:id",
   NOTIFICATION: "/notification",
   MYPOSTBUSINESS: "/my-post-business",
 
