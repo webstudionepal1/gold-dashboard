@@ -25,13 +25,13 @@ import {
 } from "../../server/api/bannerHook";
 import { ScrollableModal } from "../../components/shared/ScrollableModal";
 import { updateBannerState } from "./Components/bannerStore";
+import { ensureStreamingUrl } from "../../utils/videoUtils";
 
 interface BannerItem {
   _id: string;
   title: string;
   banner_type: string;
   image: string[];
-  mobImage: string[];
   category: string;
   subCategory: string;
   banner_title?: string;
@@ -67,7 +67,6 @@ const BannerIndex: React.FC = () => {
       category: banner.category,
       subCategory: banner.subCategory,
       image: banner.image,
-      mobImage: banner.mobImage,
       priority: banner.priority,
       locations: banner.locations,
       type: banner.type,
@@ -164,7 +163,7 @@ const BannerIndex: React.FC = () => {
       key: "type",
     },
     {
-      header: "Web Image",
+      header: "Banner Image",
       key: "image",
       render: (_, row) => (
         <div>
@@ -174,26 +173,7 @@ const BannerIndex: React.FC = () => {
                 <img
                   src={`https://gold-api.webstudiomatrix.com/${item}`}
                   width={120}
-                  className="rounded-lg"
-                />
-              );
-            })}
-        </div>
-      ),
-    },
-
-    {
-      header: "Mobile Image",
-      key: "mobImage",
-      render: (_, row) => (
-        <div>
-          {row.mobImage &&
-            row?.mobImage.map((item) => {
-              return (
-                <img
-                  src={`https://gold-api.webstudiomatrix.com/${item}`}
-                  width={120}
-                  className="rounded-lg"
+                  className="rounded-lg object-cover"
                 />
               );
             })}
@@ -250,27 +230,23 @@ const BannerIndex: React.FC = () => {
           defaultValue="homepage"
           value={selectedTab}
           onValueChange={(value) => setSelectedTab(value)}
-          className="w-full"
-        >
+          className="w-full">
           {/* Container for both TabsList and SearchFilterSort */}
           <div className="flex items-center justify-between ">
             <TabsList className="bg-transparent p-0 h-auto">
               <TabsTrigger
                 value="homepage"
-                className="px-4 py-3 rounded-none data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:text-[#DF8D28] data-[state=active]:border-b-2 data-[state=active]:border-[#DF8D28] text-gray-500"
-              >
+                className="px-4 py-3 rounded-none data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:text-[#DF8D28] data-[state=active]:border-b-2 data-[state=active]:border-[#DF8D28] text-gray-500">
                 Home Page
               </TabsTrigger>
               <TabsTrigger
                 value="category-page"
-                className="px-4 py-3 rounded-none data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:text-[#DF8D28] data-[state=active]:border-b-2 data-[state=active]:border-[#DF8D28] text-gray-500"
-              >
+                className="px-4 py-3 rounded-none data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:text-[#DF8D28] data-[state=active]:border-b-2 data-[state=active]:border-[#DF8D28] text-gray-500">
                 Category Page
               </TabsTrigger>
               <TabsTrigger
                 value="product-page"
-                className="px-4 py-3 rounded-none data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:text-[#DF8D28] data-[state=active]:border-b-2 data-[state=active]:border-[#DF8D28] text-gray-500"
-              >
+                className="px-4 py-3 rounded-none data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:text-[#DF8D28] data-[state=active]:border-b-2 data-[state=active]:border-[#DF8D28] text-gray-500">
                 Product Page
               </TabsTrigger>
             </TabsList>
@@ -302,39 +278,103 @@ const BannerIndex: React.FC = () => {
       </div>
 
       {isViewModalOpen && editingItem && (
-        <ScrollableModal classname="w-[30%]" onClose={handleCloseModal}>
-          <div className="p-4">
-            <h2 className="text-xl font-bold mb-4">Banner Details</h2>
+        <ScrollableModal classname="w-[50%]" onClose={handleCloseModal}>
+          <div className="p-6">
+            <h2 className="text-2xl font-bold mb-6">Banner Details</h2>
             {editingItem && (
-              <div className="space-y-2">
+              <div className="space-y-6">
                 <div>
-                  <strong>Title:</strong> {editingItem.title}
+                  <strong className="text-lg">Title:</strong>
+                  <p className="text-gray-700 mt-1">{editingItem.title}</p>
                 </div>
                 <div>
-                  <strong>Banner Type:</strong> {editingItem.type}
+                  <strong className="text-lg">Description:</strong>
+                  <p className="text-gray-700 mt-1">
+                    {editingItem.description}
+                  </p>
                 </div>
                 <div>
-                  <strong>Web Image:</strong>{" "}
-                  <img
-                    src={`https://gold-api.webstudiomatrix.com/${editingItem.image?.[0]}`}
-                    alt={editingItem.title}
-                    className="w-28 h-14 aspect-w-2 aspect-h-3 rounded-md object-cover"
-                  />
+                  <strong className="text-lg">Banner Type:</strong>
+                  <p className="text-gray-700 mt-1">{editingItem.type}</p>
                 </div>
                 <div>
-                  <strong>Mobile Image:</strong>{" "}
-                  <img
-                    src={`https://gold-api.webstudiomatrix.com/${editingItem.mobImage?.[0]}`}
-                    alt={editingItem.title}
-                    className="w-28 h-14   rounded-md object-cover"
-                  />
+                  <strong className="text-lg">Priority:</strong>
+                  <p className="text-gray-700 mt-1">{editingItem.priority}</p>
                 </div>
+                <div>
+                  <strong className="text-lg">Locations:</strong>
+                  <p className="text-gray-700 mt-1">
+                    {editingItem.locations?.join(", ")}
+                  </p>
+                </div>
+                <div>
+                  <strong className="text-lg">Banner Image:</strong>
+                  <div className="mt-2">
+                    <img
+                      src={`https://gold-api.webstudiomatrix.com/${editingItem.image?.[0]}`}
+                      alt={editingItem.title}
+                      className="w-full max-w-md h-48 rounded-lg object-cover border border-gray-200 shadow-sm"
+                    />
+                  </div>
+                </div>
+                {editingItem.video && (
+                  <div>
+                    <strong className="text-lg">Video:</strong>
+                    <div className="mt-2">
+                      <video
+                        src={ensureStreamingUrl(editingItem.video)}
+                        controls
+                        preload="metadata"
+                        muted
+                        playsInline
+                        className="w-full max-w-md h-48 rounded-lg border border-gray-200 shadow-sm"
+                        style={{
+                          backgroundColor: "#f3f4f6",
+                          objectFit: "cover",
+                        }}
+                        onError={(e) => {
+                          console.error("Banner video error:", e);
+                          console.log(
+                            "Failed video URL:",
+                            ensureStreamingUrl(editingItem.video)
+                          );
+                          console.log(
+                            "Original video value:",
+                            editingItem.video
+                          );
+                        }}
+                        onLoadStart={() => {
+                          console.log(
+                            "Banner video loading:",
+                            ensureStreamingUrl(editingItem.video)
+                          );
+                        }}
+                        onLoadedMetadata={(e) => {
+                          console.log("Banner video metadata loaded");
+                          e.currentTarget.currentTime = 0.1;
+                        }}
+                        onClick={(e) => {
+                          const video = e.currentTarget;
+                          if (video.paused) {
+                            video
+                              .play()
+                              .catch((err) =>
+                                console.error("Play failed:", err)
+                              );
+                          } else {
+                            video.pause();
+                          }
+                        }}>
+                        Your browser does not support the video tag.
+                      </video>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
             <button
               onClick={() => setisViewModalOpen(false)}
-              className="mt-4 bg-red-500 text-white bg-[#e48a28] transition-transform duration-200 ease-in-out hover:scale-105 py-2 px-4 rounded"
-            >
+              className="mt-4 bg-red-500 text-white bg-[#e48a28] transition-transform duration-200 ease-in-out hover:scale-105 py-2 px-4 rounded">
               Close
             </button>
           </div>

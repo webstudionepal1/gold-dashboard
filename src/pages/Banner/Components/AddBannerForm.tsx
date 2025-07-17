@@ -4,6 +4,7 @@ import { InputField } from "../../../components/shared/form_components/InputFiel
 import { DropdownField } from "../../../components/shared/form_components/Dropdown";
 import * as z from "zod";
 import FileDropInput from "../../../components/shared/form_components/FileDropInput";
+import VideoUploadField from "../../../components/shared/form_components/VideoUploadField";
 import {
   useCreateBannerMutation,
   useGetAllBannerQuery,
@@ -21,6 +22,7 @@ import { useParams } from "react-router-dom";
 import { bannerStore } from "./bannerStore";
 import { generateBannerFormDefaultValue, IBannerFormData } from "./bannerobj";
 import Header from "../../../components/shared/table_heading/Header";
+import { ensureStreamingUrl } from "../../../utils/videoUtils";
 
 // const AddBannerSchema = z.object({
 //   title: z.string().min(1, "Banner Title is required"),
@@ -51,10 +53,10 @@ const AddBannerSchema = z.object({
     .instanceof(File)
     .nullable()
     .refine((file) => file !== null, { message: "Web Image is required" }),
-  mobImage: z
-    .instanceof(File)
+  video: z
+    .union([z.instanceof(File), z.string()])
     .nullable()
-    .refine((file) => file !== null, { message: "Mobile Image is required" }),
+    .optional(), // Video can be File or URL string
 });
 const AddBannerForm = () => {
   const { id } = useParams();
@@ -159,7 +161,10 @@ const AddBannerForm = () => {
 
         if (value.image) formData.append("image", value.image);
 
-        if (value.mobImage) formData.append("mobImage", value.mobImage);
+        // Handle video URL (not file) since it's uploaded via enhanced upload API
+        if (value.video && typeof value.video === "string") {
+          formData.append("video", value.video);
+        }
         // createBanner.mutate(formData);
 
         if (id == "add") createBanner(formData);
@@ -182,7 +187,7 @@ const AddBannerForm = () => {
           <Breadcrumbs />
         </div>
 
-        <div className="flex items-center justify-between my-2 gap-4">
+        <div className="my-2">
           <div className="bg-[#ffffff] border-[#eeeeee] border-2 shadow-lg rounded-xl w-full ">
             <form
               className="flex flex-col gap-4 mx-4 my-6 "
@@ -190,8 +195,7 @@ const AddBannerForm = () => {
                 e.preventDefault();
                 e.stopPropagation();
                 form.handleSubmit();
-              }}
-            >
+              }}>
               <div>
                 <h1 className="text-xl font-semibold">General Information</h1>
                 <div className="border-b border-[#dedde2] w-full my-2  "></div>
@@ -327,81 +331,76 @@ const AddBannerForm = () => {
                 </form.Field>
               </div>
 
+              {/* Upload Section */}
+              <div className="mt-6">
+                <h1 className="text-xl font-semibold">Upload Files</h1>
+                <div className="border-b border-[#dedde2] w-full my-2"></div>
+
+                {/* Web Image Upload */}
+                <div className="mb-6">
+                  <h2 className="text-lg font-medium mb-3">Web Image</h2>
+                  <form.Field name="image">
+                    {(field) => (
+                      <div className="w-full">
+                        <FileDropInput
+                          value={field.state.value as unknown as File}
+                          onChange={(file) => {
+                            field.handleChange(file); // store the file directly
+                          }}
+                          existingImageUrl={
+                            id !== "add" && bannerData.image?.[0]
+                              ? `https://gold-api.webstudiomatrix.com/${bannerData.image[0]}`
+                              : undefined
+                          }
+                        />
+                        <FieldError field={field} />
+                      </div>
+                    )}
+                  </form.Field>
+                </div>
+
+                {/* Video Upload */}
+                <div className="mb-6">
+                  <h2 className="text-lg font-medium mb-3">Video (Optional)</h2>
+                  <form.Field name="video">
+                    {(field) => (
+                      <div className="w-full">
+                        <VideoUploadField
+                          label="Select Video File"
+                          value={field.state.value as unknown as File}
+                          onChange={(file) => {
+                            field.handleChange(file); // store the file directly
+                          }}
+                          onUploadComplete={(url) => {
+                            console.log("Video uploaded successfully:", url);
+                            // Store the video URL in the form data instead of the file
+                            field.handleChange(url);
+                          }}
+                          onUploadError={(error) => {
+                            console.error("Video upload failed:", error);
+                            // You can add error handling here if needed
+                          }}
+                          maxFileSize={200} // 200MB limit
+                          existingVideoUrl={
+                            id !== "add" && bannerData.video
+                              ? ensureStreamingUrl(bannerData.video)
+                              : undefined
+                          }
+                        />
+                        <FieldError field={field} />
+                      </div>
+                    )}
+                  </form.Field>
+                </div>
+              </div>
+
               <button
                 type="submit"
                 disabled={bannerPending}
-                className="self-end bg-[#df8d29] text-white px-7 py-2 rounded-xl"
-              >
+                className="self-end bg-[#df8d29] text-white px-7 py-2 rounded-xl">
                 {bannerPending ? "Saving..." : "Save"}
               </button>
             </form>
-          </div>
-          <div className="flex flex-col gap-2 mt-8">
-            <div>
-              <div className="bg-[#ffffff] border-[#eeeeee] border-2 shadow-lg rounded-xl w-full ">
-                <div className="mx-6 my-4">
-                  <div>
-                    <h1 className="text-xl font-semibold">Upload Web Image</h1>
-                    <div className="border-b border-[#dedde2] w-full my-2  "></div>
-                  </div>
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      form.handleSubmit();
-                    }}
-                  >
-                    <form.Field name="image">
-                      {(field) => (
-                        <div className="w-full">
-                          <FileDropInput
-                            value={field.state.value as unknown as File}
-                            onChange={(file) => {
-                              field.handleChange(file); // store the file directly
-                            }}
-                          />
-                          <FieldError field={field} />
-                        </div>
-                      )}
-                    </form.Field>
-                  </form>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <div className="bg-[#ffffff] border-[#eeeeee] border-2 shadow-lg rounded-xl w-full">
-                <div className="mx-6 my-4">
-                  <div>
-                    <h1 className="text-xl font-semibold">
-                      Upload Mobile Image
-                    </h1>
-                    <div className="border-b border-[#dedde2] w-full my-2  "></div>
-                  </div>
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      form.handleSubmit();
-                    }}
-                  >
-                    <form.Field name="mobImage">
-                      {(field) => (
-                        <div className="w-full">
-                          <FileDropInput
-                            value={field.state.value as unknown as File}
-                            onChange={(file) => {
-                              field.handleChange(file); // store the file directly
-                            }}
-                          />
-                          <FieldError field={field} />
-                        </div>
-                      )}
-                    </form.Field>
-                  </form>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

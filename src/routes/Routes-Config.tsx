@@ -41,6 +41,7 @@ import AddSupplierForm from "../pages/PurchaseManagement/components/AddSupplierF
 import SupplierDetail from "../pages/PurchaseManagement/pages/SupplierDetail";
 import SupplierHistory from "../pages/PurchaseManagement/pages/SupplierHistory";
 import AttribConfig from "../pages/settings/components/AttribConfig";
+import TestUpload from "../pages/TestUpload";
 
 export const routesConfig = [
   {
@@ -235,6 +236,10 @@ export const routesConfig = [
   {
     path: FrontendRoutes.STOCK_REPORT,
     element: <StoreReport />,
+  },
+  {
+    path: "/test-upload",
+    element: <TestUpload />,
   },
   {
     path: "*",
