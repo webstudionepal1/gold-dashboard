@@ -322,7 +322,11 @@ const BannerIndex: React.FC = () => {
                     <strong className="text-lg">Video:</strong>
                     <div className="mt-2">
                       <video
-                        src={ensureStreamingUrl(editingItem.video)}
+                        src={
+                          editingItem.video
+                            ? ensureStreamingUrl(editingItem.video)
+                            : ""
+                        }
                         controls
                         preload="metadata"
                         muted
@@ -336,7 +340,9 @@ const BannerIndex: React.FC = () => {
                           console.error("Banner video error:", e);
                           console.log(
                             "Failed video URL:",
-                            ensureStreamingUrl(editingItem.video)
+                            editingItem.video
+                              ? ensureStreamingUrl(editingItem.video)
+                              : "No video URL"
                           );
                           console.log(
                             "Original video value:",
@@ -346,7 +352,9 @@ const BannerIndex: React.FC = () => {
                         onLoadStart={() => {
                           console.log(
                             "Banner video loading:",
-                            ensureStreamingUrl(editingItem.video)
+                            editingItem.video
+                              ? ensureStreamingUrl(editingItem.video)
+                              : "No video URL"
                           );
                         }}
                         onLoadedMetadata={(e) => {

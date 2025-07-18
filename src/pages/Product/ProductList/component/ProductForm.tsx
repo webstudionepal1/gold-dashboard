@@ -155,7 +155,7 @@ const ProductForm = () => {
       formData.append("subCategory", value.subCategory);
 
       value.variants.forEach((v, index: number) => {
-        formData.append(`variants[${index}][sku]`, v.sku);
+        formData.append(`variants[${index}][sku]`, v.sku || "");
         formData.append(`variants[${index}][price]`, String(v.price));
         formData.append(`variants[${index}][wt]`, String(v.wt));
         formData.append(`variants[${index}][unit]`, v.unit);
@@ -933,7 +933,7 @@ const ProductForm = () => {
                                         : "No stones available"
                                     }
                                     options={stonesList}
-                                    value={subField.state.value}
+                                    value={String(subField.state.value || "")}
                                     onChange={(e) =>
                                       subField.handleChange(e.target.value)
                                     }
@@ -977,7 +977,7 @@ const ProductForm = () => {
                                     required
                                     type="number"
                                     placeholder="0"
-                                    value={subField.state.value}
+                                    value={String(subField.state.value || "")}
                                     onChange={(e) =>
                                       subField.handleChange(
                                         Number(e.target.value)
@@ -995,7 +995,7 @@ const ProductForm = () => {
                                   <label className="flex items-center">
                                     <input
                                       type="checkbox"
-                                      checked={subField.state.value}
+                                      checked={Boolean(subField.state.value)}
                                       onChange={(e) =>
                                         subField.handleChange(e.target.checked)
                                       }
@@ -1011,7 +1011,7 @@ const ProductForm = () => {
                                   <label className="flex items-center">
                                     <input
                                       type="checkbox"
-                                      checked={subField.state.value}
+                                      checked={Boolean(subField.state.value)}
                                       onChange={(e) =>
                                         subField.handleChange(e.target.checked)
                                       }

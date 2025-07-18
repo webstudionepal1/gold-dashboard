@@ -43,7 +43,44 @@ export interface Product {
   // Reviews and ratings
   averageRating: number;
   numberOfReviews: number;
-  reviews?: string[];
+
+  // Legacy/mock properties for backward compatibility
+  id?: string;
+  title?: string;
+  price?: number;
+  originalPrice?: number;
+  rating?: number;
+  onSale?: boolean;
+  image?: string;
+  status?: string;
+  inventory?: {
+    sku: number;
+    stockQty: number;
+    reorderLevel: number;
+  };
+  specifications?: {
+    length: string;
+    claspType: string;
+    rhodiumFinish: string;
+  };
+  natural?: {
+    shape: string;
+    color: string;
+    quantity: string;
+    clarity: string;
+    totalcarat: string;
+    carat: string;
+  };
+  reviews?: {
+    average: number;
+    count: number;
+    items: Array<{
+      author: string;
+      rating: number;
+      verified: boolean;
+      text: string;
+    }>;
+  };
 
   // Status and inventory
   isActive: boolean;
@@ -65,23 +102,4 @@ export interface Product {
   createdAt?: Date;
   updatedAt?: Date;
 
-  // Legacy compatibility (for existing components)
-  id?: string; // Maps to _id
-  title?: string; // Maps to name
-  price?: number; // Maps to variants[0].price
-  originalPrice?: number; // Maps to metadata.compareAtPrice
-  rating?: number; // Maps to averageRating
-  onSale?: boolean; // Computed from compareAtPrice
-  image?: string; // Maps to images[0]
-  status?: string; // Maps to visibleAs
-  inventory?: { sku: number; stockQty: number; reorderLevel: number }; // Maps to variants[0]
-  specifications?: { length: string; claspType: string; rhodiumFinish: string };
-  natural?: {
-    shape: string;
-    color: string;
-    quantity: string;
-    clarity: string;
-    totalcarat: string;
-    carat: string;
-  };
 }

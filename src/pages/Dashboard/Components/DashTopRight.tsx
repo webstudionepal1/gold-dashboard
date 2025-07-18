@@ -1,5 +1,5 @@
 import PriceList1 from "../../../assets/images/PriceList1.png";
-import { DonutChart } from "../../../components/ui/DonutChart";
+import DonutChart from "../../../components/ui/DonutChart";
 import BarChart from "../../../components/ui/BarChart";
 import { useEffect, useState, ReactNode } from "react";
 import TopCustomer from "../../../assets/images/TopCustomers1.png";

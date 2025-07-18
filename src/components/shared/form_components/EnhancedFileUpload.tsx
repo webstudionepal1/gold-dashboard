@@ -1,9 +1,10 @@
 import React, { useCallback, useState, useEffect, useRef } from "react";
 import { useDropzone } from "react-dropzone";
-import { io, Socket } from "socket.io-client";
+import { Socket } from "socket.io-client";
 import { apiClient } from "../../../server/utils/ApiGateway";
 import EnhancedProgressBar from "./EnhancedProgressBar";
 import { useUploadProgress } from "../../../hooks/useUploadProgress";
+import SocketManager from "../../../utils/SocketManager";
 
 interface UploadProgress {
   uploadId: string;
@@ -42,55 +43,60 @@ const EnhancedFileUpload: React.FC<EnhancedFileUploadProps> = ({
   const [socket, setSocket] = useState<Socket | null>(null);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const socketManager = SocketManager.getInstance();
 
-  // Initialize WebSocket connection
+  // Initialize WebSocket connection using SocketManager
   useEffect(() => {
-    const socketConnection = io(
-      import.meta.env.VITE_API_LOCAL_URL || "http://localhost:8080",
-      {
-        transports: ["websocket", "polling"],
+    const initializeSocket = async () => {
+      try {
+        const socketConnection = await socketManager.getConnection();
+        setSocket(socketConnection);
+
+        // Set up upload event listeners
+        const handleUploadProgress = (progressData: UploadProgress) => {
+          console.log("Upload progress:", progressData);
+          setProgress(progressData);
+          onUploadProgress?.(progressData);
+        };
+
+        const handleUploadComplete = (data: any) => {
+          console.log("Upload completed:", data);
+          setProgress(null);
+          if (data.success && data.url) {
+            onUploadComplete?.(data.url, progress?.filename || "");
+          } else {
+            onUploadError?.(data.error || "Upload failed");
+          }
+        };
+
+        const handleUploadError = (data: any) => {
+          console.log("Upload error:", data);
+          setProgress(null);
+          setError(data.error);
+          onUploadError?.(data.error);
+        };
+
+        socketManager.onUploadComplete(handleUploadComplete);
+        socketManager.onUploadError(handleUploadError);
+        socketConnection.on("upload-progress", handleUploadProgress);
+
+        return () => {
+          socketConnection.off("upload-progress", handleUploadProgress);
+          socketManager.removeUploadListeners({
+            "upload-complete": handleUploadComplete,
+            "upload-error": handleUploadError,
+          });
+        };
+      } catch (error) {
+        console.error("Failed to initialize socket:", error);
+        setError("Failed to initialize connection");
       }
-    );
+    };
 
-    socketConnection.on("connect", () => {
-      console.log("WebSocket connected");
-      // Authenticate with user token
-      const token = localStorage.getItem("token") || "";
-      const userId = localStorage.getItem("userId") || "";
-      socketConnection.emit("authenticate", { userId, token });
-    });
-
-    socketConnection.on("authenticated", (data) => {
-      console.log("WebSocket authenticated:", data);
-    });
-
-    socketConnection.on("upload-progress", (progressData: UploadProgress) => {
-      console.log("Upload progress:", progressData);
-      setProgress(progressData);
-      onUploadProgress?.(progressData);
-    });
-
-    socketConnection.on("upload-complete", (data) => {
-      console.log("Upload completed:", data);
-      setProgress(null);
-      if (data.success && data.url) {
-        onUploadComplete?.(data.url, progress?.filename || "");
-      } else {
-        onUploadError?.(data.error || "Upload failed");
-      }
-    });
-
-    socketConnection.on("upload-error", (data) => {
-      console.log("Upload error:", data);
-      setProgress(null);
-      setError(data.error);
-      onUploadError?.(data.error);
-    });
-
-    setSocket(socketConnection);
+    const cleanup = initializeSocket();
 
     return () => {
-      socketConnection.disconnect();
+      cleanup?.then(cleanupFn => cleanupFn?.());
     };
   }, [onUploadComplete, onUploadError, onUploadProgress]);
 
@@ -125,8 +131,11 @@ const EnhancedFileUpload: React.FC<EnhancedFileUploadProps> = ({
 
         const { uploadId, useMultipart, chunkSize } = initResponse.data.data;
 
-        // Subscribe to upload progress
-        socket.emit("subscribe-upload-progress", uploadId);
+        // Subscribe to upload progress using SocketManager
+        socketManager.subscribeToUploadProgress(uploadId, (progressData: UploadProgress) => {
+          setProgress(progressData);
+          onUploadProgress?.(progressData);
+        });
 
         if (useMultipart) {
           // Handle multipart upload
@@ -297,11 +306,11 @@ const EnhancedFileUpload: React.FC<EnhancedFileUploadProps> = ({
 
   // Cancel upload
   const cancelUpload = useCallback(async () => {
-    if (progress?.uploadId && socket) {
-      socket.emit("cancel-upload", progress.uploadId);
+    if (progress?.uploadId) {
+      socketManager.cancelUpload(progress.uploadId);
       setProgress(null);
     }
-  }, [progress, socket]);
+  }, [progress, socketManager]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,

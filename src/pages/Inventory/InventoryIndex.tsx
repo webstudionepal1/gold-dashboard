@@ -286,9 +286,9 @@ const InventoryIndex = () => {
 
         // If no variants, create a single item with default values
         if (
-          !product.variant ||
-          !Array.isArray(product.variant) ||
-          product.variant.length < 1
+          !product.variants ||
+          !Array.isArray(product.variants) ||
+          product.variants.length < 1
         ) {
           return [
             {

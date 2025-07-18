@@ -48,7 +48,7 @@ const CollectionIndex: React.FC = () => {
     () => [
       {
         key: "name",
-        header: "Collection Name",
+        title: "Collection Name",
         width: "20%",
         render: (value: string, row: IFetchCollection) => (
           <div className="flex items-center gap-3">
@@ -71,7 +71,7 @@ const CollectionIndex: React.FC = () => {
       },
       {
         key: "collectionType",
-        header: "Type",
+        title: "Type",
         width: "12%",
         render: (value: string) => (
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 capitalize">
@@ -81,7 +81,7 @@ const CollectionIndex: React.FC = () => {
       },
       {
         key: "collectionMode",
-        header: "Mode",
+        title: "Mode",
         width: "10%",
         render: (value: string) => (
           <span
@@ -98,7 +98,7 @@ const CollectionIndex: React.FC = () => {
       },
       {
         key: "totalProducts",
-        header: "Products",
+        title: "Products",
         width: "8%",
         render: (value: number) => (
           <span className="text-sm font-medium">{value || 0}</span>
@@ -106,7 +106,7 @@ const CollectionIndex: React.FC = () => {
       },
       {
         key: "materialType",
-        header: "Material",
+        title: "Material",
         width: "10%",
         render: (value: string) =>
           value ? (
@@ -119,7 +119,7 @@ const CollectionIndex: React.FC = () => {
       },
       {
         key: "gemstoneType",
-        header: "Gemstone",
+        title: "Gemstone",
         width: "10%",
         render: (value: string) =>
           value && value !== "none" ? (
@@ -130,7 +130,7 @@ const CollectionIndex: React.FC = () => {
       },
       {
         key: "isActive",
-        header: "Status",
+        title: "Status",
         width: "8%",
         render: (value: boolean) => (
           <span
@@ -143,7 +143,7 @@ const CollectionIndex: React.FC = () => {
       },
       {
         key: "isFeatured",
-        header: "Featured",
+        title: "Featured",
         width: "8%",
         render: (value: boolean) => (
           <div className="flex justify-center">
@@ -163,7 +163,7 @@ const CollectionIndex: React.FC = () => {
       },
       {
         key: "isLimitedEdition",
-        header: "Limited",
+        title: "Limited",
         width: "8%",
         render: (value: boolean) => (
           <div className="flex justify-center">
@@ -180,7 +180,7 @@ const CollectionIndex: React.FC = () => {
       },
       {
         key: "sortOrder",
-        header: "Order",
+        title: "Order",
         width: "6%",
         render: (value: number) => (
           <span className="text-sm">{value || 0}</span>

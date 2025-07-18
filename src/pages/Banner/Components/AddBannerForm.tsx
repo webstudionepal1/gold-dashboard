@@ -53,10 +53,7 @@ const AddBannerSchema = z.object({
     .instanceof(File)
     .nullable()
     .refine((file) => file !== null, { message: "Web Image is required" }),
-  video: z
-    .union([z.instanceof(File), z.string()])
-    .nullable()
-    .optional(), // Video can be File or URL string
+  video: z.union([z.instanceof(File), z.string()]).nullable(), // Video can be File or URL string
 });
 const AddBannerForm = () => {
   const { id } = useParams();

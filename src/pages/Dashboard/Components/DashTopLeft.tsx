@@ -1,8 +1,9 @@
+import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
 import BrideImage from "../../../assets/images/BrideImage.png";
 import BrideImageBg from "../../../assets/images/BrideImageBg.png";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import SalesChart from '../../../components/ui/SalesChart';
+import LazyChart from '../../../components/ui/LazyChart';
 import { ChartData, ChartOptions } from 'chart.js';
 import { DashboardData } from "../../../server/api/dashboardHooks";
 import { FrontendRoutes } from "../../../routes/routes";
@@ -12,8 +13,8 @@ interface DashTopLeftProps {
 }
 
 const DashTopLeft = ({ dashboardData }: DashTopLeftProps) => {
-
-    const chartData: ChartData<'line'> = {
+    // Memoize chart data to prevent unnecessary recalculations
+    const chartData: ChartData<'line'> = useMemo(() => ({
         labels: dashboardData.salesMetrics?.dailySales?.map(sale => sale.day) || [],
         datasets: [
             {
@@ -30,9 +31,10 @@ const DashTopLeft = ({ dashboardData }: DashTopLeftProps) => {
                 pointHoverRadius: 8,
             },
         ],
-    };
+    }), [dashboardData.salesMetrics?.dailySales]);
 
-    const chartOptions: ChartOptions<'line'> = {
+    // Memoize chart options to prevent unnecessary recalculations
+    const chartOptions: ChartOptions<'line'> = useMemo(() => ({
         responsive: true,
         maintainAspectRatio: false,
         scales: {
@@ -71,7 +73,7 @@ const DashTopLeft = ({ dashboardData }: DashTopLeftProps) => {
                 bodyColor: '#fff',
             },
         },
-    };
+    }), []);
 
     return (
         <div className="flex flex-col gap-5">
@@ -162,7 +164,7 @@ const DashTopLeft = ({ dashboardData }: DashTopLeftProps) => {
             <div className="bg-white shadow-md rounded-xl p-4">
                 <h2 className="mb-4 text-base font-semibold text-left text-black lg:text-xl md:text-lg">Sales Overview</h2>
                 {dashboardData.salesMetrics?.dailySales?.length ? (
-                    <SalesChart data={chartData} options={chartOptions} />
+                    <LazyChart type="sales" data={chartData} options={chartOptions} />
                 ) : (
                     <div className="flex items-center justify-center h-40 text-gray-400">
                         <p>No sales data available</p>
@@ -173,4 +175,4 @@ const DashTopLeft = ({ dashboardData }: DashTopLeftProps) => {
     );
 };
 
-export default DashTopLeft;
+export default React.memo(DashTopLeft);

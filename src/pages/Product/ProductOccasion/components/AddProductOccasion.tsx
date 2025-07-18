@@ -1,6 +1,5 @@
 import { useForm } from "@tanstack/react-form";
 import { useEffect } from "react";
-import * as z from "zod";
 import { Modal } from "../../../../components/shared";
 import {
   IFetchOccasion,
@@ -18,17 +17,6 @@ interface PropTypes {
   editData?: IFetchOccasion | null;
   closeModal: () => void;
 }
-
-const validationSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  description: z.string().optional(),
-  isActive: z.boolean(),
-  image: z.any().optional(), // File object or string URL
-  video: z.any().optional(), // File object or string URL
-  seasonality: z
-    .enum(["spring", "summer", "autumn", "winter", "year-round"])
-    .optional(),
-});
 
 // Helper function to generate SEO data and slug automatically
 const generateSEOData = (
@@ -79,8 +67,8 @@ const seasonalityOptions = [
 ];
 
 const statusOptions = [
-  { label: "Active", value: true },
-  { label: "Inactive", value: false },
+  { label: "Active", value: "true" },
+  { label: "Inactive", value: "false" },
 ];
 
 const AddProductOccasion = ({ modalRef, closeModal, editData }: PropTypes) => {
@@ -98,9 +86,7 @@ const AddProductOccasion = ({ modalRef, closeModal, editData }: PropTypes) => {
       video: null as File | null, // Will be handled by VideoUploadField
       seasonality: editData?.metadata?.seasonality ?? "year-round",
     },
-    validators: {
-      onSubmit: validationSchema,
-    },
+
     onSubmit: async ({ value }) => {
       // Generate SEO data and slug automatically
       const seoData = generateSEOData(
@@ -109,38 +95,30 @@ const AddProductOccasion = ({ modalRef, closeModal, editData }: PropTypes) => {
         value.seasonality || "year-round"
       );
 
-      // Create FormData for file uploads
-      const formData = new FormData();
+      // Create the occasion data object
+      const occasionData: Partial<IFetchOccasion> = {
+        name: value.name,
+        slug: editData?.slug || seoData.slug,
+        description: value.description || "",
+        isActive: value.isActive,
+        metadata: {
+          seasonality: value.seasonality || "year-round",
+          seoTitle: seoData.seoTitle,
+          seoDescription: seoData.seoDescription,
+          keywords: seoData.keywords,
+        },
+      };
 
-      // Add basic fields
-      formData.append("name", value.name);
-      formData.append("slug", editData?.slug || seoData.slug);
-      formData.append("description", value.description || "");
-      formData.append("isActive", String(value.isActive));
-
-      // Add metadata
-      formData.append(
-        "metadata[seasonality]",
-        value.seasonality || "year-round"
-      );
-      formData.append("metadata[seoTitle]", seoData.seoTitle);
-      formData.append("metadata[seoDescription]", seoData.seoDescription);
-      seoData.keywords.forEach((keyword, index) => {
-        formData.append(`metadata[keywords][${index}]`, keyword);
-      });
-
-      // Add files if they exist
-      if (value.image instanceof File) {
-        formData.append("image", value.image);
-      }
-      if (value.video instanceof File) {
-        formData.append("video", value.video);
+      // Handle file uploads - for now, we'll use existing URLs if editing
+      if (editData) {
+        occasionData.image = editData.image;
+        occasionData.video = editData.video;
       }
 
       if (editData) {
-        updateOccasion({ id: editData._id, body: formData });
+        updateOccasion({ id: editData._id, body: occasionData });
       } else {
-        createOccasion(formData);
+        createOccasion(occasionData);
       }
     },
   });
@@ -205,9 +183,10 @@ const AddProductOccasion = ({ modalRef, closeModal, editData }: PropTypes) => {
                 <DropdownField
                   label="Status"
                   options={statusOptions}
-                  value={field.state.value}
-                  onChange={(value) => field.handleChange(value)}
-                  placeholder="Select status"
+                  value={field.state.value ? "true" : "false"}
+                  onChange={(e) =>
+                    field.handleChange(e.target.value === "true")
+                  }
                 />
                 <FieldError field={field} />
               </div>
@@ -237,9 +216,9 @@ const AddProductOccasion = ({ modalRef, closeModal, editData }: PropTypes) => {
                     Occasion Video
                   </label>
                   <VideoUploadField
-                    onFileSelect={(file) => field.handleChange(file)}
-                    maxSize={200 * 1024 * 1024} // 200MB as per user preference
-                    currentVideo={editData?.video}
+                    onChange={(file: File | null) => field.handleChange(file)}
+                    maxFileSize={200} // 200MB as per user preference
+                    existingVideoUrl={editData?.video}
                   />
                   <FieldError field={field} />
                 </div>
@@ -255,8 +234,16 @@ const AddProductOccasion = ({ modalRef, closeModal, editData }: PropTypes) => {
                   label="Seasonality"
                   options={seasonalityOptions}
                   value={field.state.value}
-                  onChange={(value) => field.handleChange(value)}
-                  placeholder="Select seasonality"
+                  onChange={(e) =>
+                    field.handleChange(
+                      e.target.value as
+                        | "spring"
+                        | "summer"
+                        | "autumn"
+                        | "winter"
+                        | "year-round"
+                    )
+                  }
                 />
                 <FieldError field={field} />
               </div>
