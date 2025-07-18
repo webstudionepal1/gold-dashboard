@@ -1242,6 +1242,7 @@ import MasterTable from "../../../components/shared/MasterTable";
 import {
   IFetchPurchase,
   useCreatePurchaseReturnMutation,
+  useGetPurchaseReturnSummaryQuery,
 } from "../../../server/api/purchaseHooks";
 import { FieldError } from "../../auth/LoginPage";
 import { returnColumns } from "../purchaseObj";
@@ -1295,6 +1296,8 @@ const PurchaseReturnForm: React.FC<IPurchaseReturnForm> = ({
   onClose,
 }) => {
   const { mutate: createPurchaseReturn } = useCreatePurchaseReturnMutation();
+  const { data: returnSummary, isLoading: isLoadingReturnSummary } =
+    useGetPurchaseReturnSummaryQuery(data._id || "");
   const [dynamicForm, setDynamicForm] = useState({
     product: "",
     quantity: 0,
@@ -1362,16 +1365,42 @@ const PurchaseReturnForm: React.FC<IPurchaseReturnForm> = ({
 
   const productList = useMemo(() => {
     const items = data.items?.length > 0 ? data.items : data.products || [];
-    const mappedProducts = map(items, (item) => ({
-      value: get(item, "product._id", ""),
-      label: get(item, "product.name", "")?.trim() || "Unknown Product",
-      price: get(item, "price", 0),
-      quantity: get(item, "quantity", 0),
-      wt: get(item, "wt", 0), // Include weight in productList
-    }));
-    setNoProductsAvailable(mappedProducts.length === 0);
-    return mappedProducts;
-  }, [data]);
+    const mappedProducts = map(items, (item) => {
+      const productId = get(item, "product._id", "");
+      const weight = get(item, "wt", 0);
+
+      // Find return summary for this product and weight combination
+      const returnSummaryItem = returnSummary?.returnSummary?.find(
+        (summary) => summary.productId === productId && summary.wt === weight
+      );
+
+      const productName =
+        get(item, "product.name", "")?.trim() || "Unknown Product";
+      const remainingQty =
+        returnSummaryItem?.remainingQuantity || get(item, "quantity", 0);
+
+      return {
+        value: productId,
+        label: `${productName} (${weight}g) - Available: ${remainingQty}`,
+        price: get(item, "price", 0),
+        quantity: get(item, "quantity", 0),
+        wt: weight,
+        // Add return summary data
+        originalQuantity:
+          returnSummaryItem?.originalQuantity || get(item, "quantity", 0),
+        totalReturned: returnSummaryItem?.totalReturned || 0,
+        remainingQuantity: remainingQty,
+        canReturn: returnSummaryItem?.canReturn ?? true,
+      };
+    });
+
+    // Filter out products that cannot be returned
+    const returnableProducts = mappedProducts.filter(
+      (product) => product.canReturn && product.remainingQuantity > 0
+    );
+    setNoProductsAvailable(returnableProducts.length === 0);
+    return returnableProducts;
+  }, [data, returnSummary]);
 
   // Function to get product weight by ID
   const getProductWeight = (productId: string) => {
@@ -1405,6 +1434,18 @@ const PurchaseReturnForm: React.FC<IPurchaseReturnForm> = ({
     return acc + price * item.quantity;
   }, 0);
 
+  // Show loading state while fetching return summary
+  if (isLoadingReturnSummary) {
+    return (
+      <div className="py-4 space-y-4">
+        <h1 className="text-2xl font-semibold text-center">Purchase Return</h1>
+        <div className="flex justify-center items-center py-8">
+          <div className="text-gray-600">Loading return information...</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="py-4 space-y-4">
       <h1 className="text-2xl font-semibold text-center">Purchase Return</h1>
@@ -1416,8 +1457,7 @@ const PurchaseReturnForm: React.FC<IPurchaseReturnForm> = ({
           e.stopPropagation();
           console.log("Form submit event triggered");
           form.handleSubmit();
-        }}
-      >
+        }}>
         <div className="grid grid-cols-1 gap-x-4 md:grid-cols-3">
           <form.Field name="billNo">
             {(field) => (
@@ -1487,7 +1527,7 @@ const PurchaseReturnForm: React.FC<IPurchaseReturnForm> = ({
                   );
                   setDynamicForm({
                     product: e.target.value,
-                    maxQuantity: selectedProduct?.quantity || 0,
+                    maxQuantity: selectedProduct?.remainingQuantity || 0, // Use remaining quantity instead of original
                     quantity: 0,
                     wt: getProductWeight(e.target.value), // Pre-fill weight
                   });
@@ -1501,9 +1541,9 @@ const PurchaseReturnForm: React.FC<IPurchaseReturnForm> = ({
             <div className="grid grid-cols-3 gap-4">
               <div className="w-full">
                 <InputField
-                  label="Max Quantity"
+                  label="Available for Return"
                   type="number"
-                  placeholder="Max Quantity"
+                  placeholder="Available Quantity"
                   value={dynamicForm.maxQuantity}
                   disabled
                 />
@@ -1594,8 +1634,7 @@ const PurchaseReturnForm: React.FC<IPurchaseReturnForm> = ({
                   }
                 }}
                 className="bg-[#df8d29] text-sm text-white px-3 py-2 rounded-md mr-2"
-                disabled={noProductsAvailable}
-              >
+                disabled={noProductsAvailable}>
                 Add
               </button>
               <button
@@ -1608,8 +1647,7 @@ const PurchaseReturnForm: React.FC<IPurchaseReturnForm> = ({
                     wt: 0,
                   });
                 }}
-                className="px-3 py-2 text-sm text-black bg-gray-300 rounded-md"
-              >
+                className="px-3 py-2 text-sm text-black bg-gray-300 rounded-md">
                 Reset
               </button>
             </div>
@@ -1669,8 +1707,7 @@ const PurchaseReturnForm: React.FC<IPurchaseReturnForm> = ({
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 bg-[#c9c9c9] px-7 py-2 rounded-xl"
-          >
+            className="flex-1 bg-[#c9c9c9] px-7 py-2 rounded-xl">
             Cancel
           </button>
           <button
@@ -1680,8 +1717,7 @@ const PurchaseReturnForm: React.FC<IPurchaseReturnForm> = ({
               form.state.values.products.length === 0
                 ? "opacity-50 cursor-not-allowed"
                 : ""
-            }`}
-          >
+            }`}>
             Save
           </button>
         </div>
