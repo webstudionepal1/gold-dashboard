@@ -21,7 +21,6 @@ jobs:
           tar -czf dist-web.tar.gz dist
 
       - name: Setup SSH Key
-        if: github.ref == 'refs/heads/ridisidi'
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
@@ -29,7 +28,6 @@ jobs:
           ssh-keyscan -p 72 -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy Web to VPS
-        if: github.ref == 'refs/heads/ridisidi'
         env:
           VPS_HOST: ${{ secrets.VPS_HOST }}
           VPS_USER: ${{ secrets.VPS_USER }}
@@ -44,7 +42,6 @@ jobs:
             tar -xzf /tmp/dist-web.tar.gz -C "/home/nabin/ridhisiddhiadmin"
             rm /tmp/dist-web.tar.gz
           EOF
-
 
       - name: Cleanup SSH Key
         if: always()
