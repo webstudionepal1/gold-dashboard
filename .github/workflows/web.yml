@@ -2,7 +2,7 @@ name: CI/CD for Web Deployment (VPS)
 on:
   push:
     branches:
-      - panchakanya
+      - ridisidi
 
 jobs:
   build-and-deploy:
@@ -21,7 +21,7 @@ jobs:
           tar -czf dist-web.tar.gz dist
 
       - name: Setup SSH Key
-        if: github.ref == 'refs/heads/panchakanya'
+        if: github.ref == 'refs/heads/ridisidi'
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
@@ -29,7 +29,7 @@ jobs:
           ssh-keyscan -p 72 -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy Web to VPS
-        if: github.ref == 'refs/heads/panchakanya'
+        if: github.ref == 'refs/heads/ridhisiddhiadmin'
         env:
           VPS_HOST: ${{ secrets.VPS_HOST }}
           VPS_USER: ${{ secrets.VPS_USER }}
@@ -40,8 +40,8 @@ jobs:
           # SSH into the VPS and extract the bundle
           ssh -p 72 $VPS_USER@$VPS_HOST << 'EOF'
             # Create and extract web files
-            mkdir -p "/home/nabin/panchakanya"
-            tar -xzf /tmp/dist-web.tar.gz -C "/home/nabin/panchakanya"
+            mkdir -p "/home/nabin/ridhisiddhiadmin"
+            tar -xzf /tmp/dist-web.tar.gz -C "/home/nabin/ridhisiddhiadmin"
             rm /tmp/dist-web.tar.gz
           EOF
 
