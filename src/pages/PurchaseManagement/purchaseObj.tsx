@@ -31,7 +31,6 @@ export interface SupplierFormValues {
     branch: string;
   };
   logo: File | null;
-  products?: string[];
 }
 export const buttonObj: IButtonObj = {
   purchase: {
@@ -57,30 +56,29 @@ export const purchaseTabOption = [
 
 export const supplierSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  description: z.string().optional(),
+  description: z.string(),
   email: z.string().email("Invalid email format").min(1, "Email is required"),
   phone: z.string().min(1, "Phone is required"),
-  alternatePhone: z.string().optional(),
+  alternatePhone: z.string(),
   businessType: z.string().min(1, "Business Type is required"),
   addresses: z.object({
-    district: z.string().min(1, "District is required"),
-    address: z.string().min(1, "Address is required"),
-    province: z.string().min(1, "Province is required"),
+    district: z.string(),
+    address: z.string(),
+    province: z.string(),
   }),
   businessInfo: z.object({
-    company: z.string().min(1, "Company is required"),
-    companyNumber: z.string().min(1, "Company Number is required"),
-    PAN: z.string().min(1, "PAN is required"),
+    company: z.string(),
+    companyNumber: z.string(),
+    PAN: z.string(),
   }),
   bankDetails: z.object({
-    accountHolderName: z.string().min(1, "Account Holder Name is required"),
-    accountNumber: z.string().min(1, "Account Number is required"),
-    bankName: z.string().min(1, "Bank Name is required"),
-    paymentTerms: z.string().min(1, "Payment Terms are required"),
-    branch: z.string().min(1, "Branch is required"),
+    accountHolderName: z.string(),
+    accountNumber: z.string(),
+    bankName: z.string(),
+    paymentTerms: z.string(),
+    branch: z.string(),
   }),
   logo: z.instanceof(File).nullable(),
-  products: z.array(z.string()).optional(),
 });
 export const getSupplierInitialFormValues = (state: string, editData?: any) => {
   if (state === "add")
@@ -109,7 +107,6 @@ export const getSupplierInitialFormValues = (state: string, editData?: any) => {
         branch: "",
       },
       logo: null,
-      products: [""],
     };
 
   return {
@@ -137,7 +134,6 @@ export const getSupplierInitialFormValues = (state: string, editData?: any) => {
       branch: get(editData, "bankDetails.branch", ""),
     },
     logo: null,
-    products: [],
   };
 };
 export function appendFormData(

@@ -15,6 +15,8 @@ import { IFetchProduct } from "../../../server/api/productHooks";
 import {
   IFetchPurchase,
   useCreatePurchaseReturnMutation,
+  useGetPurchaseReturnSummaryQuery,
+  IReturnSummaryItem,
 } from "../../../server/api/purchaseHooks";
 import { FieldError } from "../../auth/LoginPage";
 import { useState } from "react";
@@ -42,16 +44,50 @@ const PurchaseReturnForm: React.FC<IPurchaseReturnForm> = ({
 }) => {
   console.log("data", data);
   const { mutate: createPurchaseReturn } = useCreatePurchaseReturnMutation();
+  const { data: returnSummary, isLoading: isLoadingReturnSummary } =
+    useGetPurchaseReturnSummaryQuery(data._id);
   const [dynamicForm, setDynamicForm] = useState({
     product: "",
     quantity: 0,
     maxQuantity: 0,
+    wt: 0,
   });
+  const [validationErrors, setValidationErrors] = useState<{
+    [key: string]: string;
+  }>({});
   const { data: suppliers } = useGetSupplierQuery();
   const supplierList = map(suppliers, (item) => ({
     value: get(item, "_id", ""),
     label: get(item, "name", ""),
   }));
+
+  // Helper function to validate return quantity
+  const validateReturnQuantity = (
+    productId: string,
+    wt: number,
+    quantity: number
+  ): string | null => {
+    if (!returnSummary) return null;
+
+    const productSummary = returnSummary.returnSummary.find(
+      (item) => item.productId === productId && item.wt === wt
+    );
+
+    if (!productSummary) {
+      return "Product not found in original purchase";
+    }
+
+    if (quantity <= 0) {
+      return "Quantity must be greater than 0";
+    }
+
+    if (quantity > productSummary.remainingQuantity) {
+      return `Cannot return ${quantity} items. Only ${productSummary.remainingQuantity} items remaining (${productSummary.totalReturned} already returned out of ${productSummary.originalQuantity})`;
+    }
+
+    return null;
+  };
+
   const form = useForm({
     defaultValues: {
       billNo: get(data, "billNo", ""),
@@ -64,6 +100,32 @@ const PurchaseReturnForm: React.FC<IPurchaseReturnForm> = ({
     //   onSubmit: purchaseReturnFormSchema,
     // },
     onSubmit: async ({ value }) => {
+      // Validate all products before submission
+      const errors: { [key: string]: string } = {};
+      value.products.forEach((product, index) => {
+        const productData = data.products?.find(
+          (p) =>
+            (typeof p.product === "string"
+              ? p.product
+              : (p.product as any)._id) === product.product
+        );
+        if (productData) {
+          const error = validateReturnQuantity(
+            product.product,
+            productData.wt,
+            product.quantity
+          );
+          if (error) {
+            errors[`product_${index}`] = error;
+          }
+        }
+      });
+
+      if (Object.keys(errors).length > 0) {
+        setValidationErrors(errors);
+        return;
+      }
+
       const finalValues = {
         purchase: data._id,
         refundAmount: value.refundAmount,
@@ -90,16 +152,36 @@ const PurchaseReturnForm: React.FC<IPurchaseReturnForm> = ({
 
   const productList =
     data.items.length > 0
-      ? map(data.items, (item) => ({
-          ...item,
-          value: get(item, "product._id", ""),
-          label: get(item, "product.name", ""),
-        }))
-      : map(data.products, (item) => ({
-          ...item,
-          value: get(item, "product._id", ""),
-          label: get(item, "product.name", ""),
-        }));
+      ? map(data.items, (item) => {
+          const returnInfo = returnSummary?.returnSummary.find(
+            (summary) => summary.productId === get(item, "product._id", "")
+          );
+          return {
+            ...item,
+            value: get(item, "product._id", ""),
+            label: get(item, "product.name", ""),
+            remainingQuantity:
+              returnInfo?.remainingQuantity || get(item, "quantity", 0),
+            totalReturned: returnInfo?.totalReturned || 0,
+            canReturn: returnInfo?.canReturn !== false,
+          };
+        })
+      : map(data.products, (item) => {
+          const returnInfo = returnSummary?.returnSummary.find(
+            (summary) =>
+              summary.productId === get(item, "product._id", "") &&
+              summary.wt === get(item, "wt", 0)
+          );
+          return {
+            ...item,
+            value: get(item, "product._id", ""),
+            label: get(item, "product.name", ""),
+            remainingQuantity:
+              returnInfo?.remainingQuantity || get(item, "quantity", 0),
+            totalReturned: returnInfo?.totalReturned || 0,
+            canReturn: returnInfo?.canReturn !== false,
+          };
+        });
 
   const rows = form.state.values.products.map((item) => {
     const product = productList.find((i) => i.value === item.product);
@@ -128,8 +210,7 @@ const PurchaseReturnForm: React.FC<IPurchaseReturnForm> = ({
           e.preventDefault();
           e.stopPropagation();
           form.handleSubmit();
-        }}
-      >
+        }}>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3 ">
           <form.Field name="billNo">
             {(field) => (
@@ -178,20 +259,41 @@ const PurchaseReturnForm: React.FC<IPurchaseReturnForm> = ({
           <div className="w-full">
             <DropdownField
               label="Product"
-              options={productList}
+              options={productList
+                .filter((item) => item.canReturn)
+                .map((item) => ({
+                  ...item,
+                  label: `${item.label} (${item.remainingQuantity} available, ${item.totalReturned} returned)`,
+                }))}
               required
               value={dynamicForm.product}
-              onChange={(e) =>
+              onChange={(e) => {
+                const selectedProduct = productList.find(
+                  (item) => item.value === e.target.value
+                );
                 setDynamicForm({
                   ...dynamicForm,
                   product: e.target.value,
-                  maxQuantity:
-                    productList.find((item) => item.value === e.target.value)
-                      ?.quantity || 0,
-                })
-              }
+                  maxQuantity: selectedProduct?.remainingQuantity || 0,
+                  wt:
+                    selectedProduct && "wt" in selectedProduct
+                      ? selectedProduct.wt
+                      : 0,
+                });
+                // Clear any previous validation errors for this field
+                setValidationErrors((prev) => {
+                  const newErrors = { ...prev };
+                  delete newErrors.dynamicProduct;
+                  return newErrors;
+                });
+              }}
               inputClassname="w-full"
             />
+            {validationErrors.dynamicProduct && (
+              <p className="text-red-500 text-sm mt-1">
+                {validationErrors.dynamicProduct}
+              </p>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -208,17 +310,55 @@ const PurchaseReturnForm: React.FC<IPurchaseReturnForm> = ({
 
             <div className="w-full">
               <InputField
-                label="Quantity"
+                label={`Quantity (Max: ${dynamicForm.maxQuantity})`}
                 required
-                placeholder="Quanity"
+                placeholder="Quantity"
+                type="number"
+                min="1"
+                max={dynamicForm.maxQuantity}
                 value={dynamicForm.quantity}
-                onChange={(e) =>
+                onChange={(e) => {
+                  const quantity = Number(e.target.value);
                   setDynamicForm({
                     ...dynamicForm,
-                    quantity: Number(e.target.value),
-                  })
-                }
+                    quantity,
+                  });
+
+                  // Real-time validation
+                  if (dynamicForm.product && quantity > 0) {
+                    const error = validateReturnQuantity(
+                      dynamicForm.product,
+                      dynamicForm.wt,
+                      quantity
+                    );
+                    setValidationErrors((prev) => {
+                      const newErrors = { ...prev };
+                      if (error) {
+                        newErrors.dynamicQuantity = error;
+                      } else {
+                        delete newErrors.dynamicQuantity;
+                      }
+                      return newErrors;
+                    });
+                  } else {
+                    setValidationErrors((prev) => {
+                      const newErrors = { ...prev };
+                      delete newErrors.dynamicQuantity;
+                      return newErrors;
+                    });
+                  }
+                }}
               />
+              {validationErrors.dynamicQuantity && (
+                <p className="text-red-500 text-sm mt-1">
+                  {validationErrors.dynamicQuantity}
+                </p>
+              )}
+              {dynamicForm.maxQuantity > 0 && (
+                <p className="text-gray-500 text-xs mt-1">
+                  Available for return: {dynamicForm.maxQuantity} items
+                </p>
+              )}
             </div>
           </div>
           <div className="flex items-center justify-center w-full gap-2 pt-7">
@@ -226,27 +366,86 @@ const PurchaseReturnForm: React.FC<IPurchaseReturnForm> = ({
               type="button"
               onClick={() => {
                 if (dynamicForm.product && dynamicForm.quantity) {
-                  const newProduct = {
-                    product: dynamicForm.product,
-                    quantity: dynamicForm.quantity,
-                  };
+                  // Validate before adding
+                  const error = validateReturnQuantity(
+                    dynamicForm.product,
+                    dynamicForm.wt,
+                    dynamicForm.quantity
+                  );
 
+                  if (error) {
+                    setValidationErrors((prev) => ({
+                      ...prev,
+                      dynamicQuantity: error,
+                    }));
+                    return;
+                  }
+
+                  // Check if this product is already in the return list
                   const currentProducts = form.getFieldValue("products") || [];
-                  form.setFieldValue("products", [
-                    ...currentProducts,
-                    newProduct,
-                  ]);
+                  const existingProductIndex = currentProducts.findIndex(
+                    (p) => p.product === dynamicForm.product
+                  );
 
-                  // Reset the dynamic form
+                  if (existingProductIndex >= 0) {
+                    // Update existing product quantity
+                    const updatedProducts = [...currentProducts];
+                    const newQuantity =
+                      updatedProducts[existingProductIndex].quantity +
+                      dynamicForm.quantity;
+
+                    // Validate combined quantity
+                    const combinedError = validateReturnQuantity(
+                      dynamicForm.product,
+                      dynamicForm.wt,
+                      newQuantity
+                    );
+
+                    if (combinedError) {
+                      setValidationErrors((prev) => ({
+                        ...prev,
+                        dynamicQuantity: combinedError,
+                      }));
+                      return;
+                    }
+
+                    updatedProducts[existingProductIndex].quantity =
+                      newQuantity;
+                    form.setFieldValue("products", updatedProducts);
+                  } else {
+                    // Add new product
+                    const newProduct = {
+                      product: dynamicForm.product,
+                      quantity: dynamicForm.quantity,
+                    };
+
+                    form.setFieldValue("products", [
+                      ...currentProducts,
+                      newProduct,
+                    ]);
+                  }
+
+                  // Reset the dynamic form and validation errors
                   setDynamicForm({
                     product: "",
                     maxQuantity: 0,
                     quantity: 0,
+                    wt: 0,
                   });
+                  setValidationErrors({});
+                } else {
+                  // Show validation errors if fields are empty
+                  const newErrors: { [key: string]: string } = {};
+                  if (!dynamicForm.product) {
+                    newErrors["dynamicProduct"] = "Please select a product";
+                  }
+                  if (!dynamicForm.quantity) {
+                    newErrors["dynamicQuantity"] = "Please enter a quantity";
+                  }
+                  setValidationErrors((prev) => ({ ...prev, ...newErrors }));
                 }
               }}
-              className="flex-1 bg-[#df8d29] text-sm text-white px-3 py-2 rounded-md"
-            >
+              className="flex-1 bg-[#df8d29] text-sm text-white px-3 py-2 rounded-md">
               Add
             </button>
             <button
@@ -256,10 +455,16 @@ const PurchaseReturnForm: React.FC<IPurchaseReturnForm> = ({
                   product: "",
                   maxQuantity: 0,
                   quantity: 0,
+                  wt: 0,
+                });
+                setValidationErrors((prev) => {
+                  const newErrors = { ...prev };
+                  delete newErrors.dynamicProduct;
+                  delete newErrors.dynamicQuantity;
+                  return newErrors;
                 });
               }}
-              className="flex-1 px-3 py-2 text-sm text-black bg-gray-300 rounded-md"
-            >
+              className="flex-1 px-3 py-2 text-sm text-black bg-gray-300 rounded-md">
               Reset
             </button>
           </div>
@@ -308,8 +513,7 @@ const PurchaseReturnForm: React.FC<IPurchaseReturnForm> = ({
               </label>
               <textarea
                 className="resize-none bg-[#f6f7f9] border-2 border-[#d3dae4] focus:outline-none rounded-xl px-3 py-1   placeholder:text-[#858492]"
-                placeholder="Enter Short Description"
-              ></textarea>
+                placeholder="Enter Short Description"></textarea>
               <FieldError field={field} />
             </div>
           )}
@@ -319,14 +523,12 @@ const PurchaseReturnForm: React.FC<IPurchaseReturnForm> = ({
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 bg-[#c9c9c9] px-7 py-2 rounded-xl"
-          >
+            className="flex-1 bg-[#c9c9c9] px-7 py-2 rounded-xl">
             Cancel
           </button>
           <button
             type="submit"
-            className="flex-1 bg-[#df8d29] text-white px-7 py-2 rounded-xl"
-          >
+            className="flex-1 bg-[#df8d29] text-white px-7 py-2 rounded-xl">
             Save
           </button>
         </div>

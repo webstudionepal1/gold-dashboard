@@ -3,11 +3,9 @@ import clsx from "clsx";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Breadcrumbs from "../../../components/shared/Breadcrumb";
-import { DropdownTagField } from "../../../components/shared/form_components/DropdownTags";
 import FileDropInput from "../../../components/shared/form_components/FileDropInput";
 import { InputField } from "../../../components/shared/form_components/InputField";
 import Header from "../../../components/shared/table_heading/Header";
-import { useGetAllProductsQuery } from "../../../server/api/productHooks";
 import {
   useCreateSupplierMutation,
   useUpdateSupplierMutation,
@@ -23,7 +21,6 @@ import {
 
 const AddSupplierForm = () => {
   const { page = "add" } = useParams();
-  const { data: products, isSuccess } = useGetAllProductsQuery();
   const {
     mutate: createSupplier,
     isPending,
@@ -34,9 +31,6 @@ const AddSupplierForm = () => {
     isPending: updatePending,
     isSuccess: updateSuccess,
   } = useUpdateSupplierMutation();
-  const productsList = isSuccess
-    ? products?.map((item) => ({ label: item.name, value: item._id }))
-    : [];
 
   const editData = useStore(supplierStore, (state) => state);
   console.log("editData", editData);
@@ -46,7 +40,7 @@ const AddSupplierForm = () => {
       editData
     ) as SupplierFormValues,
     validators: {
-      onChange: supplierSchema,
+      onSubmit: supplierSchema,
     },
 
     onSubmit: async ({ value }) => {
@@ -74,8 +68,7 @@ const AddSupplierForm = () => {
             e.preventDefault();
             e.stopPropagation();
             form.handleSubmit();
-          }}
-        >
+          }}>
           <div className="col-span-4 p-6 space-y-4 bg-white border rounded-xl">
             <div>
               <h1 className="text-xl font-semibold">General Information</h1>
@@ -169,8 +162,9 @@ const AddSupplierForm = () => {
                       className="resize-none bg-[#f6f7f9] border-2 border-[#d3dae4] focus:outline-none rounded-xl px-4 py-3 placeholder:text-[#858492]"
                       placeholder="Enter Short Description"
                       value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                    ></textarea>
+                      onChange={(e) =>
+                        field.handleChange(e.target.value)
+                      }></textarea>
                     <FieldError field={field} />
                   </div>
                 )}
@@ -404,37 +398,15 @@ const AddSupplierForm = () => {
                 </div>
               </div>
             </div>
-            <div className="p-6 bg-white border rounded-xl">
-              <div>
-                <h1 className="text-xl font-semibold">Item Supplied</h1>
-                <div className="border-b border-[#dedde2] w-full mt-2 mb-4"></div>
-              </div>
-              <div className="w-full">
-                <form.Field name="products" mode="array">
-                  {(field) => (
-                    <div className="w-full">
-                      <DropdownTagField
-                        required
-                        values={field.state.value}
-                        onChange={(newValues) => {
-                          field.handleChange(newValues);
-                        }}
-                        options={productsList}
-                      />
-                      <FieldError field={field} />
-                    </div>
-                  )}
-                </form.Field>
-              </div>
-            </div>
+
             <div className="flex items-center justify-end">
               <button
                 type="submit"
+                disabled={updatePending || isPending}
                 className={clsx(
                   "self-end bg-[#df8d29] text-white px-7 my-2 py-2 rounded-xl disabled:bg-[#966830]",
                   (updatePending || isPending) && "cursor-progress"
-                )}
-              >
+                )}>
                 {page === "Edit" ? "Update" : "Save"}
               </button>
             </div>
