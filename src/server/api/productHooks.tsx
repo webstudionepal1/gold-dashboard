@@ -457,3 +457,168 @@ export const useDeleteProductClaspsMutation = () => {
     },
   });
 };
+
+// Stone-related exports (placeholders for now - these should be moved to a separate stoneHooks.tsx file)
+export interface IFetchStone {
+  _id: string;
+  name: string;
+  type: "diamond" | "ruby" | "emerald" | "sapphire" | "pearl" | "other";
+  color: string;
+  clarity: string;
+  cut: string;
+  carat: number;
+  pricePerCarat: number;
+  totalPrice: number;
+  shape: string;
+  certification?: string;
+  description?: string;
+  images: string[];
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export const useGetAllStonesQuery = (params: IParams = {}) => {
+  return useQuery({
+    queryKey: ["stones", params],
+    queryFn: async () => {
+      const res = await apiClient.get<{ data: IFetchStone[] }>("stones", {
+        params,
+      });
+      return res?.data?.data;
+    },
+  });
+};
+
+export const useCreateStoneMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["stones"],
+    mutationFn: async (body: FormData) => {
+      const res = await apiClient.post("stones", body);
+      return res?.data?.data;
+    },
+    onSuccess() {
+      toast.success("Stone created successfully");
+      queryClient.invalidateQueries({ queryKey: ["stones"] });
+    },
+    onError(err: string) {
+      toast.error(err || "Error creating stone");
+    },
+  });
+};
+
+export const useUpdateStoneMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["stones"],
+    mutationFn: async ({ id, body }: { id: string; body: FormData }) => {
+      const res = await apiClient.patch(`stones/${id}`, body);
+      return res?.data?.data;
+    },
+    onSuccess() {
+      toast.success("Stone updated successfully");
+      queryClient.invalidateQueries({ queryKey: ["stones"] });
+    },
+    onError(err: string) {
+      toast.error(err || "Error updating stone");
+    },
+  });
+};
+
+export const useDeleteStoneMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["stones"],
+    mutationFn: async (id: string) => {
+      const res = await apiClient.delete(`stones/${id}`);
+      return res?.data?.data;
+    },
+    onSuccess() {
+      toast.success("Stone deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["stones"] });
+    },
+    onError(err: string) {
+      toast.error(err || "Error deleting stone");
+    },
+  });
+};
+
+// Product Occasions exports
+export const useGetAllProductOccasionsQuery = (params: IParams = {}) => {
+  return useQuery({
+    queryKey: ["occasions", params],
+    queryFn: async () => {
+      const res = await apiClient.get<{ data: IFetchOccasion[] }>("occasions", {
+        params,
+      });
+      return res?.data?.data;
+    },
+  });
+};
+
+export const useCreateProductOccasionMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["occasions"],
+    mutationFn: async (body: FormData) => {
+      const res = await apiClient.post("occasions", body);
+      return res?.data?.data;
+    },
+    onSuccess() {
+      toast.success("Product occasion created successfully");
+      queryClient.invalidateQueries({ queryKey: ["occasions"] });
+    },
+    onError(err: string) {
+      toast.error(err || "Error creating product occasion");
+    },
+  });
+};
+
+export const useUpdateProductOccasionMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["occasions"],
+    mutationFn: async ({ id, body }: { id: string; body: FormData }) => {
+      const res = await apiClient.patch(`occasions/${id}`, body);
+      return res?.data?.data;
+    },
+    onSuccess() {
+      toast.success("Product occasion updated successfully");
+      queryClient.invalidateQueries({ queryKey: ["occasions"] });
+    },
+    onError(err: string) {
+      toast.error(err || "Error updating product occasion");
+    },
+  });
+};
+
+export const useDeleteProductOccasionMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["occasions"],
+    mutationFn: async (id: string) => {
+      const res = await apiClient.delete(`occasions/${id}`);
+      return res?.data?.data;
+    },
+    onSuccess() {
+      toast.success("Product occasion deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["occasions"] });
+    },
+    onError(err: string) {
+      toast.error(err || "Error deleting product occasion");
+    },
+  });
+};
+
+// SKU validation export
+export const useValidateSKUQuery = (sku: string) => {
+  return useQuery({
+    queryKey: ["validate-sku", sku],
+    queryFn: async () => {
+      const res = await apiClient.get(`product/validate-sku/${sku}`);
+      return res?.data;
+    },
+    enabled: !!sku && sku.length > 0,
+  });
+};

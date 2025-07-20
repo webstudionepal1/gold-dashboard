@@ -134,19 +134,6 @@ export interface IFetchItems {
   _id: string;
 }
 
-export const useGetPurchaseReturnSummaryQuery = (purchaseId: string) => {
-  return useQuery({
-    queryKey: ["purchase-return-summary", purchaseId],
-    queryFn: async () => {
-      const res = await apiClient.get<{ data: IReturnSummary }>(
-        `purchase/${purchaseId}/return-summary`
-      );
-      return res?.data?.data;
-    },
-    enabled: !!purchaseId,
-  });
-};
-
 export const useCreateRawMaterialMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({

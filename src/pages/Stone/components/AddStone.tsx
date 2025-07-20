@@ -59,10 +59,29 @@ const AddStone = ({ modalRef, editData, closeModal }: propTypes) => {
         images: editData ? editData.images || [] : [],
       };
 
+      const formData = new FormData();
+      Object.entries(submissionData).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          if (Array.isArray(value)) {
+            value.forEach((item, index) => {
+              if (item instanceof File) {
+                formData.append(`${key}[${index}]`, item);
+              } else {
+                formData.append(`${key}[${index}]`, String(item));
+              }
+            });
+          } else if (value instanceof File) {
+            formData.append(key, value);
+          } else {
+            formData.append(key, String(value));
+          }
+        }
+      });
+
       if (editData) {
-        updateStone({ id: editData._id, data: submissionData });
+        updateStone({ id: editData._id, body: formData });
       } else {
-        createStone(submissionData);
+        createStone(formData);
       }
     },
   });

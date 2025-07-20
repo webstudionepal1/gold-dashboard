@@ -17,6 +17,9 @@ export interface IStone {
   updatedAt?: string;
 }
 
+// Alias for backward compatibility
+export interface IFetchStone extends IStone {}
+
 export interface IStoneFormData {
   name: string;
   type: "diamond" | "ruby" | "emerald" | "sapphire" | "pearl" | "other";

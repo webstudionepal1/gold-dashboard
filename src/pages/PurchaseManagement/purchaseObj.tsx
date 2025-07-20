@@ -401,6 +401,6 @@ export const supplierfieldSchemas = {
     companyNumber: supplierSchema.shape.businessInfo.shape.companyNumber,
     PAN: supplierSchema.shape.businessInfo.shape.PAN,
   },
-  products: supplierSchema.shape.products,
+  // products: supplierSchema.shape.products,
   logo: supplierSchema.shape.logo,
 };

@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm, useStore } from "@tanstack/react-form";
 import { InputField } from "../../../../components/shared/form_components/InputField";
 import { DropdownField } from "../../../../components/shared/form_components/Dropdown";
@@ -70,7 +70,7 @@ const ProductForm = () => {
   );
 
   // Get current category value from form state
-  const currentCategory = form.useStore((state) => state.values.category);
+  const [currentCategory, setCurrentCategory] = useState("");
 
   const subCategoriesList = useMemo(
     () =>
@@ -107,9 +107,9 @@ const ProductForm = () => {
       formstate,
       productData
     ) as IProductFormValues,
-    validators: {
-      onSubmit: productFormSchema, // Re-enabled validation
-    },
+    // validators: {
+    //   onSubmit: productFormSchema, // Re-enabled validation
+    // },
     onSubmit: async ({ value }) => {
       try {
         const formData = new FormData();
@@ -136,7 +136,7 @@ const ProductForm = () => {
         formData.append("shape", value.shape);
         formData.append("clarity", value.clarity);
         formData.append("dimension", String(value.dimension));
-        formData.append("visibleAs", value.visibleAs);
+        // formData.append("visibleAs", value.visibleAs);
 
         value.tags.forEach((tag: string, index: number) => {
           formData.append(`tags[${index}]`, tag);
@@ -306,7 +306,7 @@ const ProductForm = () => {
 
             {/* Pricing Section */}
             <div className="p-4 rounded-lg">
-              <form.Field name="variants" mode="array">
+              <form.Field name="variant" mode="array">
                 {(field) => (
                   <div>
                     <div className="flex items-center justify-between w-full py-2 mb-2 text-sm border-b">
@@ -315,7 +315,11 @@ const ProductForm = () => {
                       </h2>
                       <button
                         onClick={() =>
-                          field.pushValue({ price: 0, wt: 0, unit: "gm" })
+                          field.pushValue({
+                            price: 0,
+                            wt: 0,
+                            unit: "grams",
+                          })
                         }
                         type="button"
                         className="flex bg-[#DF8D28] rounded-md text-white items-center gap-2 px-3 py-2">
@@ -328,11 +332,10 @@ const ProductForm = () => {
                         {getFieldError("variant").join(", ")}
                       </div>
                     )}
-                    {field.state.value.map((_, i: number) => (
+                    {(field.state.value as any[]).map((_, i: number) => (
                       <div
                         key={i.toString()}
-                        className="border rounded-md p-3 mb-2"
-                      >
+                        className="border rounded-md p-3 mb-2">
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                           <form.Field name={`variant[${i}].price`}>
                             {(subField) => {
@@ -399,8 +402,7 @@ const ProductForm = () => {
                             <button
                               type="button"
                               onClick={() => field.removeValue(i)}
-                              className="flex items-center gap-2 px-3 py-1 text-sm text-red-600 border border-red-600 rounded-md"
-                            >
+                              className="flex items-center gap-2 px-3 py-1 text-sm text-red-600 border border-red-600 rounded-md">
                               <Icon
                                 icon="mdi:delete"
                                 className="text-red"
@@ -586,7 +588,10 @@ const ProductForm = () => {
                     <DropdownField
                       label="Select Occasions"
                       firstInput="Select occasions for this product"
-                      options={occasionsList}
+                      options={(occasions || []).map((occasion) => ({
+                        value: occasion._id,
+                        label: occasion.name,
+                      }))}
                       value={field.state.value?.[0] || ""}
                       onChange={(e) => {
                         const selectedValue = e.target.value;
@@ -702,18 +707,21 @@ const ProductForm = () => {
                                     label="Stone"
                                     required
                                     firstInput={
-                                      stonesList.length > 0
+                                      (stones || []).length > 0
                                         ? "Select stone"
                                         : "No stones available"
                                     }
-                                    options={stonesList}
+                                    options={(stones || []).map((stone) => ({
+                                      value: stone._id,
+                                      label: stone.name,
+                                    }))}
                                     value={String(subField.state.value || "")}
                                     onChange={(e) =>
                                       subField.handleChange(e.target.value)
                                     }
                                   />
                                   <FieldError field={subField} />
-                                  {stonesList.length === 0 && (
+                                  {(stones || []).length === 0 && (
                                     <p className="text-xs text-gray-500 mt-1">
                                       No stones available. Please add stones
                                       first.
@@ -811,7 +819,7 @@ const ProductForm = () => {
           {/* Visibility Options - Radio Buttons */}
           <div className="p-4 bg-white border rounded-lg">
             <h2 className="mb-4 font-medium text-gray-700">Visible as</h2>
-            <form.Field name="visibleAs">
+            {/* <form.Field name="visibleAs">
               {(field) => (
                 <div className="space-y-2">
                   {visibilityOptions.map((option) => (
@@ -838,7 +846,7 @@ const ProductForm = () => {
                   )}
                 </div>
               )}
-            </form.Field>
+            </form.Field> */}
           </div>
 
           {/* Product Tags */}
@@ -889,8 +897,7 @@ const ProductForm = () => {
             <button
               type="submit"
               disabled={pendingAddition || pendingUpdate}
-              className="px-6 py-2 text-white rounded-md min-w-32 bg-orange hover:bg-orange-600 disabled:opacity-50"
-            >
+              className="px-6 py-2 text-white rounded-md min-w-32 bg-orange hover:bg-orange-600 disabled:opacity-50">
               {pendingAddition || pendingUpdate ? (
                 <Icon icon="nrk:spinner" width={18} height={18} />
               ) : (

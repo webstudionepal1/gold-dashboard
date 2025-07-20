@@ -60,6 +60,17 @@ export const useGetCompanyDetailsQuery = () => {
   });
 };
 
+// Alias for backward compatibility
+export const useGetMainCompanyQuery = () => {
+  return useQuery({
+    queryKey: ["company"],
+    queryFn: async () => {
+      const res = await apiClient.get<{ data: IFetchCompany[] }>("company");
+      return res?.data?.data?.[0]; // Return first company as main company
+    },
+  });
+};
+
 export const useUpdateCompanyDetailsMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({

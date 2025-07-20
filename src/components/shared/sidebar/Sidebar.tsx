@@ -31,10 +31,6 @@ interface SidebarSection {
   routes: Route[];
 }
 
-const CompanyLogo = () => {
-  return;
-};
-
 const SidebarHeader: React.FC = () => {
   const { isCollapsed } = useSidebar();
 
@@ -43,8 +39,7 @@ const SidebarHeader: React.FC = () => {
       className={clsx(
         "flex items-center p-4",
         isCollapsed ? "justify-center" : "justify-between"
-      )}
-    >
+      )}>
       <img
         src="/barun2.png"
         alt="company-logo"
@@ -52,8 +47,6 @@ const SidebarHeader: React.FC = () => {
           isCollapsed ? "h-[50px] w-[44px]" : "h-full w-full",
           "transition-all duration-300"
         )}
-        size="lg"
-        showLoadingState={true}
       />
     </section>
   );

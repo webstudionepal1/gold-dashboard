@@ -194,3 +194,13 @@ export const productListColumns = [
   { title: "Stock", key: "stock" },
   { title: "Sold", key: "sold" },
 ];
+
+export const occasionColumns = [
+  { title: "S.N", key: "sn" },
+  { title: "Image", key: "image" },
+  { title: "Name", key: "name" },
+  { title: "Description", key: "description" },
+  { title: "Total Products", key: "totalProducts" },
+  { title: "Status", key: "status" },
+  { title: "Actions", key: "actions" },
+];

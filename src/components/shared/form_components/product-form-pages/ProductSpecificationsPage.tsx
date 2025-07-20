@@ -66,7 +66,7 @@ export const ProductSpecificationsPage: React.FC = () => {
 
   // Transform clasps for dropdown
   const claspsList = claspsSuccess
-    ? clasps?.data?.map((clasp: any) => ({
+    ? clasps?.map((clasp: any) => ({
         value: clasp._id,
         label: clasp.name,
       })) || []
@@ -400,7 +400,9 @@ export const ProductSpecificationsPage: React.FC = () => {
                   updateFormData({ makingCharges: value });
                   validateMakingCharges(value);
                 }}
-                onBlur={(e) => validateMakingCharges(Number(e.target.value) || 0)}
+                onBlur={(e) =>
+                  validateMakingCharges(Number(e.target.value) || 0)
+                }
               />
               <p className="text-sm text-gray-500">
                 Additional charges for craftsmanship
@@ -461,12 +463,12 @@ export const ProductSpecificationsPage: React.FC = () => {
               describes your product
             </p>
             <p>
-              • <strong>Clarity:</strong> Use standard gemological clarity grades
-              when applicable
+              • <strong>Clarity:</strong> Use standard gemological clarity
+              grades when applicable
             </p>
             <p>
-              • <strong>Making Charges:</strong> Include any additional costs for
-              craftsmanship or special techniques
+              • <strong>Making Charges:</strong> Include any additional costs
+              for craftsmanship or special techniques
             </p>
           </div>
         </div>

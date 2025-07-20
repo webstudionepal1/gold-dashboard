@@ -30,14 +30,23 @@ const NewProductForm: React.FC = () => {
     return {
       // Basic Information
       name: product.name || "",
-      slug: product.slug || "",
+      slug: "",
       description: product.description || "",
-      category: product.category?._id || product.category || "",
-      subCategory: product.subCategory?._id || product.subCategory || "",
+      category:
+        typeof product.category === "object"
+          ? product.category._id
+          : product.category || "",
+      subCategory:
+        typeof product.subCategory === "object"
+          ? product.subCategory._id
+          : product.subCategory || "",
 
       // Specifications
       length: product.length || 0,
-      claspType: product.claspType?._id || product.claspType || "",
+      claspType:
+        typeof product.claspType === "object"
+          ? product.claspType._id
+          : product.claspType || "",
       rhodoumFinishes: product.rhodoumFinishes || false,
       shape: product.shape || "",
       quantity: product.quantity || 0,
@@ -48,12 +57,12 @@ const NewProductForm: React.FC = () => {
       makingCharges: product.makingCharges || 0,
 
       // Variants
-      variants: product.variants || [
+      variants: [
         {
           sku: "",
           price: 0,
           wt: 0,
-          unit: "grams",
+          unit: "grams" as "grams" | "kg" | "pieces" | "carats",
           totalStock: 0,
           usedStock: 0,
           remainingStock: 0,
@@ -63,36 +72,32 @@ const NewProductForm: React.FC = () => {
       ],
 
       // Stones and Occasions
-      stones:
-        product.stones?.map((stone: any) => ({
-          stone: stone.stone?._id || stone.stone || "",
-          quantity: stone.quantity || 1,
-          totalPrice: stone.totalPrice || 0,
-          isOptional: stone.isOptional || true,
-          isDefault: stone.isDefault || false,
-        })) || [],
-      occasions:
-        product.occasions?.map((occasion: any) => occasion._id || occasion) ||
-        [],
+      stones: [],
+      occasions: [],
 
       // Media
       images: product.images || [],
 
       // SEO & Marketing
       tags: product.tags || [],
-      visibleAs: product.visibleAs || "normal",
+      visibleAs:
+        (product.visibleAs as
+          | "featured"
+          | "bestSellers"
+          | "newArrivals"
+          | "normal") || "normal",
       metadata: {
-        seoTitle: product.metadata?.seoTitle || "",
-        seoDescription: product.metadata?.seoDescription || "",
-        keywords: product.metadata?.keywords || [],
-        vendor: product.metadata?.vendor || "",
-        barcode: product.metadata?.barcode || "",
-        compareAtPrice: product.metadata?.compareAtPrice || 0,
+        seoTitle: "",
+        seoDescription: "",
+        keywords: [],
+        vendor: "",
+        barcode: "",
+        compareAtPrice: 0,
       },
 
       // Status
-      isActive: product.isActive !== undefined ? product.isActive : true,
-      isFeatured: product.isFeatured || false,
+      isActive: true,
+      isFeatured: false,
     };
   };
 

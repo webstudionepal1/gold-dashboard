@@ -10,8 +10,8 @@ import {
 import {
   IFetchItems,
   useDeleteRawMaterial,
-  useGetRawMaterialsQuery,
 } from "../../../server/api/purchaseHooks";
+import { useGetRawMaterialsQuery } from "../../../server/api/rawMaterialHook";
 import { map } from "lodash";
 import { ITable } from "../../PurchaseManagement/purchaseObj";
 import Header from "../../../components/shared/table_heading/Header";
@@ -66,8 +66,7 @@ const AttribConfig = () => {
           <span
             className={`text-white py-1 px-2 rounded-full ${
               item.isActive ? "bg-green" : "bg-red"
-            }`}
-          >
+            }`}>
             {item.isActive ? "Active" : "Inactive"}
           </span>
         ),
@@ -107,7 +106,7 @@ const AttribConfig = () => {
       columns: rawColumns,
       rows: map(rawmaterial, (item, index: number) => ({
         ...item,
-        id: item._id,
+        id: item.id,
         sn: index + 1,
       })),
       editAction(rows: IFetchItems) {
@@ -129,8 +128,7 @@ const AttribConfig = () => {
       <Header text="Attribute Config">
         <button
           onClick={() => buttonObj[tab].handleClick()}
-          className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-sm text-white px-4 py-2 flex rounded-lg transition-colors duration-200"
-        >
+          className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-sm text-white px-4 py-2 flex rounded-lg transition-colors duration-200">
           <Icon
             icon="material-symbols-light:add-rounded"
             width="18"

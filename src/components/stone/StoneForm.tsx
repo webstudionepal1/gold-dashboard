@@ -39,7 +39,21 @@ const StoneForm: React.FC<StoneFormProps> = ({
     images: [],
   });
 
-  const [errors, setErrors] = useState<Partial<IStoneFormData>>({});
+  interface StoneFormErrors {
+    name?: string;
+    type?: string;
+    color?: string;
+    clarity?: string;
+    cut?: string;
+    carat?: string;
+    pricePerCarat?: string;
+    shape?: string;
+    certification?: string;
+    description?: string;
+    images?: string;
+  }
+
+  const [errors, setErrors] = useState<StoneFormErrors>({});
 
   // Initialize form with stone data if editing
   useEffect(() => {
@@ -76,7 +90,7 @@ const StoneForm: React.FC<StoneFormProps> = ({
   };
 
   const validateForm = (): boolean => {
-    const newErrors: Partial<IStoneFormData> = {};
+    const newErrors: StoneFormErrors = {};
 
     if (!formData.name.trim()) {
       newErrors.name = "Name is required";

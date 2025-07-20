@@ -48,6 +48,9 @@ import SupplierDetail from "../pages/PurchaseManagement/pages/SupplierDetail";
 import SupplierHistory from "../pages/PurchaseManagement/pages/SupplierHistory";
 import AttribConfig from "../pages/settings/components/AttribConfig";
 import EditProfileForm from "../pages/settings/ProfileConfig/EditProfileForm";
+import ProductOccasion from "../pages/Product/ProductOccasion/ProductOccasion";
+import StoneIndex from "../pages/Stone/StoneIndex";
+import TestUpload from "../pages/TestUpload";
 import { ProductDetails } from "../pages/Product/ProductList/[id]/components/ProductDetails";
 
 export const routesConfig = [

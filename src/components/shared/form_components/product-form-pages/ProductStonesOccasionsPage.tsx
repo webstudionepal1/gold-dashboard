@@ -20,7 +20,7 @@ export const ProductStonesOccasionsPage: React.FC = () => {
 
   // Transform stones for dropdown
   const stonesList = stonesSuccess
-    ? stones?.data?.map((stone: any) => ({
+    ? stones?.map((stone: any) => ({
         value: stone._id,
         label: stone.name,
       })) || []
@@ -28,7 +28,7 @@ export const ProductStonesOccasionsPage: React.FC = () => {
 
   // Transform occasions for dropdown
   const occasionsList = occasionsSuccess
-    ? occasions?.data?.map((occasion: any) => ({
+    ? occasions?.map((occasion: any) => ({
         value: occasion._id,
         label: occasion.name,
       })) || []
@@ -132,7 +132,10 @@ export const ProductStonesOccasionsPage: React.FC = () => {
                       type="button"
                       onClick={() => removeStone(index)}
                       className="text-red-500 hover:text-red-700 p-1 rounded-md hover:bg-red-50 transition-colors">
-                      <Icon icon="material-symbols:delete" className="w-4 h-4" />
+                      <Icon
+                        icon="material-symbols:delete"
+                        className="w-4 h-4"
+                      />
                     </button>
                   </div>
 
@@ -201,7 +204,9 @@ export const ProductStonesOccasionsPage: React.FC = () => {
                             type="checkbox"
                             checked={stone.isOptional}
                             onChange={(e) =>
-                              updateStone(index, { isOptional: e.target.checked })
+                              updateStone(index, {
+                                isOptional: e.target.checked,
+                              })
                             }
                             className="sr-only peer"
                           />
@@ -224,7 +229,9 @@ export const ProductStonesOccasionsPage: React.FC = () => {
                             type="checkbox"
                             checked={stone.isDefault}
                             onChange={(e) =>
-                              updateStone(index, { isDefault: e.target.checked })
+                              updateStone(index, {
+                                isDefault: e.target.checked,
+                              })
                             }
                             className="sr-only peer"
                           />
@@ -243,7 +250,9 @@ export const ProductStonesOccasionsPage: React.FC = () => {
                 className="w-12 h-12 mx-auto mb-3 text-gray-300"
               />
               <p>No stones added yet</p>
-              <p className="text-sm">Click "Add Stone" to configure gemstones for this product</p>
+              <p className="text-sm">
+                Click "Add Stone" to configure gemstones for this product
+              </p>
             </div>
           )}
         </div>
@@ -260,7 +269,7 @@ export const ProductStonesOccasionsPage: React.FC = () => {
 
           {occasionsList.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-              {occasionsList.map((occasion) => {
+              {occasionsList.map((occasion: any) => {
                 const isSelected = (formData.occasions || []).includes(
                   occasion.value
                 );
@@ -303,7 +312,9 @@ export const ProductStonesOccasionsPage: React.FC = () => {
                 className="w-12 h-12 mx-auto mb-3 text-gray-300"
               />
               <p>No occasions available</p>
-              <p className="text-sm">Occasions will appear here when they are configured</p>
+              <p className="text-sm">
+                Occasions will appear here when they are configured
+              </p>
             </div>
           )}
 
@@ -311,7 +322,8 @@ export const ProductStonesOccasionsPage: React.FC = () => {
             <div className="mt-4 pt-4 border-t border-green-200">
               <p className="text-sm text-green-700 flex items-center gap-2">
                 <Icon icon="material-symbols:info" className="w-4 h-4" />
-                Selected occasions help customers find products for specific events
+                Selected occasions help customers find products for specific
+                events
               </p>
             </div>
           )}
@@ -328,8 +340,8 @@ export const ProductStonesOccasionsPage: React.FC = () => {
           </h4>
           <div className="space-y-2 text-sm text-gray-600">
             <p>
-              • <strong>Gemstones:</strong> Configure different stone options that
-              customers can choose from
+              • <strong>Gemstones:</strong> Configure different stone options
+              that customers can choose from
             </p>
             <p>
               • <strong>Optional Stones:</strong> Allow customers to customize
@@ -340,8 +352,8 @@ export const ProductStonesOccasionsPage: React.FC = () => {
               commonly chosen
             </p>
             <p>
-              • <strong>Occasions:</strong> Help customers find the perfect piece
-              for their special events
+              • <strong>Occasions:</strong> Help customers find the perfect
+              piece for their special events
             </p>
             <p>
               • <strong>Pricing:</strong> Stone prices are added to the base

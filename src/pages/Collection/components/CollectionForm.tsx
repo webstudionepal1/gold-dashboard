@@ -782,9 +782,10 @@ const CollectionForm = () => {
                   Collection Images
                 </label>
                 <FileDropInput
+                  multiple={false}
                   label="Collection Images"
                   value={null}
-                  onChange={(file) => {
+                  onChange={(file: File | null) => {
                     if (file) {
                       // For multiple images, we'd need a different approach
                       // For now, treating as single image upload
@@ -801,9 +802,10 @@ const CollectionForm = () => {
                   Banner Image
                 </label>
                 <FileDropInput
+                  multiple={false}
                   label="Banner Image"
                   value={null}
-                  onChange={(file) => {
+                  onChange={(file: File | null) => {
                     if (file) {
                       setUploadedBannerImage(file.name);
                     }

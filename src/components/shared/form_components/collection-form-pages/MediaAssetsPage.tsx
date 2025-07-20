@@ -188,6 +188,7 @@ export const MediaAssetsPage: React.FC = () => {
             </p>
 
             <FileDropInput
+              multiple={false}
               label="Banner Image"
               value={bannerImage}
               onChange={handleBannerImageUpload}
