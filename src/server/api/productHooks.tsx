@@ -11,10 +11,12 @@ export interface IBaseProductSubCategory {
   description?: string;
   totalProducts?: number;
   isActive?: boolean;
+  category?: string;
 }
 export interface IFetchSubCategory extends IBaseProductSubCategory {
   _id: string;
   name: string;
+  category: string;
 }
 
 export interface IProductCategory {
@@ -155,6 +157,20 @@ export const useGetAllProductsQuery = (params: IParams = {}) => {
       });
       return res?.data?.data;
     },
+  });
+};
+
+export const useGetProductByIdQuery = (
+  id: string,
+  options?: { enabled?: boolean }
+) => {
+  return useQuery({
+    queryKey: ["product", id],
+    queryFn: async () => {
+      const res = await apiClient.get<{ data: IFetchProduct }>(`product/${id}`);
+      return res?.data;
+    },
+    enabled: !!id && options?.enabled !== false,
   });
 };
 
@@ -480,12 +496,12 @@ export interface IFetchStone {
   name: string;
   type: "diamond" | "ruby" | "emerald" | "sapphire" | "pearl" | "other";
   color: string;
-  clarity?: string;
-  cut?: string;
+  clarity: string;
+  cut: string;
   carat: number;
   pricePerCarat: number;
   totalPrice: number;
-  shape?: string;
+  shape: string;
   certification?: string;
   description?: string;
   images: string[];
@@ -528,6 +544,111 @@ export const useGetAllStonesQuery = (params: IParams = {}) => {
         return [];
       }
     },
+    retry: 1,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+// Stone CRUD operations
+export interface ICreateStoneData {
+  name: string;
+  type: "diamond" | "ruby" | "emerald" | "sapphire" | "pearl" | "other";
+  color: string;
+  clarity: string;
+  cut: string;
+  carat: number;
+  pricePerCarat: number;
+  shape: string;
+  certification?: string;
+  description?: string;
+  images?: string[];
+}
+
+export interface IUpdateStoneData extends Partial<ICreateStoneData> {
+  isActive?: boolean;
+}
+
+export const useCreateStoneMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: ICreateStoneData) => {
+      const res = await apiClient.post("stone", data);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["stones"] });
+      toast.success("Stone created successfully");
+    },
+    onError: (error: any) => {
+      console.error("Error creating stone:", error);
+      toast.error(error?.response?.data?.message || "Failed to create stone");
+    },
+  });
+};
+
+export const useUpdateStoneMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: IUpdateStoneData;
+    }) => {
+      const res = await apiClient.put(`stone/${id}`, data);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["stones"] });
+      toast.success("Stone updated successfully");
+    },
+    onError: (error: any) => {
+      console.error("Error updating stone:", error);
+      toast.error(error?.response?.data?.message || "Failed to update stone");
+    },
+  });
+};
+
+export const useDeleteStoneMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await apiClient.delete(`stone/${id}`);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["stones"] });
+      toast.success("Stone deleted successfully");
+    },
+    onError: (error: any) => {
+      console.error("Error deleting stone:", error);
+      toast.error(error?.response?.data?.message || "Failed to delete stone");
+    },
+  });
+};
+
+export const useGetStoneByIdQuery = (id: string) => {
+  return useQuery({
+    queryKey: ["stone", id],
+    queryFn: async () => {
+      try {
+        const res = await apiClient.get<{
+          success: boolean;
+          message: string;
+          data: IFetchStone;
+        }>(`stone/${id}`);
+
+        return res.data.data;
+      } catch (error) {
+        console.error("Error fetching stone:", error);
+        throw error;
+      }
+    },
+    enabled: !!id,
     retry: 1,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });

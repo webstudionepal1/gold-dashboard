@@ -1,6 +1,13 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
-import React, { useCallback, useMemo, useState, useRef, useEffect } from "react";
+import React, {
+  useCallback,
+  useMemo,
+  useState,
+  useRef,
+  useEffect,
+} from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { FrontendRoutes } from "../../../routes/routes";
 import { SearchFilterSort } from "../../../components/global/SearchFilterSort";
 import { filterOptions, sortOptions } from "../../../constants/DropDownOptions";
 import {
@@ -57,10 +64,13 @@ const ProductList: React.FC = () => {
 
   // Debounce search query for better performance
   const debouncedSearchQuery = useDebounce(filterState.searchQuery, 300);
-  const onEdit = useCallback((row: IFetchProduct) => {
-    updateProductState(row);
-    navigate(`/product/edit`);
-  }, []);
+  const onEdit = useCallback(
+    (row: IFetchProduct) => {
+      updateProductState(row);
+      navigate(`/product/edit/${row._id}`);
+    },
+    [navigate]
+  );
   // Optimized filtering with debounced search
   const filteredProducts = useMemo(() => {
     if (!productsData || productsData.length === 0) return [];
@@ -134,7 +144,12 @@ const ProductList: React.FC = () => {
     }
 
     return result;
-  }, [productsData, debouncedSearchQuery, filterState.filterValue, filterState.sortValue]);
+  }, [
+    productsData,
+    debouncedSearchQuery,
+    filterState.filterValue,
+    filterState.sortValue,
+  ]);
 
   const handleSearch = (query: string) => {
     setFilterState((prev) => ({ ...prev, searchQuery: query }));
@@ -148,43 +163,53 @@ const ProductList: React.FC = () => {
     setFilterState((prev) => ({ ...prev, sortValue: sort }));
   };
 
-  const handleCardClick = useCallback((product: IFetchProduct) => {
-    navigate(`/product/${product._id}`, { state: { product } });
-  }, [navigate]);
+  const handleCardClick = useCallback(
+    (product: IFetchProduct) => {
+      navigate(`/product/${product._id}`, { state: { product } });
+    },
+    [navigate]
+  );
 
   // Memoize table columns to prevent unnecessary re-renders
-  const columns = useMemo(() => [
-    {
-      title: "Product",
-      key: "product",
-    },
-    {
-      title: "Category",
-      key: "category",
-    },
-    {
-      title: "Sub Category",
-      key: "subCategory",
-    },
-    {
-      title: "Price",
-      key: "price",
-    },
-    {
-      title: "Stock",
-      key: "stock",
-    },
-  ], []);
+  const columns = useMemo(
+    () => [
+      {
+        title: "Product",
+        key: "product",
+      },
+      {
+        title: "Category",
+        key: "category",
+      },
+      {
+        title: "Sub Category",
+        key: "subCategory",
+      },
+      {
+        title: "Price",
+        key: "price",
+      },
+      {
+        title: "Stock",
+        key: "stock",
+      },
+    ],
+    []
+  );
 
   // Memoize table data transformation
-  const tableData = useMemo(() => filteredProducts.map((product) => ({
-    ...product,
-    product: get(product, "name", ""),
-    category: get(product, "category.name", ""),
-    subCategory: get(product, "subCategory.name", ""),
-    price: get(product, "variants[0].price", 0),
-    stock: get(product, "variants[0].stockQuantity", "-"),
-  })), [filteredProducts]);
+  const tableData = useMemo(
+    () =>
+      filteredProducts.map((product) => ({
+        ...product,
+        product: get(product, "name", ""),
+        category: get(product, "category.name", ""),
+        subCategory: get(product, "subCategory.name", ""),
+        price: get(product, "variants[0].price", 0),
+        stock: get(product, "variants[0].stockQuantity", "-"),
+      })),
+    [filteredProducts]
+  );
 
   if (isLoading) {
     return (
@@ -197,7 +222,7 @@ const ProductList: React.FC = () => {
   return (
     <div className="container mx-auto py-auto">
       <Header text="Products">
-        <Link to="/product/add">
+        <Link to={FrontendRoutes.ADDPRODUCT}>
           <button className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-sm text-white px-4 py-2 flex rounded-lg transition-colors duration-200">
             <Icon icon="ic:outline-add" fontSize={18} />
             New Product

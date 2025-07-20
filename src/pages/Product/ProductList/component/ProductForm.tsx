@@ -64,12 +64,19 @@ const ProductForm = () => {
     [categorySuccess, categories]
   );
 
+  // Get current category value from form state
+  const currentCategory = form.useStore((state) => state.values.category);
+
   const subCategoriesList = useMemo(
     () =>
       subSuccess
-        ? subCategories.map((item) => ({ label: item.name, value: item._id }))
+        ? subCategories
+            .filter(
+              (item) => !currentCategory || item.category === currentCategory
+            )
+            .map((item) => ({ label: item.name, value: item._id }))
         : [],
-    [subSuccess, subCategories]
+    [subSuccess, subCategories, currentCategory]
   );
 
   const claspsList = useMemo(
@@ -314,7 +321,11 @@ const ProductForm = () => {
                           firstInput="Select Category"
                           options={categoriesList}
                           value={field.state.value}
-                          onChange={(e) => field.handleChange(e.target.value)}
+                          onChange={(e) => {
+                            field.handleChange(e.target.value);
+                            // Reset subcategory when category changes
+                            form.setFieldValue("subCategory", "");
+                          }}
                         />
                         <FieldError field={field} />
                       </div>
@@ -327,10 +338,15 @@ const ProductForm = () => {
                         <DropdownField
                           label="Product Sub-Category"
                           required
-                          firstInput="Select Sub Category"
+                          firstInput={
+                            !currentCategory
+                              ? "Select category first"
+                              : "Select Sub Category"
+                          }
                           options={subCategoriesList}
                           value={field.state.value}
                           onChange={(e) => field.handleChange(e.target.value)}
+                          disabled={!currentCategory}
                         />
                         <FieldError field={field} />
                       </div>

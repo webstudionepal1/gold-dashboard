@@ -41,6 +41,12 @@ export const SidebarConfig = {
               title: "Product Occasion",
               icon: "",
             },
+            {
+              id: 24,
+              path: FrontendRoutes.STONE,
+              title: "Stone Management",
+              icon: "",
+            },
           ],
         },
         {

@@ -39,6 +39,7 @@ import OrderReport from "../pages/analytics/OrderReport";
 import SalesReport from "../pages/analytics/SalesReport";
 import StoreReport from "../pages/analytics/StoreReport";
 import ProductForm from "../pages/Product/ProductList/component/ProductForm";
+import NewProductForm from "../pages/Product/components/NewProductForm";
 import CustomerDetails from "../pages/Customer/components/CustomerDetails";
 import OrderDetails from "../pages/OrderManagement/Order/OrderDetails";
 import InventoryIndex from "../pages/Inventory/InventoryIndex";
@@ -48,6 +49,7 @@ import SupplierDetail from "../pages/PurchaseManagement/pages/SupplierDetail";
 import SupplierHistory from "../pages/PurchaseManagement/pages/SupplierHistory";
 import AttribConfig from "../pages/settings/components/AttribConfig";
 import TestUpload from "../pages/TestUpload";
+import StoneIndex from "../pages/Stone/StoneIndex";
 
 export const routesConfig = [
   {
@@ -116,6 +118,14 @@ export const routesConfig = [
     element: <ProductList />,
   },
   {
+    path: FrontendRoutes.ADDPRODUCT,
+    element: <NewProductForm />,
+  },
+  {
+    path: FrontendRoutes.EDITPRODUCT,
+    element: <NewProductForm />,
+  },
+  {
     path: "/product/:id",
     element: <ProductForm />,
   },
@@ -134,6 +144,10 @@ export const routesConfig = [
   {
     path: FrontendRoutes.PRODUCTOCCASION,
     element: <ProductOccasion />,
+  },
+  {
+    path: FrontendRoutes.STONE,
+    element: <StoneIndex />,
   },
 
   {
