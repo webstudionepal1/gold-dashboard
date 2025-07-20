@@ -2,19 +2,35 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../utils/ApiGateway";
 import { toast } from "react-toastify";
 
-export interface IParams {
-  [key: string]: string;
+export interface IFetchCompany {
+  _id: string;
+  name: string;
+  ownerNo: string;
+  address: string;
+  email: string;
+  phone: string;
+  description: string;
+  registrationNo: string;
+  city: string;
+  zipCode: string;
+  openDay: string;
+  openTime: string;
+  closeTime: string;
+  paymentMode: string;
+  bankName: string;
+  accountNo: string;
+  accountHolder: string;
+  branch: string;
+  companyName: string;
+  [key: string]: any;
 }
-
-export interface IShopProfile {
+export interface ICompany {
   _id?: string;
-  companyName?: string;
   name?: string;
   ownerNo?: string;
   address?: string;
   email?: string;
   phone?: string;
-  logo?: string[];
   description?: string;
   registrationNo?: string;
   city?: string;
@@ -23,86 +39,43 @@ export interface IShopProfile {
   openTime?: string;
   closeTime?: string;
   paymentMode?: string;
+  companyName?: string;
   bankName?: string;
   accountNo?: string;
   accountHolder?: string;
   branch?: string;
-  qr?: string[];
-  createdAt?: string;
-  updatedAt?: string;
 }
 
-export interface IFetchCompany extends IShopProfile {
-  _id: string;
+interface IUpdateProps {
+  id: string;
+  body: FormData;
 }
-
-// Get all companies
-export const useGetAllCompaniesQuery = (params: IParams = {}) => {
+export const useGetCompanyDetailsQuery = () => {
   return useQuery({
-    queryKey: ["company", params],
+    queryKey: ["company"],
     queryFn: async () => {
-      const res = await apiClient.get<{ data: IFetchCompany[] }>("company", {
-        params,
-      });
+      const res = await apiClient.get<{ data: IFetchCompany[] }>("company");
       return res?.data?.data;
     },
   });
 };
 
-// Get company by ID
-export const useGetCompanyByIdQuery = (id: string) => {
-  return useQuery({
-    queryKey: ["company", id],
-    queryFn: async () => {
-      const res = await apiClient.get<{ data: IFetchCompany }>(`company/${id}`);
-      return res?.data?.data;
-    },
-    enabled: !!id,
-  });
-};
-
-// Get the first/main company (for app-wide company info)
+// Alias for backward compatibility
 export const useGetMainCompanyQuery = () => {
   return useQuery({
-    queryKey: ["company", "main"],
+    queryKey: ["company"],
     queryFn: async () => {
-      const res = await apiClient.get<{ data: IFetchCompany[] }>("company", {
-        params: { limit: 1 },
-      });
-      return res?.data?.data?.[0] || null;
+      const res = await apiClient.get<{ data: IFetchCompany[] }>("company");
+      return res?.data?.data?.[0]; // Return first company as main company
     },
   });
 };
 
-// Create company
-export const useCreateCompanyMutation = () => {
+export const useUpdateCompanyDetailsMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ["company"],
-    mutationFn: async (body: FormData) => {
-      const res = await apiClient.post("company", body, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      return res?.data?.data;
-    },
-    onSuccess() {
-      toast.success("Company created successfully");
-      queryClient.invalidateQueries({ queryKey: ["company"] });
-    },
-    onError(err: string) {
-      toast.error(err || "Error creating company");
-    },
-  });
-};
-
-// Update company
-export const useUpdateCompanyMutation = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationKey: ["company"],
-    mutationFn: async ({ id, body }: { id: string; body: FormData }) => {
+    mutationFn: async ({ id, body }: IUpdateProps) => {
       const res = await apiClient.patch(`company/${id}`, body, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -111,30 +84,11 @@ export const useUpdateCompanyMutation = () => {
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Company updated successfully");
+      toast.success("Successfully updated details");
       queryClient.invalidateQueries({ queryKey: ["company"] });
     },
     onError(err: string) {
-      toast.error(err || "Error updating company");
-    },
-  });
-};
-
-// Delete company
-export const useDeleteCompanyMutation = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationKey: ["company"],
-    mutationFn: async (id: string) => {
-      const res = await apiClient.delete(`company/${id}`);
-      return res?.data?.data;
-    },
-    onSuccess() {
-      toast.success("Company deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["company"] });
-    },
-    onError(err: string) {
-      toast.error(err || "Error deleting company");
+      toast.success(err || "Error Updating Details");
     },
   });
 };

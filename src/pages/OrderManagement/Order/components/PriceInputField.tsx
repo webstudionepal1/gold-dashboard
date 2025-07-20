@@ -44,13 +44,13 @@ export const PriceInputField = React.forwardRef<
           type={type}
           placeholder={placeholder}
           className={twMerge(
-            `${border && "border"} border-grey-200 ${
-              defaultPadding && "py-3 pl-14 pr-4"
-            } rounded ${
+            `min-h-[44px] ${border && "border"} border-grey-200 ${
+              defaultPadding && "py-2 pl-14 pr-4"
+            } rounded-xl ${
               readonly
                 ? "placeholder:text-[#95949a] cursor-auto"
-                : "text-[#95949a]"
-            } outline-none w-full ${inputClassName}`
+                : "text-gray-800"
+            } outline-none w-full ${inputClassName} bg-[#f6f7f9]`
           )}
           readOnly={readonly}
           {...other}

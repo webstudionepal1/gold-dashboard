@@ -1,49 +1,95 @@
 import { useForm } from "@tanstack/react-form";
 import { get } from "lodash";
-import React from "react";
+import { useEffect } from "react";
 import { z } from "zod";
+import { DropdownField } from "../../../components/shared/form_components/Dropdown";
+import MultiImageUploader from "../../../components/shared/form_components/FileDropInput";
+import { InputField } from "../../../components/shared/form_components/InputField";
+import {
+  useCreateExpenseMutation,
+  useGetExpenseCategoryQuery,
+  useUpdateExpenseMutation,
+} from "../../../server/api/expensesHook";
+import { FieldError } from "../../auth/LoginPage";
 interface propTypes {
   editData?: any;
   closeModal: () => void;
 }
-import { FieldError } from "../../auth/LoginPage";
-import { InputField } from "../../../components/shared/form_components/InputField";
-import { DropdownField } from "../../../components/shared/form_components/Dropdown";
-import FileDropInput from "../../../components/shared/form_components/FileDropInput";
 
 const addExpenseSchema = z.object({
-  date: z.coerce
-    .date()
-    .refine((date) => date.getFullYear() >= 1950, {
-      message: "The year cannot be lower than 1950",
-    })
-    .refine((date) => date <= new Date(), {
-      message: "The year cannot be above the present date.",
-    }),
-  category: z.string().min(1, "Category is required"),
+  date: z.string(),
+  expenseCategory: z.string().min(1, "Category is required"),
   amount: z.number().min(0, "Amount cannot be negative"),
   description: z.string().min(1, "Description is required"),
-  image: z
-    .instanceof(File)
-    .nullable()
-    .refine((file) => file !== null, { message: "Image is required" }),
+  image: z.array(z.instanceof(File)),
+  existingImages: z.array(z.string()),
 });
+interface IExpenseForm {
+  date: string;
+  expenseCategory: string;
+  amount: number;
+  description: string;
+  image: File[];
+  existingImages: string[];
+}
 const ExpenseForm = ({ editData, closeModal }: propTypes) => {
+  {
+  }
+  const {
+    mutate: createExpense,
+    isPending: ExpensePending,
+    isSuccess: ExpenseSuccess,
+  } = useCreateExpenseMutation();
+
+  const {
+    mutate: updateExpense,
+    isPending: updateExpensePending,
+    isSuccess: updateExpenseSuccess,
+  } = useUpdateExpenseMutation();
+  const {
+    data: expenseCategoryList,
+    isLoading: expenseCategoryLoading,
+    isSuccess: expenseCategorySuccess,
+  } = useGetExpenseCategoryQuery();
+
   const form = useForm({
     defaultValues: {
-      date: editData ? get(editData, "name", "") : "",
-      category: editData ? get(editData, "category", "") : "",
+      date: editData ? get(editData, "date", "") : "",
+      expenseCategory: editData ? get(editData, "expenseCategory._id", "") : "",
       amount: editData ? get(editData, "amount", 0) : 0,
       description: editData ? get(editData, "description", "") : "",
-      image: editData ? get(editData, "image", null) : null,
-    },
+      image: [],
+      existingImages: get(editData, "images", []),
+    } as IExpenseForm,
     validators: {
       onSubmit: addExpenseSchema,
     },
     onSubmit: async ({ value }) => {
-      console.log("Order Submitted", value);
+      const formData = new FormData();
+
+      formData.append("date", value.date);
+      formData.append("expenseCategory", value.expenseCategory);
+      formData.append("amount", `${value.amount}`);
+      formData.append("description", value.description);
+
+      // formData.append("images", value.image);
+      if (Array.isArray(value.image)) {
+        value.image.forEach((file: any) => {
+          formData.append("images", file);
+        });
+      }
+
+      if (editData) {
+        updateExpense({ id: editData._id, body: formData });
+      } else {
+        createExpense(formData);
+      }
     },
   });
+
+  useEffect(() => {
+    if (ExpenseSuccess) form.reset();
+  }, [ExpenseSuccess]);
   return (
     <>
       <div className="bg-[#ffffff]">
@@ -53,6 +99,7 @@ const ExpenseForm = ({ editData, closeModal }: propTypes) => {
             e.preventDefault();
             e.stopPropagation();
             form.handleSubmit();
+            closeModal();
           }}
         >
           <h1 className="flex items-center justify-center text-xl font-semibold">
@@ -79,16 +126,16 @@ const ExpenseForm = ({ editData, closeModal }: propTypes) => {
           </div>
 
           <div className="flex items-center gap-4 w-full">
-            <form.Field name="category">
+            <form.Field name="expenseCategory">
               {(field) => (
                 <div className="w-full">
                   <DropdownField
                     label="Category"
                     required
-                    options={[
-                      { value: "fixed", label: "Fixed" },
-                      { value: "percentage", label: "Percentage" },
-                    ]}
+                    options={expenseCategoryList?.map((item) => ({
+                      label: item.name ?? "",
+                      value: item._id ?? "",
+                    }))}
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
                     inputClassname="w-full"
@@ -106,9 +153,8 @@ const ExpenseForm = ({ editData, closeModal }: propTypes) => {
                     label="Amount"
                     required
                     min={0}
-                    placeholder="Enter Discount"
                     value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={(e) => field.handleChange(Number(e.target.value))}
                   />
                   <FieldError field={field} />
                 </div>
@@ -132,16 +178,15 @@ const ExpenseForm = ({ editData, closeModal }: propTypes) => {
 
           <form.Field name="image">
             {(field) => (
-              <div className="w-full">
-                <FileDropInput
-                  label="Invoice"
-                  value={field.state.value as unknown as File}
-                  onChange={(file) => {
-                    field.handleChange(file); // store the file directly
-                  }}
-                />
-                <FieldError field={field} />
-              </div>
+              <MultiImageUploader
+                existingFiles={form.getFieldValue("existingImages")}
+                multiple={true}
+                form={form}
+                existingFileField="existingImages"
+                label="Upload Receipts"
+                value={field.state.value}
+                onChange={(files) => field.handleChange(files)}
+              />
             )}
           </form.Field>
 
@@ -156,7 +201,7 @@ const ExpenseForm = ({ editData, closeModal }: propTypes) => {
               type="submit"
               className=" bg-[#df8d29] flex-1 text-white px-7 py-2 rounded-xl "
             >
-              Save
+              {editData ? "Update" : "Add"}
             </button>
           </div>
         </form>

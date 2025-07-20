@@ -115,10 +115,21 @@ const AddProductOccasion = ({ modalRef, closeModal, editData }: PropTypes) => {
         occasionData.video = editData.video;
       }
 
+      const formData = new FormData();
+      Object.entries(occasionData).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          if (value instanceof File) {
+            formData.append(key, value);
+          } else {
+            formData.append(key, String(value));
+          }
+        }
+      });
+
       if (editData) {
-        updateOccasion({ id: editData._id, body: occasionData });
+        updateOccasion({ id: editData._id, body: formData });
       } else {
-        createOccasion(occasionData);
+        createOccasion(formData);
       }
     },
   });
@@ -199,9 +210,10 @@ const AddProductOccasion = ({ modalRef, closeModal, editData }: PropTypes) => {
               {(field) => (
                 <div>
                   <FileDropInput
+                    multiple={false}
                     label="Occasion Image"
                     value={field.state.value}
-                    onChange={(file) => field.handleChange(file)}
+                    onChange={(file: File | null) => field.handleChange(file)}
                     existingImageUrl={editData?.image}
                   />
                   <FieldError field={field} />

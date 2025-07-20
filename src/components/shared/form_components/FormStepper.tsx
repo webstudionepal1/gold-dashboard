@@ -134,12 +134,14 @@ export const FormStepper: React.FC<FormStepperProps> = ({
 interface ProgressBarProps {
   currentStep: number;
   totalSteps: number;
+  completedSteps?: number[];
   className?: string;
 }
 
 export const ProgressBar: React.FC<ProgressBarProps> = ({
   currentStep,
   totalSteps,
+  completedSteps = [],
   className = "",
 }) => {
   const progressPercentage = ((currentStep - 1) / (totalSteps - 1)) * 100;

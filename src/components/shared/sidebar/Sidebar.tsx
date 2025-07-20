@@ -40,13 +40,13 @@ const SidebarHeader: React.FC = () => {
         "flex items-center p-4",
         isCollapsed ? "justify-center" : "justify-between"
       )}>
-      <CompanyLogo
+      <img
+        src="/barun2.png"
+        alt="company-logo"
         className={clsx(
           isCollapsed ? "h-[50px] w-[44px]" : "h-full w-full",
           "transition-all duration-300"
         )}
-        size="lg"
-        showLoadingState={true}
       />
     </section>
   );

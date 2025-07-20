@@ -16,39 +16,6 @@ const DashboardComp = () => {
     isLoading: metalPricesLoading,
     error: metalPricesError,
   } = useGetLatestMetalPricesQuery();
-
-  // Memoize the combined data to prevent unnecessary re-renders
-  // This MUST be called before any early returns to maintain hook order
-  const combinedData = useMemo(() => {
-    // Create a default empty data structure if no data is available
-    const emptyData = {
-      salesMetrics: {
-        dailySales: [],
-        totalSalesByCategory: [],
-        totalRevenue: 0,
-        totalOrders: 0,
-        averageOrderValue: 0,
-      },
-      orderMetrics: {
-        dailyOrders: { labels: [], datasets: [] },
-        todaysOrders: [],
-      },
-      priceList: [],
-      recentTransactions: [],
-      lowStockItems: [],
-      topCustomers: [],
-      metalPrices: undefined,
-    };
-
-    // Combine dashboard data with metal prices or use empty data if none available
-    return dashboardData
-      ? {
-          ...dashboardData,
-          metalPrices: metalPricesData,
-        }
-      : emptyData;
-  }, [dashboardData, metalPricesData]);
-
   const isLoading = dashboardLoading || metalPricesLoading;
   const error = dashboardError || metalPricesError;
 
@@ -68,6 +35,34 @@ const DashboardComp = () => {
     );
   }
 
+  // Create a default empty data structure if no data is available
+  const emptyData = {
+    salesMetrics: {
+      dailySales: [],
+      totalSalesByCategory: [],
+      totalRevenue: 0,
+      totalOrders: 0,
+      averageOrderValue: 0,
+    },
+    orderMetrics: {
+      dailyOrders: { labels: [], datasets: [] },
+      todaysOrders: [],
+    },
+    priceList: [],
+    recentTransactions: [],
+    lowStockItems: [],
+    topCustomers: [],
+    metalPrices: undefined,
+  };
+
+  // Combine dashboard data with metal prices or use empty data if none available
+  const combinedData = dashboardData
+    ? {
+        ...dashboardData,
+        metalPrices: metalPricesData,
+      }
+    : emptyData;
+
   return (
     <div className="flex flex-col gap-5 bg-[#F4F4F5]">
       <div className="flex flex-col gap-5 md:flex-row">
@@ -83,4 +78,4 @@ const DashboardComp = () => {
   );
 };
 
-export default React.memo(DashboardComp);
+export default DashboardComp;

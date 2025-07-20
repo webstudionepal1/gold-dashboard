@@ -1,22 +1,18 @@
 import * as z from "zod";
-type VisibilityType =
+import { get } from "lodash";
+
+export type VisibilityType =
   | "featured"
   | "bestsellers"
   | "newarrivals"
   | "recommended"
-  | "";
+  | "popular";
 
 type ProductVariant = {
   sku?: string; // Made optional - will be auto-generated if not provided
   price: number;
   wt: number;
-  unit: string;
-  totalStock: number;
-  usedStock: number;
-  remainingStock: number;
-  reorderPoint: number;
-  costPrice?: number;
-  isActive: boolean;
+  unit?: string;
 };
 
 export interface IProductStone {
@@ -32,11 +28,8 @@ export interface IProductFormValues {
   slug?: string;
   description: string;
   category: string;
-  subCategory: string;
-  variants: ProductVariant[];
-  makingCharges: number;
-
-  // Physical properties
+  subCategory?: string;
+  variant: ProductVariant[];
   length: number;
   claspType?: string;
   rhodoumFinishes: boolean;
@@ -55,21 +48,8 @@ export interface IProductFormValues {
 
   // SEO and marketing
   tags: string[];
-  visibleAs: VisibilityType;
-
-  // Status flags
-  isActive: boolean;
-  isFeatured: boolean;
-
-  // Metadata
-  metadata?: {
-    seoTitle?: string;
-    seoDescription?: string;
-    keywords?: string[];
-    vendor?: string;
-    barcode?: string;
-    compareAtPrice?: number;
-  };
+  images: File | null; // Changed from 'image' to 'images' to match form field
+  existingImage?: string;
 }
 
 export interface UploadedImage {
@@ -78,68 +58,78 @@ export interface UploadedImage {
   file: File;
 }
 
+export const productFormSchema = z
+  .object({
+    // General Information
+    name: z.string().min(1, "Name is required"),
+    description: z.string().min(1, "Description is required"),
+    category: z.string().min(1, "Category is required"),
+    subCategory: z.string().optional(),
+
+    // Price - Fixed validation
+    variant: z
+      .array(
+        z.object({
+          price: z.number().min(0.01, "Price must be greater than 0"),
+          wt: z.number().min(0.01, "Weight must be greater than 0"),
+          unit: z.string().optional().default("gm"),
+        })
+      )
+      .min(1, "At least one variant is required"),
+
+    // Product Specification
+    length: z.number().min(0.01, "Length must be greater than 0"),
+    claspType: z.string().optional(),
+    rhodoumFinishes: z.boolean(),
+
+    // Material Information
+    shape: z.string().min(1, "Shape is required"),
+    clarity: z.string().min(1, "Clarity is required"),
+    dimension: z.number().min(0.01, "Dimension must be greater than 0"),
+
+    // Image - Fixed field name
+    images: z.instanceof(File).nullable(),
+    existingImage: z.string().optional(),
+
+    // Visibility Option (single selection) - Fixed enum
+    visibleAs: z.enum([
+      "featured",
+      "bestsellers",
+      "newarrivals",
+      "recommended",
+      "popular",
+    ]),
+
+    // Tags
+    tags: z.array(z.string()).min(1, "At least one tag is required"),
+  })
+  .refine(
+    (data) => {
+      // For new products, require an image
+      // For updates, allow either new image or existing image
+      return data.images !== null || data.existingImage;
+    },
+    {
+      message: "At least one image is required",
+      path: ["images"],
+    }
+  );
+
 export const categoryColumns = [
-  {
-    title: "Name",
-    key: "name",
-  },
-  {
-    title: "Description",
-    key: "description",
-  },
-  {
-    title: "Total Products",
-    key: "totalProducts",
-  },
+  { title: "S.N", key: "sn" },
+  { title: "Name", key: "name" },
+  { title: "Description", key: "description" },
+  { title: "Total Products", key: "totalProducts" },
 ];
 
 export const subCategoryColumns = [
-  {
-    title: "Name",
-    key: "name",
-  },
-  {
-    title: "Category",
-    key: "category",
-  },
-  {
-    title: "Description",
-    key: "description",
-  },
-  {
-    title: "Total Products",
-    key: "totalProducts",
-  },
+  { title: "S.N", key: "sn" },
+  { title: "Name", key: "name" },
+  // { title: "Category", key: "category" },
+  { title: "Description", key: "description" },
+  { title: "Total Products", key: "totalProducts" },
 ];
 
-export const occasionColumns = [
-  {
-    title: "Name",
-    key: "name",
-  },
-  {
-    title: "Description",
-    key: "description",
-  },
-  {
-    title: "Total Products",
-    key: "totalProducts",
-  },
-  {
-    title: "Image",
-    key: "image",
-  },
-  {
-    title: "Video",
-    key: "video",
-  },
-  {
-    title: "Status",
-    key: "isActive",
-  },
-];
-
-import { get } from "lodash";
 export const generateProductDefaultValue = (state: string, editData?: any) => {
   if (state === "add") {
     return {
@@ -147,20 +137,7 @@ export const generateProductDefaultValue = (state: string, editData?: any) => {
       description: "",
       category: "",
       subCategory: "",
-      variants: [
-        {
-          sku: "", // Optional - will be auto-generated if left empty
-          price: 0,
-          wt: 0,
-          unit: "grams",
-          totalStock: 0,
-          usedStock: 0,
-          remainingStock: 0,
-          reorderPoint: 10,
-          isActive: true,
-        },
-      ],
-      makingCharges: 0,
+      variant: [{ price: 0, wt: 0, unit: "gm" }],
       length: 0,
       claspType: "",
       rhodoumFinishes: true,
@@ -168,33 +145,17 @@ export const generateProductDefaultValue = (state: string, editData?: any) => {
       quantity: 0,
       clarity: "",
       dimension: 0,
-      stones: [],
-      occasions: [],
-      visibleAs: "featured",
-      isActive: true,
-      isFeatured: false,
+      visibleAs: "featured" as VisibilityType,
       tags: ["Featured"],
+      images: null, // Changed from 'image' to 'images'
     };
   } else {
-    return {
+    const data = {
       name: get(editData, "name", ""),
       description: get(editData, "description", ""),
-      category: get(editData, "category", ""),
-      subCategory: get(editData, "subCategory", ""),
-      variants: get(editData, "variants", [
-        {
-          sku: "",
-          price: 0,
-          wt: 0,
-          unit: "grams",
-          totalStock: 0,
-          usedStock: 0,
-          remainingStock: 0,
-          reorderPoint: 10,
-          isActive: true,
-        },
-      ]),
-      makingCharges: get(editData, "makingCharges", 0),
+      category: get(editData, "category._id", ""),
+      subCategory: get(editData, "subCategory._id", ""),
+      variant: get(editData, "variant", [{ price: 0, wt: 0, unit: "gm" }]),
       length: get(editData, "length", 0),
       claspType: (() => {
         const claspTypeValue = get(editData, "claspType", "");
@@ -214,100 +175,32 @@ export const generateProductDefaultValue = (state: string, editData?: any) => {
       color: get(editData, "color"),
       clarity: get(editData, "clarity", ""),
       dimension: get(editData, "dimension", 0),
-      visibleAs: get(editData, "visibleAs", "featured"),
-      isActive: get(editData, "isActive", true),
-      isFeatured: get(editData, "isFeatured", false),
+      visibleAs: get(editData, "visibleAs", "featured") as VisibilityType,
       tags: get(editData, "tags", ["Featured"]),
-      metadata: get(editData, "metadata"),
+      images: null, // Changed from 'image' to 'images'
+      existingImage: get(editData, "images[0]", undefined),
     };
+    return data;
   }
 };
 
-export const productFormSchema = z.object({
-  // General Information
-  name: z.string().min(1, "Name is required"),
-  description: z.string().min(1, "Description is required"),
-  category: z.string().min(1, "Category is required"),
-  subCategory: z.string().min(1, "Sub Category is required"),
+export const productListColumns = [
+  { title: "S.N", key: "sn" },
+  { title: "Image", key: "image" },
+  { title: "Product", key: "product" },
+  { title: "Category", key: "categ" },
+  { title: "Sub Category", key: "subCate" },
+  { title: "Price", key: "price" },
+  { title: "Stock", key: "stock" },
+  { title: "Sold", key: "sold" },
+];
 
-  // Variants
-  variants: z
-    .array(
-      z.object({
-        sku: z.string().optional(), // Made optional - will be auto-generated if not provided
-        price: z.number().min(1, "Price must be greater than 0"),
-        wt: z.number().min(0, "Weight cannot be negative"),
-        unit: z.string().min(1, "Unit is required"),
-        totalStock: z.number().min(0, "Total stock cannot be negative"),
-        usedStock: z.number().min(0, "Used stock cannot be negative"),
-        remainingStock: z.number().min(0, "Remaining stock cannot be negative"),
-        reorderPoint: z.number().min(0, "Reorder point cannot be negative"),
-        costPrice: z
-          .number()
-          .min(0, "Cost price cannot be negative")
-          .optional(),
-        isActive: z.boolean(),
-      })
-    )
-    .min(1, "At least one variant is required"),
-
-  // Making charges
-  makingCharges: z.number().min(0, "Making charges cannot be negative"),
-
-  // Product Specification
-  length: z.number().min(1, "Length is required"),
-  claspType: z.string().optional(),
-  rhodoumFinishes: z.boolean(),
-  quantity: z.number().min(0, "Quantity cannot be negative"),
-  totalCarat: z.number().min(0, "Total carat cannot be negative").optional(),
-  color: z.string().optional(),
-
-  // Material Information
-  shape: z.string().min(1, "Shape is required"),
-  clarity: z.string().min(1, "Clarity is required"),
-  dimension: z.number().min(1, "Dimension is required"),
-
-  // Stones (optional)
-  stones: z
-    .array(
-      z.object({
-        stone: z.string().min(1, "Stone is required"),
-        quantity: z.number().min(1, "Quantity must be at least 1"),
-        totalPrice: z.number().min(0, "Total price cannot be negative"),
-        isOptional: z.boolean(),
-        isDefault: z.boolean(),
-      })
-    )
-    .optional(),
-
-  // Occasions (optional)
-  occasions: z.array(z.string()).optional(),
-
-  // Visibility Option (single selection)
-  visibleAs: z.enum([
-    "",
-    "featured",
-    "bestsellers",
-    "newarrivals",
-    "recommended",
-  ]),
-
-  // Status flags
-  isActive: z.boolean(),
-  isFeatured: z.boolean(),
-
-  // Tags
-  tags: z.array(z.string()).min(1, "At least one tag is required"),
-
-  // Metadata (optional)
-  metadata: z
-    .object({
-      seoTitle: z.string().optional(),
-      seoDescription: z.string().optional(),
-      keywords: z.array(z.string()).optional(),
-      vendor: z.string().optional(),
-      barcode: z.string().optional(),
-      compareAtPrice: z.number().min(0).optional(),
-    })
-    .optional(),
-});
+export const occasionColumns = [
+  { title: "S.N", key: "sn" },
+  { title: "Image", key: "image" },
+  { title: "Name", key: "name" },
+  { title: "Description", key: "description" },
+  { title: "Total Products", key: "totalProducts" },
+  { title: "Status", key: "status" },
+  { title: "Actions", key: "actions" },
+];

@@ -2,10 +2,15 @@ export const FrontendRoutes = {
   HOME: "/",
   LOGIN: "/login",
   PRODUCTLIST: "/product/product-list",
+  ADDPRODUCT: "/product/add",
+  EDITPRODUCT: "/product/edit/:id",
   PRODUCTDESCRIPTION: "/product/:productId",
   PRODUCTCATEGORY: "/product/product-category",
   PRODUCTSUBCATEGORY: "/product/sub-category",
   PRODUCTOCCASION: "/product/product-occasion",
+  STONE: "/stone",
+  ADDSTONE: "/stone/add",
+  EDITSTONE: "/stone/edit/:id",
   ASSIGNEDORDER: "/order/assigned-order",
   CONFIRMEDORDER: "/order/confirmed-order",
   ADDORDER: "/order/add-order",
@@ -24,7 +29,7 @@ export const FrontendRoutes = {
   ADDSUPPLIERS: "/inventory/suppliers/:page",
   SUPPLIERDETAIL: "/inventory/supplier/:id",
   SUPPLIERHISTORY: "/inventory/suppliers/supplier-history",
-  // ATTRIBUTES: "/attribute",
+
   BANNER: "/banner",
   ADDBANNER: "/banner/add-banner",
   COLLECTION: "/collection",
@@ -46,4 +51,5 @@ export const FrontendRoutes = {
   STOCK_REPORT: "/stock-report",
 
   SETTINGS: "/settings",
+  PROFILECONFIG: "/settings/profile-config",
 };

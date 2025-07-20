@@ -1,167 +1,15 @@
-// import type React from "react";
-// import { useState } from "react";
-// import { ColumnConfig, Table, TableData } from "../../components/shared/Table";
-// import { SearchFilterSort } from "../../components/global/SearchFilterSort";
-
-// interface Customer {
-//   _id: string;
-//   categories: string;
-//   inflow: string;
-//   outflow: string;
-//   balance: string;
-// }
-
-// const ProfitandLoss: React.FC = () => {
-//   const [searchQuery, setSearchQuery] = useState("");
-//   const [selectedFilter, setSelectedFilter] = useState("");
-//   const [selectedSort, setSelectedSort] = useState("");
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const [itemsPerPage, setItemsPerPage] = useState(10);
-
-//   const [customers, setCustomers] = useState<Customer[]>([
-//     {
-//       _id: "1",
-//       categories: "opening balance",
-//       inflow: "Rs 120",
-//       outflow: "Rs 120",
-//       balance: "Rs 120",
-//     },
-//     {
-//       _id: "2",
-//       categories: "opening balance",
-//       inflow: "Rs 120",
-//       outflow: "Rs 120",
-//       balance: "Rs 120",
-//     },
-//     {
-//       _id: "3",
-//       categories: "opening balance",
-//       inflow: "Rs 120",
-//       outflow: "Rs 120",
-//       balance: "Rs 120",
-//     },
-//   ]);
-
-//   const handleDeleteCustomer = (row: TableData<Customer>) => {
-//     setCustomers((prev) => prev.filter((o) => o._id !== row._id));
-//   };
-
-//   const filterOptions = [
-//     { value: "", label: "All Customers" },
-//     { value: "active", label: "Active" },
-//     { value: "inactive", label: "Inactive" },
-//   ];
-
-//   const sortOptions = [
-//     { value: "", label: "Default" },
-//     // These are just placeholders — doesn't apply to your current data
-//     { value: "name-asc", label: "Name (A-Z)" },
-//     { value: "name-desc", label: "Name (Z-A)" },
-//     { value: "orders-high", label: "Orders (High)" },
-//     { value: "orders-low", label: "Orders (Low)" },
-//   ];
-
-//   const filteredCustomers = customers.filter((customer) => {
-//     const matchesSearch = customer.categories
-//       .toLowerCase()
-//       .includes(searchQuery.toLowerCase());
-//     return matchesSearch;
-//   });
-
-//   const sortedCustomers = [...filteredCustomers]; // Keeping as-is unless real sort fields are added
-
-//   const columns: ColumnConfig<Customer>[] = [
-//     { header: "Categories", key: "categories" },
-//     { header: "In Flow (Rs)", key: "inflow" },
-//     { header: "Out Flow (Rs)", key: "outflow" },
-//     { header: "Balance", key: "balance" },
-//   ];
-
-//   const handleRowSelect = (selectedIds: string[]) => {
-//     console.log("Selected rows:", selectedIds);
-//   };
-
-//   const handlePageChange = (page: number) => {
-//     setCurrentPage(page);
-//   };
-
-//   const handleItemsPerPageChange = (limit: number) => {
-//     setItemsPerPage(limit);
-//     setCurrentPage(1);
-//   };
-
-//   const handleSearch = (query: string) => {
-//     setSearchQuery(query);
-//     setCurrentPage(1);
-//   };
-
-//   const handleFilter = (filter: string) => {
-//     setSelectedFilter(filter);
-//     setCurrentPage(1);
-//   };
-
-//   const handleSort = (sort: string) => {
-//     setSelectedSort(sort);
-//     setCurrentPage(1);
-//   };
-
-//   return (
-//     <div className="container mx-auto px-4 py-6">
-//       <div className="flex justify-between items-center mb-6">
-//         <h1 className="text-2xl font-bold text-gray-800">Cash Flow</h1>
-//       </div>
-
-//       <div className="bg-white p-4">
-//         <SearchFilterSort
-//           onSearch={handleSearch}
-//           onFilter={handleFilter}
-//           onSort={handleSort}
-//           filterOptions={filterOptions}
-//           sortOptions={sortOptions}
-//           placeholder="Search here..."
-//         />
-
-//         <div className="bg-white rounded-lg shadow">
-//           <Table
-//             columns={columns}
-//             data={sortedCustomers}
-//             showSelectAll={true}
-//             onRowSelect={handleRowSelect}
-//             // onToggle={handleToggleStatus} // ❌ Removed since it doesn't exist now
-//             deleteRow={handleDeleteCustomer}
-//             showPagination={true}
-//             paginationDetails={{
-//               currentPage,
-//               limit: itemsPerPage,
-//               totalCount: filteredCustomers.length,
-//             }}
-//             onItemsPerPageChange={handleItemsPerPageChange}
-//             onPageChange={handlePageChange}
-//             showBg={true}
-//             showAction={false}
-//             showEdit={true}
-//             showDelete={true}
-//             showView={true}
-//           />
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default ProfitandLoss;
-
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SearchFilterSort } from "../../components/global/SearchFilterSort";
-import MasterTable from "../../components/shared/MasterTable";
 import Header from "../../components/shared/table_heading/Header";
 import { FrontendRoutes } from "../../routes/routes";
-import { IFetchOrder, useGetAllOrdersQuery } from "../../server/api/orderHooks";
-import { cashFlowColumns } from "./components/CashObj";
-import dayjs from "dayjs";
-import { get } from "lodash";
-import ToggleSlider from "../../components/shared/form_components/ToggleSlider";
+
+import ProfitTable from "./components/ProfitTable";
+import {
+  RevenueCategory,
+  useGetFinancialReportQuery,
+} from "../../server/api/profitandlossHook";
+import { profitandlossColumns } from "./profitandlossObj";
 
 // Filter state interface
 interface FilterState {
@@ -172,29 +20,28 @@ interface FilterState {
   sort: string;
 }
 
-// Dynamic config for IFetchOrder
-
 const ProfitandLoss = () => {
-  const {
-    data: orders,
-    isSuccess,
-    isLoading,
-  } = useGetAllOrdersQuery({
-    orderStatus: "pending",
-  });
+  // Consolidated filter state
+  const today = new Date();
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(today.getDate() - 7);
 
-  const [showSecondTable, setShowSecondTable] = useState(false);
+  const formatDate = (date: Date) => date.toISOString().split("T")[0];
 
-  const handleToggle = () => {
-    setShowSecondTable((prev) => !prev);
+  const [startDate, setStartDate] = useState<string>(formatDate(sevenDaysAgo));
+  const [endDate, setEndDate] = useState<string>(formatDate(today));
+
+  const handleDataChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    type: "start" | "end"
+  ) => {
+    if (type === "start") {
+      setStartDate(e.target.value);
+    } else {
+      setEndDate(e.target.value);
+    }
   };
 
-  const orderList = useMemo(
-    () => (isSuccess ? orders : []),
-    [isSuccess, orders]
-  );
-
-  // Consolidated filter state
   const [filterState, setFilterState] = useState<FilterState>({
     searchQuery: "",
     currentPage: 1,
@@ -202,6 +49,30 @@ const ProfitandLoss = () => {
     filter: "",
     sort: "",
   });
+
+  const {
+    data: FinancialReport,
+    isSuccess: isfinancialRepSuccess,
+    isLoading: isfinancialRepLoading,
+  } = useGetFinancialReportQuery({ startDate, endDate });
+
+  // State for controlling hidden rows toggle visibility
+  const [showHiddenRows, setShowHiddenRows] = useState(false);
+  const financialReportList = useMemo(
+    () =>
+      isfinancialRepSuccess && FinancialReport?.revenue
+        ? FinancialReport.revenue
+        : [],
+    [isfinancialRepSuccess, FinancialReport]
+  );
+
+  const financiallReportList = useMemo(
+    () =>
+      isfinancialRepSuccess && FinancialReport?.expenses
+        ? FinancialReport.expenses
+        : [],
+    [isfinancialRepSuccess, FinancialReport]
+  );
 
   const navigate = useNavigate();
 
@@ -223,7 +94,7 @@ const ProfitandLoss = () => {
     { value: "amount-low", label: "Amount (Low to High)" },
   ];
 
-  const filterItems = (items: IFetchOrder[]) => {
+  const filterItems = (items: RevenueCategory[]) => {
     if (!items || items.length === 0) return [];
 
     let filteredItems = [...items];
@@ -231,51 +102,38 @@ const ProfitandLoss = () => {
     // Apply search filter
     if (filterState.searchQuery) {
       filteredItems = filteredItems.filter((item) => {
-        const customerName = item.customer?.name?.toLowerCase() || "";
-        const orderId = item._id?.toLowerCase() || "";
-        const email = item.customer?.email?.toLowerCase() || "";
+        const category = item?.category?.toLowerCase() || "";
 
-        return (
-          customerName.includes(filterState.searchQuery.toLowerCase()) ||
-          orderId.includes(filterState.searchQuery.toLowerCase()) ||
-          email.includes(filterState.searchQuery.toLowerCase())
-        );
+        return category.includes(filterState.searchQuery.toLowerCase());
       });
     }
 
-    // Apply status filter
     if (filterState.filter) {
       filteredItems = filteredItems.filter((item) => {
-        return (
-          item.orderStatus.toLowerCase() === filterState.filter.toLowerCase()
-        );
+        return item.category.toLowerCase() === filterState.filter.toLowerCase();
       });
     }
 
-    // Apply sorting
     if (filterState.sort) {
       filteredItems = [...filteredItems].sort((a, b) => {
         switch (filterState.sort) {
-          case "name-asc":
-            return (a.customer?.name || "").localeCompare(
-              b.customer?.name || ""
-            );
-          case "name-desc":
-            return (b.customer?.name || "").localeCompare(
-              a.customer?.name || ""
-            );
-          case "date-newest":
-            return (
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-            );
-          case "date-oldest":
-            return (
-              new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-            );
-          case "amount-high":
-            return b.totalAmount - a.totalAmount;
-          case "amount-low":
-            return a.totalAmount - b.totalAmount;
+          case "category-asc":
+            return a.category.localeCompare(b.category);
+          case "category-desc":
+            return b.category.localeCompare(a.category);
+          case "inflow-high":
+            return b.inflow - a.inflow;
+          case "inflow-low":
+            return a.inflow - b.inflow;
+          case "outflow-high":
+            return b.outflow - a.outflow;
+          case "outflow-low":
+            return a.outflow - b.outflow;
+          case "balance-high":
+            return b.balance - a.balance;
+
+          case "balance-low":
+            return a.balance - b.balance;
           default:
             return 0;
         }
@@ -285,36 +143,69 @@ const ProfitandLoss = () => {
     return filteredItems;
   };
 
-  // Get filtered items
-  const filteredItems = useMemo(
-    () =>
-      filterItems(orderList).map((item) => ({
-        ...item,
-        orderedProducts: get(item, "orderedProducts.length", 0),
-        orderStatus: (
-          <div className="px-2 py-1 text-xs text-white rounded-full bg-green dark-green">
-            {get(item, "orderStatus", "")}
-          </div>
-        ),
-        customer: get(item, "customer.name", "-"),
-        createdAt: (
-          <div className="text-center">
-            {dayjs(get(item, "createdAt", "")).format("MMMM D, YYYY")}
-            <br />
-            {dayjs(get(item, "createdAt", "")).format("h:mm A")}
-          </div>
-        ),
-      })),
-    [orderList, filterState]
-  );
+  // Sample data for main visible rows
 
-  // Calculate pagination
+  // const mainTransactions = useMemo(() => {
+  //   return filterItems(financialReportList).map((categoryItem) => ({
+  //     id: categoryItem.category, // Or a unique ID if needed
+  //     category: categoryItem.category,
+  //     inFlow: categoryItem.inflow,
+  //     outFlow: categoryItem.outflow,
+  //     balance: categoryItem.balance,
+  //   }));
+  // }, [financialReportList, filterState]);
 
-  const handleViewItem = (item: IFetchOrder) => {
-    navigate(`${FrontendRoutes.ORDERDETAILS}/${item._id}`);
+  const mainTransactions = useMemo(() => {
+    return filterItems(financialReportList).map((categoryItem) => ({
+      id: categoryItem.category,
+      category: categoryItem.category,
+      inflow: categoryItem.inflow, // was: inFlow
+      outflow: categoryItem.outflow, // was: outFlow
+      balance: categoryItem.balance,
+    }));
+  }, [financialReportList, filterState]);
+
+  const detailedTransactions = useMemo(() => {
+    return filterItems(financiallReportList).map((item) => ({
+      id: item.category,
+      category: item.category,
+      inflow: item.inflow,
+      outflow: item.outflow,
+      balance: item.balance,
+    }));
+  }, [financiallReportList]);
+
+  // const detailedTransactions = useMemo(() => {
+  //   // Generate detailed transaction rows based on the main transactions
+  //   return mainTransactions.slice(0, 3).flatMap((transaction) => {
+  //     // Generate detailed rows based on inflow and outflow for each transaction
+  //     return [
+  //       {
+  //         id: `${transaction.id}-detail-1`,
+
+  //         category: `${transaction.category} - Item 1`,
+  //         inFlow: Math.round(transaction.inflow * 0.6),
+  //         outFlow: Math.round(transaction.outflow * 0.6),
+  //         balance:
+  //           Math.round(transaction.inflow * 0.6) -
+  //           Math.round(transaction.outflow * 0.6),
+  //       },
+  //       {
+  //         // id: `${transaction.id}-detail-2`,
+
+  //         inFlow: Math.round(transaction.inflow * 0.4),
+  //         outFlow: Math.round(transaction.outflow * 0.4),
+  //         balance:
+  //           Math.round(transaction.inflow * 0.4) -
+  //           Math.round(transaction.outflow * 0.4),
+  //       },
+  //     ];
+  //   });
+  // }, [mainTransactions]);
+
+  const handleViewItem = (item: any) => {
+    navigate(`${FrontendRoutes.ORDERDETAILS}/${item.id}`);
   };
-
-  // Updated handlers using the setter function
 
   const handleSearch = (query: string) => {
     setFilterState((prev) => ({ ...prev, searchQuery: query, currentPage: 1 }));
@@ -328,99 +219,51 @@ const ProfitandLoss = () => {
     setFilterState((prev) => ({ ...prev, sort, currentPage: 1 }));
   };
 
-  const dummyData = [
-    {
-      date: "2025-04-20",
-      category: "Salary",
-      inFlow: 50000,
-      outFlow: 0,
-      balance: 50000,
-    },
-    {
-      date: "2025-04-21",
-      category: "Groceries",
-      inFlow: 0,
-      outFlow: 5000,
-      balance: 45000,
-    },
-    {
-      date: "2025-04-22",
-      category: "Investment Return",
-      inFlow: 10000,
-      outFlow: 0,
-      balance: 55000,
-    },
-    {
-      date: "2025-04-23",
-      category: "Dining Out",
-      inFlow: 0,
-      outFlow: 2000,
-      balance: 53000,
-    },
-    {
-      date: "2025-04-24",
-      category: "Online Shopping",
-      inFlow: 0,
-      outFlow: 7000,
-      balance: 46000,
-    },
-  ];
-
   return (
     <div className="container px-4 py-3 mx-auto">
       <Header text="Profit & Loss"></Header>
-      <div className="bg-white border-[#eae9ec] border-2 w-full pb-8 rounded-xl">
-        <div className="mx-3">
-          <MasterTable
-            showAction
-            filterSection={
-              <SearchFilterSort
-                onSearch={handleSearch}
-                onFilter={handleFilter}
-                onSort={handleSort}
-                filterOptions={filterOptions}
-                sortOptions={sortOptions}
-                placeholder="Search by customer name, ID or email..."
-              />
-            }
-            // viewAction={(row) => navigate(`/order/order-details/${row._id}`)}
-            // editAction={() => console.log("edit")}
-            // onDelete={(id) => console.log("delete")}
-            rows={filteredItems}
-            columns={cashFlowColumns}
-            loading={isLoading}
+
+      <div className="flex gap-4 items-center my-4">
+        <div>
+          <label>Start Date</label>
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="border px-2 py-1 rounded"
           />
         </div>
-
-        <div className="flex items-center justify-between mx-8">
-          <span className="text-gray-700 font-medium">Expenses</span>
-          <ToggleSlider enabled={showSecondTable} onToggle={handleToggle} />
+        <div>
+          <label>End Date</label>
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="border px-2 py-1 rounded"
+          />
         </div>
-
-        {/* Second Table */}
-        {showSecondTable && (
-          <div className="mt-8 mx-3">
-            <MasterTable
-              showAction
-              // filterSection={
-              //   <SearchFilterSort
-              //     onSearch={handleSearch}
-              //     onFilter={handleFilter}
-              //     onSort={handleSort}
-              //     filterOptions={filterOptions}
-              //     sortOptions={sortOptions}
-              //     placeholder="Search by customer name, ID or email..."
-              //   />
-              // }
-              // viewAction={(row) => navigate(`/order/order-details/${row._id}`)}
-              // editAction={() => console.log("edit")}
-              // onDelete={(id) => console.log("delete")}
-              rows={filteredItems}
-              columns={cashFlowColumns}
-              loading={isLoading}
-            />
-          </div>
-        )}
+      </div>
+      <div className="bg-white border-[#eae9ec] border-2 w-full pb-8 rounded-xl">
+        <div className="mx-3">
+          <ProfitTable
+            // filterSection={
+            //   <SearchFilterSort
+            //     onFilter={handleFilter}
+            //     onSort={handleSort}
+            //     filterOptions={filterOptions}
+            //     sortOptions={sortOptions}
+            //     placeholder="Search by customer name, ID or email..."
+            //   />
+            // }
+            rows={mainTransactions}
+            columns={profitandlossColumns}
+            loading={isfinancialRepLoading}
+            // Enable hidden rows feature
+            // hiddenRows={detailedTransactions}
+            // showHiddenRowsToggle={true}
+            // hiddenRowsLabel="Expenses"
+          />
+        </div>
       </div>
     </div>
   );

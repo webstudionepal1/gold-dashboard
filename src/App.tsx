@@ -1,11 +1,11 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { Outlet } from "react-router-dom";
+import { Navbar } from "./components/shared";
 import Sidebar, { SidebarInset } from "./components/shared/sidebar/Sidebar";
+import { SidebarProvider } from "./components/shared/sidebar/SidebarContext";
 import { initializeAuth } from "./hooks/useAuth";
 import { SidebarConfig } from "./routes/Sidebar";
-import { SidebarProvider } from "./components/shared/sidebar/SidebarContext";
-import { Navbar } from "./components/shared";
-import { Outlet } from "react-router-dom";
 
 export default function App() {
   const queryClient = useQueryClient();

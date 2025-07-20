@@ -1,22 +1,22 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { apiClient } from "../utils/ApiGateway";
-import { IFetchSupplier } from "./supplierHooks";
+// import { IFetchSupplier } from "./supplierHooks";
 import { IFetchProduct } from "./productHooks";
 
 export interface IItem {
   item: string;
-  quantity: number;
+  quantity?: number;
   price: number;
   paidAmount: number;
 }
 
 export interface IProducts {
   product: string;
-  quantity: number;
+  quantity?: number;
   price: number;
   paidAmount: number;
-  wt: number;
+  wt?: number;
 }
 
 export interface IFetchPurchase {
@@ -24,7 +24,7 @@ export interface IFetchPurchase {
   billNo: string;
   items: IItem[];
   products: IProducts[];
-  supplier: IFetchSupplier;
+  supplier: string;
   discount: number;
   discountType: string;
   totalAmount: number;
@@ -117,35 +117,74 @@ export const useDeletePurchaseMutation = () => {
   });
 };
 
-// Hook to get return summary for a specific purchase
-export interface IReturnSummaryItem {
-  productId: string;
-  productName: string;
-  wt: number;
-  originalQuantity: number;
-  totalReturned: number;
-  remainingQuantity: number;
-  canReturn: boolean;
+// getraw materials
+export interface IItems {
+  name?: string;
+  usedStock?: number;
+  unit?: string;
+  remainingStock?: number;
+  totalStock?: number;
+}
+export interface IFetchItems {
+  name: string;
+  unit?: string;
+  usedStock: number;
+  remainingStock: number;
+  totalStock: number;
+  _id: string;
 }
 
-export interface IReturnSummary {
-  purchaseId: string;
-  returnSummary: IReturnSummaryItem[];
-}
-
-export const useGetPurchaseReturnSummaryQuery = (purchaseId: string) => {
-  return useQuery({
-    queryKey: ["purchase-return-summary", purchaseId],
-    queryFn: async () => {
-      const res = await apiClient.get<{ data: IReturnSummary }>(
-        `purchase/${purchaseId}/return-summary`
-      );
+export const useCreateRawMaterialMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["rawitem"],
+    mutationFn: async (body: IItems) => {
+      const res = await apiClient.post("rawitem", body);
       return res?.data?.data;
     },
-    enabled: !!purchaseId,
+    onSuccess() {
+      toast.success("Raw Material created successfully");
+      queryClient.invalidateQueries({ queryKey: ["rawitem"] });
+    },
+    onError(err: string) {
+      toast.error(err || "Error creating raw material");
+    },
   });
 };
-
+export const useUpdateRawItemsMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["rawitem"],
+    mutationFn: async ({ id, body }: { id: string; body: IItems }) => {
+      const res = await apiClient.patch(`rawitem/${id}`, body);
+      return res?.data?.data;
+    },
+    onSuccess() {
+      toast.success("Raw Material updated successfully");
+      queryClient.invalidateQueries({ queryKey: ["rawitem"] });
+    },
+    onError(err: string) {
+      toast.error(err || "Error updating raw material");
+    },
+  });
+};
+export const useDeleteRawMaterial = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["rawitem"],
+    mutationFn: async (id: string) => {
+      const res = await apiClient.delete(`rawitem/${id}`);
+      return res?.data?.data;
+    },
+    onSuccess() {
+      toast.success("Raw Material deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["rawitem"] });
+    },
+    onError(err: string) {
+      toast.error(err || "Error deleting raw material");
+    },
+  });
+};
 // purchase - return hooks
 export interface IReturnItem {
   item: any;
@@ -183,7 +222,7 @@ interface IUpdatePurchaseReturn {
 }
 export const useGetPurchaseReturnQuery = (params = {}) => {
   return useQuery({
-    queryKey: ["purchase-return", params],
+    queryKey: ["purchase/return", params],
     queryFn: async () => {
       const res = await apiClient.get<{ data: IFetchPurchaseReturn[] }>(
         "purchase/return",
@@ -199,14 +238,14 @@ export const useGetPurchaseReturnQuery = (params = {}) => {
 export const useCreatePurchaseReturnMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["purchase-return"],
+    mutationKey: ["purchase/return"],
     mutationFn: async (body: IPurchaseReturn) => {
       const res = await apiClient.post("purchase/return", body);
       return res?.data?.data;
     },
     onSuccess() {
       toast.success("Purchase return created successfully");
-      queryClient.invalidateQueries({ queryKey: ["purchase-return"] });
+      queryClient.invalidateQueries({ queryKey: ["purchase/return"] });
     },
     onError(err: string) {
       toast.error(err || "Error creating purchase return");
@@ -247,5 +286,34 @@ export const useDeletePurchasReturnMutation = () => {
     onError(err: string) {
       toast.error(err || "Error deleting purchase return");
     },
+  });
+};
+
+// Purchase return summary hook
+export interface IReturnSummaryItem {
+  productId: string;
+  productName: string;
+  wt: number;
+  originalQuantity: number;
+  totalReturned: number;
+  remainingQuantity: number;
+  canReturn: boolean;
+}
+
+export interface IReturnSummary {
+  purchaseId: string;
+  returnSummary: IReturnSummaryItem[];
+}
+
+export const useGetPurchaseReturnSummaryQuery = (purchaseId: string) => {
+  return useQuery({
+    queryKey: ["purchase-return-summary", purchaseId],
+    queryFn: async () => {
+      const res = await apiClient.get<{ data: IReturnSummary }>(
+        `purchase/${purchaseId}/return-summary`
+      );
+      return res?.data?.data;
+    },
+    enabled: !!purchaseId,
   });
 };

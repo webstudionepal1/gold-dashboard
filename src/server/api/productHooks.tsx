@@ -11,10 +11,12 @@ export interface IBaseProductSubCategory {
   description?: string;
   totalProducts?: number;
   isActive?: boolean;
+  category?: string;
 }
 export interface IFetchSubCategory extends IBaseProductSubCategory {
   _id: string;
   name: string;
+  category: string;
 }
 
 export interface IProductCategory {
@@ -29,32 +31,33 @@ export interface IFetchCategory extends IProductCategory {
   _id: string;
   name: string;
 }
-export interface IProductVariant {
-  _id?: string;
-  sku: string;
-  price: number;
-  wt: number;
-  unit: string;
-  totalStock: number;
+export interface StockItem {
   usedStock: number;
+  price: number;
+  unit: string;
+  _id: string;
+  wt: number;
   remainingStock: number;
-  reorderPoint: number;
-  costPrice?: number;
-  isActive: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
+  totalStock: number;
 }
 
 export interface IBaseProduct {
+  _id?: string;
   name?: string;
   slug?: string;
   description?: string;
-  category?: string | IProductCategory;
-  subCategory?: string | IBaseProductSubCategory;
-  variants?: IProductVariant[];
+  category?: string;
+  subCategory?: string;
+  variant?: Array<{
+    price?: number;
+    wt?: number;
+    unit?: string;
+    totalStock?: number;
+    usedStock?: number;
+    remainingStock?: number;
+    reorderPoint?: number;
+  }>;
   makingCharges?: number;
-
-  // Physical properties
   length?: number;
   claspType?: string;
   rhodoumFinishes?: boolean;
@@ -69,52 +72,42 @@ export interface IBaseProduct {
   tags?: string[];
   visibleAs?: string;
   images?: string[];
-
-  // Reviews and ratings
   averageRating?: number;
   numberOfReviews?: number;
-  reviews?: string[];
-
-  // Status and inventory
-  isActive?: boolean;
-  isFeatured?: boolean;
-
-  // Metadata
-  metadata?: {
-    seoTitle?: string;
-    seoDescription?: string;
-    keywords?: string[];
-    vendor?: string;
-    barcode?: string;
-    compareAtPrice?: number;
-  };
-
-  // Audit fields
-  createdBy?: string;
-  updatedBy?: string;
-  _id?: string;
 }
-export interface IFetchProduct extends IBaseProduct {
+export interface IFetchProduct {
   _id: string;
   name: string;
-  slug: string;
+  ratings: number;
   description: string;
-  category: string | IProductCategory;
-  subCategory: string | IBaseProductSubCategory;
-  variants: IProductVariant[];
+  category: IFetchCategory;
+  subCategory: IFetchSubCategory;
+  averageRating?: number;
+  numberOfReviews?: number;
+  variant: [
+    {
+      price: number;
+      wt: number;
+      unit: string;
+      totalStock: number;
+      usedStock: number;
+      remainingStock: number;
+      reorderPoint: number;
+    }
+  ];
   makingCharges: number;
-
-  // Reviews and ratings
-  averageRating: number;
-  numberOfReviews: number;
-
-  // Status and inventory
-  isActive: boolean;
-  isFeatured: boolean;
-
-  // Timestamps
-  createdAt?: Date;
-  updatedAt?: Date;
+  length: number;
+  claspType: IFetchClasps;
+  rhodoumFinishes: boolean;
+  shape: string;
+  quantity: number;
+  totalCarat: number;
+  color: string;
+  clarity: string;
+  dimension: number;
+  tags: string[];
+  visibleAs: string;
+  images: string[];
 }
 
 //clasps interfaces
@@ -122,6 +115,7 @@ export interface IFetchClasps {
   name: string;
   images?: string[];
   _id: string;
+  isActive: boolean;
 }
 
 //occasion interfaces
@@ -157,6 +151,29 @@ export const useGetAllProductsQuery = (params: IParams = {}) => {
     },
   });
 };
+export const useGetProductById = (id: string) => {
+  return useQuery({
+    queryKey: ["products", id],
+    queryFn: async () => {
+      const res = await apiClient.get<{ data: IFetchProduct }>(`product/${id}`);
+      return res?.data?.data;
+    },
+  });
+};
+
+export const useGetProductByIdQuery = (
+  id: string,
+  options?: { enabled?: boolean }
+) => {
+  return useQuery({
+    queryKey: ["product", id],
+    queryFn: async () => {
+      const res = await apiClient.get<{ data: IFetchProduct }>(`product/${id}`);
+      return res?.data;
+    },
+    enabled: !!id && options?.enabled !== false,
+  });
+};
 
 export const useCreateProductsMutation = () => {
   const queryClient = useQueryClient();
@@ -190,7 +207,11 @@ export const useUpdateProductsMutation = () => {
       id: string | undefined;
       body: FormData;
     }) => {
-      const res = await apiClient.patch(`product/${id}`, body);
+      const res = await apiClient.patch(`product/${id}`, body, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       return res?.data?.data;
     },
     onSuccess() {
@@ -369,9 +390,9 @@ export const useDeleteProductSubCategoryMutation = () => {
 // Product clasp
 export const useGetAllProductClaspsQuery = (params: IParams = {}) => {
   return useQuery({
-    queryKey: ["clasp"],
+    queryKey: ["clasptype"],
     queryFn: async () => {
-      const res = await apiClient.get<{ data: IFetchClasps[] }>("clasptype", {
+      const res = await apiClient.get<{ data: IFetchClasps[] }>("calsptype", {
         params,
       });
       return res?.data?.data;
@@ -379,12 +400,156 @@ export const useGetAllProductClaspsQuery = (params: IParams = {}) => {
   });
 };
 
-// Product occasions
+export const useCreateProductClaspsMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["clasptype"],
+    mutationFn: async (body: FormData) => {
+      const res = await apiClient.post("calsptype", body, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      return res?.data?.data;
+    },
+    onSuccess() {
+      toast.success("Product clasp created successfully");
+      queryClient.invalidateQueries({ queryKey: ["clasptype"] });
+    },
+    onError(err: string) {
+      toast.error(err || "Error creating product clasp");
+    },
+  });
+};
+
+export const useUpdateProductClaspsMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["clasptype"],
+    mutationFn: async ({ id, body }: { id: string; body: FormData }) => {
+      const res = await apiClient.patch(`calsptype/${id}`, body, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      return res?.data?.data;
+    },
+    onSuccess() {
+      toast.success("Product clasp updated successfully");
+      queryClient.invalidateQueries({ queryKey: ["clasptype"] });
+    },
+    onError(err: string) {
+      toast.error(err || "Error updating product clasp");
+    },
+  });
+};
+
+export const useDeleteProductClaspsMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["clasptype"],
+    mutationFn: async (id: string) => {
+      const res = await apiClient.delete(`calsptype/${id}`);
+      return res?.data?.data;
+    },
+    onSuccess() {
+      toast.success("Product clasp deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["clasptype"] });
+    },
+    onError(err: string) {
+      toast.error(err || "Error deleting product clasp");
+    },
+  });
+};
+
+// Stone-related exports (placeholders for now - these should be moved to a separate stoneHooks.tsx file)
+export interface IFetchStone {
+  _id: string;
+  name: string;
+  type: "diamond" | "ruby" | "emerald" | "sapphire" | "pearl" | "other";
+  color: string;
+  clarity: string;
+  cut: string;
+  carat: number;
+  pricePerCarat: number;
+  totalPrice: number;
+  shape: string;
+  certification?: string;
+  description?: string;
+  images: string[];
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export const useGetAllStonesQuery = (params: IParams = {}) => {
+  return useQuery({
+    queryKey: ["stones", params],
+    queryFn: async () => {
+      const res = await apiClient.get<{ data: IFetchStone[] }>("stones", {
+        params,
+      });
+      return res?.data?.data;
+    },
+  });
+};
+
+export const useCreateStoneMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["stones"],
+    mutationFn: async (body: FormData) => {
+      const res = await apiClient.post("stones", body);
+      return res?.data?.data;
+    },
+    onSuccess() {
+      toast.success("Stone created successfully");
+      queryClient.invalidateQueries({ queryKey: ["stones"] });
+    },
+    onError(err: string) {
+      toast.error(err || "Error creating stone");
+    },
+  });
+};
+
+export const useUpdateStoneMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["stones"],
+    mutationFn: async ({ id, body }: { id: string; body: FormData }) => {
+      const res = await apiClient.patch(`stones/${id}`, body);
+      return res?.data?.data;
+    },
+    onSuccess() {
+      toast.success("Stone updated successfully");
+      queryClient.invalidateQueries({ queryKey: ["stones"] });
+    },
+    onError(err: string) {
+      toast.error(err || "Error updating stone");
+    },
+  });
+};
+
+export const useDeleteStoneMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["stones"],
+    mutationFn: async (id: string) => {
+      const res = await apiClient.delete(`stones/${id}`);
+      return res?.data?.data;
+    },
+    onSuccess() {
+      toast.success("Stone deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["stones"] });
+    },
+    onError(err: string) {
+      toast.error(err || "Error deleting stone");
+    },
+  });
+};
+
+// Product Occasions exports
 export const useGetAllProductOccasionsQuery = (params: IParams = {}) => {
   return useQuery({
-    queryKey: ["occasions"],
+    queryKey: ["occasions", params],
     queryFn: async () => {
-      const res = await apiClient.get<{ data: IFetchOccasion[] }>("occasion", {
+      const res = await apiClient.get<{ data: IFetchOccasion[] }>("occasions", {
         params,
       });
       return res?.data?.data;
@@ -396,16 +561,16 @@ export const useCreateProductOccasionMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ["occasions"],
-    mutationFn: async (body: Partial<IFetchOccasion>) => {
-      const res = await apiClient.post("occasion", body);
+    mutationFn: async (body: FormData) => {
+      const res = await apiClient.post("occasions", body);
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Occasion created successfully");
+      toast.success("Product occasion created successfully");
       queryClient.invalidateQueries({ queryKey: ["occasions"] });
     },
     onError(err: string) {
-      toast.error(err || "Error creating occasion");
+      toast.error(err || "Error creating product occasion");
     },
   });
 };
@@ -414,22 +579,16 @@ export const useUpdateProductOccasionMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ["occasions"],
-    mutationFn: async ({
-      id,
-      body,
-    }: {
-      id: string;
-      body: Partial<IFetchOccasion>;
-    }) => {
-      const res = await apiClient.patch(`occasion/${id}`, body);
+    mutationFn: async ({ id, body }: { id: string; body: FormData }) => {
+      const res = await apiClient.patch(`occasions/${id}`, body);
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Occasion updated successfully");
+      toast.success("Product occasion updated successfully");
       queryClient.invalidateQueries({ queryKey: ["occasions"] });
     },
     onError(err: string) {
-      toast.error(err || "Error updating occasion");
+      toast.error(err || "Error updating product occasion");
     },
   });
 };
@@ -439,96 +598,27 @@ export const useDeleteProductOccasionMutation = () => {
   return useMutation({
     mutationKey: ["occasions"],
     mutationFn: async (id: string) => {
-      const res = await apiClient.delete(`occasion/${id}`);
+      const res = await apiClient.delete(`occasions/${id}`);
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Occasion deleted successfully");
+      toast.success("Product occasion deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["occasions"] });
     },
     onError(err: string) {
-      toast.error(err || "Error deleting occasion");
+      toast.error(err || "Error deleting product occasion");
     },
   });
 };
 
-// SKU validation hook
-export const useValidateSKUQuery = (sku: string, excludeProductId?: string) => {
+// SKU validation export
+export const useValidateSKUQuery = (sku: string) => {
   return useQuery({
-    queryKey: ["validate-sku", sku, excludeProductId],
+    queryKey: ["validate-sku", sku],
     queryFn: async () => {
-      if (!sku || sku.trim() === "") {
-        return { isUnique: true };
-      }
-      const params = excludeProductId ? { excludeProductId } : {};
-      const res = await apiClient.get(
-        `validate-sku/${encodeURIComponent(sku)}`,
-        {
-          params,
-        }
-      );
-      return res?.data?.data;
+      const res = await apiClient.get(`product/validate-sku/${sku}`);
+      return res?.data;
     },
-    enabled: !!sku && sku.trim() !== "",
-    staleTime: 30000, // Cache for 30 seconds
-  });
-};
-
-// Stone interfaces and hooks
-export interface IFetchStone {
-  _id: string;
-  name: string;
-  type: "diamond" | "ruby" | "emerald" | "sapphire" | "pearl" | "other";
-  color: string;
-  clarity?: string;
-  cut?: string;
-  carat: number;
-  pricePerCarat: number;
-  totalPrice: number;
-  shape?: string;
-  certification?: string;
-  description?: string;
-  images: string[];
-  isActive: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-export const useGetAllStonesQuery = (params: IParams = {}) => {
-  return useQuery({
-    queryKey: ["stones", params],
-    queryFn: async () => {
-      try {
-        const res = await apiClient.get<{
-          success: boolean;
-          message: string;
-          data: {
-            stones: IFetchStone[];
-            pagination: any;
-            filters: any;
-          };
-        }>("stone", {
-          params,
-        });
-
-        console.log("Stones API response:", res?.data);
-
-        // Handle different response structures
-        if (res?.data?.data?.stones) {
-          return res.data.data.stones;
-        } else if (Array.isArray(res?.data?.data)) {
-          return res.data.data;
-        } else if (Array.isArray(res?.data)) {
-          return res.data;
-        }
-
-        return [];
-      } catch (error) {
-        console.error("Error fetching stones:", error);
-        return [];
-      }
-    },
-    retry: 1,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: !!sku && sku.length > 0,
   });
 };

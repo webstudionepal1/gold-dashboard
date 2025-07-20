@@ -1,3 +1,5 @@
+import { IFetchCashFlow } from "../../../server/api/cashflowHooks";
+
 export const Ordertitle: Record<string, string> = {
   "order-details": "Order Details",
   "confirmed-order-details": "Confirmed Orders",
@@ -34,23 +36,23 @@ export const getStatusColor = (status: string) => {
 
 export const cashFlowColumns = [
   {
-    key: "customer",
+    key: "date",
     title: "Date",
   },
   {
     title: "Categories",
-    key: "createdAt",
+    key: "type",
   },
   {
-    key: "totalAmount",
+    key: "inFlow",
     title: "In Flow (Rs)",
   },
   {
-    key: "orderedProducts",
+    key: "outFlow",
     title: "Out Flow (Rs)",
   },
   {
-    key: "orderStatus",
+    key: "total",
     title: "Balance",
   },
 ];
@@ -89,3 +91,34 @@ export const order_details_columns = [
   { key: "total_price", title: "Total Price" },
   { key: "status", title: "Status" },
 ];
+
+export const CashFlowType = {
+  SALE: "sale",                 // Revenue from product sales
+  PURCHASE: "purchase",         // Cost of purchasing inventory
+  EXPENSE: "expense",           // General business expenses
+  REFUND: "refund",             // Customer refunds
+  SUPPLIER_RETURN: "supplierReturn", // Returns to suppliers
+  CUSTOMER_DEPOSIT: "customerDeposit", // Customer deposits for custom jewelry
+  ADJUSTMENT: "adjustment",     // Manual accounting adjustments
+  OTHER_INCOME: "otherIncome"   // Other income sources
+}
+export const getCashInAndOut = (data: IFetchCashFlow) => {
+  switch (data.transactionType) {
+    case CashFlowType.SALE:
+    case CashFlowType.CUSTOMER_DEPOSIT:
+    case CashFlowType.OTHER_INCOME:
+      return "cash-in"; // Money is coming into business
+
+    case CashFlowType.PURCHASE:
+    case CashFlowType.EXPENSE:
+    case CashFlowType.REFUND:
+    case CashFlowType.SUPPLIER_RETURN:
+      return "cash-out"; // Money is going out of business
+
+    case CashFlowType.ADJUSTMENT:
+      return "depends"; // Adjustment could be either in or out depending on context
+
+    default:
+      return "unknown"; // fallback
+  }
+};

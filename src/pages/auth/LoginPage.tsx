@@ -15,7 +15,6 @@ export const FieldError = ({ field }: { field: any }) => {
       typeof error === "string"
         ? error
         : error.message || JSON.stringify(error);
-    console.log("error", errorMessage);
     return (
       <div className="min-h-[20px]">
         <span className="text-xs text-red">{errorMessage}</span>

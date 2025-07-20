@@ -3,7 +3,6 @@ import { useForm, useStore } from "@tanstack/react-form";
 import { InputField } from "../../../../components/shared/form_components/InputField";
 import { DropdownField } from "../../../../components/shared/form_components/Dropdown";
 import { FieldError } from "../../../auth/LoginPage";
-import * as z from "zod";
 import {
   useCreateProductsMutation,
   useGetAllProductCategoriesQuery,
@@ -17,18 +16,22 @@ import {
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { PriceInputField } from "../../../OrderManagement/Order/components/PriceInputField";
 import ChipInputInside from "../../ProductCategory/components/ChipInputInside";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Header from "../../../../components/shared/table_heading/Header";
 import { productStore } from "../../../../store/productStore";
 import {
   generateProductDefaultValue,
-  IProductFormValues,
+  type IProductFormValues,
   productFormSchema,
-  UploadedImage,
+  type VisibilityType,
 } from "../../productObj";
+import MultiImageUploader from "../../../../components/shared/form_components/FileDropInput";
+import { cleanObject } from "../../../../utils/cleanObject";
+import { useClearableNumberInput } from "../../../../utils/numberInputHelpers";
 
 const ProductForm = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const productData = useStore(productStore, (state) => state);
 
   const {
@@ -36,11 +39,13 @@ const ProductForm = () => {
     isPending: pendingAddition,
     isSuccess: productCreateSuccess,
   } = useCreateProductsMutation();
+
   const {
     mutate: updateProduct,
     isPending: pendingUpdate,
     isSuccess: productUpdateSuccess,
   } = useUpdateProductsMutation();
+
   const { data: categories, isSuccess: categorySuccess } =
     useGetAllProductCategoriesQuery();
   const { data: subCategories, isSuccess: subSuccess } =
@@ -64,12 +69,19 @@ const ProductForm = () => {
     [categorySuccess, categories]
   );
 
+  // Get current category value from form state
+  const [currentCategory, setCurrentCategory] = useState("");
+
   const subCategoriesList = useMemo(
     () =>
       subSuccess
-        ? subCategories.map((item) => ({ label: item.name, value: item._id }))
+        ? subCategories
+            .filter(
+              (item) => !currentCategory || item.category === currentCategory
+            )
+            .map((item) => ({ label: item.name, value: item._id }))
         : [],
-    [subSuccess, subCategories]
+    [subSuccess, subCategories, currentCategory]
   );
 
   const claspsList = useMemo(
@@ -80,177 +92,106 @@ const ProductForm = () => {
     [claspsSuccess, clasps]
   );
 
-  const occasionsList = useMemo(
-    () =>
-      occasionsSuccess && Array.isArray(occasions)
-        ? occasions.map((occasion) => ({
-            value: occasion._id,
-            label: occasion.name,
-          }))
-        : [],
-    [occasionsSuccess, occasions]
-  );
-
-  const stonesList = useMemo(() => {
-    console.log("Stones data:", {
-      stones,
-      stonesSuccess,
-      stonesLoading,
-      stonesError,
-    });
-
-    if (stonesSuccess && Array.isArray(stones)) {
-      return stones.map((stone) => ({
-        value: stone._id,
-        label: `${stone.name} (${stone.carat}ct - ${stone.color})`,
-      }));
-    }
-    return [];
-  }, [stonesSuccess, stones, stonesLoading, stonesError]);
-
-  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
-  const [skuValidationStates, setSKUValidationStates] = useState<{
-    [key: string]: string;
-  }>({});
   const visibilityOptions = [
     { value: "featured", label: "Featured" },
     { value: "bestsellers", label: "Best Sellers" },
+    { value: "popular", label: "Popular" },
     { value: "newarrivals", label: "New Arrivals" },
     { value: "recommended", label: "Recommended for you" },
   ];
+
   const formstate = id ?? "add";
+
   const form = useForm({
     defaultValues: generateProductDefaultValue(
       formstate,
       productData
     ) as IProductFormValues,
-    validators: {
-      onChange: productFormSchema,
-      onSubmit: productFormSchema,
-      onBlur: productFormSchema,
-    },
+    // validators: {
+    //   onSubmit: productFormSchema, // Re-enabled validation
+    // },
     onSubmit: async ({ value }) => {
-      const formData = new FormData();
-      // Object.entries(value).forEach(([key, value]) => {
-      //   if (key === "variant") {
-      //     value.forEach((v, index: number) => {
-      //       formData.append(`variant[${index}][price]`, String(v.price));
-      //       formData.append(`variant[${index}][size]`, v.size);
-      //       formData.append(`variant[${index}][unit]`, v.unit);
-      //     });
-      //   } else if (Array.isArray(value)) {
-      //     value.forEach((item, index: number) => {
-      //       formData.append(`${key}[${index}]`, item);
-      //     });
-      //   } else if (uploadedImages.some((img) => img.name === key)) {
-      //     uploadedImages.find((img) => img.name === key)?.file &&
-      //       formData.append(key, uploadedImages.find((img) => img.name === key)?.file);
-      //   } else {
-      //     formData.append(key, value);
-      //   }
-      // });
-      formData.append("name", value.name);
-      formData.append("description", value.description);
-      formData.append("category", value.category);
-      formData.append("subCategory", value.subCategory);
+      try {
+        const formData = new FormData();
+        const formattedData = cleanObject(value);
+        // delete formattedData["image"];
+        delete formattedData["existingImage"];
+        formData.append("name", value.name);
+        formData.append("description", value.description);
+        formData.append("category", value.category);
 
-      value.variants.forEach((v, index: number) => {
-        formData.append(`variants[${index}][sku]`, v.sku || "");
-        formData.append(`variants[${index}][price]`, String(v.price));
-        formData.append(`variants[${index}][wt]`, String(v.wt));
-        formData.append(`variants[${index}][unit]`, v.unit);
-        formData.append(`variants[${index}][totalStock]`, String(v.totalStock));
-        formData.append(`variants[${index}][usedStock]`, String(v.usedStock));
-        formData.append(
-          `variants[${index}][remainingStock]`,
-          String(v.remainingStock)
-        );
-        formData.append(
-          `variants[${index}][reorderPoint]`,
-          String(v.reorderPoint)
-        );
-        if (v.costPrice)
-          formData.append(`variants[${index}][costPrice]`, String(v.costPrice));
-        formData.append(`variants[${index}][isActive]`, String(v.isActive));
-      });
-
-      // Making charges
-      formData.append("makingCharges", String(value.makingCharges));
-
-      // Physical properties
-      formData.append("length", String(value.length));
-      if (value.claspType) formData.append("claspType", value.claspType);
-      formData.append("rhodoumFinishes", String(value.rhodoumFinishes));
-      formData.append("shape", value.shape);
-      formData.append("quantity", String(value.quantity));
-      if (value.totalCarat)
-        formData.append("totalCarat", String(value.totalCarat));
-      if (value.color) formData.append("color", value.color);
-      formData.append("clarity", value.clarity);
-      formData.append("dimension", String(value.dimension));
-
-      // SEO and marketing
-      formData.append("visibleAs", value.visibleAs);
-
-      // Status flags
-      formData.append("isActive", String(value.isActive));
-      formData.append("isFeatured", String(value.isFeatured));
-
-      // Metadata (if provided)
-      if (value.metadata) {
-        if (value.metadata.seoTitle)
-          formData.append("metadata[seoTitle]", value.metadata.seoTitle);
-        if (value.metadata.seoDescription)
-          formData.append(
-            "metadata[seoDescription]",
-            value.metadata.seoDescription
-          );
-        if (value.metadata.keywords) {
-          value.metadata.keywords.forEach((keyword, index) => {
-            formData.append(`metadata[keywords][${index}]`, keyword);
-          });
+        if (value.subCategory && value.subCategory.trim() !== "") {
+          formData.append("subCategory", value.subCategory);
         }
-        if (value.metadata.vendor)
-          formData.append("metadata[vendor]", value.metadata.vendor);
-        if (value.metadata.barcode)
-          formData.append("metadata[barcode]", value.metadata.barcode);
-        if (value.metadata.compareAtPrice)
-          formData.append(
-            "metadata[compareAtPrice]",
-            String(value.metadata.compareAtPrice)
-          );
+
+        value.variant.forEach((v, index: number) => {
+          formData.append(`variant[${index}][price]`, String(v.price));
+          formData.append(`variant[${index}][wt]`, v.wt.toString());
+          formData.append(`variant[${index}][unit]`, v.unit ?? "gm");
+        });
+
+        formData.append("length", String(value.length));
+        if (value.claspType) formData.append("claspType", value.claspType);
+        formData.append("rhodoumFinishes", String(value.rhodoumFinishes));
+        formData.append("shape", value.shape);
+        formData.append("clarity", value.clarity);
+        formData.append("dimension", String(value.dimension));
+        // formData.append("visibleAs", value.visibleAs);
+
+        value.tags.forEach((tag: string, index: number) => {
+          formData.append(`tags[${index}]`, tag);
+        });
+
+        // Handle image upload - Fix the field name mismatch
+        if (value.images) {
+          formData.append("images", value.images);
+        } else if (formstate !== "add" && value.existingImage) {
+          // For updates without new image, include existing image info
+          formData.append("existingImage", value.existingImage);
+        }
+
+        if (formstate !== "add") {
+          updateProduct({ id: productData._id, body: formData });
+        } else {
+          createProduct(formData);
+        }
+      } catch (error) {
+        console.error("Form submission error:", error);
       }
-
-      value.tags.forEach((tag: string, index: number) => {
-        formData.append(`tags[${index}]`, tag);
-      });
-
-      uploadedImages.forEach((img) => {
-        formData.append(`images`, img.file);
-      });
-      if (id == "add") createProduct(formData);
-      else updateProduct({ id: productData._id, body: formData });
     },
   });
 
   useEffect(() => {
-    if (productCreateSuccess || productUpdateSuccess) form.reset();
+    if (productCreateSuccess || productUpdateSuccess) {
+      form.reset();
+      navigate("/product/product-list");
+    }
   }, [productCreateSuccess, productUpdateSuccess]);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const newImages = Array.from(e.target.files).map((file: File) => ({
-        name: file.name,
-        file: file,
-        url: URL.createObjectURL(file),
-      }));
-      setUploadedImages([...uploadedImages, ...newImages].slice(0, 4));
-    }
+  // Helper function to get field errors
+  const getFieldError = (_fieldPath: string) => {
+    return [];
   };
 
+  // Debug: Log form state
+
   return (
-    <div className="max-w-6xl p-2 mx-auto">
+    <div className="p-2">
       <Header text={id === "add" ? "Add Product" : "Edit Product"} />
+
+      {/* Debug Panel - Remove in production */}
+      {/* <div className="mb-4 p-4 bg-gray-100 rounded">
+        <h3 className="font-bold">Debug Info:</h3>
+        <p>Form Submitting: {form.state.isSubmitting ? "Yes" : "No"}</p>
+        <p>Form Mode: {formstate}</p>
+        <p>Product Data Images: {JSON.stringify(productData?.images)}</p>
+        <p>Existing Image: {form.getFieldValue("existingImage")}</p>
+        <p>
+          Current Image Value:{" "}
+          {form.state.values.images ? "File selected" : "No file"}
+        </p>
+        <p>Form Errors: {JSON.stringify(formErrors, null, 2)}</p>
+      </div> */}
 
       <form
         onSubmit={(e) => {
@@ -267,7 +208,6 @@ const ProductForm = () => {
               <h2 className="py-2 mb-2 font-semibold text-gray-700 border-b">
                 General Information
               </h2>
-
               <div className="space-y-4">
                 <form.Field name="name">
                   {(field) => (
@@ -280,6 +220,11 @@ const ProductForm = () => {
                         onChange={(e) => field.handleChange(e.target.value)}
                       />
                       <FieldError field={field} />
+                      {getFieldError("name").length > 0 && (
+                        <div className="text-red-500 text-sm mt-1">
+                          {getFieldError("name").join(", ")}
+                        </div>
+                      )}
                     </div>
                   )}
                 </form.Field>
@@ -289,17 +234,22 @@ const ProductForm = () => {
                     <div>
                       <div className="flex flex-col">
                         <label className="mb-1 text-sm font-medium text-gray-700">
-                          Description <span className="text-red-500">*</span>
+                          Description <span className="text-red">*</span>
                         </label>
                         <textarea
                           placeholder="Enter short description"
-                          className="p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                          className="p-2 border rounded-md focus:outline-none bg-[#f6f7f9] resize-none"
                           value={field.state.value}
                           onChange={(e) => field.handleChange(e.target.value)}
                           rows={3}
                         />
                       </div>
                       <FieldError field={field} />
+                      {getFieldError("description").length > 0 && (
+                        <div className="text-red-500 text-sm mt-1">
+                          {getFieldError("description").join(", ")}
+                        </div>
+                      )}
                     </div>
                   )}
                 </form.Field>
@@ -314,9 +264,18 @@ const ProductForm = () => {
                           firstInput="Select Category"
                           options={categoriesList}
                           value={field.state.value}
-                          onChange={(e) => field.handleChange(e.target.value)}
+                          onChange={(e) => {
+                            field.handleChange(e.target.value);
+                            // Reset subcategory when category changes
+                            form.setFieldValue("subCategory", "");
+                          }}
                         />
                         <FieldError field={field} />
+                        {getFieldError("category").length > 0 && (
+                          <div className="text-red-500 text-sm mt-1">
+                            {getFieldError("category").join(", ")}
+                          </div>
+                        )}
                       </div>
                     )}
                   </form.Field>
@@ -326,13 +285,18 @@ const ProductForm = () => {
                       <div>
                         <DropdownField
                           label="Product Sub-Category"
-                          required
                           firstInput="Select Sub Category"
                           options={subCategoriesList}
                           value={field.state.value}
                           onChange={(e) => field.handleChange(e.target.value)}
+                          disabled={!currentCategory}
                         />
                         <FieldError field={field} />
+                        {getFieldError("subCategory").length > 0 && (
+                          <div className="text-red-500 text-sm mt-1">
+                            {getFieldError("subCategory").join(", ")}
+                          </div>
+                        )}
                       </div>
                     )}
                   </form.Field>
@@ -342,25 +306,19 @@ const ProductForm = () => {
 
             {/* Pricing Section */}
             <div className="p-4 rounded-lg">
-              <form.Field name="variants" mode="array">
+              <form.Field name="variant" mode="array">
                 {(field) => (
                   <div>
                     <div className="flex items-center justify-between w-full py-2 mb-2 text-sm border-b">
-                      <h2 className="text-base font-semibold text-gray-700 ">
-                        Product Variants
+                      <h2 className="text-base font-semibold text-gray-700">
+                        Pricing
                       </h2>
                       <button
                         onClick={() =>
                           field.pushValue({
-                            sku: "", // Optional - will be auto-generated
                             price: 0,
                             wt: 0,
                             unit: "grams",
-                            totalStock: 0,
-                            usedStock: 0,
-                            remainingStock: 0,
-                            reorderPoint: 10,
-                            isActive: true,
                           })
                         }
                         type="button"
@@ -369,309 +327,92 @@ const ProductForm = () => {
                         Add Variant
                       </button>
                     </div>
-                    {field.state.value.map((_, i: number) => (
+                    {getFieldError("variant").length > 0 && (
+                      <div className="text-red-500 text-sm mb-2">
+                        {getFieldError("variant").join(", ")}
+                      </div>
+                    )}
+                    {(field.state.value as any[]).map((_, i: number) => (
                       <div
                         key={i.toString()}
-                        className="border rounded-lg p-4 mb-4 bg-gray-50">
-                        <div className="flex justify-between items-center mb-4">
-                          <h3 className="font-medium text-gray-700">
-                            Variant {i + 1}
-                          </h3>
-                          {field.state.value.length > 1 && (
-                            <button
-                              type="button"
-                              onClick={() => field.removeValue(i)}
-                              className="text-red-500 hover:text-red-700">
-                              <Icon icon="ep:delete" width="18" height="18" />
-                            </button>
-                          )}
-                        </div>
-
-                        {/* SKU and Basic Info */}
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 mb-4">
-                          <form.Field name={`variants[${i}].sku`}>
+                        className="border rounded-md p-3 mb-2">
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                          <form.Field name={`variant[${i}].price`}>
                             {(subField) => {
-                              const skuKey = `variant-${i}-sku`;
-                              const currentSKU = subField.state.value || "";
-
+                              const priceInput = useClearableNumberInput(
+                                subField.state.value,
+                                subField.handleChange
+                              );
                               return (
                                 <div>
-                                  <InputField
-                                    label="SKU"
-                                    placeholder="Enter unique SKU (optional - auto-generated if empty)"
-                                    value={currentSKU}
-                                    onChange={(e) => {
-                                      subField.handleChange(e.target.value);
-                                      // Clear validation state when typing
-                                      if (skuValidationStates[skuKey]) {
-                                        setSKUValidationStates((prev) => ({
-                                          ...prev,
-                                          [skuKey]: "",
-                                        }));
-                                      }
-                                    }}
-                                    onBlur={async (e) => {
-                                      const skuValue = e.target.value.trim();
-                                      if (skuValue) {
-                                        setSKUValidationStates((prev) => ({
-                                          ...prev,
-                                          [skuKey]: "validating",
-                                        }));
-
-                                        try {
-                                          const response = await fetch(
-                                            `/api/v1/en/validate-sku/${encodeURIComponent(
-                                              skuValue
-                                            )}`
-                                          );
-                                          const result = await response.json();
-
-                                          setSKUValidationStates((prev) => ({
-                                            ...prev,
-                                            [skuKey]: result.success
-                                              ? "valid"
-                                              : "invalid",
-                                          }));
-                                        } catch (error) {
-                                          setSKUValidationStates((prev) => ({
-                                            ...prev,
-                                            [skuKey]: "error",
-                                          }));
-                                        }
-                                      } else {
-                                        setSKUValidationStates((prev) => ({
-                                          ...prev,
-                                          [skuKey]: "",
-                                        }));
-                                      }
-                                    }}
+                                  <PriceInputField
+                                    label="Base Price"
+                                    placeholder="Enter base price"
+                                    type="number"
+                                    required
+                                    min="0"
+                                    {...priceInput}
                                   />
-                                  <FieldError field={subField} />
-
-                                  {/* SKU Validation Status */}
-                                  {currentSKU &&
-                                    skuValidationStates[skuKey] && (
-                                      <div className="mt-1">
-                                        {skuValidationStates[skuKey] ===
-                                          "validating" && (
-                                          <p className="text-xs text-blue-500">
-                                            <Icon
-                                              icon="eos-icons:loading"
-                                              className="inline mr-1"
-                                            />
-                                            Checking SKU availability...
-                                          </p>
-                                        )}
-                                        {skuValidationStates[skuKey] ===
-                                          "valid" && (
-                                          <p className="text-xs text-green-600">
-                                            <Icon
-                                              icon="mdi:check-circle"
-                                              className="inline mr-1"
-                                            />
-                                            SKU is available
-                                          </p>
-                                        )}
-                                        {skuValidationStates[skuKey] ===
-                                          "invalid" && (
-                                          <p className="text-xs text-red-600">
-                                            <Icon
-                                              icon="mdi:alert-circle"
-                                              className="inline mr-1"
-                                            />
-                                            SKU already exists
-                                          </p>
-                                        )}
-                                        {skuValidationStates[skuKey] ===
-                                          "error" && (
-                                          <p className="text-xs text-red-600">
-                                            <Icon
-                                              icon="mdi:alert-circle"
-                                              className="inline mr-1"
-                                            />
-                                            Error validating SKU
-                                          </p>
-                                        )}
-                                      </div>
-                                    )}
-
-                                  <p className="text-xs text-gray-500 mt-1">
-                                    Leave empty to auto-generate SKU
-                                  </p>
+                                  {getFieldError(`variant.${i}.price`).length >
+                                    0 && (
+                                    <div className="text-red-500 text-sm mt-1">
+                                      {getFieldError(`variant.${i}.price`).join(
+                                        ", "
+                                      )}
+                                    </div>
+                                  )}
                                 </div>
                               );
                             }}
                           </form.Field>
-                          <form.Field name={`variants[${i}].unit`}>
-                            {(subField) => (
-                              <div>
-                                <DropdownField
-                                  label="Unit"
-                                  required
-                                  firstInput="Select Unit"
-                                  options={[
-                                    { value: "grams", label: "Grams" },
-                                    { value: "kg", label: "Kilograms" },
-                                    { value: "pieces", label: "Pieces" },
-                                    { value: "carats", label: "Carats" },
-                                  ]}
-                                  value={subField.state.value}
-                                  onChange={(e) =>
-                                    subField.handleChange(e.target.value)
-                                  }
-                                />
-                                <FieldError field={subField} />
-                              </div>
-                            )}
-                          </form.Field>
-                        </div>
 
-                        {/* Price and Weight */}
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 mb-4">
-                          <form.Field name={`variants[${i}].price`}>
-                            {(subField) => (
-                              <div>
-                                <PriceInputField
-                                  label="Price"
-                                  placeholder="Enter price"
-                                  type="number"
-                                  required
-                                  value={subField.state.value}
-                                  onChange={(e) =>
-                                    subField.handleChange(
-                                      Number(e.target.value)
-                                    )
-                                  }
-                                />
-                                <FieldError field={subField} />
-                              </div>
-                            )}
-                          </form.Field>
-                          <form.Field name={`variants[${i}].wt`}>
-                            {(subField) => (
-                              <div>
-                                <InputField
-                                  label="Weight"
-                                  required
-                                  type="number"
-                                  placeholder="Enter weight"
-                                  value={String(subField.state.value)}
-                                  onChange={(e) =>
-                                    subField.handleChange(
-                                      Number(e.target.value)
-                                    )
-                                  }
-                                />
-                                <FieldError field={subField} />
-                              </div>
-                            )}
+                          <form.Field name={`variant[${i}].wt`}>
+                            {(subField) => {
+                              const weightInput = useClearableNumberInput(
+                                subField.state.value,
+                                subField.handleChange
+                              );
+                              return (
+                                <div>
+                                  <InputField
+                                    label="Size"
+                                    type="number"
+                                    required
+                                    step="any"
+                                    min="0"
+                                    placeholder="Enter in gram"
+                                    {...weightInput}
+                                  />
+                                  <FieldError field={subField} />
+                                  {getFieldError(`variant.${i}.wt`).length >
+                                    0 && (
+                                    <div className="text-red-500 text-sm mt-1">
+                                      {getFieldError(`variant.${i}.wt`).join(
+                                        ", "
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            }}
                           </form.Field>
                         </div>
-
-                        {/* Stock Management */}
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-3 mb-4">
-                          <form.Field name={`variants[${i}].totalStock`}>
-                            {(subField) => (
-                              <div>
-                                <InputField
-                                  label="Total Stock"
-                                  required
-                                  type="number"
-                                  placeholder="0"
-                                  value={String(subField.state.value)}
-                                  onChange={(e) =>
-                                    subField.handleChange(
-                                      Number(e.target.value)
-                                    )
-                                  }
-                                />
-                                <FieldError field={subField} />
-                              </div>
-                            )}
-                          </form.Field>
-                          <form.Field name={`variants[${i}].remainingStock`}>
-                            {(subField) => (
-                              <div>
-                                <InputField
-                                  label="Remaining Stock"
-                                  required
-                                  type="number"
-                                  placeholder="0"
-                                  value={String(subField.state.value)}
-                                  onChange={(e) =>
-                                    subField.handleChange(
-                                      Number(e.target.value)
-                                    )
-                                  }
-                                />
-                                <FieldError field={subField} />
-                              </div>
-                            )}
-                          </form.Field>
-                          <form.Field name={`variants[${i}].reorderPoint`}>
-                            {(subField) => (
-                              <div>
-                                <InputField
-                                  label="Reorder Point"
-                                  required
-                                  type="number"
-                                  placeholder="10"
-                                  value={String(subField.state.value)}
-                                  onChange={(e) =>
-                                    subField.handleChange(
-                                      Number(e.target.value)
-                                    )
-                                  }
-                                />
-                                <FieldError field={subField} />
-                              </div>
-                            )}
-                          </form.Field>
-                        </div>
-
-                        {/* Optional Fields */}
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                          <form.Field name={`variants[${i}].costPrice`}>
-                            {(subField) => (
-                              <div>
-                                <InputField
-                                  label="Cost Price (Optional)"
-                                  type="number"
-                                  placeholder="Enter cost price"
-                                  value={String(subField.state.value || "")}
-                                  onChange={(e) =>
-                                    subField.handleChange(
-                                      e.target.value
-                                        ? Number(e.target.value)
-                                        : undefined
-                                    )
-                                  }
-                                />
-                                <FieldError field={subField} />
-                              </div>
-                            )}
-                          </form.Field>
-                          <form.Field name={`variants[${i}].isActive`}>
-                            {(subField) => (
-                              <div className="flex items-center space-x-2 mt-6">
-                                <input
-                                  type="checkbox"
-                                  id={`variant-active-${i}`}
-                                  checked={subField.state.value}
-                                  onChange={(e) =>
-                                    subField.handleChange(e.target.checked)
-                                  }
-                                  className="rounded border-gray-300"
-                                />
-                                <label
-                                  htmlFor={`variant-active-${i}`}
-                                  className="text-sm font-medium text-gray-700">
-                                  Active Variant
-                                </label>
-                              </div>
-                            )}
-                          </form.Field>
-                        </div>
+                        {i > 0 && (
+                          <div className="flex justify-end mt-2">
+                            <button
+                              type="button"
+                              onClick={() => field.removeValue(i)}
+                              className="flex items-center gap-2 px-3 py-1 text-sm text-red-600 border border-red-600 rounded-md">
+                              <Icon
+                                icon="mdi:delete"
+                                className="text-red"
+                                width="18"
+                                height="18"
+                              />
+                              Remove
+                            </button>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -684,24 +425,32 @@ const ProductForm = () => {
               <h2 className="py-2 mb-2 font-semibold text-gray-700 border-b">
                 Product Specification
               </h2>
-
               <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <form.Field name="length">
-                  {(field) => (
-                    <div>
-                      <InputField
-                        label="Length"
-                        required
-                        type="number"
-                        placeholder="0"
-                        value={String(field.state.value)}
-                        onChange={(e) =>
-                          field.handleChange(Number(e.target.value))
-                        }
-                      />
-                      <FieldError field={field} />
-                    </div>
-                  )}
+                  {(field) => {
+                    const lengthInput = useClearableNumberInput(
+                      field.state.value,
+                      field.handleChange
+                    );
+                    return (
+                      <div>
+                        <InputField
+                          label="Length"
+                          required
+                          type="number"
+                          placeholder="Enter length"
+                          min="0"
+                          {...lengthInput}
+                        />
+                        <FieldError field={field} />
+                        {getFieldError("length").length > 0 && (
+                          <div className="text-red-500 text-sm mt-1">
+                            {getFieldError("length").join(", ")}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }}
                 </form.Field>
 
                 <form.Field name="claspType">
@@ -709,13 +458,17 @@ const ProductForm = () => {
                     <div>
                       <DropdownField
                         label="Clasp Type"
-                        required
                         firstInput="Select clasp type"
                         options={claspsList}
                         value={field.state.value}
                         onChange={(e) => field.handleChange(e.target.value)}
                       />
                       <FieldError field={field} />
+                      {getFieldError("claspType").length > 0 && (
+                        <div className="text-red-500 text-sm mt-1">
+                          {getFieldError("claspType").join(", ")}
+                        </div>
+                      )}
                     </div>
                   )}
                 </form.Field>
@@ -737,6 +490,11 @@ const ProductForm = () => {
                         }
                       />
                       <FieldError field={field} />
+                      {getFieldError("rhodoumFinishes").length > 0 && (
+                        <div className="text-red-500 text-sm mt-1">
+                          {getFieldError("rhodoumFinishes").join(", ")}
+                        </div>
+                      )}
                     </div>
                   )}
                 </form.Field>
@@ -748,7 +506,6 @@ const ProductForm = () => {
               <h2 className="py-2 mb-2 font-semibold text-gray-700 border-b">
                 Material Information
               </h2>
-
               <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <form.Field name="shape">
                   {(field) => (
@@ -761,6 +518,11 @@ const ProductForm = () => {
                         onChange={(e) => field.handleChange(e.target.value)}
                       />
                       <FieldError field={field} />
+                      {getFieldError("shape").length > 0 && (
+                        <div className="text-red-500 text-sm mt-1">
+                          {getFieldError("shape").join(", ")}
+                        </div>
+                      )}
                     </div>
                   )}
                 </form.Field>
@@ -776,26 +538,40 @@ const ProductForm = () => {
                         onChange={(e) => field.handleChange(e.target.value)}
                       />
                       <FieldError field={field} />
+                      {getFieldError("clarity").length > 0 && (
+                        <div className="text-red-500 text-sm mt-1">
+                          {getFieldError("clarity").join(", ")}
+                        </div>
+                      )}
                     </div>
                   )}
                 </form.Field>
 
                 <form.Field name="dimension">
-                  {(field) => (
-                    <div>
-                      <InputField
-                        label="Dimension"
-                        required
-                        type="number"
-                        placeholder="0"
-                        value={String(field.state.value)}
-                        onChange={(e) =>
-                          field.handleChange(Number(e.target.value))
-                        }
-                      />
-                      <FieldError field={field} />
-                    </div>
-                  )}
+                  {(field) => {
+                    const dimensionInput = useClearableNumberInput(
+                      field.state.value,
+                      field.handleChange
+                    );
+                    return (
+                      <div>
+                        <InputField
+                          label="Dimension"
+                          required
+                          type="number"
+                          placeholder="Enter dimension"
+                          min="0"
+                          {...dimensionInput}
+                        />
+                        <FieldError field={field} />
+                        {getFieldError("dimension").length > 0 && (
+                          <div className="text-red-500 text-sm mt-1">
+                            {getFieldError("dimension").join(", ")}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }}
                 </form.Field>
               </div>
             </div>
@@ -812,7 +588,10 @@ const ProductForm = () => {
                     <DropdownField
                       label="Select Occasions"
                       firstInput="Select occasions for this product"
-                      options={occasionsList}
+                      options={(occasions || []).map((occasion) => ({
+                        value: occasion._id,
+                        label: occasion.name,
+                      }))}
                       value={field.state.value?.[0] || ""}
                       onChange={(e) => {
                         const selectedValue = e.target.value;
@@ -928,18 +707,21 @@ const ProductForm = () => {
                                     label="Stone"
                                     required
                                     firstInput={
-                                      stonesList.length > 0
+                                      (stones || []).length > 0
                                         ? "Select stone"
                                         : "No stones available"
                                     }
-                                    options={stonesList}
+                                    options={(stones || []).map((stone) => ({
+                                      value: stone._id,
+                                      label: stone.name,
+                                    }))}
                                     value={String(subField.state.value || "")}
                                     onChange={(e) =>
                                       subField.handleChange(e.target.value)
                                     }
                                   />
                                   <FieldError field={subField} />
-                                  {stonesList.length === 0 && (
+                                  {(stones || []).length === 0 && (
                                     <p className="text-xs text-gray-500 mt-1">
                                       No stones available. Please add stones
                                       first.
@@ -1033,12 +815,11 @@ const ProductForm = () => {
         </div>
 
         {/* Right Column */}
-        <div className="space-y-6 ">
+        <div className="space-y-6">
           {/* Visibility Options - Radio Buttons */}
           <div className="p-4 bg-white border rounded-lg">
             <h2 className="mb-4 font-medium text-gray-700">Visible as</h2>
-
-            <form.Field name="visibleAs">
+            {/* <form.Field name="visibleAs">
               {(field) => (
                 <div className="space-y-2">
                   {visibilityOptions.map((option) => (
@@ -1048,7 +829,9 @@ const ProductForm = () => {
                         id={`visibility-${option.value}`}
                         value={option.value}
                         checked={field.state.value === option.value}
-                        // onChange={() => field.setValue(() => option.value)}
+                        onChange={() =>
+                          field.handleChange(option.value as VisibilityType)
+                        }
                         className="mr-2"
                       />
                       <label htmlFor={`visibility-${option.value}`}>
@@ -1056,91 +839,70 @@ const ProductForm = () => {
                       </label>
                     </div>
                   ))}
+                  {getFieldError("visibleAs").length > 0 && (
+                    <div className="text-red-500 text-sm mt-1">
+                      {getFieldError("visibleAs").join(", ")}
+                    </div>
+                  )}
                 </div>
               )}
-            </form.Field>
+            </form.Field> */}
           </div>
 
           {/* Product Tags */}
           <div className="p-4 bg-white border rounded-lg">
             <h2 className="mb-4 font-medium text-gray-700">Product Tags</h2>
-
             <form.Field name="tags">
               {(field) => (
                 <div>
                   <ChipInputInside field={field} />
-                  {/* <div className="flex flex-wrap gap-2">
-                 
-                  </div> */}
+                  {getFieldError("tags").length > 0 && (
+                    <div className="text-red-500 text-sm mt-1">
+                      {getFieldError("tags").join(", ")}
+                    </div>
+                  )}
                 </div>
               )}
             </form.Field>
           </div>
 
-          {/* Upload Photos */}
-          <div className="p-4 bg-white border rounded-lg">
-            <h2 className="mb-4 font-medium text-gray-700">Upload Photos</h2>
-
-            <div className="p-8 mb-4 text-center border-2 border-dashed rounded-lg">
-              <div className="flex justify-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="w-12 h-12 text-gray-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+          {/* Image Upload Section - Fixed to match banner form exactly */}
+          <div className="bg-[#ffffff] border-[#eeeeee] border-2 shadow-lg rounded-xl w-full">
+            <div className="mx-6 my-4">
+              <div>
+                <h1 className="text-xl font-semibold">Upload Product Image</h1>
+                <div className="border-b border-[#dedde2] w-full my-2"></div>
+              </div>
+              <form.Field name="images">
+                {(field) => (
+                  <MultiImageUploader
+                    multiple={false}
+                    form={form}
+                    label=""
+                    value={field.state.value}
+                    // existingFileField="existingImage"
+                    accept={{
+                      "image/*": [".png", ".jpg", ".jpeg", ".svg", ".webp"],
+                    }}
+                    existingFile={form.getFieldValue("existingImage")}
+                    onChange={(file) => field.handleChange(file)}
                   />
-                </svg>
-              </div>
-              <p className="mt-2 text-sm text-gray-500">
-                JPEG, PNG, SVG or JPG
-              </p>
-              <p className="mt-1 text-xs text-gray-400">
-                (Max file size 800 KB)
-              </p>
-
-              <input
-                type="file"
-                id="photo-upload"
-                multiple
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
-              />
-              <label
-                htmlFor="photo-upload"
-                className="inline-block px-4 py-2 mt-4 text-gray-700 bg-gray-100 rounded cursor-pointer hover:bg-gray-200">
-                Browse File
-              </label>
+                )}
+              </form.Field>
             </div>
-
-            {/* Preview of uploaded images */}
-            {uploadedImages.length > 0 && (
-              <div className="grid grid-cols-4 gap-2">
-                {uploadedImages.map((img, index) => (
-                  <div key={index} className="overflow-hidden border rounded">
-                    <img
-                      src={img.url}
-                      alt={`Preview ${index}`}
-                      className="object-cover w-full h-16"
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
 
           {/* Submit Button */}
           <div className="text-right">
             <button
               type="submit"
-              className="px-6 py-2 text-white rounded-md bg-orange hover:bg-orange-600">
-              Save Product
+              disabled={pendingAddition || pendingUpdate}
+              className="px-6 py-2 text-white rounded-md min-w-32 bg-orange hover:bg-orange-600 disabled:opacity-50">
+              {pendingAddition || pendingUpdate ? (
+                <Icon icon="nrk:spinner" width={18} height={18} />
+              ) : (
+                "Save Product"
+              )}
             </button>
           </div>
         </div>

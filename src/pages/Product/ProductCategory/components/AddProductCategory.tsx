@@ -4,14 +4,24 @@ import { useEffect } from "react";
 import { Modal } from "../../../../components/shared";
 import {
   useCreateProductCategoriesMutation,
-  useUpdateProductCategoriesMutation
+  useUpdateProductCategoriesMutation,
 } from "../../../../server/api/productHooks";
+import { z } from "zod";
+import { FieldError } from "../../../auth/LoginPage";
 interface propTypes {
   modalRef: React.RefObject<HTMLDivElement | null>;
   editData?: any;
   closeModal: () => void;
 }
 
+const schema = z.object({
+  name: z.string().min(1, "**Name is required"),
+  description: z.string().optional(),
+});
+interface ICategoryValue {
+  name: string;
+  description?: string;
+}
 const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
   const { mutate: createCategory, isSuccess: createSuccess } =
     useCreateProductCategoriesMutation();
@@ -21,8 +31,12 @@ const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
     defaultValues: {
       name: editData ? get(editData, "name", "") : "",
       description: editData ? get(editData, "description", "") : "",
+    } as ICategoryValue,
+    validators: {
+      onChange: schema,
+      onSubmit: schema,
+      onBlur: schema,
     },
-    validators: {},
 
     onSubmit: async ({ value }) => {
       if (editData) updateCategory({ id: editData._id, body: value });
@@ -58,38 +72,40 @@ const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
             </label>
             <form.Field name="name">
               {(field) => (
-                <input
-                  id="category"
-                  type="text"
-                  value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  className={`border border-gray-300 rounded-md p-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500}`}
-                  placeholder="Enter Category name"
-                />
+                <div>
+                  <input
+                    id="category"
+                    type="text"
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    className={`border border-gray-300 rounded-md p-2 w-full focus:ring-2 bg-[#f6f7f9] focus:ring-blue-500 focus:border-blue-500}`}
+                    placeholder="Enter Category name"
+                  />
+                  <FieldError field={field} />
+                </div>
               )}
             </form.Field>
           </div>
-      
-          <div>
-            <label
-              htmlFor="description"
-              className="block mb-1 text-sm font-medium text-gray-700"
-            >
-              Description *
-            </label>
-            <form.Field name="description">
-              {(field) => (
-                <textarea
-                  id="description"
-                  value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  className={`border border-gray-300 rounded-md p-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
-                  rows={3}
-                  placeholder="Enter short description"
-                />
-              )}
-            </form.Field>
-          </div>
+
+          <form.Field name="description">
+            {(field) => (
+              <div>
+                <div className="flex flex-col">
+                  <label className="mb-1 text-sm font-medium text-gray-700">
+                    Description <span className="text-red">*</span>
+                  </label>
+                  <textarea
+                    placeholder="Enter short description"
+                    className="p-2 border rounded-md focus:outline-none bg-[#f6f7f9] resize-none"
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    rows={3}
+                  />
+                </div>
+                <FieldError field={field} />
+              </div>
+            )}
+          </form.Field>
         </div>
         <div className="flex justify-between gap-3 mt-6">
           <button

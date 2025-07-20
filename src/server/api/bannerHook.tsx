@@ -10,12 +10,14 @@ export interface IFetchBanner {
   title?: string;
   description?: string;
   image?: string[];
+  mobImage?: string[];
   video?: string;
   category?: string;
   subCategory?: string;
   priority?: number;
   locations?: string[];
   type?: string;
+  status?: string;
 }
 
 //Products routes
@@ -63,7 +65,9 @@ export const useUpdateBannerMutation = () => {
       id: string | undefined;
       body: FormData;
     }) => {
-      const res = await apiClient.patch(`banner/${id}`, body);
+      const res = await apiClient.patch(`banner/${id}`, body, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       return res?.data?.data;
     },
     onSuccess() {

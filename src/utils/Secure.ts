@@ -1,7 +1,7 @@
-import CryptoJS from 'crypto-js';
+import CryptoJS from "crypto-js";
 
 const secret_key =
-  localStorage.getItem('_TFDSFUMATRIX') ?? 'HVkaW9uZXBhbC5jb20iL';
+  localStorage.getItem("_TFDSFUMATRIX") ?? "HVkaW9uZXBhbC5jb20iL";
 
 /**
  * Encrypts a given string using AES encryption.
