@@ -62,6 +62,14 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
     [props, maxFiles]
   );
 
+  const removeFile = () => {
+    setFile(null);
+    setPreviewUrl(null);
+    if (onChange) {
+      onChange(null);
+    }
+  };
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept,

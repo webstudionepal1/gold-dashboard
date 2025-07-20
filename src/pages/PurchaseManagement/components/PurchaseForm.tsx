@@ -1,11 +1,4 @@
 import React from "react";
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from "../../../components/shared/tab";
-import RawMaterialForm from "./RawMaterialForm";
 import NewProductForm from "./NewProductForm";
 import { IFetchPurchase } from "../../../server/api/purchaseHooks";
 

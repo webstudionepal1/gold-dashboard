@@ -14,10 +14,12 @@ interface DonutChartProps {
     options?: ChartOptions<'doughnut'>;
 }
 
-export const DonutChart = ({ data, options }: DonutChartProps) => {
+const DonutChart = ({ data, options }: DonutChartProps) => {
     return (
         <div className="w-32 h-32">
             <Doughnut data={data} options={options} />
         </div>
     );
 };
+
+export default DonutChart;

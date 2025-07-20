@@ -10,7 +10,7 @@ export interface IFetchBanner {
   title?: string;
   description?: string;
   image?: string[];
-  mobImage?: string[];
+  video?: string;
   category?: string;
   subCategory?: string;
   priority?: number;

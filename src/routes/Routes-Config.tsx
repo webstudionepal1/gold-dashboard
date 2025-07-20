@@ -21,6 +21,11 @@ import ConfirmedOrder from "../pages/OrderManagement/ConfirmedOrder/ConfirmedOrd
 import OrderIndex from "../pages/OrderManagement/Order/OrderIndex";
 import AddOrderForm from "../pages/OrderManagement/Order/components/AddOrderPage";
 import AddBannerForm from "../pages/Banner/Components/AddBannerForm";
+import CollectionIndex from "../pages/Collection/CollectionIndex";
+import CollectionForm from "../pages/Collection/components/CollectionForm";
+import CollectionDetails from "../pages/Collection/components/CollectionDetails";
+
+import NewCollectionForm from "../pages/Collection/components/NewCollectionForm";
 import CustomerIndex from "../pages/Customer/CustomerIndex";
 // import AddCustomerForm from "../pages/Customer/components/AddCustomerForm";
 import Transaction from "../pages/transaction/Transaction";
@@ -33,6 +38,7 @@ import OrderReport from "../pages/analytics/OrderReport";
 import SalesReport from "../pages/analytics/SalesReport";
 import StoreReport from "../pages/analytics/StockReport";
 import ProductForm from "../pages/Product/ProductList/component/ProductForm";
+import NewProductForm from "../pages/Product/components/NewProductForm";
 import CustomerDetails from "../pages/Customer/components/CustomerDetails";
 import OrderDetails from "../pages/OrderManagement/Order/OrderDetails";
 import InventoryIndex from "../pages/Inventory/InventoryIndex";
@@ -130,6 +136,14 @@ export const routesConfig = [
     path: FrontendRoutes.PRODUCTSUBCATEGORY,
     element: <Productsubcategory />,
   },
+  {
+    path: FrontendRoutes.PRODUCTOCCASION,
+    element: <ProductOccasion />,
+  },
+  {
+    path: FrontendRoutes.STONE,
+    element: <StoneIndex />,
+  },
 
   {
     path: FrontendRoutes.CUSTOMER,
@@ -184,6 +198,25 @@ export const routesConfig = [
     path: "/banner/:id",
     element: <AddBannerForm />,
   },
+
+  // Collections
+  {
+    path: FrontendRoutes.COLLECTION,
+    element: <CollectionIndex />,
+  },
+  {
+    path: FrontendRoutes.ADDCOLLECTION,
+    element: <NewCollectionForm />,
+  },
+  {
+    path: FrontendRoutes.EDITCOLLECTION,
+    element: <NewCollectionForm />,
+  },
+  {
+    path: FrontendRoutes.COLLECTIONDETAILS,
+    element: <CollectionDetails />,
+  },
+
   {
     path: FrontendRoutes.NOTIFICATION,
     element: <NotificationIndex />,
@@ -238,6 +271,10 @@ export const routesConfig = [
   {
     path: FrontendRoutes.STOCK_REPORT,
     element: <StoreReport />,
+  },
+  {
+    path: "/test-upload",
+    element: <TestUpload />,
   },
   {
     path: "*",

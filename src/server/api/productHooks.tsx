@@ -11,10 +11,12 @@ export interface IBaseProductSubCategory {
   description?: string;
   totalProducts?: number;
   isActive?: boolean;
+  category?: string;
 }
 export interface IFetchSubCategory extends IBaseProductSubCategory {
   _id: string;
   name: string;
+  category: string;
 }
 
 export interface IProductCategory {
@@ -42,6 +44,7 @@ export interface StockItem {
 export interface IBaseProduct {
   _id?: string;
   name?: string;
+  slug?: string;
   description?: string;
   category?: string;
   subCategory?: string;
@@ -64,6 +67,8 @@ export interface IBaseProduct {
   color?: string;
   clarity?: string;
   dimension?: number;
+
+  // SEO and marketing
   tags?: string[];
   visibleAs?: string;
   images?: string[];
@@ -113,6 +118,27 @@ export interface IFetchClasps {
   isActive: boolean;
 }
 
+//occasion interfaces
+export interface IFetchOccasion {
+  _id: string;
+  name: string;
+  slug: string;
+  description: string;
+  totalProducts: number;
+  isActive: boolean;
+  image: string;
+  video: string;
+  metadata?: {
+    seoTitle?: string;
+    seoDescription?: string;
+    keywords?: string[];
+    seasonality?: "spring" | "summer" | "autumn" | "winter" | "year-round";
+    popularity?: number;
+  };
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
 //Products routes
 export const useGetAllProductsQuery = (params: IParams = {}) => {
   return useQuery({
@@ -132,6 +158,20 @@ export const useGetProductById = (id: string) => {
       const res = await apiClient.get<{ data: IFetchProduct }>(`product/${id}`);
       return res?.data?.data;
     },
+  });
+};
+
+export const useGetProductByIdQuery = (
+  id: string,
+  options?: { enabled?: boolean }
+) => {
+  return useQuery({
+    queryKey: ["product", id],
+    queryFn: async () => {
+      const res = await apiClient.get<{ data: IFetchProduct }>(`product/${id}`);
+      return res?.data;
+    },
+    enabled: !!id && options?.enabled !== false,
   });
 };
 

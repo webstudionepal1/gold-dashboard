@@ -35,7 +35,25 @@ export const SidebarConfig = {
               title: "Product Sub Category",
               icon: "",
             },
+            {
+              id: 23,
+              path: FrontendRoutes.PRODUCTOCCASION,
+              title: "Product Occasion",
+              icon: "",
+            },
+            {
+              id: 24,
+              path: FrontendRoutes.STONE,
+              title: "Stone Management",
+              icon: "",
+            },
           ],
+        },
+        {
+          id: 25,
+          path: FrontendRoutes.COLLECTION,
+          title: "Collections",
+          icon: "material-symbols:collections",
         },
         {
           id: 3,

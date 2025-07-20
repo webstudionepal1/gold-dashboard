@@ -3,6 +3,7 @@ import React from "react";
 import html2pdf from "html2pdf.js";
 import { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
+import CompanyLogo from "../../../components/shared/CompanyLogo";
 
 export interface InvoiceItem {
   name: string;
@@ -66,17 +67,16 @@ const Invoice: React.FC<Props> = ({ data }) => {
     <div>
       <div
         className="max-w-4xl mx-auto p-8 bg-white rounded-xl text-sm text-gray-800 font-sans"
-        ref={contentRef}
-      >
+        ref={contentRef}>
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
             <div>
-              <img
-                src="/barun_gems_logo.png"
-                alt="Barun Gems Logo"
-                height={200}
-                width={200}
+              <CompanyLogo
+                size="xl"
+                className="h-[200px] w-[200px]"
+                fallbackSrc="/barun_gems_logo.png"
+                showLoadingState={false}
               />
               {/* <h1 className="text-2xl font-bold text-gray-900">
               {data.shopName}
@@ -203,14 +203,12 @@ const Invoice: React.FC<Props> = ({ data }) => {
       <div className="flex justify-end mt-6 gap-4">
         <button
           onClick={() => handlePrint()}
-          className="px-5 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-600 transition"
-        >
+          className="px-5 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-600 transition">
           Print
         </button>
         <button
           onClick={() => handleExportPDF()}
-          className="px-4 py-2 bg-[#df8d29] text-white rounded-lg hover:bg-[#c6893f] transition"
-        >
+          className="px-4 py-2 bg-[#df8d29] text-white rounded-lg hover:bg-[#c6893f] transition">
           Export
         </button>
       </div>

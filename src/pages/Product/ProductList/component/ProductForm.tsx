@@ -8,7 +8,10 @@ import {
   useGetAllProductCategoriesQuery,
   useGetAllProductClaspsQuery,
   useGetAllProductSubCategoriesQuery,
+  useGetAllProductOccasionsQuery,
+  useGetAllStonesQuery,
   useUpdateProductsMutation,
+  useValidateSKUQuery,
 } from "../../../../server/api/productHooks";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { PriceInputField } from "../../../OrderManagement/Order/components/PriceInputField";
@@ -49,6 +52,14 @@ const ProductForm = () => {
     useGetAllProductSubCategoriesQuery();
   const { data: clasps, isSuccess: claspsSuccess } =
     useGetAllProductClaspsQuery();
+  const { data: occasions, isSuccess: occasionsSuccess } =
+    useGetAllProductOccasionsQuery();
+  const {
+    data: stones,
+    isSuccess: stonesSuccess,
+    isLoading: stonesLoading,
+    error: stonesError,
+  } = useGetAllStonesQuery();
 
   const categoriesList = useMemo(
     () =>
@@ -58,12 +69,19 @@ const ProductForm = () => {
     [categorySuccess, categories]
   );
 
+  // Get current category value from form state
+  const currentCategory = form.useStore((state) => state.values.category);
+
   const subCategoriesList = useMemo(
     () =>
       subSuccess
-        ? subCategories.map((item) => ({ label: item.name, value: item._id }))
+        ? subCategories
+            .filter(
+              (item) => !currentCategory || item.category === currentCategory
+            )
+            .map((item) => ({ label: item.name, value: item._id }))
         : [],
-    [subSuccess, subCategories]
+    [subSuccess, subCategories, currentCategory]
   );
 
   const claspsList = useMemo(
@@ -181,8 +199,7 @@ const ProductForm = () => {
           e.stopPropagation();
           form.handleSubmit();
         }}
-        className="grid grid-cols-1 gap-4 lg:grid-cols-3"
-      >
+        className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         {/* Left Column */}
         <div className="col-span-2 bg-white border rounded-md">
           <div className="col-span-2">
@@ -247,7 +264,11 @@ const ProductForm = () => {
                           firstInput="Select Category"
                           options={categoriesList}
                           value={field.state.value}
-                          onChange={(e) => field.handleChange(e.target.value)}
+                          onChange={(e) => {
+                            field.handleChange(e.target.value);
+                            // Reset subcategory when category changes
+                            form.setFieldValue("subCategory", "");
+                          }}
                         />
                         <FieldError field={field} />
                         {getFieldError("category").length > 0 && (
@@ -268,6 +289,7 @@ const ProductForm = () => {
                           options={subCategoriesList}
                           value={field.state.value}
                           onChange={(e) => field.handleChange(e.target.value)}
+                          disabled={!currentCategory}
                         />
                         <FieldError field={field} />
                         {getFieldError("subCategory").length > 0 && (
@@ -284,7 +306,7 @@ const ProductForm = () => {
 
             {/* Pricing Section */}
             <div className="p-4 rounded-lg">
-              <form.Field name="variant" mode="array">
+              <form.Field name="variants" mode="array">
                 {(field) => (
                   <div>
                     <div className="flex items-center justify-between w-full py-2 mb-2 text-sm border-b">
@@ -296,10 +318,9 @@ const ProductForm = () => {
                           field.pushValue({ price: 0, wt: 0, unit: "gm" })
                         }
                         type="button"
-                        className="flex bg-[#DF8D28] rounded-md text-white items-center gap-2 px-3 py-2"
-                      >
+                        className="flex bg-[#DF8D28] rounded-md text-white items-center gap-2 px-3 py-2">
                         <Icon icon="ep:plus" width="18" height="18" />
-                        Product Size
+                        Add Variant
                       </button>
                     </div>
                     {getFieldError("variant").length > 0 && (
@@ -551,6 +572,236 @@ const ProductForm = () => {
                   }}
                 </form.Field>
               </div>
+            </div>
+
+            {/* Occasions Section */}
+            <div className="p-4 rounded-lg">
+              <h2 className="py-2 mb-2 font-semibold text-gray-700 border-b">
+                Occasions (Optional)
+              </h2>
+
+              <form.Field name="occasions" mode="array">
+                {(field) => (
+                  <div>
+                    <DropdownField
+                      label="Select Occasions"
+                      firstInput="Select occasions for this product"
+                      options={occasionsList}
+                      value={field.state.value?.[0] || ""}
+                      onChange={(e) => {
+                        const selectedValue = e.target.value;
+                        if (
+                          selectedValue &&
+                          !field.state.value?.includes(selectedValue)
+                        ) {
+                          field.pushValue(selectedValue);
+                        }
+                      }}
+                    />
+
+                    {/* Display selected occasions */}
+                    {field.state.value && field.state.value.length > 0 && (
+                      <div className="mt-2">
+                        <p className="text-sm text-gray-600 mb-2">
+                          Selected occasions:
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {field.state.value.map(
+                            (occasionId: string, index: number) => {
+                              const occasion = occasions?.find(
+                                (o) => o._id === occasionId
+                              );
+                              return (
+                                <span
+                                  key={occasionId}
+                                  className="inline-flex items-center px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
+                                  {occasion?.name || occasionId}
+                                  <button
+                                    type="button"
+                                    onClick={() => field.removeValue(index)}
+                                    className="ml-1 text-blue-600 hover:text-blue-800">
+                                    <Icon
+                                      icon="mdi:close"
+                                      className="w-3 h-3"
+                                    />
+                                  </button>
+                                </span>
+                              );
+                            }
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </form.Field>
+            </div>
+
+            {/* Stones Section */}
+            <div className="p-4 rounded-lg">
+              <h2 className="py-2 mb-2 font-semibold text-gray-700 border-b">
+                Stones (Optional)
+                {stonesLoading && (
+                  <span className="text-sm text-blue-500 ml-2">
+                    Loading stones...
+                  </span>
+                )}
+                {stonesError && (
+                  <span className="text-sm text-red-500 ml-2">
+                    Error loading stones
+                  </span>
+                )}
+              </h2>
+
+              <form.Field name="stones" mode="array">
+                {(field) => (
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <p className="text-sm text-gray-600">
+                        Add stones to this product
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          field.pushValue({
+                            stone: "",
+                            quantity: 1,
+                            totalPrice: 0,
+                            isOptional: true,
+                            isDefault: false,
+                          })
+                        }
+                        className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600">
+                        <Icon icon="mdi:plus" className="inline mr-1" />
+                        Add Stone
+                      </button>
+                    </div>
+
+                    {field.state.value &&
+                      field.state.value.map((stone: any, index: number) => (
+                        <div
+                          key={index}
+                          className="border rounded p-3 mb-3 bg-gray-50">
+                          <div className="flex justify-between items-center mb-2">
+                            <h4 className="font-medium text-gray-700">
+                              Stone {index + 1}
+                            </h4>
+                            <button
+                              type="button"
+                              onClick={() => field.removeValue(index)}
+                              className="text-red-500 hover:text-red-700">
+                              <Icon icon="mdi:delete" className="w-4 h-4" />
+                            </button>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <form.Field name={`stones[${index}].stone`}>
+                              {(subField) => (
+                                <div>
+                                  <DropdownField
+                                    label="Stone"
+                                    required
+                                    firstInput={
+                                      stonesList.length > 0
+                                        ? "Select stone"
+                                        : "No stones available"
+                                    }
+                                    options={stonesList}
+                                    value={String(subField.state.value || "")}
+                                    onChange={(e) =>
+                                      subField.handleChange(e.target.value)
+                                    }
+                                  />
+                                  <FieldError field={subField} />
+                                  {stonesList.length === 0 && (
+                                    <p className="text-xs text-gray-500 mt-1">
+                                      No stones available. Please add stones
+                                      first.
+                                    </p>
+                                  )}
+                                </div>
+                              )}
+                            </form.Field>
+
+                            <form.Field name={`stones[${index}].quantity`}>
+                              {(subField) => (
+                                <div>
+                                  <InputField
+                                    label="Quantity"
+                                    required
+                                    type="number"
+                                    placeholder="1"
+                                    value={String(subField.state.value)}
+                                    onChange={(e) =>
+                                      subField.handleChange(
+                                        Number(e.target.value)
+                                      )
+                                    }
+                                  />
+                                  <FieldError field={subField} />
+                                </div>
+                              )}
+                            </form.Field>
+
+                            <form.Field name={`stones[${index}].totalPrice`}>
+                              {(subField) => (
+                                <div>
+                                  <PriceInputField
+                                    label="Total Price"
+                                    required
+                                    type="number"
+                                    placeholder="0"
+                                    value={String(subField.state.value || "")}
+                                    onChange={(e) =>
+                                      subField.handleChange(
+                                        Number(e.target.value)
+                                      )
+                                    }
+                                  />
+                                  <FieldError field={subField} />
+                                </div>
+                              )}
+                            </form.Field>
+
+                            <div className="flex gap-4">
+                              <form.Field name={`stones[${index}].isOptional`}>
+                                {(subField) => (
+                                  <label className="flex items-center">
+                                    <input
+                                      type="checkbox"
+                                      checked={Boolean(subField.state.value)}
+                                      onChange={(e) =>
+                                        subField.handleChange(e.target.checked)
+                                      }
+                                      className="mr-2"
+                                    />
+                                    <span className="text-sm">Optional</span>
+                                  </label>
+                                )}
+                              </form.Field>
+
+                              <form.Field name={`stones[${index}].isDefault`}>
+                                {(subField) => (
+                                  <label className="flex items-center">
+                                    <input
+                                      type="checkbox"
+                                      checked={Boolean(subField.state.value)}
+                                      onChange={(e) =>
+                                        subField.handleChange(e.target.checked)
+                                      }
+                                      className="mr-2"
+                                    />
+                                    <span className="text-sm">Default</span>
+                                  </label>
+                                )}
+                              </form.Field>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </form.Field>
             </div>
           </div>
         </div>

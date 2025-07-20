@@ -19,6 +19,23 @@ import { productListColumns } from "../productObj";
 //   sortValue: string;
 // }
 
+// Custom hook for debounced search
+const useDebounce = (value: string, delay: number) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+};
+
 const ProductList: React.FC = () => {
   const { data: productsList, isSuccess, isLoading } = useGetAllProductsQuery();
   const productsData = useMemo(
@@ -193,4 +210,4 @@ const ProductList: React.FC = () => {
   );
 };
 
-export default ProductList;
+export default React.memo(ProductList);

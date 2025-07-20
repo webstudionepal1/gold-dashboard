@@ -16,7 +16,7 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 
-import { FC } from 'react';
+import { FC, memo } from 'react';
 import { Icon } from '@iconify/react/dist/iconify.js';
 
 ChartJS.register(
@@ -47,4 +47,4 @@ const SalesChart: FC<SalesChartProps> = ({ data, options }) => {
     );
 };
 
-export default SalesChart;
+export default memo(SalesChart);

@@ -504,13 +504,13 @@ import {
   useGetAllBannerQuery,
 } from "../../server/api/bannerHook";
 import { updateBannerState } from "./Components/bannerStore";
+import { ensureStreamingUrl } from "../../utils/videoUtils";
 
 interface BannerItem {
   _id: string;
   title: string;
   banner_type: string;
   image: string[];
-  mobImage: string[];
   category: string;
   subCategory: string;
   banner_title?: string;

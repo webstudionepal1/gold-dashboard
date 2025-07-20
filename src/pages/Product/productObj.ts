@@ -9,13 +9,23 @@ export type VisibilityType =
   | "popular";
 
 type ProductVariant = {
+  sku?: string; // Made optional - will be auto-generated if not provided
   price: number;
   wt: number;
   unit?: string;
 };
 
+export interface IProductStone {
+  stone: string; // ObjectId as string
+  quantity: number;
+  totalPrice: number;
+  isOptional: boolean;
+  isDefault: boolean;
+}
+
 export interface IProductFormValues {
   name: string;
+  slug?: string;
   description: string;
   category: string;
   subCategory?: string;
@@ -24,9 +34,19 @@ export interface IProductFormValues {
   claspType?: string;
   rhodoumFinishes: boolean;
   shape: string;
+  quantity: number;
+  totalCarat?: number;
+  color?: string;
   clarity: string;
   dimension: number;
-  visibleAs: VisibilityType;
+
+  // Stones
+  stones?: IProductStone[];
+
+  // Occasions
+  occasions?: string[]; // Array of occasion ObjectIds as strings
+
+  // SEO and marketing
   tags: string[];
   images: File | null; // Changed from 'image' to 'images' to match form field
   existingImage?: string;
@@ -122,6 +142,7 @@ export const generateProductDefaultValue = (state: string, editData?: any) => {
       claspType: "",
       rhodoumFinishes: true,
       shape: "",
+      quantity: 0,
       clarity: "",
       dimension: 0,
       visibleAs: "featured" as VisibilityType,
@@ -149,6 +170,9 @@ export const generateProductDefaultValue = (state: string, editData?: any) => {
       })(),
       rhodoumFinishes: get(editData, "rhodoumFinishes", true),
       shape: get(editData, "shape", ""),
+      quantity: get(editData, "quantity", 0),
+      totalCarat: get(editData, "totalCarat"),
+      color: get(editData, "color"),
       clarity: get(editData, "clarity", ""),
       dimension: get(editData, "dimension", 0),
       visibleAs: get(editData, "visibleAs", "featured") as VisibilityType,

@@ -17,8 +17,7 @@ export const ProductGridView = ({
         <div
           key={product._id}
           className="flex flex-col overflow-hidden transition-shadow bg-white rounded-sm cursor-pointer h-80 hover:shadow-md"
-          onClick={() => handleCardClick(product)}
-        >
+          onClick={() => handleCardClick(product)}>
           <div className="flex justify-between my-4">
             <div className="flex flex-col gap-6">
               <ArrowIcon />
@@ -43,9 +42,15 @@ export const ProductGridView = ({
               {[...Array(5)].map((_, i) => (
                 <Icon
                   key={i}
-                  icon={i < product?.ratings ? "mdi:star" : "mdi:star-outline"}
+                  icon={
+                    i < (product?.averageRating || 0)
+                      ? "mdi:star"
+                      : "mdi:star-outline"
+                  }
                   className={`w-4 h-4 ${
-                    i < product?.ratings ? "text-yellow" : "text-gray-300"
+                    i < (product?.averageRating || 0)
+                      ? "text-yellow"
+                      : "text-gray-300"
                   }`}
                 />
               ))}
@@ -53,7 +58,7 @@ export const ProductGridView = ({
           </div>
           <div className="flex items-center gap-x-2">
             <span className="text-lg font-bold">
-              ${get(product, "price", 0).toFixed(2)}
+              ${get(product, "variants[0].price", 0).toFixed(2)}
             </span>
             {/* {product.onSale && (
               <span className="text-[#C2BDBA] line-through text-sm">

@@ -133,15 +133,17 @@ export interface IFetchItems {
   totalStock: number;
   _id: string;
 }
-export const useGetRawMaterialsQuery = (params = {}) => {
+
+export const useGetPurchaseReturnSummaryQuery = (purchaseId: string) => {
   return useQuery({
-    queryKey: ["rawitem", params],
+    queryKey: ["purchase-return-summary", purchaseId],
     queryFn: async () => {
-      const res = await apiClient.get<{ data: IFetchItems[] }>("rawitem", {
-        params,
-      });
+      const res = await apiClient.get<{ data: IReturnSummary }>(
+        `purchase/${purchaseId}/return-summary`
+      );
       return res?.data?.data;
     },
+    enabled: !!purchaseId,
   });
 };
 
