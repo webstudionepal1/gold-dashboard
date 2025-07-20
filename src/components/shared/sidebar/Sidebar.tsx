@@ -39,9 +39,10 @@ const SidebarHeader: React.FC = () => {
       className={clsx(
         "flex items-center p-4",
         isCollapsed ? "justify-center" : "justify-between"
-      )}>
+      )}
+    >
       <img
-        src="/barun2.png"
+        src="/companylogo.png"
         alt="company-logo"
         className={clsx(
           isCollapsed ? "h-[50px] w-[44px]" : "h-full w-full",
@@ -66,7 +67,8 @@ const SubRouteItem: React.FC<{
       to={child.path}
       key={child.id}
       className="relative flex items-center pl-4 mt-[2px] rounded-lg"
-      onClick={() => closeSidebar()}>
+      onClick={() => closeSidebar()}
+    >
       <div className="absolute left-[0.4rem] top-1/2 -translate-y-1/2">
         <div
           className={`h-[1px] w-2 rounded-full transition-colors duration-200 ${
@@ -79,7 +81,8 @@ const SubRouteItem: React.FC<{
         size="body-sm-default"
         className={`hover:bg-gray-50 py-2 px-3 rounded transition-colors duration-200 ${
           isActive ? "bg-[#FCF4EA]" : ""
-        }`}>
+        }`}
+      >
         {child.title}
       </Text>
     </Link>
@@ -119,7 +122,8 @@ const RouteItem: React.FC<{
             closeSidebar();
           }
         }}
-        title={isCollapsed ? route.title : ""}>
+        title={isCollapsed ? route.title : ""}
+      >
         <div className={clsx("flex items-center", isCollapsed ? "" : "gap-3")}>
           <Icon
             icon={route.icon}
@@ -132,7 +136,8 @@ const RouteItem: React.FC<{
           {!isCollapsed && (
             <Text
               variant={isActive ? "orange" : "fadish-black"}
-              size="body-sm-default">
+              size="body-sm-default"
+            >
               {route.title}
             </Text>
           )}
@@ -152,7 +157,8 @@ const RouteItem: React.FC<{
         <div
           className={`ml-8 flex flex-col relative overflow-hidden transition-all duration-200 ease-in-out ${
             isExpanded ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-          }`}>
+          }`}
+        >
           <div className="absolute left-[0.3125rem] top-0 bottom-0 w-px bg-yellow" />
           {route.children &&
             route.children.map((child) => (
@@ -175,7 +181,8 @@ const MobileToggleButton: React.FC = () => {
     <button
       onClick={toggleSidebar}
       className="fixed z-40 p-2 text-white rounded-full shadow-lg top-4 left-4 md:hidden bg-primary-blue"
-      aria-label="Toggle Sidebar">
+      aria-label="Toggle Sidebar"
+    >
       <Icon icon={"mdi-light:unfold-more-vertical"} className="size-6" />
     </button>
   );
@@ -263,14 +270,16 @@ const Sidebar: React.FC<{ config: { sections: SidebarSection[] } }> = ({
           "w-72 max-w-72",
           isSidebarOpen ? "translate-x-0" : "-translate-x-full",
           `bg-[${COLORS.sidebarBackground}]`
-        )}>
+        )}
+      >
         <SidebarHeader />
 
         <div className="flex-grow space-y-6 overflow-y-auto">
           {config.sections.map((section, index) => (
             <section
               key={section.title}
-              className={index > 1 ? "pb-[178px]" : ""}>
+              className={index > 1 ? "pb-[178px]" : ""}
+            >
               <div className="flex flex-col gap-2">
                 <SectionDivider
                   title={section.title}
@@ -308,7 +317,8 @@ export const SidebarInset: React.FC<SidebarInsetProps> = ({
       className={clsx(
         "flex-1 transition-all duration-300 ease-in-out",
         className
-      )}>
+      )}
+    >
       {children}
     </div>
   );

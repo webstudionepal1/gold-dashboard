@@ -53,7 +53,8 @@ export const SidebarConfig = {
           id: 25,
           path: FrontendRoutes.COLLECTION,
           title: "Collections",
-          icon: "material-symbols:collections",
+          // icon: "material-symbols:collections",
+          icon: "bi:collection",
         },
         {
           id: 3,
@@ -195,8 +196,16 @@ export const SidebarConfig = {
           title: "Settings",
           icon: "mdi-light:settings",
           children: [
-            { id: 107, path: "/settings/profile-config", title: "Profile config" },
-            { id: 108, path: "/settings/attribute-config", title: "Attribute config" },
+            {
+              id: 107,
+              path: "/settings/profile-config",
+              title: "Profile config",
+            },
+            {
+              id: 108,
+              path: "/settings/attribute-config",
+              title: "Attribute config",
+            },
           ],
         },
         {
