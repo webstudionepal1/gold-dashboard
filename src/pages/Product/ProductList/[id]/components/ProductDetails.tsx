@@ -67,7 +67,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
       </div>
       {product.variant && product.variant.length > 0 && (
         <div className="flex items-center gap-4">
-          {product.variant.map((item) => (
+          {product.variant.map((item:any) => (
             <div
               key={item?.sku || `variant-${item?.wt}-${item?.unit}`}
               className="w-28 flex flex-col bg-white border-2 p-4 rounded-lg py-2">

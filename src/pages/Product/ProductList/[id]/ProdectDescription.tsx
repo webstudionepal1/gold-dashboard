@@ -16,7 +16,7 @@ const ProductDescription: React.FC = () => {
   if (error)
     return (
       <div className="text-center text-red-500">
-        Error loading product: {error}
+        Error loading product: {error as any}
       </div>
     );
   if (!product) return <div className="text-center">Product not found.</div>;
