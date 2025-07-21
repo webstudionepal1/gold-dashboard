@@ -14,6 +14,14 @@ export const initializeAuth = () => {
   let token: string | null | undefined = Cookies.get("_UPLFMMATRIX");
   let user: string | null | undefined = Cookies.get("user");
 
+  // Check for invalid user data format and clear if found
+  if (user === "[object Object]") {
+    console.error("Invalid user data format detected, clearing cookies");
+    Cookies.remove("_UPLFMMATRIX");
+    Cookies.remove("user");
+    return null;
+  }
+
   // Check if token exists
   if (token && user) {
     try {
@@ -36,7 +44,7 @@ export const initializeAuth = () => {
         Cookies.remove("_UPLFMMATRIX");
         Cookies.remove("user");
       }
-    } catch (error) {
+    } catch (_error) {
       // In case the token is invalid or decoding fails
       token = null;
       user = null;

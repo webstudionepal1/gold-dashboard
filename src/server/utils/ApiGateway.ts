@@ -2,7 +2,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 // Configure base URL from environment variables
 // export const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}api/v1/en/`;
-export const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}`;
+export const API_BASE_URL = `${import.meta.env.VITE_API_LOCAL_URL}`;
 
 // Create an axios instance
 export const apiClient = axios.create({

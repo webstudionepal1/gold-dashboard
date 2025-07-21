@@ -16,6 +16,8 @@ import Productsubcategory from "../pages/Product/ProductSubcategory/ProductSubCa
 
 import BannerIndex from "../pages/Banner/BannerIndex";
 import NotificationIndex from "../pages/Notification/NotificationIndex";
+import NotificationTest from "../components/test/NotificationTest";
+import NotificationAdminPanel from "../components/admin/NotificationAdminPanel";
 import MyPostBusinessIndex from "../pages/MyPostBusiness/MyPostBusinessIndex";
 import ConfirmedOrder from "../pages/OrderManagement/ConfirmedOrder/ConfirmedOrder";
 import OrderIndex from "../pages/OrderManagement/Order/OrderIndex";
@@ -231,6 +233,14 @@ export const routesConfig = [
   {
     path: FrontendRoutes.NOTIFICATION,
     element: <NotificationIndex />,
+  },
+  {
+    path: "/notification-test",
+    element: <NotificationTest />,
+  },
+  {
+    path: "/notification-admin",
+    element: <NotificationAdminPanel />,
   },
   // MyPostBusiness route commented out - will be integrated later
   // {

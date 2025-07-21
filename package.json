@@ -4,11 +4,17 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --port 5173",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:headed": "playwright test --headed",
+    "test:notifications": "playwright test tests/e2e/notification.spec.ts",
+    "test:install": "playwright install"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
@@ -54,6 +60,7 @@
   "devDependencies": {
     "@eslint/js": "^9.21.0",
     "@iconify/react": "^5.2.0",
+    "@playwright/test": "^1.48.0",
     "@types/js-cookie": "^3.0.6",
     "@types/lodash": "^4.17.16",
     "@types/react": "^19.0.10",

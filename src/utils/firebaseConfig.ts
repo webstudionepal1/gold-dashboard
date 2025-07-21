@@ -42,25 +42,37 @@ export const getMessagingInstance = async () => {
   }
 };
 
-// Register service worker with broader compatibility
-export const registerServiceWorker = async () => {
+// Register service worker with enhanced error handling and retry logic
+export const registerServiceWorker = async (retryCount = 0, maxRetries = 2) => {
   if (!("serviceWorker" in navigator)) {
     console.error("Service Worker is not supported in this browser");
     return false;
   }
 
   try {
-    // First, unregister any existing service workers to avoid conflicts
-    const registrations = await navigator.serviceWorker.getRegistrations();
-    for (const registration of registrations) {
-      if (registration.scope.includes(window.location.origin)) {
-        await registration.unregister();
-        console.log("Unregistered existing service worker");
-      }
+    console.log("Registering service worker...");
+
+    // Check if service worker is already registered and active
+    const existingRegistration = await navigator.serviceWorker.getRegistration(
+      "/firebase-messaging-sw.js"
+    );
+
+    if (existingRegistration && existingRegistration.active) {
+      console.log(
+        "Service worker already registered and active:",
+        existingRegistration
+      );
+      return existingRegistration;
     }
 
-    // Register the service worker with a broader scope
-    const registration = await navigator.serviceWorker.register(
+    // If existing registration is not active, unregister it
+    if (existingRegistration) {
+      await existingRegistration.unregister();
+      console.log("Unregistered inactive service worker");
+    }
+
+    // Register the service worker with timeout protection
+    const registrationPromise = navigator.serviceWorker.register(
       "/firebase-messaging-sw.js",
       {
         scope: "/",
@@ -68,25 +80,62 @@ export const registerServiceWorker = async () => {
       }
     );
 
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(
+        () => reject(new Error("Service worker registration timeout")),
+        10000
+      );
+    });
+
+    const registration = (await Promise.race([
+      registrationPromise,
+      timeoutPromise,
+    ])) as ServiceWorkerRegistration;
+
     // Wait for the service worker to be activated
     if (registration.installing) {
       console.log("Service worker installing");
 
-      // Wait for installation to complete
-      await new Promise((resolve) => {
-        registration?.installing?.addEventListener("statechange", (e: any) => {
+      // Wait for installation to complete with timeout
+      await new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          reject(new Error("Service worker installation timeout"));
+        }, 15000);
+
+        registration.installing!.addEventListener("statechange", (e: any) => {
           if (e?.target?.state === "activated") {
+            clearTimeout(timeout);
             console.log("Service worker activated");
             resolve(true);
+          } else if (e?.target?.state === "redundant") {
+            clearTimeout(timeout);
+            reject(new Error("Service worker became redundant"));
           }
         });
       });
     }
 
+    // Ensure service worker is ready
+    await navigator.serviceWorker.ready;
+
     console.log("Service Worker registered successfully:", registration);
     return registration;
   } catch (error) {
     console.error("Service Worker registration failed:", error);
+
+    // Retry logic for registration failures
+    if (retryCount < maxRetries) {
+      console.log(
+        `Retrying service worker registration (${
+          retryCount + 1
+        }/${maxRetries})...`
+      );
+      await new Promise((resolve) =>
+        setTimeout(resolve, 1000 * (retryCount + 1))
+      );
+      return registerServiceWorker(retryCount + 1, maxRetries);
+    }
+
     return false;
   }
 };
@@ -151,8 +200,8 @@ export const checkNotificationPermission = async () => {
   }
 };
 
-// Request FCM Token with browser-specific handling
-export const requestFCMToken = async () => {
+// Request FCM Token with enhanced error handling and retry logic
+export const requestFCMToken = async (retryCount = 0, maxRetries = 3) => {
   try {
     // Feature detection
     const isBrave =
@@ -160,10 +209,34 @@ export const requestFCMToken = async () => {
         (await (navigator as any)?.brave.isBrave())) ||
       false;
 
-    // First ensure the service worker is registered
-    const swRegistration = await registerServiceWorker();
+    // Check if FCM is supported
+    const isFCMSupported = await isSupported();
+    if (!isFCMSupported) {
+      throw new Error(
+        "Firebase Cloud Messaging is not supported in this browser"
+      );
+    }
+
+    // First ensure the service worker is registered with retry
+    let swRegistration = await registerServiceWorker();
     if (!swRegistration) {
-      throw new Error("Failed to register service worker");
+      // Wait a bit and try again
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      swRegistration = await registerServiceWorker();
+      if (!swRegistration) {
+        throw new Error("Failed to register service worker after retry");
+      }
+    }
+
+    // Wait for service worker to be ready
+    if (swRegistration.installing) {
+      await new Promise((resolve) => {
+        swRegistration.installing!.addEventListener("statechange", () => {
+          if (swRegistration.installing!.state === "installed") {
+            resolve(void 0);
+          }
+        });
+      });
     }
 
     // Then check notification permissions
@@ -172,24 +245,40 @@ export const requestFCMToken = async () => {
       throw new Error("Notification permission not granted");
     }
 
-    // Initialize messaging
-    const messagingInstance = await getMessagingInstance();
+    // Initialize messaging with retry
+    let messagingInstance = await getMessagingInstance();
     if (!messagingInstance) {
-      throw new Error("Failed to initialize messaging");
+      // Wait and try again
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      messagingInstance = await getMessagingInstance();
+      if (!messagingInstance) {
+        throw new Error("Failed to initialize messaging after retry");
+      }
     }
 
     // Get FCM token with additional options for Chrome/Brave
     console.log("Requesting FCM token...");
-    const fcmToken = await getToken(messagingInstance, {
+
+    // Add timeout to prevent hanging
+    const tokenPromise = getToken(messagingInstance, {
       vapidKey: VAPID_KEY,
       serviceWorkerRegistration: swRegistration,
     });
+
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error("FCM token request timeout")), 10000);
+    });
+
+    const fcmToken = (await Promise.race([
+      tokenPromise,
+      timeoutPromise,
+    ])) as string;
 
     if (!fcmToken) {
       throw new Error("No registration token available");
     }
 
-    console.log("FCM Token:", fcmToken);
+    console.log("FCM Token obtained successfully");
     return fcmToken;
   } catch (err) {
     console.error("Error getting FCM token:", err);
@@ -197,16 +286,32 @@ export const requestFCMToken = async () => {
     // Specific error handling for common issues
     const errorMessage = err instanceof Error ? err.message : "Unknown error";
 
-    if (errorMessage.includes("push service")) {
+    if (
+      errorMessage.includes("push service") ||
+      errorMessage.includes("AbortError")
+    ) {
       console.warn(
         "Push service error - check your network connection and try again"
       );
+
+      // Retry logic for push service errors
+      if (retryCount < maxRetries) {
+        console.log(
+          `Retrying FCM token request (${retryCount + 1}/${maxRetries})...`
+        );
+        await new Promise((resolve) =>
+          setTimeout(resolve, 2000 * (retryCount + 1))
+        ); // Exponential backoff
+        return requestFCMToken(retryCount + 1, maxRetries);
+      }
     } else if (errorMessage.includes("failed to register")) {
       console.warn(
         "Service worker registration issue - try clearing browser cache"
       );
     } else if (errorMessage.includes("permission")) {
       console.warn("Permission issue - check browser notification settings");
+    } else if (errorMessage.includes("timeout")) {
+      console.warn("FCM token request timed out - network or server issue");
     }
 
     return null;
