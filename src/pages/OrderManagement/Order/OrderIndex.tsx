@@ -74,7 +74,7 @@ const OrderIndex = () => {
   );
 
   return (
-    <div className="container mx-auto px-4 py-3">
+    <div>
       <Header text="Orders" />
       <div className="p-4 bg-white border-2 rounded-lg">
         <MasterTable

@@ -410,8 +410,6 @@ const getStepFields = (step: number): string[] => {
     case 4:
       return ["images", "bannerImage", "video"];
     case 5:
-      return ["seoTitle", "seoDescription", "keywords", "tags"];
-    case 6:
       return ["sortOrder", "availableFrom", "availableUntil"];
     default:
       return [];

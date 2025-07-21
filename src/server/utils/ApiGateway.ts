@@ -53,24 +53,26 @@ apiClient.interceptors.response.use(
     return response;
   },
   (error) => {
-    // Handle unauthorized access
-    if (error.response?.status === 401) {
-      console.log(error);
-      localStorage.clear();
-      const redirectPath = encodeURIComponent(window.location.pathname);
-      window.location.href = `/auth-login?redirect=${redirectPath}`;
-    }
+    console.log("error", error);
+    // // Handle unauthorized access
+    // if (error.response?.status === 401) {
+    //   console.log(error);
+    //   localStorage.clear();
+    //   const redirectPath = encodeURIComponent(window.location.pathname);
+    //   window.location.href = `/auth-login?redirect=${redirectPath}`;
+    // }
 
-    // If request was canceled, do not show error
-    if (axios.isCancel(error)) {
-      return Promise.resolve({ canceled: true });
-    }
+    // // If request was canceled, do not show error
+    // if (axios.isCancel(error)) {
+    //   return Promise.resolve({ canceled: true });
+    // }
 
-    // Format error message
-    const errorMessage =
-      error.response?.data?.message ||
-      error.message ||
-      "An unexpected error occurred";
+    // // Format error message
+    // const errorMessage =
+    //   error.response?.data?.message ||
+    //   error.message ||
+    //   "An unexpected error occurred";
+    const errorMessage = "heelo";
 
     return Promise.reject(errorMessage);
   }

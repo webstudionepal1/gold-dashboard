@@ -59,7 +59,8 @@ export const FormStepper: React.FC<FormStepperProps> = ({
                     }
                     ${isClickable ? "hover:scale-105" : ""}
                   `}
-                  onClick={() => handleStepClick(step.id)}>
+                  onClick={() => handleStepClick(step.id)}
+                >
                   {hasError ? (
                     <Icon icon="material-symbols:error" className="w-6 h-6" />
                   ) : isCompleted ? (
@@ -80,9 +81,10 @@ export const FormStepper: React.FC<FormStepperProps> = ({
                     className?.includes("compact-stepper")
                       ? "hidden sm:block"
                       : ""
-                  }`}>
+                  }`}
+                >
                   <h3
-                    className={`text-xs font-medium transition-colors duration-300 ${
+                    className={`text-xs font-medium transition-colors duration-300 text-nowrap ${
                       hasError
                         ? "text-red-600"
                         : isActive
@@ -90,12 +92,13 @@ export const FormStepper: React.FC<FormStepperProps> = ({
                         : isCompleted
                         ? "text-gray-900"
                         : "text-gray-500"
-                    }`}>
+                    }`}
+                  >
                     {step.title}
                   </h3>
                   {!className?.includes("compact-stepper") && (
                     <p
-                      className={`text-xs mt-1 transition-colors duration-300 ${
+                      className={`text-xs mt-1 transition-colors duration-300 text-nowrap ${
                         hasError
                           ? "text-red-500"
                           : isActive
@@ -103,7 +106,8 @@ export const FormStepper: React.FC<FormStepperProps> = ({
                           : isCompleted
                           ? "text-gray-600"
                           : "text-gray-400"
-                      }`}>
+                      }`}
+                    >
                       {step.description}
                     </p>
                   )}
@@ -115,11 +119,13 @@ export const FormStepper: React.FC<FormStepperProps> = ({
                 <div
                   className={`flex-1 mx-4 ${
                     className?.includes("compact-stepper") ? "mb-4" : "mb-8"
-                  }`}>
+                  }`}
+                >
                   <div
                     className={`h-0.5 w-full transition-all duration-500 ${
                       currentStep > step.id ? "bg-[#DF8D28]" : "bg-gray-300"
-                    }`}></div>
+                    }`}
+                  ></div>
                 </div>
               )}
             </React.Fragment>
@@ -159,7 +165,8 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
       <div className="w-full bg-gray-200 rounded-full h-2">
         <div
           className="bg-gradient-to-r from-[#DF8D28] to-[#B8691A] h-2 rounded-full transition-all duration-500 ease-out"
-          style={{ width: `${progressPercentage}%` }}></div>
+          style={{ width: `${progressPercentage}%` }}
+        ></div>
       </div>
     </div>
   );
@@ -203,7 +210,8 @@ export const StepperNavigation: React.FC<StepperNavigationProps> = ({
               ? "bg-gray-100 text-gray-400 cursor-not-allowed"
               : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400"
           }
-        `}>
+        `}
+      >
         <Icon icon="material-symbols:arrow-back" className="w-4 h-4" />
         Previous
       </button>
@@ -221,7 +229,8 @@ export const StepperNavigation: React.FC<StepperNavigationProps> = ({
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                   : "bg-[#DF8D28] text-white hover:bg-[#B8691A] hover:scale-105"
               }
-            `}>
+            `}
+          >
             {isLoading ? (
               <>
                 <Icon
@@ -252,7 +261,8 @@ export const StepperNavigation: React.FC<StepperNavigationProps> = ({
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                   : "bg-gradient-to-r from-[#DF8D28] to-[#B8691A] text-white hover:from-[#B8691A] hover:to-[#9A5515] hover:scale-105 shadow-lg"
               }
-            `}>
+            `}
+          >
             {isLoading ? (
               <>
                 <Icon

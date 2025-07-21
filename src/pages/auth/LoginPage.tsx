@@ -69,7 +69,8 @@ export const LoginPage = () => {
           onSubmit={(e) => {
             e.preventDefault();
             form.handleSubmit();
-          }}>
+          }}
+        >
           <div className="space-y-2">
             <form.Field name="email">
               {(field) => (
@@ -106,7 +107,8 @@ export const LoginPage = () => {
               "w-full p-2 mt-6 font-semibold text-gray-800 transition bg-white rounded hover:bg-gray-200",
               isPending && "cursor-wait"
             )}
-            disabled={isPending}>
+            disabled={isPending}
+          >
             {isPending ? (
               <span className="flex items-center justify-center gap-2">
                 <Icon

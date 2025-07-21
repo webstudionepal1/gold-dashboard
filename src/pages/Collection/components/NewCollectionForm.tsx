@@ -70,7 +70,7 @@ const NewCollectionForm: React.FC = () => {
   const handleFormSubmit = async (formData: any) => {
     try {
       // Transform form data to API format
-      const apiData = {
+      const apiData: any = {
         name: formData.name,
         slug: formData.slug,
         description: formData.description,
@@ -82,9 +82,6 @@ const NewCollectionForm: React.FC = () => {
         styleCategory: formData.styleCategory,
         collectionMode: formData.collectionMode,
         conditions: formData.conditions,
-        images: formData.images,
-        bannerImage: formData.bannerImage,
-        video: formData.video,
         metadata: formData.metadata,
         isLimitedEdition: formData.isLimitedEdition,
         availableFrom: formData.availableFrom
@@ -95,6 +92,19 @@ const NewCollectionForm: React.FC = () => {
           : undefined,
         sortOrder: formData.sortOrder,
       };
+
+      // Only include media fields if they have valid values
+      if (Array.isArray(formData.images) && formData.images.length > 0) {
+        apiData.images = formData.images;
+      }
+
+      if (formData.bannerImage && formData.bannerImage.trim() !== "") {
+        apiData.bannerImage = formData.bannerImage;
+      }
+
+      if (formData.video && formData.video.trim() !== "") {
+        apiData.video = formData.video;
+      }
 
       if (isEdit && id) {
         await updateCollectionMutation.mutateAsync({ id, body: apiData });

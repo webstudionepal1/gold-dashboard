@@ -3,55 +3,55 @@
 @tailwind utilities;
 
 @font-face {
-  font-family: 'Dm Sans';
-  src: url('/fonts/DMSans-Light.ttf') format('ttf');
+  font-family: "Dm Sans";
+  src: url("/fonts/DMSans-Light.ttf") format("ttf");
   font-weight: 300;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: 'Dm Sans';
-  src: url('/fonts/DMSans-Regular.ttf') format('ttf');
+  font-family: "Dm Sans";
+  src: url("/fonts/DMSans-Regular.ttf") format("ttf");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Dm Sans';
-  src: url('/fonts/DMSans-Medium.ttf') format('ttf');
+  font-family: "Dm Sans";
+  src: url("/fonts/DMSans-Medium.ttf") format("ttf");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Dm Sans';
-  src: url('/fonts/DMSans-SemiBold.ttf') format('ttf');
+  font-family: "Dm Sans";
+  src: url("/fonts/DMSans-SemiBold.ttf") format("ttf");
   font-weight: 600;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Dm Sans';
-  src: url('/fonts/DMSans-Bold.ttf') format('ttf');
+  font-family: "Dm Sans";
+  src: url("/fonts/DMSans-Bold.ttf") format("ttf");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Dm Sans';
-  src: url('/fonts/DMSans-ExtraBold.ttf') format('ttf');
+  font-family: "Dm Sans";
+  src: url("/fonts/DMSans-ExtraBold.ttf") format("ttf");
   font-weight: 800;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Dm Sans';
-  src: url('/fonts/DMSans-Black.ttf') format('ttf');
+  font-family: "Dm Sans";
+  src: url("/fonts/DMSans-Black.ttf") format("ttf");
   font-weight: 900;
   font-style: normal;
   font-display: swap;
@@ -67,7 +67,7 @@
 }
 * {
   margin: 0;
-  font-family: 'Dm Sans' inherit;
+  font-family: "Dm Sans" inherit;
   /* overflow: auto; */
   padding: 0;
 }
@@ -83,7 +83,6 @@ ul {
   margin: 0;
   padding: 0;
 }
-
 
 html,
 body {

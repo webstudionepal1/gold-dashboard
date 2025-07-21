@@ -86,14 +86,14 @@ const NewProductForm: React.FC = () => {
           | "bestSellers"
           | "newArrivals"
           | "normal") || "normal",
-      metadata: {
-        seoTitle: "",
-        seoDescription: "",
-        keywords: [],
-        vendor: "",
-        barcode: "",
-        compareAtPrice: 0,
-      },
+      // metadata: {
+      //   seoTitle: "",
+      //   seoDescription: "",
+      //   keywords: [],
+      //   vendor: "",
+      //   barcode: "",
+      //   compareAtPrice: 0,
+      // },
 
       // Status
       isActive: true,
@@ -225,34 +225,34 @@ const NewProductForm: React.FC = () => {
     formDataObj.append("isFeatured", formData.isFeatured.toString());
 
     // Metadata
-    if (formData.metadata) {
-      if (formData.metadata.seoTitle) {
-        formDataObj.append("metadata[seoTitle]", formData.metadata.seoTitle);
-      }
-      if (formData.metadata.seoDescription) {
-        formDataObj.append(
-          "metadata[seoDescription]",
-          formData.metadata.seoDescription
-        );
-      }
-      if (formData.metadata.keywords) {
-        formData.metadata.keywords.forEach((keyword, index) => {
-          formDataObj.append(`metadata[keywords][${index}]`, keyword);
-        });
-      }
-      if (formData.metadata.vendor) {
-        formDataObj.append("metadata[vendor]", formData.metadata.vendor);
-      }
-      if (formData.metadata.barcode) {
-        formDataObj.append("metadata[barcode]", formData.metadata.barcode);
-      }
-      if (formData.metadata.compareAtPrice) {
-        formDataObj.append(
-          "metadata[compareAtPrice]",
-          formData.metadata.compareAtPrice.toString()
-        );
-      }
-    }
+    // if (formData.metadata) {
+    //   if (formData.metadata.seoTitle) {
+    //     formDataObj.append("metadata[seoTitle]", formData.metadata.seoTitle);
+    //   }
+    //   if (formData.metadata.seoDescription) {
+    //     formDataObj.append(
+    //       "metadata[seoDescription]",
+    //       formData.metadata.seoDescription
+    //     );
+    //   }
+    //   if (formData.metadata.keywords) {
+    //     formData.metadata.keywords.forEach((keyword, index) => {
+    //       formDataObj.append(`metadata[keywords][${index}]`, keyword);
+    //     });
+    //   }
+    //   if (formData.metadata.vendor) {
+    //     formDataObj.append("metadata[vendor]", formData.metadata.vendor);
+    //   }
+    //   if (formData.metadata.barcode) {
+    //     formDataObj.append("metadata[barcode]", formData.metadata.barcode);
+    //   }
+    //   if (formData.metadata.compareAtPrice) {
+    //     formDataObj.append(
+    //       "metadata[compareAtPrice]",
+    //       formData.metadata.compareAtPrice.toString()
+    //     );
+    //   }
+    // }
 
     // Note: Images would need to be handled separately if they are File objects
     // For now, assuming images are URLs from the existing product

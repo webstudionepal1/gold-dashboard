@@ -143,7 +143,7 @@ export const ProductSpecificationsPage: React.FC = () => {
         <div className="flex items-center justify-center gap-3 mb-3">
           <Icon
             icon="material-symbols:straighten"
-            className="w-6 h-6 text-[#DF8D28]"
+            className="w-6 h-6 text-customorange"
           />
           <h2 className="text-xl font-bold text-gray-900">
             Product Specifications
@@ -157,11 +157,11 @@ export const ProductSpecificationsPage: React.FC = () => {
       {/* Form Fields */}
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Physical Dimensions Section */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+        <div className=" bg-gray-50 rounded-xl p-6 border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <Icon
               icon="material-symbols:straighten"
-              className="w-5 h-5 text-blue-600"
+              className="w-5 h-5 text-customorange "
             />
             Physical Dimensions
           </h3>
@@ -186,7 +186,8 @@ export const ProductSpecificationsPage: React.FC = () => {
               {validationState.length?.errors.map((error, index) => (
                 <p
                   key={index}
-                  className="text-red-500 text-sm flex items-center gap-1">
+                  className="text-red-500 text-sm flex items-center gap-1"
+                >
                   <Icon icon="material-symbols:error" className="w-4 h-4" />
                   {error}
                 </p>
@@ -212,7 +213,8 @@ export const ProductSpecificationsPage: React.FC = () => {
               {validationState.dimension?.errors.map((error, index) => (
                 <p
                   key={index}
-                  className="text-red-500 text-sm flex items-center gap-1">
+                  className="text-red-500 text-sm flex items-center gap-1"
+                >
                   <Icon icon="material-symbols:error" className="w-4 h-4" />
                   {error}
                 </p>
@@ -240,7 +242,8 @@ export const ProductSpecificationsPage: React.FC = () => {
               {validationState.quantity?.errors.map((error, index) => (
                 <p
                   key={index}
-                  className="text-red-500 text-sm flex items-center gap-1">
+                  className="text-red-500 text-sm flex items-center gap-1"
+                >
                   <Icon icon="material-symbols:error" className="w-4 h-4" />
                   {error}
                 </p>
@@ -250,11 +253,11 @@ export const ProductSpecificationsPage: React.FC = () => {
         </div>
 
         {/* Shape and Clarity Section */}
-        <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-200">
+        <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <Icon
               icon="material-symbols:diamond"
-              className="w-5 h-5 text-purple-600"
+              className="w-5 h-5 text-customorange"
             />
             Shape & Quality
           </h3>
@@ -278,7 +281,8 @@ export const ProductSpecificationsPage: React.FC = () => {
               {validationState.shape?.errors.map((error, index) => (
                 <p
                   key={index}
-                  className="text-red-500 text-sm flex items-center gap-1">
+                  className="text-red-500 text-sm flex items-center gap-1"
+                >
                   <Icon icon="material-symbols:error" className="w-4 h-4" />
                   {error}
                 </p>
@@ -303,7 +307,8 @@ export const ProductSpecificationsPage: React.FC = () => {
               {validationState.clarity?.errors.map((error, index) => (
                 <p
                   key={index}
-                  className="text-red-500 text-sm flex items-center gap-1">
+                  className="text-red-500 text-sm flex items-center gap-1"
+                >
                   <Icon icon="material-symbols:error" className="w-4 h-4" />
                   {error}
                 </p>
@@ -317,7 +322,7 @@ export const ProductSpecificationsPage: React.FC = () => {
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <Icon
               icon="material-symbols:settings"
-              className="w-5 h-5 text-green-600"
+              className="w-5 h-5 text-customorange"
             />
             Additional Properties
           </h3>
@@ -379,7 +384,8 @@ export const ProductSpecificationsPage: React.FC = () => {
               {validationState.totalCarat?.errors.map((error, index) => (
                 <p
                   key={index}
-                  className="text-red-500 text-sm flex items-center gap-1">
+                  className="text-red-500 text-sm flex items-center gap-1"
+                >
                   <Icon icon="material-symbols:error" className="w-4 h-4" />
                   {error}
                 </p>
@@ -410,7 +416,8 @@ export const ProductSpecificationsPage: React.FC = () => {
               {validationState.makingCharges?.errors.map((error, index) => (
                 <p
                   key={index}
-                  className="text-red-500 text-sm flex items-center gap-1">
+                  className="text-red-500 text-sm flex items-center gap-1"
+                >
                   <Icon icon="material-symbols:error" className="w-4 h-4" />
                   {error}
                 </p>
@@ -449,7 +456,7 @@ export const ProductSpecificationsPage: React.FC = () => {
           <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center gap-2">
             <Icon
               icon="material-symbols:help"
-              className="w-5 h-5 text-gray-600"
+              className="w-5 h-5 text-customorange"
             />
             Specification Guidelines
           </h4>

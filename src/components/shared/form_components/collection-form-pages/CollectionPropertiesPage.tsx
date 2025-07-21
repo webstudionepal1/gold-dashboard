@@ -50,7 +50,7 @@ export const CollectionPropertiesPage: React.FC = () => {
         <div className="flex items-center justify-center gap-3 mb-3">
           <Icon
             icon="material-symbols:diamond"
-            className="w-6 h-6 text-[#DF8D28]"
+            className="w-6 h-6 text-customorange"
           />
           <h2 className="text-xl font-bold text-gray-900">
             Collection Properties
@@ -65,11 +65,11 @@ export const CollectionPropertiesPage: React.FC = () => {
       {/* Form Fields */}
       <div className="max-w-2xl mx-auto space-y-6">
         {/* Material and Gemstone Section */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-200">
+        <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
             <Icon
               icon="material-symbols:category"
-              className="w-5 h-5 text-blue-600"
+              className="w-5 h-5 text-customorange"
             />
             Material & Gemstone
           </h3>
@@ -112,11 +112,11 @@ export const CollectionPropertiesPage: React.FC = () => {
         </div>
 
         {/* Style Section */}
-        <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-200">
+        <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <Icon
               icon="material-symbols:palette"
-              className="w-5 h-5 text-purple-600"
+              className="w-5 h-5 text-customorange"
             />
             Style & Design
           </h3>
@@ -143,7 +143,7 @@ export const CollectionPropertiesPage: React.FC = () => {
           <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center gap-2">
             <Icon
               icon="material-symbols:help"
-              className="w-5 h-5 text-gray-600"
+              className="w-5 h-5 text-customorange"
             />
             Why These Properties Matter
           </h4>
