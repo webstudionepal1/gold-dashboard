@@ -124,7 +124,7 @@ const defaultFormData: CollectionFormData = {
     seoDescription: "",
     keywords: [],
     tags: [],
-    targetAudience: "",
+    targetAudience: "unisex",
     seasonality: "year-round",
     popularity: 0,
     trendingScore: 0,

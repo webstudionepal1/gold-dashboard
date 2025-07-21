@@ -73,11 +73,11 @@ export const AvailabilityTimingPage: React.FC = () => {
       {/* Form Fields */}
       <div className="max-w-2xl mx-auto space-y-6">
         {/* Limited Edition Settings */}
-        <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-xl p-6 border border-orange-200">
+        <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <Icon
               icon="material-symbols:star"
-              className="w-5 h-5 text-orange-600"
+              className="w-5 h-5 text-gray-600"
             />
             Limited Edition Settings
           </h3>
@@ -106,11 +106,11 @@ export const AvailabilityTimingPage: React.FC = () => {
             </div>
 
             {formData.isLimitedEdition && (
-              <div className="bg-white rounded-lg p-4 border border-orange-200">
+              <div className="bg-white rounded-lg p-4 border border-gray-200">
                 <div className="flex items-start gap-3">
                   <Icon
                     icon="material-symbols:info"
-                    className="w-5 h-5 text-orange-600 mt-0.5"
+                    className="w-5 h-5 text-gray-600 mt-0.5"
                   />
                   <div>
                     <h4 className="font-medium text-gray-900 mb-1">
@@ -133,11 +133,11 @@ export const AvailabilityTimingPage: React.FC = () => {
         </div>
 
         {/* Availability Schedule */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+        <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <Icon
               icon="material-symbols:calendar-month"
-              className="w-5 h-5 text-blue-600"
+              className="w-5 h-5 text-gray-600"
             />
             Availability Schedule
           </h3>
@@ -183,7 +183,7 @@ export const AvailabilityTimingPage: React.FC = () => {
 
             {/* Date Range Preview */}
             {(formData.availableFrom || formData.availableUntil) && (
-              <div className="bg-white rounded-lg p-4 border border-blue-200">
+              <div className="bg-white rounded-lg p-4 border border-gray-200">
                 <h4 className="font-medium text-gray-900 mb-2">
                   Availability Preview:
                 </h4>
@@ -216,7 +216,8 @@ export const AvailabilityTimingPage: React.FC = () => {
             {validationState.dateRange?.errors.map((error, index) => (
               <p
                 key={index}
-                className="text-red-500 text-sm flex items-center gap-1">
+                className="text-red-500 text-sm flex items-center gap-1"
+              >
                 <Icon icon="material-symbols:error" className="w-4 h-4" />
                 {error}
               </p>
@@ -225,11 +226,11 @@ export const AvailabilityTimingPage: React.FC = () => {
         </div>
 
         {/* Display Settings */}
-        <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
+        <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <Icon
               icon="material-symbols:sort"
-              className="w-5 h-5 text-green-600"
+              className="w-5 h-5 text-gray-600"
             />
             Display Settings
           </h3>
@@ -256,14 +257,15 @@ export const AvailabilityTimingPage: React.FC = () => {
               {validationState.sortOrder?.errors.map((error, index) => (
                 <p
                   key={index}
-                  className="text-red-500 text-sm flex items-center gap-1">
+                  className="text-red-500 text-sm flex items-center gap-1"
+                >
                   <Icon icon="material-symbols:error" className="w-4 h-4" />
                   {error}
                 </p>
               ))}
             </div>
 
-            <div className="bg-white rounded-lg p-4 border border-green-200">
+            <div className="bg-white rounded-lg p-4 border border-gray-200">
               <h4 className="font-medium text-gray-900 mb-2">
                 Sort Order Examples:
               </h4>
@@ -353,11 +355,11 @@ export const AvailabilityTimingPage: React.FC = () => {
         </div>
 
         {/* Final Notes */}
-        <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
+        <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
           <div className="flex items-start gap-3">
             <Icon
               icon="material-symbols:info"
-              className="w-6 h-6 text-blue-600 mt-1"
+              className="w-6 h-6 text-gray-600 mt-1"
             />
             <div>
               <h4 className="font-semibold text-gray-900 mb-2">

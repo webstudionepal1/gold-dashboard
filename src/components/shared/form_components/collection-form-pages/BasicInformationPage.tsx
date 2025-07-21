@@ -111,7 +111,8 @@ export const BasicInformationPage: React.FC = () => {
           {validationState.name?.errors.map((error, index) => (
             <p
               key={index}
-              className="text-red-500 text-sm flex items-center gap-1">
+              className="text-red-500 text-sm flex items-center gap-1"
+            >
               <Icon icon="material-symbols:error" className="w-4 h-4" />
               {error}
             </p>
@@ -142,7 +143,8 @@ export const BasicInformationPage: React.FC = () => {
           {validationState.slug?.errors.map((error, index) => (
             <p
               key={index}
-              className="text-red-500 text-sm flex items-center gap-1">
+              className="text-red-500 text-sm flex items-center gap-1"
+            >
               <Icon icon="material-symbols:error" className="w-4 h-4" />
               {error}
             </p>
@@ -172,14 +174,16 @@ export const BasicInformationPage: React.FC = () => {
                 formData.shortDescription.length > 450
                   ? "text-red-500"
                   : "text-gray-400"
-              }`}>
+              }`}
+            >
               {formData.shortDescription.length}/500
             </span>
           </div>
           {validationState.shortDescription?.errors.map((error, index) => (
             <p
               key={index}
-              className="text-red-500 text-sm flex items-center gap-1">
+              className="text-red-500 text-sm flex items-center gap-1"
+            >
               <Icon icon="material-symbols:error" className="w-4 h-4" />
               {error}
             </p>
@@ -209,14 +213,16 @@ export const BasicInformationPage: React.FC = () => {
                 formData.description.length > 1800
                   ? "text-red-500"
                   : "text-gray-400"
-              }`}>
+              }`}
+            >
               {formData.description.length}/2000
             </span>
           </div>
           {validationState.description?.errors.map((error, index) => (
             <p
               key={index}
-              className="text-red-500 text-sm flex items-center gap-1">
+              className="text-red-500 text-sm flex items-center gap-1"
+            >
               <Icon icon="material-symbols:error" className="w-4 h-4" />
               {error}
             </p>
@@ -224,11 +230,11 @@ export const BasicInformationPage: React.FC = () => {
         </div>
 
         {/* Status Settings */}
-        <div className="bg-gradient-to-r from-[#DF8D28]/5 to-[#DF8D28]/10 rounded-xl p-6 border border-[#DF8D28]/20">
+        <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <Icon
               icon="material-symbols:settings"
-              className="w-5 h-5 text-[#DF8D28]"
+              className="w-5 h-5 text-gray-600"
             />
             Collection Status
           </h3>

@@ -14,7 +14,7 @@ import { BasicInformationPage } from "./collection-form-pages/BasicInformationPa
 import { CollectionPropertiesPage } from "./collection-form-pages/CollectionPropertiesPage";
 import { SmartCollectionRulesPage } from "./collection-form-pages/SmartCollectionRulesPage";
 import { MediaAssetsPage } from "./collection-form-pages/MediaAssetsPage";
-import { SEOMarketingPage } from "./collection-form-pages/SEOMarketingPage";
+
 import { AvailabilityTimingPage } from "./collection-form-pages/AvailabilityTimingPage";
 
 // Define the steps for the stepper
@@ -45,12 +45,6 @@ const FORM_STEPS: StepperStep[] = [
   },
   {
     id: 5,
-    title: "SEO & Marketing",
-    description: "Optimization",
-    icon: "material-symbols:search",
-  },
-  {
-    id: 6,
     title: "Availability",
     description: "Timing & Review",
     icon: "material-symbols:schedule",
@@ -145,8 +139,6 @@ const MultiPageFormContent: React.FC<{
       case 4:
         return <MediaAssetsPage />;
       case 5:
-        return <SEOMarketingPage />;
-      case 6:
         return <AvailabilityTimingPage />;
       default:
         return <BasicInformationPage />;
@@ -173,7 +165,8 @@ const MultiPageFormContent: React.FC<{
               <button
                 type="button"
                 onClick={onCancel}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors flex items-center gap-2">
+                className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors flex items-center gap-2"
+              >
                 <Icon icon="material-symbols:close" className="w-5 h-5" />
                 Cancel
               </button>
@@ -240,7 +233,8 @@ export const MultiPageCollectionForm: React.FC<
   return (
     <MultiPageFormProvider
       initialData={initialData}
-      totalSteps={FORM_STEPS.length}>
+      totalSteps={FORM_STEPS.length}
+    >
       <MultiPageFormContent
         onSubmit={onSubmit}
         onCancel={onCancel}
@@ -256,7 +250,6 @@ export {
   CollectionPropertiesPage,
   SmartCollectionRulesPage,
   MediaAssetsPage,
-  SEOMarketingPage,
   AvailabilityTimingPage,
   FORM_STEPS,
 };

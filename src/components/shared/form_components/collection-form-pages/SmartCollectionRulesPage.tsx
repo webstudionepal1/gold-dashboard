@@ -73,11 +73,11 @@ export const SmartCollectionRulesPage: React.FC = () => {
       {/* Form Fields */}
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Collection Mode Selection */}
-        <div className="bg-gradient-to-r from-[#DF8D28]/5 to-[#DF8D28]/10 rounded-xl p-4 border border-[#DF8D28]/20">
+        <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
             <Icon
               icon="material-symbols:settings"
-              className="w-5 h-5 text-[#DF8D28]"
+              className="w-5 h-5 text-gray-600"
             />
             Collection Management Mode
           </h3>
@@ -103,7 +103,8 @@ export const SmartCollectionRulesPage: React.FC = () => {
                   formData.collectionMode === "manual"
                     ? "border-[#DF8D28] bg-[#DF8D28]/5"
                     : "border-gray-200 bg-gray-50"
-                }`}>
+                }`}
+              >
                 <div className="flex items-center gap-2 mb-2">
                   <Icon
                     icon="material-symbols:hand-gesture"
@@ -122,7 +123,8 @@ export const SmartCollectionRulesPage: React.FC = () => {
                   formData.collectionMode === "automatic"
                     ? "border-[#DF8D28] bg-[#DF8D28]/5"
                     : "border-gray-200 bg-gray-50"
-                }`}>
+                }`}
+              >
                 <div className="flex items-center gap-2 mb-2">
                   <Icon
                     icon="material-symbols:auto-mode"
@@ -141,7 +143,8 @@ export const SmartCollectionRulesPage: React.FC = () => {
                   formData.collectionMode === "hybrid"
                     ? "border-[#DF8D28] bg-[#DF8D28]/5"
                     : "border-gray-200 bg-gray-50"
-                }`}>
+                }`}
+              >
                 <div className="flex items-center gap-2 mb-2">
                   <Icon
                     icon="material-symbols:merge"
@@ -161,7 +164,8 @@ export const SmartCollectionRulesPage: React.FC = () => {
             {validationState.collectionMode?.errors.map((error, index) => (
               <p
                 key={index}
-                className="text-red-500 text-sm flex items-center gap-1">
+                className="text-red-500 text-sm flex items-center gap-1"
+              >
                 <Icon icon="material-symbols:error" className="w-4 h-4" />
                 {error}
               </p>
@@ -173,11 +177,11 @@ export const SmartCollectionRulesPage: React.FC = () => {
         {(formData.collectionMode === "automatic" ||
           formData.collectionMode === "hybrid") && (
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 border-b border-gray-200">
+            <div className="bg-gray-50 p-6 border-b border-gray-200">
               <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
                 <Icon
                   icon="material-symbols:rule"
-                  className="w-5 h-5 text-blue-600"
+                  className="w-5 h-5 text-gray-600"
                 />
                 Automatic Collection Rules
               </h3>
@@ -199,7 +203,8 @@ export const SmartCollectionRulesPage: React.FC = () => {
               {validationState.conditions?.errors.map((error, index) => (
                 <p
                   key={index}
-                  className="text-red-500 text-sm flex items-center gap-1 mt-4">
+                  className="text-red-500 text-sm flex items-center gap-1 mt-4"
+                >
                   <Icon icon="material-symbols:error" className="w-4 h-4" />
                   {error}
                 </p>
@@ -210,11 +215,11 @@ export const SmartCollectionRulesPage: React.FC = () => {
 
         {/* Manual Mode Information */}
         {formData.collectionMode === "manual" && (
-          <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
+          <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
             <div className="flex items-start gap-3">
               <Icon
                 icon="material-symbols:info"
-                className="w-6 h-6 text-blue-600 mt-1"
+                className="w-6 h-6 text-gray-600 mt-1"
               />
               <div>
                 <h4 className="font-semibold text-gray-900 mb-2">
@@ -225,7 +230,7 @@ export const SmartCollectionRulesPage: React.FC = () => {
                   products to include in this collection after creating it. You
                   can always change the collection mode later if needed.
                 </p>
-                <div className="bg-white rounded-lg p-3 border border-blue-200">
+                <div className="bg-white rounded-lg p-3 border border-gray-200">
                   <p className="text-sm text-gray-700">
                     <strong>Next steps:</strong> After creating this collection,
                     you'll be able to browse your product catalog and manually
@@ -239,11 +244,11 @@ export const SmartCollectionRulesPage: React.FC = () => {
 
         {/* Hybrid Mode Information */}
         {formData.collectionMode === "hybrid" && (
-          <div className="bg-purple-50 rounded-xl p-6 border border-purple-200">
+          <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
             <div className="flex items-start gap-3">
               <Icon
                 icon="material-symbols:info"
-                className="w-6 h-6 text-purple-600 mt-1"
+                className="w-6 h-6 text-gray-600 mt-1"
               />
               <div>
                 <h4 className="font-semibold text-gray-900 mb-2">
@@ -255,13 +260,13 @@ export const SmartCollectionRulesPage: React.FC = () => {
                   specific products.
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div className="bg-white rounded-lg p-3 border border-purple-200">
+                  <div className="bg-white rounded-lg p-3 border border-gray-200">
                     <p className="text-sm text-gray-700">
                       <strong>Automatic:</strong> Products matching your rules
                       will be automatically included
                     </p>
                   </div>
-                  <div className="bg-white rounded-lg p-3 border border-purple-200">
+                  <div className="bg-white rounded-lg p-3 border border-gray-200">
                     <p className="text-sm text-gray-700">
                       <strong>Manual Override:</strong> You can manually add
                       products that don't match rules or exclude products that

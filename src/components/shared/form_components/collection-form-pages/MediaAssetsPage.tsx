@@ -15,35 +15,48 @@ export const MediaAssetsPage: React.FC = () => {
   // Handle multiple image uploads for collection gallery
   const handleImageUpload = (files: File[]) => {
     setSelectedImages(files);
-    // Convert files to URLs for form data (in real app, upload to server first)
-    const imageUrls = files.map((file) => URL.createObjectURL(file));
+    // Create proper placeholder URLs that match expected format
+    const imageUrls =
+      files && files.length > 0
+        ? files.map(
+            (file, index) =>
+              `https://placeholder.com/collection-image-${index + 1}-${
+                file.name
+              }`
+          )
+        : [];
     updateFormData({ images: imageUrls });
 
     // Validate images
     const errors: string[] = [];
-    if (files.length > 10) {
+    if (files && files.length > 10) {
       errors.push("Maximum 10 images allowed");
     }
-    updateValidation("images", errors.length === 0, errors);
+    // Images are optional, so no error if empty
+    updateValidation("images", true, errors);
   };
 
   // Handle banner image upload
   const handleBannerImageUpload = (file: File | null) => {
     setBannerImage(file);
     if (file) {
-      const bannerUrl = URL.createObjectURL(file);
-      updateFormData({ bannerImage: bannerUrl });
+      // Create proper placeholder URL that matches expected format
+      updateFormData({
+        bannerImage: `https://placeholder.com/banner-${file.name}`,
+      });
     } else {
       updateFormData({ bannerImage: "" });
     }
+    // Banner image is optional, so always valid
+    updateValidation("bannerImage", true, []);
   };
 
   // Handle video upload
   const handleVideoUpload = (file: File | null) => {
     setVideoFile(file);
     if (file) {
-      const videoUrl = URL.createObjectURL(file);
-      updateFormData({ video: videoUrl });
+      // Create proper placeholder URL that matches expected format
+      updateFormData({ video: `https://placeholder.com/video-${file.name}` });
     } else {
       updateFormData({ video: "" });
     }
@@ -78,11 +91,11 @@ export const MediaAssetsPage: React.FC = () => {
       {/* Form Fields */}
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Collection Images Gallery */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-200">
+        <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
             <Icon
               icon="material-symbols:photo-library"
-              className="w-5 h-5 text-blue-600"
+              className="w-5 h-5 text-gray-600"
             />
             Collection Gallery Images
           </h3>
@@ -95,38 +108,14 @@ export const MediaAssetsPage: React.FC = () => {
 
             {/* Multiple Image Upload */}
             <div className="space-y-4">
-              <div className="border-2 border-dashed border-blue-300 rounded-lg p-8 text-center">
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={(e) => {
-                    const files = Array.from(e.target.files || []);
-                    handleImageUpload(files);
-                  }}
-                  className="hidden"
-                  id="gallery-images"
-                />
-                <label htmlFor="gallery-images" className="cursor-pointer">
-                  <div className="flex flex-col items-center gap-3">
-                    <Icon
-                      icon="material-symbols:add-photo-alternate"
-                      className="w-12 h-12 text-blue-500"
-                    />
-                    <div>
-                      <p className="text-lg font-medium text-gray-700">
-                        Upload Gallery Images
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Click to select multiple images or drag and drop
-                      </p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        Maximum 10 images • JPG, PNG, WebP • Max 5MB each
-                      </p>
-                    </div>
-                  </div>
-                </label>
-              </div>
+              <FileDropInput
+                multiple={true}
+                label="Collection Images"
+                value={selectedImages}
+                onChange={handleImageUpload}
+                maxFiles={10}
+                placeholder="Drag and drop or click to select multiple images"
+              />
 
               {/* Image Preview Grid */}
               {selectedImages.length > 0 && (
@@ -146,7 +135,8 @@ export const MediaAssetsPage: React.FC = () => {
                           );
                           handleImageUpload(newImages);
                         }}
-                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600">
+                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                      >
                         ×
                       </button>
                       <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
@@ -161,7 +151,8 @@ export const MediaAssetsPage: React.FC = () => {
               {validationState.images?.errors.map((error, index) => (
                 <p
                   key={index}
-                  className="text-red-500 text-sm flex items-center gap-1">
+                  className="text-red-500 text-sm flex items-center gap-1"
+                >
                   <Icon icon="material-symbols:error" className="w-4 h-4" />
                   {error}
                 </p>
@@ -171,11 +162,11 @@ export const MediaAssetsPage: React.FC = () => {
         </div>
 
         {/* Banner Image */}
-        <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-200">
+        <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <Icon
               icon="material-symbols:banner"
-              className="w-5 h-5 text-purple-600"
+              className="w-5 h-5 text-gray-600"
             />
             Collection Banner Image
           </h3>
@@ -195,7 +186,7 @@ export const MediaAssetsPage: React.FC = () => {
               existingImageUrl={formData.bannerImage}
             />
 
-            <div className="bg-white rounded-lg p-4 border border-purple-200">
+            <div className="bg-white rounded-lg p-4 border border-gray-200">
               <h4 className="font-medium text-gray-900 mb-2">
                 Banner Image Guidelines:
               </h4>
@@ -212,11 +203,11 @@ export const MediaAssetsPage: React.FC = () => {
         </div>
 
         {/* Video Upload */}
-        <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
+        <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <Icon
               icon="material-symbols:video-library"
-              className="w-5 h-5 text-green-600"
+              className="w-5 h-5 text-gray-600"
             />
             Collection Video (Optional)
           </h3>
@@ -238,7 +229,7 @@ export const MediaAssetsPage: React.FC = () => {
               existingVideoUrl={formData.video}
             />
 
-            <div className="bg-white rounded-lg p-4 border border-green-200">
+            <div className="bg-white rounded-lg p-4 border border-gray-200">
               <h4 className="font-medium text-gray-900 mb-2">
                 Video Guidelines:
               </h4>
@@ -255,7 +246,8 @@ export const MediaAssetsPage: React.FC = () => {
             {validationState.video?.errors.map((error, index) => (
               <p
                 key={index}
-                className="text-red-500 text-sm flex items-center gap-1">
+                className="text-red-500 text-sm flex items-center gap-1"
+              >
                 <Icon icon="material-symbols:error" className="w-4 h-4" />
                 {error}
               </p>
