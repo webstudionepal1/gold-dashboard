@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useGetCollectionByIdQuery } from "../../../server/api/collectionHooks";
 import Breadcrumbs from "../../../components/shared/Breadcrumb";
 import { format } from "date-fns";
+import SafeImage from "../../../components/ui/SafeImage";
 
 const CollectionDetails = () => {
   const navigate = useNavigate();
@@ -56,13 +57,10 @@ const CollectionDetails = () => {
           <div className="flex items-start justify-between">
             <div className="flex items-start gap-4">
               {collection.bannerImage && (
-                <img
+                <SafeImage
                   src={collection.bannerImage}
                   alt={collection.name}
                   className="w-24 h-24 rounded-lg object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = "/placeholder.svg";
-                  }}
                 />
               )}
               <div>
@@ -96,7 +94,7 @@ const CollectionDetails = () => {
                   <span>•</span>
                   <span>Products: {collection.totalProducts}</span>
                   <span>•</span>
-                  <span>Sort Order: {collection.sortOrder}</span>
+                  <span>Sort Order: {collection.sortOrder ?? 0}</span>
                 </div>
               </div>
             </div>
@@ -139,7 +137,7 @@ const CollectionDetails = () => {
               <div className="flex justify-between">
                 <span className="text-gray-600">Type:</span>
                 <span className="font-medium capitalize">
-                  {collection.collectionType.replace("_", " ")}
+                  {collection.collectionType?.replace("_", " ") || "Custom"}
                 </span>
               </div>
               <div className="flex justify-between">
@@ -152,7 +150,8 @@ const CollectionDetails = () => {
                 <div className="flex justify-between">
                   <span className="text-gray-600">Material:</span>
                   <span className="font-medium capitalize">
-                    {collection.materialType.replace("_", " ")}
+                    {collection.materialType?.replace("_", " ") ||
+                      collection.materialType}
                   </span>
                 </div>
               )}
@@ -241,14 +240,12 @@ const CollectionDetails = () => {
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {collection.images.map((image, index) => (
-                <img
-                  key={index}
+                <SafeImage
+                  key={`${collection._id}-image-${index}`}
                   src={image}
                   alt={`${collection.name} ${index + 1}`}
                   className="w-full h-32 object-cover rounded-lg border border-gray-200"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = "/placeholder.svg";
-                  }}
+                  showLoadingPlaceholder={true}
                 />
               ))}
             </div>
