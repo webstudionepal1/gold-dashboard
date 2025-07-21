@@ -1,17 +1,18 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
+import get from "lodash/get";
 import React, { useMemo, useState } from "react";
-import { Table } from "../../../components/shared/Table";
+import MasterTable from "../../../components/shared/MasterTable";
+import Header from "../../../components/shared/table_heading/Header";
 import { useOutsideClick } from "../../../hooks/UseOutsideClick";
 import {
   IFetchSubCategory,
   useDeleteProductSubCategoryMutation,
   useGetAllProductSubCategoriesQuery,
+  useUpdateProductSubCategoryMutation,
 } from "../../../server/api/productHooks";
-import { AddProductSubCategory } from "./components/AddProductSubCategory";
-import Header from "../../../components/shared/table_heading/Header";
 import { subCategoryColumns } from "../productObj";
-import MasterTable from "../../../components/shared/MasterTable";
-import { get } from "lodash";
+import { AddProductSubCategory } from "./components/AddProductSubCategory";
+import { StatusSwitch } from "../../../components/shared/StatusSwitch";
 
 interface IEditModal {
   state: boolean;
@@ -31,14 +32,47 @@ const Productsubcategory: React.FC = () => {
     isSuccess,
     isLoading,
   } = useGetAllProductSubCategoriesQuery();
+
   const { mutate: deleteSubCategory } = useDeleteProductSubCategoryMutation();
+  const { mutate: updateSubCategory } = useUpdateProductSubCategoryMutation();
+
+  const handleStatusToggle = async (
+    subCategoryId: string,
+    newStatus: boolean
+  ) => {
+    const subCategory = subCategories?.find(
+      (subCat) => subCat._id === subCategoryId
+    );
+    if (subCategory) {
+      updateSubCategory({
+        id: subCategoryId,
+        body: {
+          ...subCategory,
+          isActive: newStatus,
+        },
+      });
+    }
+  };
+
   const subCategoriesData = useMemo(
     () =>
       isSuccess
         ? subCategories?.map((item, index: number) => ({
             ...item,
+            description:
+              get(item, "description", "").length > 50
+                ? `${get(item, "description", "").slice(0, 50)}...`
+                : get(item, "description", ""),
             sn: index + 1,
-            category: get(item, "category.name", "-"),
+            // category: get(item, "category._id", "-"),
+            status: (
+              <StatusSwitch
+                isActive={get(item, "isActive", true)}
+                onToggle={(newStatus) =>
+                  handleStatusToggle(item._id, newStatus)
+                }
+              />
+            ),
           }))
         : [],
     [isSuccess, subCategories]
@@ -54,7 +88,7 @@ const Productsubcategory: React.FC = () => {
               editData: null,
             });
           }}
-         className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-sm text-white px-4 py-2 flex rounded-lg transition-colors duration-200"
+          className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-sm text-white px-4 py-2 flex rounded-lg transition-colors duration-200"
         >
           <Icon icon="ic:outline-add" fontSize={24} />
           New Subcategory

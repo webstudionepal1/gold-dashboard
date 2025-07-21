@@ -155,11 +155,10 @@ const PurchaseIndex = () => {
               if (selectedTab === "purchase") {
                 setModal((prev) => ({ ...prev, of: "purchase" }));
               } else {
-                console.log(buttonObj[selectedTab]);
                 navigate("/inventory/suppliers/add");
               }
             }}
-            className="px-3 py-2 flex items-center text-white bg-[#d49327] transition-transform duration-200 ease-in-out hover:scale-105 rounded-lg"
+            className="px-3 py-2 flex items-center text-white bg-[#d49327] rounded-lg"
           >
             <Icon
               icon="material-symbols-light:add-rounded"
@@ -171,7 +170,7 @@ const PurchaseIndex = () => {
           </button>
         )}
       </Header>
-      <div className="p-4 bg-white border-2 rounded-lg">
+      <div className="bg-white border-2 rounded-lg">
         <MasterTable
           showAction
           tabsOptions={
@@ -197,7 +196,7 @@ const PurchaseIndex = () => {
       )}
 
       {modal.of === "purchase-view" && modal.data && (
-        <ScrollableModal classname="w-full max-w-2xl" onClose={closeModal}>
+        <ScrollableModal classname="w-full max-w-3xl" onClose={closeModal}>
           <PurchaseDetailsCard data={modal.data} />
         </ScrollableModal>
       )}

@@ -10,9 +10,8 @@ interface productWiseData {
   averagePrice: number;
 }
 
-interface productWiseResponse {
-  products: productWiseData[];
-}
+// Allow undefined to handle query states
+type productWiseResponse = productWiseData[] | undefined;
 
 export const useGetProductWiseDataQuery = ({
   date,
@@ -27,9 +26,16 @@ export const useGetProductWiseDataQuery = ({
       const res = await apiClient.get("/orderProduct", {
         params: { date, period },
       });
-      return res.data?.data;
+      // Handle different response structures
+      if (Array.isArray(res.data)) {
+        return res.data;
+      } else if (res.data?.data && Array.isArray(res.data.data)) {
+        return res.data.data;
+      }
+      console.warn("Unexpected ProductWise response structure:", res.data);
+      return [];
     },
-    enabled: !!date && !!period, // don’t fetch until both dates are available
+    enabled: !!date && !!period,
   });
 };
 
@@ -39,6 +45,11 @@ interface categoryWiseData {
   totalOrders: number;
   totalRevenue: number;
   percentageShare: number;
+  averagePrice: number;
+}
+
+interface categoryWiseResponse {
+  data: categoryWiseData[];
 }
 
 export const useGetCategoryWiseDataQuery = ({
@@ -48,40 +59,13 @@ export const useGetCategoryWiseDataQuery = ({
   date: string;
   period: string;
 }) => {
-  return useQuery({
+  return useQuery<categoryWiseResponse>({
     queryKey: ["orderCategory", date, period],
     queryFn: async () => {
-      const res = await apiClient.get<{ data: categoryWiseData[] }>(
-        "orderCategory",
-        {
-          params: { date, period },
-        }
-      );
-      return res?.data?.data;
-    },
-    enabled: !!date && !!period,
-  });
-};
-
-// orderSubCategory;
-
-export const useGetSubCategoryWiseDataQuery = ({
-  date,
-  period,
-}: {
-  date: string;
-  period: string;
-}) => {
-  return useQuery({
-    queryKey: ["orderSubCategory", date, period],
-    queryFn: async () => {
-      const res = await apiClient.get<{ data: subCategoryWiseData[] }>(
-        "orderSubCategory",
-        {
-          params: { date, period },
-        }
-      );
-      return res?.data?.data;
+      const res = await apiClient.get<categoryWiseResponse>("orderCategory", {
+        params: { date, period },
+      });
+      return res?.data;
     },
     enabled: !!date && !!period,
   });
@@ -93,8 +77,31 @@ interface subCategoryWiseData {
   totalOrders: number;
   totalRevenue: number;
   percentageShare: number;
+  averagePrice: number;
 }
 
 interface subCategoryWiseResponse {
   data: subCategoryWiseData[];
 }
+
+export const useGetSubCategoryWiseDataQuery = ({
+  date,
+  period,
+}: {
+  date: string;
+  period: string;
+}) => {
+  return useQuery<subCategoryWiseResponse>({
+    queryKey: ["orderSubCategory", date, period],
+    queryFn: async () => {
+      const res = await apiClient.get<subCategoryWiseResponse>(
+        "orderSubCategory",
+        {
+          params: { date, period },
+        }
+      );
+      return res?.data;
+    },
+    enabled: !!date && !!period,
+  });
+};

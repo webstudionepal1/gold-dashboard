@@ -42,7 +42,6 @@ export interface SupplierFormValues {
   };
   logo: File | null; // Optional logo file
   existingLogo?: string; // Optional existing logo URL
-  products: string[];
 }
 export const buttonObj: IButtonObj = {
   purchase: {
@@ -100,7 +99,6 @@ export const supplierSchema = z.object({
   }),
   // logo: z.instanceof(File).nullable(),
   logo: z.instanceof(File).nullable(),
-  products: z.array(z.string()).optional(),
 });
 export const getSupplierInitialFormValues = (state: string, editData?: any) => {
   if (state === "add")
@@ -133,7 +131,6 @@ export const getSupplierInitialFormValues = (state: string, editData?: any) => {
         branch: "",
       },
       logo: null, // Fix: null instead of File constructor
-      products: [],
     };
 
   return {
@@ -166,9 +163,6 @@ export const getSupplierInitialFormValues = (state: string, editData?: any) => {
     },
     logo: null, // Fix: null instead of File constructor
     existingLogo: get(editData, "logo[0]"),
-    products: get(editData, "products", []).map((item: { _id: string }) =>
-      get(item, "_id")
-    ),
   };
 };
 
@@ -319,9 +313,9 @@ export interface IRawMaterialForm {
   // phone_no: string;
   items: {
     item: string;
-    quantity: number;
+    quantity?: number;
     price: number;
-    wt: number;
+    wt?: number;
     paidAmount: number;
   }[];
   description?: string;
@@ -334,9 +328,9 @@ export const RawMaterialSchema = z.object({
     .array(
       z.object({
         item: z.string().min(1, "**Item name is required**"),
-        quantity: z.coerce.number().min(1, "**Quantity is required**"),
+        quantity: z.coerce.number().optional(),
         price: z.coerce.number().min(1, "**Price is required**"),
-        wt: z.number().min(1, "** Weight is required **"),
+        wt: z.number().optional(),
         paidAmount: z.coerce.number().min(1, "**Paid Amount is required**"),
       })
     )
@@ -350,10 +344,10 @@ export interface IPurchaseForm {
   // phone_no: string;
   products: {
     product: string;
-    quantity: number;
+    quantity?: number;
     price: number;
     paidAmount: number;
-    wt: number;
+    wt?: number;
   }[];
   description?: string;
 }
@@ -365,10 +359,10 @@ export const PurchaseSchema = z.object({
     .array(
       z.object({
         product: z.string().min(1, "**Product name is required**"),
-        quantity: z.coerce.number().min(1, "**Quantity is required**"),
+        quantity: z.coerce.number().optional(),
         price: z.coerce.number().min(1, "**Price is required**"),
         paidAmount: z.coerce.number().min(1, "**Paid Amount is required**"),
-        wt: z.coerce.number().min(1, "**Weight is required**"),
+        wt: z.coerce.number().optional(),
       })
     )
     .min(1, "**At least one item is required**"),
@@ -402,6 +396,5 @@ export const supplierfieldSchemas = {
     companyNumber: supplierSchema.shape.businessInfo.shape.companyNumber,
     PAN: supplierSchema.shape.businessInfo.shape.PAN,
   },
-  products: supplierSchema.shape.products,
   logo: supplierSchema.shape.logo,
 };

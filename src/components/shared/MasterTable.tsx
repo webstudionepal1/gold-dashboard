@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback, ReactNode } from "react";
-import { debounce } from "lodash"; // Make sure this import is included
 import clsx from "clsx";
+import { debounce } from "lodash"; // Make sure this import is included
+import React, { ReactNode, useCallback, useEffect, useState } from "react";
 import TableAction from "./_table/TableAction";
 
 // Define proper TypeScript interfaces
@@ -37,6 +37,7 @@ interface MasterTableProps {
   returnAction?: (row: any) => void;
   emptyStateMessage?: string;
   printAction?: (row: any) => void;
+  className?: string;
 }
 
 const MasterTable: React.FC<MasterTableProps> = ({
@@ -61,6 +62,7 @@ const MasterTable: React.FC<MasterTableProps> = ({
   returnAction,
   printAction,
   emptyStateMessage = "No data available",
+  className,
 }) => {
   // State
   const [globalFilter, setGlobalFilter] = useState<string>("");
@@ -252,7 +254,7 @@ const MasterTable: React.FC<MasterTableProps> = ({
         <button
           key={i}
           onClick={() => handlePageChange(i)}
-          className={`relative inline-flex items-center justify-center w-8 h-8 rounded-lg text-sm font-medium ${
+          className={`relative inline-flex items-center justify-center size-6 rounded-md text-sm font-medium ${
             pageIndex === i
               ? "bg-[#DF8D28] text-white"
               : "text-gray-500 hover:bg-gray-100"
@@ -267,7 +269,7 @@ const MasterTable: React.FC<MasterTableProps> = ({
   };
 
   return (
-    <div className="p-4 bg-white rounded-md">
+    <div className={clsx("p-4 bg-white rounded-md", className)}>
       <div className="flex flex-col justify-between gap-3 pb-4 md:flex-row md:items-center">
         {tabsOptions && tabsOptions}
 
@@ -356,7 +358,8 @@ const MasterTable: React.FC<MasterTableProps> = ({
                   <th
                     key={column.key}
                     className={clsx(
-                      "px-6 py-3 text-xs font-medium tracking-wider  text-center bg-gray-50 text-gray-500 uppercase"
+                      "px-6 py-3 text-xs font-medium tracking-wider bg-gray-50 text-gray-500 uppercase",
+                      column.key === "action" ? "text-center" : "text-start"
                     )}
                   >
                     {column.title}
@@ -391,7 +394,7 @@ const MasterTable: React.FC<MasterTableProps> = ({
                         ? columns.length + (showAction ? 2 : 1)
                         : columns.length + (showAction ? 1 : 0)
                     }
-                    className="px-6 py-4 text-sm text-center text-gray-500"
+                    className="px-6 py-2 text-sm text-center text-gray-500"
                   >
                     {emptyStateMessage}
                   </td>
@@ -407,7 +410,7 @@ const MasterTable: React.FC<MasterTableProps> = ({
                     }`}
                   >
                     {canSelect && (
-                      <td className="px-3 py-4 text-sm whitespace-nowrap">
+                      <td className="px-3 py-2 text-sm whitespace-nowrap">
                         {row.id !== undefined && (
                           <input
                             type="checkbox"
@@ -421,7 +424,10 @@ const MasterTable: React.FC<MasterTableProps> = ({
                     {columns.map((column) => (
                       <td
                         key={column.key}
-                        className="px-6 py-4 text-sm text-center whitespace-nowrap"
+                        className={clsx(
+                          "px-6 py-2 text-sm whitespace-nowrap",
+                          column.key === "action" ? "text-center" : "text-start"
+                        )}
                       >
                         {column.key === "attachment" &&
                         row[column.key] === "Null" ? (
@@ -432,7 +438,7 @@ const MasterTable: React.FC<MasterTableProps> = ({
                       </td>
                     ))}
                     {showAction && (
-                      <td className="px-0 py-4 text-sm whitespace-nowrap">
+                      <td className="px-0 py-2 text-sm whitespace-nowrap">
                         <TableAction
                           row={row}
                           viewAction={viewAction}
@@ -452,7 +458,7 @@ const MasterTable: React.FC<MasterTableProps> = ({
         </div>
 
         {/* Bottom pagination */}
-        <div className="px-4 py-3 bg-white border-t border-gray-200 sm:px-6">
+        <div className="px-2 py-1 bg-white border-t border-gray-200 sm:px-6">
           <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
             <div className="flex items-center text-sm text-gray-600">
               {currentPageRows.length > 0 ? (
@@ -469,7 +475,7 @@ const MasterTable: React.FC<MasterTableProps> = ({
                 <button
                   onClick={() => handlePageChange(Math.max(pageIndex - 1, 0))}
                   disabled={pageIndex === 0}
-                  className={`relative inline-flex items-center px-2 py-2 rounded-full text-sm font-medium ${
+                  className={`relative inline-flex items-center px-2 py-1 rounded-full text-sm font-medium ${
                     pageIndex === 0
                       ? "text-gray-300 cursor-not-allowed"
                       : "text-gray-500 hover:bg-gray-100"

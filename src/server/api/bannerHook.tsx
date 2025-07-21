@@ -64,7 +64,9 @@ export const useUpdateBannerMutation = () => {
       id: string | undefined;
       body: FormData;
     }) => {
-      const res = await apiClient.patch(`banner/${id}`, body);
+      const res = await apiClient.patch(`banner/${id}`, body, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       return res?.data?.data;
     },
     onSuccess() {

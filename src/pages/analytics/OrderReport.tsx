@@ -1,72 +1,21 @@
-import { Icon } from "@iconify/react/dist/iconify.js";
 import { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import MasterTable from "../../components/shared/MasterTable";
-import { ScrollableModal } from "../../components/shared/ScrollableModal";
 import Header from "../../components/shared/table_heading/Header";
 import { DynamicTab } from "../PurchaseManagement/components/DynamicTab";
-
-import { orderReportTabOption, ITable } from "../analytics/OrderReportObj";
-
+import { orderReportTabOption, type ITable } from "../analytics/OrderReportObj";
 import { map } from "lodash";
-import {
-  IFetchExpenses,
-  useDeleteExpenseMutation,
-  useGetExpenseCategoryQuery,
-  useGetExpensesQuery,
-} from "../../server/api/expensesHook";
-
+import type { IFetchExpenses } from "../../server/api/expensesHook";
 import { SearchFilterSort } from "../../components/global/SearchFilterSort";
-import { filterOptions, sortOptions } from "../../constants/DropDownOptions";
-import { StatCard } from "./components/iconCard";
 import {
-  IOrderCategoryData,
   useGetOrderCategoryQuery,
   useGetOrderStatusQuery,
   useGetTopOrderProductsQuery,
 } from "../../server/api/orderReportHook";
-import { Carousel } from "./components/Carousel";
 import {
   DateFilter,
-  PeriodOption,
+  type PeriodOption,
 } from "../../components/shared/DatePeriodFilter";
-
-const stats = [
-  {
-    percentage: 12,
-    label: "Gold",
-    icon: <img src="/Gold.png" alt="Gold" className="h-6 w-6 object-contain" />,
-    imageBgClassName: "bg-[#f7e8c9]",
-  },
-  {
-    percentage: 8,
-    label: "Silver",
-    icon: (
-      <img src="/Silver.png" alt="Silver" className="h-6 w-6 object-contain" />
-    ),
-    imageBgClassName: "bg-[#edeef2]",
-  },
-  {
-    percentage: 5,
-    label: "Watch",
-    icon: (
-      <img src="/watch.png" alt="Watch" className="h-6 w-6 object-contain" />
-    ),
-    imageBgClassName: "bg-[#d8efff]",
-  },
-  {
-    percentage: 15,
-    label: "Pasni Set",
-    icon: (
-      <img
-        src="/pasniSet.png"
-        alt="Pasni Set"
-        className="h-6 w-6 object-contain"
-      />
-    ),
-    imageBgClassName: "bg-[#ffe3e9]",
-  },
-];
 
 interface IEditModal {
   state: boolean;
@@ -78,6 +27,7 @@ interface FilterState {
   filterValue: string;
   sortValue: string;
 }
+
 type TabFilter = {
   date: string;
   period: PeriodOption;
@@ -99,7 +49,8 @@ const OrderReport = () => {
 
   const todayFilter = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
   const initialTabFilters: Record<string, TabFilter> = {
-    topOrderProducts: { date: todayFilter, period: "Monthly" },
+    topOrderProducts: { date: todayFilter, period: "Yearly" },
+    orderCategory: { date: todayFilter, period: "Yearly" },
   };
 
   const [tabFilters, setTabFilters] = useState(initialTabFilters);
@@ -110,6 +61,88 @@ const OrderReport = () => {
     }));
   };
 
+  // Define filter options
+  const statusFilterOptions = [
+    { label: "All", value: "" },
+    { label: "Confirmed", value: "confirmed" },
+    { label: "Delivered", value: "delivered" },
+    { label: "Pending", value: "pending" },
+    { label: "Shipped", value: "shipped" },
+  ];
+
+  const categoryFilterOptions = [
+    { label: "All", value: "" },
+    { label: "Uncategorized", value: "Uncategorized" },
+  ];
+
+  const topProductsFilterOptions = [
+    { label: "All", value: "" },
+    { label: "High Revenue (>1M)", value: "highRevenue" },
+  ];
+
+  const filterOptions = useMemo(() => {
+    switch (selectedTab) {
+      case "statusSummary":
+        return statusFilterOptions;
+      case "topOrderProducts":
+        return topProductsFilterOptions;
+      case "orderCategory":
+        return categoryFilterOptions;
+      default:
+        return [];
+    }
+  }, [selectedTab]);
+
+  // Define sort options
+  const statusSortOptions = [
+    { label: "Status A-Z", value: "status_asc" },
+    { label: "Status Z-A", value: "status_desc" },
+    { label: "Count (Low to High)", value: "count_asc" },
+    { label: "Count (High to Low)", value: "count_desc" },
+    { label: "Percentage (Low to High)", value: "percentage_asc" },
+    { label: "Percentage (High to Low)", value: "percentage_desc" },
+  ];
+
+  const topProductsSortOptions = [
+    { label: "Product Name A-Z", value: "productName_asc" },
+    { label: "Product Name Z-A", value: "productName_desc" },
+    { label: "Quantity Sold (Low to High)", value: "totalQuantitySold_asc" },
+    { label: "Quantity Sold (High to Low)", value: "totalQuantitySold_desc" },
+    { label: "Revenue (Low to High)", value: "totalRevenue_asc" },
+    { label: "Revenue (High to Low)", value: "totalRevenue_desc" },
+    { label: "Average Price (Low to High)", value: "averagePrice_asc" },
+    { label: "Average Price (High to Low)", value: "averagePrice_desc" },
+  ];
+
+  const categorySortOptions = [
+    { label: "Category A-Z", value: "category_asc" },
+    { label: "Category Z-A", value: "category_desc" },
+    { label: "Units Sold (Low to High)", value: "unitsSold_asc" },
+    { label: "Units Sold (High to Low)", value: "unitsSold_desc" },
+    { label: "Total Orders (Low to High)", value: "totalOrders_asc" },
+    { label: "Total Orders (High to Low)", value: "totalOrders_desc" },
+    { label: "Revenue (Low to High)", value: "totalRevenue_asc" },
+    { label: "Revenue (High to Low)", value: "totalRevenue_desc" },
+    { label: "Average Price (Low to High)", value: "averagePrice_asc" },
+    { label: "Average Price (High to Low)", value: "averagePrice_desc" },
+    { label: "Percentage Share (Low to High)", value: "percentageShare_asc" },
+    { label: "Percentage Share (High to Low)", value: "percentageShare_desc" },
+  ];
+
+  const sortOptions = useMemo(() => {
+    switch (selectedTab) {
+      case "statusSummary":
+        return statusSortOptions;
+      case "topOrderProducts":
+        return topProductsSortOptions;
+      case "orderCategory":
+        return categorySortOptions;
+      default:
+        return [];
+    }
+  }, [selectedTab]);
+
+  // Fetch data
   const {
     data: orderStatusList,
     isLoading: orderStatusLoading,
@@ -122,90 +155,183 @@ const OrderReport = () => {
     isSuccess: orderCategorySuccess,
   } = useGetOrderCategoryQuery();
 
-  console.log("ORDER CATEOGRY0", orderCategoryList);
-
-  const transformedData = (orderCategoryList ?? []).map((item) => ({
-    category: item.category,
-    percentageShare: item.percentageShare,
-  }));
-
   const {
     data: TopOrderList,
     isLoading: topOrderLoading,
     isSuccess: topOrderSuccess,
   } = useGetTopOrderProductsQuery({
-    date: tabFilters.topOrderProducts.date,
-    period: tabFilters.topOrderProducts.period,
+    date: tabFilters.topOrderProducts?.date,
+    period: tabFilters.topOrderProducts?.period.toLowerCase(),
   });
 
-  console.log("Top order data", TopOrderList);
+  // Filter and sort data
+  const statusDataFiltered = useMemo(() => {
+    let result =
+      orderStatusSuccess && orderStatusList?.orders
+        ? [...orderStatusList.orders]
+        : [];
 
-  const orderStatusData = useMemo(
-    () => (orderStatusSuccess ? orderStatusList : []),
-    [orderStatusSuccess, orderStatusList]
-  );
+    if (filterState.searchQuery) {
+      const query = filterState.searchQuery.toLowerCase();
+      result = result.filter(
+        (item) =>
+          item.status.toLowerCase().includes(query) ||
+          String(item.count).includes(query) ||
+          String(item.percentage).includes(query)
+      );
+    }
 
-  const TopOrderData = useMemo(
-    () => (topOrderSuccess ? TopOrderList : []),
-    [topOrderSuccess, TopOrderList]
-  );
+    if (filterState.filterValue) {
+      result = result.filter((item) => item.status === filterState.filterValue);
+    }
 
-  // const filteredOrderStatus = useMemo(() => {
-  //   if (!orderStatusData || orderStatusData.length === 0) return [];
+    if (filterState.sortValue) {
+      switch (filterState.sortValue) {
+        case "status_asc":
+          result.sort((a, b) => a.status.localeCompare(b.status));
+          break;
+        case "status_desc":
+          result.sort((a, b) => b.status.localeCompare(a.status));
+          break;
+        case "count_asc":
+          result.sort((a, b) => a.count - b.count);
+          break;
+        case "count_desc":
+          result.sort((a, b) => b.count - a.count);
+          break;
+        case "percentage_asc":
+          result.sort((a, b) => a.percentage - b.percentage);
+          break;
+        case "percentage_desc":
+          result.sort((a, b) => b.percentage - a.percentage);
+          break;
+      }
+    }
 
-  //   let result = [...orderStatusData];
+    return result;
+  }, [orderStatusList, orderStatusSuccess, filterState]);
 
-  //   if (filterState.searchQuery) {
-  //     const query = filterState.searchQuery.toLowerCase();
-  //     result = result.filter(
-  //       (item) =>
-  //         (item.status && item.status.toLowerCase().includes(query)) ||
-  //         (typeof item.status === "string" &&
-  //           item.status.toLowerCase().includes(query))
-  //     );
-  //   }
-  //   if (filterState.filterValue) {
-  //     result = result.filter(
-  //       (item) =>
-  //         (typeof item.status === "string" &&
-  //           item.status === filterState.filterValue) ||
-  //         (item.status && item.status === filterState.filterValue)
-  //     );
-  //   }
+  const topOrderDataFiltered = useMemo(() => {
+    let result =
+      topOrderSuccess && TopOrderList?.products
+        ? [...TopOrderList.products]
+        : [];
 
-  //   // if (filterState.sortValue) {
-  //   //   switch (filterState.sortValue) {
-  //   //     case "title_asc":
-  //   //       result.sort((a, b) =>
-  //   //         a.name && b.name ? a.name.localeCompare(b.name) : 0
-  //   //       );
-  //   //       break;
-  //   //     case "title_desc":
-  //   //       result.sort((a, b) =>
-  //   //         a.name && b.name ? b.name.localeCompare(a.name) : 0
-  //   //       );
-  //   //       break;
-  //   //     case "price_asc":
-  //   //       result.sort((a, b) => (a.price && b.price ? a.price - b.price : 0));
-  //   //       break;
-  //   //     case "price_desc":
-  //   //       result.sort((a, b) => (a.price && b.price ? b.price - a.price : 0));
-  //   //       break;
-  //   //     case "rating_asc":
-  //   //       result.sort((a, b) =>
-  //   //         a.ratings && b.ratings ? a.ratings - b.ratings : 0
-  //   //       );
-  //   //       break;
-  //   //     case "rating_desc":
-  //   //       result.sort((a, b) =>
-  //   //         a.ratings && b.ratings ? b.ratings - a.ratings : 0
-  //   //       );
-  //   //       break;
-  //   //   }
-  //   // }
+    if (filterState.searchQuery) {
+      const query = filterState.searchQuery.toLowerCase();
+      result = result.filter(
+        (item) =>
+          item.productName.toLowerCase().includes(query) ||
+          String(item.totalQuantitySold).includes(query) ||
+          String(item.totalRevenue).includes(query)
+        // String(item.averagePrice).includes(query)
+      );
+    }
 
-  //   return result;
-  // }, [orderStatusData, filterState]);
+    if (filterState.filterValue) {
+      if (filterState.filterValue === "highRevenue") {
+        result = result.filter((item) => item.totalRevenue > 1000000);
+      }
+    }
+
+    if (filterState.sortValue) {
+      switch (filterState.sortValue) {
+        case "productName_asc":
+          result.sort((a, b) => a.productName.localeCompare(b.productName));
+          break;
+        case "productName_desc":
+          result.sort((a, b) => b.productName.localeCompare(a.productName));
+          break;
+        case "totalQuantitySold_asc":
+          result.sort((a, b) => a.totalQuantitySold - b.totalQuantitySold);
+          break;
+        case "totalQuantitySold_desc":
+          result.sort((a, b) => b.totalQuantitySold - a.totalQuantitySold);
+          break;
+        case "totalRevenue_asc":
+          result.sort((a, b) => a.totalRevenue - b.totalRevenue);
+          break;
+        case "totalRevenue_desc":
+          result.sort((a, b) => b.totalRevenue - a.totalRevenue);
+          break;
+        // case "averagePrice_asc":
+        //   result.sort((a, b) => a.averagePrice - b.averagePrice);
+        //   break;
+        // case "averagePrice_desc":
+        //   result.sort((a, b) => b.averagePrice - a.averagePrice);
+        //   break;
+      }
+    }
+
+    return result;
+  }, [TopOrderList, topOrderSuccess, filterState]);
+
+  const categoryDataFiltered = useMemo(() => {
+    let result =
+      orderCategorySuccess && orderCategoryList ? [...orderCategoryList] : [];
+
+    if (filterState.searchQuery) {
+      const query = filterState.searchQuery.toLowerCase();
+      result = result.filter(
+        (item) =>
+          item.category.toLowerCase().includes(query) ||
+          String(item.unitsSold).includes(query) ||
+          String(item.totalOrders).includes(query) ||
+          String(item.totalRevenue).includes(query) ||
+          String(item.averagePrice).includes(query) ||
+          String(item.percentageShare).includes(query)
+      );
+    }
+
+    if (filterState.filterValue) {
+      if (filterState.filterValue === "Uncategorized") {
+        result = result.filter((item) => item.category === "Uncategorized");
+      }
+    }
+
+    if (filterState.sortValue) {
+      switch (filterState.sortValue) {
+        case "category_asc":
+          result.sort((a, b) => a.category.localeCompare(b.category));
+          break;
+        case "category_desc":
+          result.sort((a, b) => b.category.localeCompare(a.category));
+          break;
+        case "unitsSold_asc":
+          result.sort((a, b) => a.unitsSold - b.unitsSold);
+          break;
+        case "unitsSold_desc":
+          result.sort((a, b) => b.unitsSold - a.unitsSold);
+          break;
+        case "totalOrders_asc":
+          result.sort((a, b) => a.totalOrders - b.totalOrders);
+          break;
+        case "totalOrders_desc":
+          result.sort((a, b) => b.totalOrders - a.totalOrders);
+          break;
+        case "totalRevenue_asc":
+          result.sort((a, b) => a.totalRevenue - b.totalRevenue);
+          break;
+        case "totalRevenue_desc":
+          result.sort((a, b) => b.totalRevenue - a.totalRevenue);
+          break;
+        case "averagePrice_asc":
+          result.sort((a, b) => a.averagePrice - b.averagePrice);
+          break;
+        case "averagePrice_desc":
+          result.sort((a, b) => b.averagePrice - a.averagePrice);
+          break;
+        case "percentageShare_asc":
+          result.sort((a, b) => a.percentageShare - b.percentageShare);
+          break;
+        case "percentageShare_desc":
+          result.sort((a, b) => b.percentageShare - a.percentageShare);
+          break;
+      }
+    }
+
+    return result;
+  }, [orderCategoryList, orderCategorySuccess, filterState]);
 
   const handleSearch = (query: string) => {
     setFilterState((prev) => ({ ...prev, searchQuery: query }));
@@ -219,6 +345,11 @@ const OrderReport = () => {
     setFilterState((prev) => ({ ...prev, sortValue: sort }));
   };
 
+  const handleTabChange = (tab: string) => {
+    setSelectedTab(tab);
+    setFilterState((prev) => ({ ...prev, sortValue: "", filterValue: "" }));
+  };
+
   const orderStatusTableData = useMemo(
     () => ({
       columns: [
@@ -226,14 +357,15 @@ const OrderReport = () => {
         { key: "count", title: "Total Order" },
         { key: "formattedPercentage", title: "Percentage" },
       ],
-      rows: map(orderStatusList?.orders || [], (item) => ({
+      rows: map(statusDataFiltered, (item) => ({
         ...item,
         formattedPercentage: `${item.percentage} %`,
       })),
     }),
-    [orderStatusList, orderStatusSuccess]
+    [statusDataFiltered]
   );
-  const TopOrderProductsTableData = useMemo(
+
+  const topOrderProductsTableData = useMemo(
     () => ({
       columns: [
         { key: "productImage", title: "Product Image" },
@@ -241,88 +373,114 @@ const OrderReport = () => {
         { key: "totalQuantitySold", title: "Total Quantity Sold" },
         { key: "totalRevenue", title: "Total Revenue" },
       ],
-      rows: map(TopOrderList?.products, (item, sn) => ({
+      rows: map(topOrderDataFiltered, (item) => ({
         ...item,
-        productImage: "IMAGE",
+        productImage: item.productImage || "IMAGE",
       })),
     }),
-    [TopOrderList, topOrderSuccess]
+    [topOrderDataFiltered]
   );
-  // const returnTableData = useMemo(
-  //   () => ({
-  //     columns: [{ key: "name", title: "Name" }],
-  //     rows: map(returnList, (item) => ({
-  //       ...item,
-  //     })),
-  //   }),
-  //   [returnList, returnSuccess]
-  // );
+
+  const orderCategoryTableData = useMemo(
+    () => ({
+      columns: [
+        { key: "category", title: "Category" },
+        { key: "unitsSold", title: "Units Sold" },
+        { key: "totalOrders", title: "Total Orders" },
+        { key: "totalRevenue", title: "Revenue" },
+        { key: "percentageShare", title: "Percentage Share" },
+      ],
+      rows: map(categoryDataFiltered, (item) => ({
+        ...item,
+        percentageShare: <div>{item.percentageShare} %</div>,
+      })),
+    }),
+    [categoryDataFiltered]
+  );
 
   const tableDataObj: ITable = {
     statusSummary: orderStatusTableData,
-    topOrderProducts: TopOrderProductsTableData,
+    topOrderProducts: topOrderProductsTableData,
+    orderCategory: orderCategoryTableData,
   };
+
   const [modal, setModal] = useState({
     of: "",
     edit: false,
     data: null,
   });
+
   const closeModal = useCallback(
     () => setModal({ of: "", edit: false, data: null }),
     []
   );
 
   return (
-    <div className="container px-4 py-3 mx-auto ">
-      <Header text="Order Report" />
+    <div className="container px-4 py-3 mx-auto">
+      <div className="mb-6">
+        <Header text="Order Report" />
+      </div>
 
-      {/* {selectedTab === "topOrderProducts" && (
-        <Carousel itemsPerView={4} autoSlideInterval={2500} className="p-8">
-          {orderCategoryList &&
-            orderCategoryList?.map((stat: IOrderCategoryData, index) => (
-              <StatCard
-                key={index}
-                percentage={stat.percentageShare}
-                label={stat.category}
+      {(selectedTab === "topOrderProducts" ||
+        selectedTab === "orderCategory") && (
+        <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="flex-1">
+              <h3 className="text-sm font-medium text-gray-700 mb-2">
+                Report Settings
+              </h3>
+              <DateFilter
+                value={tabFilters[selectedTab]}
+                onChange={handleTabFilterChange}
               />
-            ))}
-        </Carousel>
-      )} */}
-
-      {selectedTab === "topOrderProducts" && (
-        <DateFilter
-          value={tabFilters[selectedTab]}
-          onChange={handleTabFilterChange}
-        />
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="px-3 py-1.5 bg-gray-100 rounded-md text-sm">
+                <span className="font-medium">Current Period:</span>{" "}
+                <span>{tabFilters[selectedTab]?.period}</span>
+              </div>
+              <div className="px-3 py-1.5 bg-gray-100 rounded-md text-sm">
+                <span className="font-medium">Date:</span>{" "}
+                <span>
+                  {tabFilters[selectedTab] &&
+                    new Date(tabFilters[selectedTab].date).toLocaleDateString()}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
-      <MasterTable
-        loading={orderStatusLoading}
-        tabsOptions={
-          <DynamicTab
-            selectedTab={selectedTab}
-            setSelectedTab={setSelectedTab}
-            tabOptions={orderReportTabOption}
-          />
-        }
-        // filterSection={
-        //   <SearchFilterSort
-
-        //     onFilter={handleFilter}
-        //     onSort={handleSort}
-        //     onViewChange={() => {}}
-        //     showFilter={true}
-        //     showSort={true}
-        //     showView={true}
-        //     filterOptions={filterOptions}
-        //     sortOptions={sortOptions}
-        //     placeholder="Search products..."
-        //   />
-        // }
-        rows={tableDataObj[selectedTab].rows || []}
-        columns={tableDataObj[selectedTab].columns}
-        canSelect
-      />
+      <div className="bg-white rounded-lg shadow-sm">
+        <MasterTable
+          loading={
+            orderStatusLoading || topOrderLoading || orderCategoryLoading
+          }
+          tabsOptions={
+            <DynamicTab
+              selectedTab={selectedTab}
+              setSelectedTab={handleTabChange}
+              tabOptions={orderReportTabOption}
+            />
+          }
+          filterSection={
+            <SearchFilterSort
+              onFilter={handleFilter}
+              onSort={handleSort}
+              onViewChange={() => {}}
+              showFilter={true}
+              showSort={true}
+              showView={false}
+              filterOptions={filterOptions}
+              sortOptions={sortOptions}
+              placeholder="Search orders..."
+            />
+          }
+          rows={tableDataObj[selectedTab].rows || []}
+          columns={tableDataObj[selectedTab].columns}
+          canSelect
+        />
+      </div>
     </div>
   );
 };

@@ -116,7 +116,6 @@ const SupplierHistory = () => {
     //   setEditingItem(item); // Set the item for the Other Page Banner
     // }
     setIsModalOpen(true); // Open the modal for either banner
-    console.log(item);
   };
 
   const handleDeleteItem = (item: TableData<SupplierHistoryItem>) => {

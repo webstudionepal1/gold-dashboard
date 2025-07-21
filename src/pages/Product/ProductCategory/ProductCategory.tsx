@@ -8,9 +8,11 @@ import {
   IFetchCategory,
   useDeleteProductCategoriesMutation,
   useGetAllProductCategoriesQuery,
+  useUpdateProductCategoriesMutation,
 } from "../../../server/api/productHooks";
 import { categoryColumns } from "../productObj";
 import AddProductCategory from "./components/AddProductCategory";
+import { StatusSwitch } from "../../../components/shared/StatusSwitch";
 // import { AddProductCategory } from "./components/AddProductCategory";
 
 interface IEditModal {
@@ -32,6 +34,21 @@ const ProductCategory: React.FC = () => {
     isLoading,
   } = useGetAllProductCategoriesQuery();
   const { mutate: deleteCategory } = useDeleteProductCategoriesMutation();
+  const { mutate: updateCategory } = useUpdateProductCategoriesMutation();
+
+  const handleStatusToggle = async (categoryId: string, newStatus: boolean) => {
+    const category = categories?.find((cat) => cat._id === categoryId);
+    if (category) {
+      updateCategory({
+        id: categoryId,
+        body: {
+          ...category,
+          isActive: newStatus,
+        },
+      });
+    }
+  };
+
   const categoriesData = useMemo(
     () =>
       isSuccess
@@ -41,9 +58,19 @@ const ProductCategory: React.FC = () => {
             //   .map((subItem) => get(subItem, "name", ""))
             //   .join(", "),
             sn: index + 1,
-
-            description: get(item, "description", ""),
+            description:
+              get(item, "description", "").length > 50
+                ? `${get(item, "description", "").slice(0, 50)}...`
+                : get(item, "description", ""),
             totalProducts: get(item, "totalProducts", 0),
+            status: (
+              <StatusSwitch
+                isActive={get(item, "isActive", true)}
+                onToggle={(newStatus) =>
+                  handleStatusToggle(item._id, newStatus)
+                }
+              />
+            ),
           }))
         : [],
     [isSuccess, categories]

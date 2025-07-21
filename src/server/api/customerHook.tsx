@@ -57,6 +57,16 @@ export const useGetCustomerQuery = (params: IParams = {}) => {
     },
   });
 };
+export const useGetCustomerById = (id: string) => {
+  return useQuery({
+    queryKey: ["user", id],
+    queryFn: async () => {
+      const res = await apiClient.get<{ data: IUser }>(`user/${id}`);
+      return res?.data?.data;
+    },
+    enabled: !!id,
+  });
+};
 
 export const useDeleteCustomerMutation = () => {
   const queryClient = useQueryClient();

@@ -89,7 +89,6 @@ const EditProfileForm = () => {
     },
   });
 
-  console.log("form", form.state.values);
   return (
     <div>
       <div className="flex items-center justify-between">

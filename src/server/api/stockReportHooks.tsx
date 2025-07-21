@@ -1,100 +1,109 @@
+// import { useQuery } from "@tanstack/react-query";
+// import { apiClient } from "../utils/ApiGateway";
+
+// interface CategoryWiseData {
+//   totalVariants: number;
+//   totalStock: number;
+//   lowStockCount: number;
+//   outOfStockCount: number;
+//   inStockCount: number;
+//   category: string;
+//   totalProducts: number;
+//   lowStockPercentage: number;
+//   outofStockPercentage: number;
+// }
+
+// interface categoryWiseResponse {
+//   products: CategoryWiseData[];
+// }
+
+// export const useCategoryWiseDataQuery = () => {
+//   return useQuery<categoryWiseResponse>({
+//     queryKey: ["categoryInv"],
+//     queryFn: async () => {
+//       const res = await apiClient.get("/categoryInv");
+//       return res.data;
+//     },
+//   });
+// };
+
+// interface LowStockWiseData {
+//   _id: string;
+//   name: string;
+//   variant: {
+//     price: number;
+//     weight: number;
+//     unit: string;
+//     remainingStock: number;
+//     reorderPoint: number;
+//     status: string;
+//   };
+//   category: string;
+//   subCategory: string;
+//   images: string;
+// }
+
+// export const useLowStockWiseDataQuery = () => {
+//   return useQuery({
+//     queryKey: ["low-stock"],
+//     queryFn: async () => {
+//       const res = await apiClient.get<{ data: LowStockWiseData[] }>(
+//         "low-stock"
+//       );
+//       return res?.data;
+//     },
+//   });
+// };
+
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "../utils/ApiGateway";
 
-interface productWiseData {
-  unitsSold: number;
+interface CategoryWiseData {
+  totalVariants: number;
+  totalStock: number;
+  lowStockCount: number;
+  outOfStockCount: number;
+  inStockCount: number;
+  category: string;
+  totalProducts: number;
+  lowStockPercentage: number;
+  outofStockPercentage: number;
+}
+
+// API returns an array directly
+export const useCategoryWiseDataQuery = () => {
+  return useQuery<CategoryWiseData[]>({
+    queryKey: ["categoryInv"],
+    queryFn: async () => {
+      const res = await apiClient.get("/categoryInv");
+      return res.data; // Expecting an array of CategoryWiseData
+    },
+  });
+};
+
+interface LowStockWiseData {
+  _id: string;
+  name: string;
+  variant: {
+    price: number;
+    weight: number;
+    unit: string;
+    remainingStock: number;
+    reorderPoint: number;
+    status: string;
+  };
   category: string;
   subCategory: string;
-  product: string;
-  totalRevenue: number;
-  averagePrice: number;
+  images: string;
 }
 
-interface productWiseResponse {
-  products: productWiseData[];
-}
-
-export const useGetProductWiseDataQuery = ({
-  date,
-  period,
-}: {
-  date: string;
-  period: string;
-}) => {
-  return useQuery<productWiseResponse>({
-    queryKey: ["orderProduct", date, period],
+// API returns an array directly
+export const useLowStockWiseDataQuery = () => {
+  return useQuery<LowStockWiseData[]>({
+    queryKey: ["low-stock"],
     queryFn: async () => {
-      const res = await apiClient.get("/orderProduct", {
-        params: { date, period },
-      });
-      return res.data?.data;
+      const res = await apiClient.get<LowStockWiseData[]>("low-stock");
+      return res.data; // Expecting an array of LowStockWiseData
     },
-    enabled: !!date && !!period, // don’t fetch until both dates are available
   });
 };
-
-interface categoryWiseData {
-  category: string;
-  unitsSold: number;
-  totalOrders: number;
-  totalRevenue: number;
-  percentageShare: number;
-}
-
-export const useGetCategoryWiseDataQuery = ({
-  date,
-  period,
-}: {
-  date: string;
-  period: string;
-}) => {
-  return useQuery({
-    queryKey: ["orderCategory", date, period],
-    queryFn: async () => {
-      const res = await apiClient.get<{ data: categoryWiseData[] }>(
-        "orderCategory",
-        {
-          params: { date, period },
-        }
-      );
-      return res?.data?.data;
-    },
-    enabled: !!date && !!period,
-  });
-};
-
-// orderSubCategory;
-
-export const useGetSubCategoryWiseDataQuery = ({
-  date,
-  period,
-}: {
-  date: string;
-  period: string;
-}) => {
-  return useQuery({
-    queryKey: ["orderSubCategory", date, period],
-    queryFn: async () => {
-      const res = await apiClient.get<{ data: subCategoryWiseData[] }>(
-        "orderSubCategory",
-        {
-          params: { date, period },
-        }
-      );
-      return res?.data?.data;
-    },
-    enabled: !!date && !!period,
-  });
-};
-
-interface subCategoryWiseData {
-  subCategory: string;
-  unitsSold: number;
-  totalOrders: number;
-  totalRevenue: number;
-  percentageShare: number;
-}
-
-interface subCategoryWiseResponse {
-  data: subCategoryWiseData[];
-}

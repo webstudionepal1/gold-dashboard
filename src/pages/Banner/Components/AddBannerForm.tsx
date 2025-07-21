@@ -23,6 +23,7 @@ import {
   type IBannerFormData,
 } from "./bannerobj";
 import MultiImageUploader from "../../../components/shared/form_components/FileDropInput";
+import { cleanObject } from "../../../utils/cleanObject";
 
 const AddBannerSchema = z.object({
   title: z.string().min(1, "Banner Title is required"),
@@ -31,14 +32,18 @@ const AddBannerSchema = z.object({
   subCategory: z.string().min(1, "Sub Category is required"),
   priority: z.number().min(0, "Price must be a positive number"),
   locations: z.array(z.string()).min(1, "Location is required"),
-
   image: z
-    .array(z.instanceof(File))
-    .nonempty({ message: "At least one image is required" }),
-
+    .instanceof(File)
+    .nullable()
+    .refine((val) => val !== null, {
+      message: "At least one image is required",
+    }),
   mobImage: z
-    .array(z.instanceof(File))
-    .nonempty({ message: "At least one image is required" }),
+    .instanceof(File)
+    .nullable()
+    .refine((val) => val !== null, {
+      message: "At least one image is required",
+    }),
 });
 
 const AddBannerForm = () => {
@@ -93,17 +98,21 @@ const AddBannerForm = () => {
   const formState = id ?? "add";
   const isEditMode = id !== "add";
 
+  // UseForm with inferred types from defaultValues
   const form = useForm({
-    defaultValues: generateBannerFormDefaultValue(
-      formState,
-      bannerData
-    ) as IBannerFormData,
+    defaultValues: generateBannerFormDefaultValue(formState, bannerData),
     validators: {
       onSubmit: AddBannerSchema,
     },
     onSubmit: async ({ value }) => {
       try {
         const formData = new FormData();
+        const formattedData = cleanObject(value);
+
+        delete formattedData["image"];
+        delete formattedData["existingImage"];
+        delete formattedData["mobImage"];
+        delete formattedData["existingMobImage"];
 
         formData.append("title", value.title);
         formData.append("description", value.description);
@@ -114,16 +123,15 @@ const AddBannerForm = () => {
           formData.append("locations", item)
         );
 
-        // if (value.image) formData.append("image", value.image);
-        // if (value.mobImage) formData.append("mobImage", value.mobImage);
-
-        if (value.image && value.image.length > 0) {
-          value.image.forEach((file) => formData.append("image", file));
+        // Handle image uploads
+        if (value.image) {
+          formData.append("image", value.image);
         }
 
-        if (value.mobImage && value.mobImage.length > 0) {
-          value.mobImage.forEach((file) => formData.append("mobImage", file));
+        if (value.mobImage) {
+          formData.append("mobImage", value.mobImage);
         }
+
         if (id === "add") createBanner(formData);
         else updateBanner({ id: bannerData._id, body: formData });
       } catch (error) {
@@ -146,6 +154,7 @@ const AddBannerForm = () => {
         </div>
       );
     }
+    return null;
   };
 
   useEffect(() => {
@@ -307,11 +316,16 @@ const AddBannerForm = () => {
               <form.Field name="image">
                 {(field) => (
                   <MultiImageUploader
-                    multiple
+                    multiple={false}
                     form={form}
                     label=""
-                    value={field.state.value as File[]}
-                    onChange={(files: File[]) => field.handleChange(files)}
+                    value={field.state.value}
+                    existingFileField="existingImage"
+                    accept={{
+                      "image/*": [".png", ".jpg", ".jpeg", ".svg"],
+                    }}
+                    existingFile={form.getFieldValue("existingImage")}
+                    onChange={(file) => field.handleChange(file)}
                   />
                 )}
               </form.Field>
@@ -328,11 +342,16 @@ const AddBannerForm = () => {
               <form.Field name="mobImage">
                 {(field) => (
                   <MultiImageUploader
-                    multiple
+                    multiple={false}
                     form={form}
                     label=""
-                    value={field.state.value as File[]}
-                    onChange={(files: File[]) => field.handleChange(files)}
+                    value={field.state.value}
+                    existingFileField="existingMobImage"
+                    accept={{
+                      "image/*": [".png", ".jpg", ".jpeg", ".svg", ".webp"],
+                    }}
+                    existingFile={form.getFieldValue("existingMobImage")}
+                    onChange={(file) => field.handleChange(file)}
                   />
                 )}
               </form.Field>
