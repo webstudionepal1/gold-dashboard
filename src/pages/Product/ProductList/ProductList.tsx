@@ -56,7 +56,7 @@ const ProductList: React.FC = () => {
   }, []);
   const onEdit = useCallback((row: IFetchProduct) => {
     updateProductState(row);
-    navigate(`/product/edit`);
+    navigate(`/product/edit/${row._id}`);
   }, []);
   // const filteredProducts = useMemo(() => {
   //   if (!productsData || productsData.length === 0) return [];

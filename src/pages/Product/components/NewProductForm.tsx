@@ -117,7 +117,7 @@ const NewProductForm: React.FC = () => {
       }
 
       // Navigate back to products list on success
-      navigate("/products");
+      navigate("/product/product-list");
     } catch (error) {
       console.error("Error saving product:", error);
       // Handle error (show toast, etc.)
@@ -262,7 +262,7 @@ const NewProductForm: React.FC = () => {
 
   // Handle form cancellation
   const handleFormCancel = () => {
-    navigate("/products");
+    navigate("/product/product-list");
   };
 
   // Show loading state while fetching existing product data

@@ -120,6 +120,14 @@ export const routesConfig = [
     element: <ProductList />,
   },
   {
+    path: FrontendRoutes.ADDPRODUCT,
+    element: <NewProductForm />,
+  },
+  {
+    path: FrontendRoutes.EDITPRODUCT,
+    element: <NewProductForm />,
+  },
+  {
     path: "/product/details/:id",
     element: <ProductDescription />,
   },
