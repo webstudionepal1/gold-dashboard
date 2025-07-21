@@ -65,7 +65,8 @@ const AddSupplierForm = () => {
       // Reset with initial values to ensure proper reset
       form.reset(getSupplierInitialFormValues("add"));
       // Force complete form re-render by changing key
-      setFormKey((prev) => prev + 1);
+      // setFormKey((prev) => prev + 1);
+      history.back();
     }
   }, [updateSuccess, createSuccess, form]);
 

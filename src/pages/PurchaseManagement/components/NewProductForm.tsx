@@ -34,7 +34,6 @@
 //   const { data: suppliers, isSuccess } = useGetSupplierQuery();
 //   const { data: products, isSuccess: productSuccess } =
 //     useGetAllProductsQuery();
-
 //   const suppliersList = isSuccess
 //     ? suppliers?.map((item) => ({
 //         label: item.name,
@@ -44,7 +43,6 @@
 //   const productList = productSuccess
 //     ? products?.map((item) => ({ label: item.name, value: item._id }))
 //     : [];
-//   console.log("PRODUT DATA", productList);
 
 //   const form = useForm({
 //     defaultValues: {
@@ -86,6 +84,12 @@
 //       onClose();
 //     }
 //   }, [createSuccess, updateSuccess, onClose]);
+
+//   // Function to get product weight by ID
+//   const getProductWeight = (productId: string) => {
+//     const product = products?.find((p) => p._id === productId);
+//     return product?.variant?.[0]?.wt ?? 0;
+//   };
 
 //   return (
 //     <div>
@@ -169,7 +173,15 @@
 //                             label="Product Name"
 //                             required
 //                             value={field.state.value}
-//                             onChange={(e) => field.handleChange(e.target.value)}
+//                             onChange={(e) => {
+//                               field.handleChange(e.target.value);
+//                               // Update weight field when product changes
+//                               const weight = getProductWeight(e.target.value);
+//                               form.setFieldValue(
+//                                 `products[${index}].wt`,
+//                                 weight
+//                               );
+//                             }}
 //                             options={productList}
 //                           />
 //                           <FieldError field={field} />
@@ -244,12 +256,11 @@
 //                     </form.Field>
 //                   </div>
 
-//                   {/* Remove Button */}
 //                   {index > 0 && (
 //                     <div className="flex items-center justify-end px-2 py-2">
 //                       <button
 //                         type="button"
-//                         onClick={() => field.removeValue(index)} // Fix applied here
+//                         onClick={() => field.removeValue(index)}
 //                         className="px-3 py-1 border-[#de8d28] border-2 text-[#de8d28] rounded-xl"
 //                       >
 //                         Remove
@@ -272,7 +283,7 @@
 //                 value={field.state.value}
 //                 onChange={(e) => field.handleChange(e.target.value)}
 //                 className="resize-none bg-[#f6f7f9] border-2 border-[#d3dae4] focus:outline-none rounded-xl px-3 py-1 placeholder:text-[#858492]"
-//                 placeholder="Enter Short Hypothetical Description"
+//                 placeholder="Enter Short Description"
 //               ></textarea>
 //             </div>
 //           )}
@@ -306,6 +317,7 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useForm } from "@tanstack/react-form";
 import { get } from "lodash";
+import { z } from "zod";
 import { DropdownField } from "../../../components/shared/form_components/Dropdown";
 import { InputField } from "../../../components/shared/form_components/InputField";
 import {
@@ -318,8 +330,41 @@ import {
 } from "../../../server/api/purchaseHooks";
 import { useGetSupplierQuery } from "../../../server/api/supplierHooks";
 import { FieldError } from "../../auth/LoginPage";
-import { IPurchaseForm, PurchaseSchema } from "../purchaseObj";
 import { useEffect } from "react";
+
+// Updated PurchaseSchema to enforce non-negative quantity
+export const PurchaseSchema = z.object({
+  billNo: z.string().min(1, "**Bill No is required**"),
+  supplier: z.string().min(1, "**Supplier name is required**"),
+  products: z
+    .array(
+      z.object({
+        product: z.string().min(1, "**Product name is required**"),
+        quantity: z.coerce
+          .number()
+          .min(0, "**Quantity must be non-negative**")
+          .optional(),
+        price: z.coerce.number().min(1, "**Price is required**"),
+        paidAmount: z.coerce.number().min(1, "**Paid Amount is required**"),
+        wt: z.coerce.number().optional(),
+      })
+    )
+    .min(1, "**At least one product is required**"),
+  description: z.string().optional(),
+});
+
+export interface IPurchaseForm {
+  billNo: string;
+  supplier: string;
+  products: {
+    product: string;
+    quantity?: number;
+    price: number;
+    paidAmount: number;
+    wt?: number;
+  }[];
+  description?: string;
+}
 
 interface NewProductProps {
   onClose: () => void;
@@ -500,6 +545,7 @@ const NewProductForm = ({
                           <InputField
                             label="Quantity"
                             type="number"
+                            min={0} // Prevent negative input
                             value={field.state.value}
                             onChange={(e) =>
                               field.handleChange(Number(e.target.value))
