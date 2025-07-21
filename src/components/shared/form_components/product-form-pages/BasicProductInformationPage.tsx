@@ -151,7 +151,8 @@ export const BasicProductInformationPage: React.FC = () => {
           {validationState.name?.errors.map((error, index) => (
             <p
               key={index}
-              className="text-red-500 text-sm flex items-center gap-1">
+              className="text-red-500 text-sm flex items-center gap-1"
+            >
               <Icon icon="material-symbols:error" className="w-4 h-4" />
               {error}
             </p>
@@ -181,7 +182,8 @@ export const BasicProductInformationPage: React.FC = () => {
           {validationState.slug?.errors.map((error, index) => (
             <p
               key={index}
-              className="text-red-500 text-sm flex items-center gap-1">
+              className="text-red-500 text-sm flex items-center gap-1"
+            >
               <Icon icon="material-symbols:error" className="w-4 h-4" />
               {error}
             </p>
@@ -212,14 +214,16 @@ export const BasicProductInformationPage: React.FC = () => {
                 formData.description.length > 1800
                   ? "text-red-500"
                   : "text-gray-400"
-              }`}>
+              }`}
+            >
               {formData.description.length}/2000
             </span>
           </div>
           {validationState.description?.errors.map((error, index) => (
             <p
               key={index}
-              className="text-red-500 text-sm flex items-center gap-1">
+              className="text-red-500 text-sm flex items-center gap-1"
+            >
               <Icon icon="material-symbols:error" className="w-4 h-4" />
               {error}
             </p>
@@ -227,11 +231,11 @@ export const BasicProductInformationPage: React.FC = () => {
         </div>
 
         {/* Category and Sub-Category */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+        <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <Icon
               icon="material-symbols:category"
-              className="w-5 h-5 text-blue-600"
+              className="w-5 h-5 text-customorange"
             />
             Product Categorization
           </h3>
@@ -255,7 +259,8 @@ export const BasicProductInformationPage: React.FC = () => {
               {validationState.category?.errors.map((error, index) => (
                 <p
                   key={index}
-                  className="text-red-500 text-sm flex items-center gap-1">
+                  className="text-red-500 text-sm flex items-center gap-1"
+                >
                   <Icon icon="material-symbols:error" className="w-4 h-4" />
                   {error}
                 </p>
@@ -286,7 +291,8 @@ export const BasicProductInformationPage: React.FC = () => {
               {validationState.subCategory?.errors.map((error, index) => (
                 <p
                   key={index}
-                  className="text-red-500 text-sm flex items-center gap-1">
+                  className="text-red-500 text-sm flex items-center gap-1"
+                >
                   <Icon icon="material-symbols:error" className="w-4 h-4" />
                   {error}
                 </p>
@@ -300,7 +306,7 @@ export const BasicProductInformationPage: React.FC = () => {
           <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center gap-2">
             <Icon
               icon="material-symbols:help"
-              className="w-5 h-5 text-gray-600"
+              className="w-5 h-5 text-customorange"
             />
             Tips for Better Product Information
           </h4>

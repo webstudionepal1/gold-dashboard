@@ -125,15 +125,15 @@ export const ProductVariantsPage: React.FC = () => {
         <div className="flex items-center justify-center gap-3 mb-3">
           <Icon
             icon="material-symbols:inventory"
-            className="w-6 h-6 text-[#DF8D28]"
+            className="w-6 h-6 text-customorange"
           />
           <h2 className="text-xl font-bold text-gray-900">
             Product Variants & Pricing
           </h2>
         </div>
         <p className="text-gray-600 text-sm max-w-md mx-auto">
-          Configure different variants of your product with pricing and inventory
-          details.
+          Configure different variants of your product with pricing and
+          inventory details.
         </p>
       </div>
 
@@ -151,7 +151,8 @@ export const ProductVariantsPage: React.FC = () => {
           <button
             type="button"
             onClick={addVariant}
-            className="flex bg-[#DF8D28] rounded-md text-white items-center gap-2 px-4 py-2 hover:bg-[#B8691A] transition-colors">
+            className="flex bg-[#DF8D28] rounded-md text-white items-center gap-2 px-4 py-2 hover:bg-[#B8691A] transition-colors"
+          >
             <Icon icon="material-symbols:add" className="w-4 h-4" />
             Add Variant
           </button>
@@ -162,7 +163,8 @@ export const ProductVariantsPage: React.FC = () => {
           {formData.variants.map((variant, index) => (
             <div
               key={index}
-              className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+              className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm"
+            >
               <div className="flex justify-between items-center mb-4">
                 <h4 className="font-medium text-gray-900 flex items-center gap-2">
                   <Icon
@@ -175,7 +177,8 @@ export const ProductVariantsPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => removeVariant(index)}
-                    className="text-red-500 hover:text-red-700 p-1 rounded-md hover:bg-red-50 transition-colors">
+                    className="text-red-500 hover:text-red-700 p-1 rounded-md hover:bg-red-50 transition-colors"
+                  >
                     <Icon icon="material-symbols:delete" className="w-4 h-4" />
                   </button>
                 )}
@@ -206,34 +209,41 @@ export const ProductVariantsPage: React.FC = () => {
                     }}
                   />
                   {/* SKU Validation Status */}
-                  {variant.sku && skuValidationStates[`variant-${index}-sku`] && (
-                    <div className="mt-1">
-                      {skuValidationStates[`variant-${index}-sku`] ===
-                        "validating" && (
-                        <p className="text-xs text-blue-500 flex items-center gap-1">
-                          <Icon
-                            icon="eos-icons:loading"
-                            className="w-3 h-3 animate-spin"
-                          />
-                          Checking SKU availability...
-                        </p>
-                      )}
-                      {skuValidationStates[`variant-${index}-sku`] ===
-                        "valid" && (
-                        <p className="text-xs text-green-600 flex items-center gap-1">
-                          <Icon icon="material-symbols:check-circle" className="w-3 h-3" />
-                          SKU is available
-                        </p>
-                      )}
-                      {skuValidationStates[`variant-${index}-sku`] ===
-                        "invalid" && (
-                        <p className="text-xs text-red-600 flex items-center gap-1">
-                          <Icon icon="material-symbols:error" className="w-3 h-3" />
-                          SKU already exists
-                        </p>
-                      )}
-                    </div>
-                  )}
+                  {variant.sku &&
+                    skuValidationStates[`variant-${index}-sku`] && (
+                      <div className="mt-1">
+                        {skuValidationStates[`variant-${index}-sku`] ===
+                          "validating" && (
+                          <p className="text-xs text-blue-500 flex items-center gap-1">
+                            <Icon
+                              icon="eos-icons:loading"
+                              className="w-3 h-3 animate-spin"
+                            />
+                            Checking SKU availability...
+                          </p>
+                        )}
+                        {skuValidationStates[`variant-${index}-sku`] ===
+                          "valid" && (
+                          <p className="text-xs text-green-600 flex items-center gap-1">
+                            <Icon
+                              icon="material-symbols:check-circle"
+                              className="w-3 h-3"
+                            />
+                            SKU is available
+                          </p>
+                        )}
+                        {skuValidationStates[`variant-${index}-sku`] ===
+                          "invalid" && (
+                          <p className="text-xs text-red-600 flex items-center gap-1">
+                            <Icon
+                              icon="material-symbols:error"
+                              className="w-3 h-3"
+                            />
+                            SKU already exists
+                          </p>
+                        )}
+                      </div>
+                    )}
                   <p className="text-xs text-gray-500">
                     Leave empty to auto-generate SKU
                   </p>
@@ -373,9 +383,7 @@ export const ProductVariantsPage: React.FC = () => {
                     <label className="text-sm font-medium text-gray-700">
                       Active Variant
                     </label>
-                    <p className="text-xs text-gray-500">
-                      Available for sale
-                    </p>
+                    <p className="text-xs text-gray-500">Available for sale</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input
@@ -401,7 +409,8 @@ export const ProductVariantsPage: React.FC = () => {
                         : variant.remainingStock <= variant.reorderPoint * 2
                         ? "text-yellow-600"
                         : "text-green-600"
-                    }`}>
+                    }`}
+                  >
                     <Icon
                       icon={
                         variant.remainingStock <= variant.reorderPoint
@@ -410,7 +419,7 @@ export const ProductVariantsPage: React.FC = () => {
                           ? "material-symbols:info"
                           : "material-symbols:check-circle"
                       }
-                      className="w-4 h-4"
+                      className="w-4 h-4 text-customorange"
                     />
                     <span>
                       {variant.remainingStock <= variant.reorderPoint
@@ -422,7 +431,12 @@ export const ProductVariantsPage: React.FC = () => {
                   </div>
                   {variant.price > 0 && variant.costPrice && (
                     <div className="text-gray-600">
-                      Margin: {((variant.price - variant.costPrice) / variant.price * 100).toFixed(1)}%
+                      Margin:{" "}
+                      {(
+                        ((variant.price - variant.costPrice) / variant.price) *
+                        100
+                      ).toFixed(1)}
+                      %
                     </div>
                   )}
                 </div>
@@ -435,7 +449,8 @@ export const ProductVariantsPage: React.FC = () => {
         {validationState.variants?.errors.map((error, index) => (
           <div
             key={index}
-            className="bg-red-50 border border-red-200 rounded-lg p-4">
+            className="bg-red-50 border border-red-200 rounded-lg p-4"
+          >
             <p className="text-red-600 text-sm flex items-center gap-2">
               <Icon icon="material-symbols:error" className="w-4 h-4" />
               {error}
@@ -448,7 +463,7 @@ export const ProductVariantsPage: React.FC = () => {
           <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center gap-2">
             <Icon
               icon="material-symbols:help"
-              className="w-5 h-5 text-gray-600"
+              className="w-5 h-5 text-customorange"
             />
             Variant Management Tips
           </h4>
@@ -466,8 +481,8 @@ export const ProductVariantsPage: React.FC = () => {
               each variant.
             </p>
             <p>
-              • <strong>Cost Price:</strong> Track your costs to calculate profit
-              margins.
+              • <strong>Cost Price:</strong> Track your costs to calculate
+              profit margins.
             </p>
           </div>
         </div>

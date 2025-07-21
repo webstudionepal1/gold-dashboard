@@ -86,7 +86,7 @@ export const ProductStonesOccasionsPage: React.FC = () => {
         <div className="flex items-center justify-center gap-3 mb-3">
           <Icon
             icon="material-symbols:diamond"
-            className="w-6 h-6 text-[#DF8D28]"
+            className="w-6 h-6 text-customorange"
           />
           <h2 className="text-xl font-bold text-gray-900">
             Stones & Occasions
@@ -100,19 +100,20 @@ export const ProductStonesOccasionsPage: React.FC = () => {
       {/* Form Fields */}
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Stones Section */}
-        <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-200">
+        <div className=" bg-gray-50 rounded-xl p-6 border border-gray-200">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
               <Icon
                 icon="material-symbols:diamond"
-                className="w-5 h-5 text-purple-600"
+                className="w-5 h-5 text-customorange "
               />
               Gemstones ({(formData.stones || []).length})
             </h3>
             <button
               type="button"
               onClick={addStone}
-              className="flex bg-purple-600 rounded-md text-white items-center gap-2 px-4 py-2 hover:bg-purple-700 transition-colors">
+              className="flex bg-customorange rounded-md text-white items-center gap-2 px-4 py-2   transition-colors"
+            >
               <Icon icon="material-symbols:add" className="w-4 h-4" />
               Add Stone
             </button>
@@ -123,7 +124,8 @@ export const ProductStonesOccasionsPage: React.FC = () => {
               {formData.stones.map((stone, index) => (
                 <div
                   key={index}
-                  className="bg-white border border-purple-200 rounded-lg p-4">
+                  className="bg-white border border-purple-200 rounded-lg p-4"
+                >
                   <div className="flex justify-between items-center mb-3">
                     <h4 className="font-medium text-gray-900">
                       Stone {index + 1}
@@ -131,7 +133,8 @@ export const ProductStonesOccasionsPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => removeStone(index)}
-                      className="text-red-500 hover:text-red-700 p-1 rounded-md hover:bg-red-50 transition-colors">
+                      className=" p-1 rounded-md  transition-colors"
+                    >
                       <Icon
                         icon="material-symbols:delete"
                         className="w-4 h-4"
@@ -210,7 +213,7 @@ export const ProductStonesOccasionsPage: React.FC = () => {
                             }
                             className="sr-only peer"
                           />
-                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-600/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-customorange/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-customorange"></div>
                         </label>
                       </div>
 
@@ -235,7 +238,7 @@ export const ProductStonesOccasionsPage: React.FC = () => {
                             }
                             className="sr-only peer"
                           />
-                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-600/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-customorange/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-customorange"></div>
                         </label>
                       </div>
                     </div>
@@ -262,7 +265,7 @@ export const ProductStonesOccasionsPage: React.FC = () => {
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <Icon
               icon="material-symbols:event"
-              className="w-5 h-5 text-green-600"
+              className="w-5 h-5 text-customorange"
             />
             Suitable Occasions ({(formData.occasions || []).length} selected)
           </h3>
@@ -282,14 +285,16 @@ export const ProductStonesOccasionsPage: React.FC = () => {
                       isSelected
                         ? "border-green-500 bg-green-100 text-green-800"
                         : "border-gray-200 bg-white text-gray-700 hover:border-green-300 hover:bg-green-50"
-                    }`}>
+                    }`}
+                  >
                     <div className="flex items-center gap-2">
                       <div
                         className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
                           isSelected
                             ? "border-green-500 bg-green-500"
                             : "border-gray-300"
-                        }`}>
+                        }`}
+                      >
                         {isSelected && (
                           <Icon
                             icon="material-symbols:check"
@@ -334,7 +339,7 @@ export const ProductStonesOccasionsPage: React.FC = () => {
           <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center gap-2">
             <Icon
               icon="material-symbols:help"
-              className="w-5 h-5 text-gray-600"
+              className="w-5 h-5 text-customorange"
             />
             Stones & Occasions Guide
           </h4>

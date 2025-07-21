@@ -59,7 +59,7 @@ export const SmartCollectionRulesPage: React.FC = () => {
         <div className="flex items-center justify-center gap-3 mb-3">
           <Icon
             icon="material-symbols:smart-toy"
-            className="w-6 h-6 text-[#DF8D28]"
+            className="w-6 h-6 text-customorange"
           />
           <h2 className="text-xl font-bold text-gray-900">
             Smart Collection Rules
@@ -77,7 +77,7 @@ export const SmartCollectionRulesPage: React.FC = () => {
           <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
             <Icon
               icon="material-symbols:settings"
-              className="w-5 h-5 text-gray-600"
+              className="w-5 h-5 text-customorange"
             />
             Collection Management Mode
           </h3>
@@ -108,7 +108,7 @@ export const SmartCollectionRulesPage: React.FC = () => {
                 <div className="flex items-center gap-2 mb-2">
                   <Icon
                     icon="material-symbols:hand-gesture"
-                    className="w-5 h-5 text-blue-600"
+                    className="w-5 h-5 text-customorange"
                   />
                   <h4 className="font-semibold text-gray-900">Manual</h4>
                 </div>
@@ -128,7 +128,7 @@ export const SmartCollectionRulesPage: React.FC = () => {
                 <div className="flex items-center gap-2 mb-2">
                   <Icon
                     icon="material-symbols:auto-mode"
-                    className="w-5 h-5 text-green-600"
+                    className="w-5 h-5 text-customorange"
                   />
                   <h4 className="font-semibold text-gray-900">Automatic</h4>
                 </div>
@@ -148,7 +148,7 @@ export const SmartCollectionRulesPage: React.FC = () => {
                 <div className="flex items-center gap-2 mb-2">
                   <Icon
                     icon="material-symbols:merge"
-                    className="w-5 h-5 text-purple-600"
+                    className="w-5 h-5 text-customorange"
                   />
                   <h4 className="font-semibold text-gray-900">Hybrid</h4>
                 </div>
@@ -181,7 +181,7 @@ export const SmartCollectionRulesPage: React.FC = () => {
               <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
                 <Icon
                   icon="material-symbols:rule"
-                  className="w-5 h-5 text-gray-600"
+                  className="w-5 h-5 text-customorange"
                 />
                 Automatic Collection Rules
               </h3>
@@ -284,7 +284,7 @@ export const SmartCollectionRulesPage: React.FC = () => {
           <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center gap-2">
             <Icon
               icon="material-symbols:help"
-              className="w-5 h-5 text-gray-600"
+              className="w-5 h-5 text-customorange"
             />
             Collection Mode Guide
           </h4>

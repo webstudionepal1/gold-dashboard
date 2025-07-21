@@ -573,7 +573,7 @@ export const ConditionBuilder: React.FC<ConditionBuilderProps> = ({
               <div className="flex items-center px-3 py-2 border border-gray-300 rounded-md bg-gray-50">
                 <Icon
                   icon="eos-icons:loading"
-                  className="w-4 h-4 text-blue-500 mr-2 animate-spin"
+                  className="w-4 h-4 text-customorange mr-2 animate-spin"
                 />
                 <span className="text-sm text-gray-500">Loading...</span>
               </div>
@@ -621,19 +621,20 @@ export const ConditionBuilder: React.FC<ConditionBuilderProps> = ({
   };
 
   return (
-    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+    <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
           <Icon
             icon="material-symbols:rule"
-            className="w-5 h-5 text-blue-600"
+            className="w-5 h-5 text-customorange"
           />
           Collection Conditions
         </h3>
         <button
           type="button"
           onClick={addGroup}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg text-sm flex items-center gap-1 transition-colors">
+          className="bg-customorange hover:bg-customorangedark text-white px-3 py-1 rounded-lg text-sm flex items-center gap-1 transition-colors"
+        >
           <Icon icon="ic:outline-add" className="w-4 h-4" />
           Add Group
         </button>
@@ -660,7 +661,8 @@ export const ConditionBuilder: React.FC<ConditionBuilderProps> = ({
         {conditions.groups.map((group, groupIndex) => (
           <div
             key={groupIndex}
-            className="bg-white rounded-lg border border-gray-200 p-4">
+            className="bg-white rounded-lg border border-gray-200 p-4"
+          >
             <div className="flex items-center justify-between mb-4">
               <h4 className="font-medium text-gray-900">
                 Group {groupIndex + 1}
@@ -669,7 +671,8 @@ export const ConditionBuilder: React.FC<ConditionBuilderProps> = ({
                 type="button"
                 onClick={() => removeGroup(groupIndex)}
                 className="text-red-600 hover:text-red-700 p-1"
-                disabled={conditions.groups.length === 1}>
+                disabled={conditions.groups.length === 1}
+              >
                 <Icon icon="ic:outline-delete" className="w-4 h-4" />
               </button>
             </div>
@@ -695,7 +698,8 @@ export const ConditionBuilder: React.FC<ConditionBuilderProps> = ({
               {group.rules.map((rule, ruleIndex) => (
                 <div
                   key={ruleIndex}
-                  className="grid grid-cols-12 gap-2 items-end">
+                  className="grid grid-cols-12 gap-2 items-end"
+                >
                   <div className="col-span-3">
                     <DropdownField
                       label={ruleIndex === 0 ? "Field" : ""}
@@ -748,7 +752,8 @@ export const ConditionBuilder: React.FC<ConditionBuilderProps> = ({
                       type="button"
                       onClick={() => removeRule(groupIndex, ruleIndex)}
                       className="text-red-600 hover:text-red-700 p-1"
-                      disabled={group.rules.length === 1}>
+                      disabled={group.rules.length === 1}
+                    >
                       <Icon icon="ic:outline-remove" className="w-4 h-4" />
                     </button>
                   </div>
@@ -759,7 +764,8 @@ export const ConditionBuilder: React.FC<ConditionBuilderProps> = ({
             <button
               type="button"
               onClick={() => addRule(groupIndex)}
-              className="mt-3 text-blue-600 hover:text-blue-700 text-sm flex items-center gap-1">
+              className="mt-3 text-customorange hover:text-customorangedark text-sm flex items-center gap-1"
+            >
               <Icon icon="ic:outline-add" className="w-4 h-4" />
               Add Rule
             </button>

@@ -6,10 +6,7 @@ import {
   StepperNavigation,
   StepperStep,
 } from "./FormStepper";
-import {
-  ProductFormProvider,
-  useProductForm,
-} from "./ProductFormContext";
+import { ProductFormProvider, useProductForm } from "./ProductFormContext";
 import { BasicProductInformationPage } from "./product-form-pages/BasicProductInformationPage";
 import { ProductSpecificationsPage } from "./product-form-pages/ProductSpecificationsPage";
 import { ProductVariantsPage } from "./product-form-pages/ProductVariantsPage";
@@ -50,14 +47,14 @@ const FORM_STEPS: StepperStep[] = [
     description: "Images & Assets",
     icon: "material-symbols:image",
   },
+  // {
+  //   id: 6,
+  //   title: "SEO & Marketing",
+  //   description: "Optimization",
+  //   icon: "material-symbols:search",
+  // },
   {
     id: 6,
-    title: "SEO & Marketing",
-    description: "Optimization",
-    icon: "material-symbols:search",
-  },
-  {
-    id: 7,
     title: "Status & Review",
     description: "Final Settings",
     icon: "material-symbols:checklist",
@@ -140,9 +137,9 @@ const MultiPageFormContent: React.FC<{
         return <ProductStonesOccasionsPage />;
       case 5:
         return <ProductMediaPage />;
+      // case 6:
+      //   return <ProductSEOMarketingPage />;
       case 6:
-        return <ProductSEOMarketingPage />;
-      case 7:
         return <ProductInventoryStatusPage />;
       default:
         return <BasicProductInformationPage />;
@@ -159,7 +156,8 @@ const MultiPageFormContent: React.FC<{
               <button
                 type="button"
                 onClick={onCancel}
-                className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+                className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+              >
                 <Icon icon="material-symbols:arrow-back" className="w-6 h-6" />
               </button>
               <div>
@@ -202,9 +200,7 @@ const MultiPageFormContent: React.FC<{
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 min-h-[600px]">
-          <div className="p-8">
-            {renderCurrentPage()}
-          </div>
+          <div className="p-8">{renderCurrentPage()}</div>
         </div>
       </div>
 
@@ -234,13 +230,17 @@ interface MultiPageProductFormProps {
   isEdit?: boolean;
 }
 
-export const MultiPageProductForm: React.FC<
-  MultiPageProductFormProps
-> = ({ onSubmit, onCancel, initialData, isEdit = false }) => {
+export const MultiPageProductForm: React.FC<MultiPageProductFormProps> = ({
+  onSubmit,
+  onCancel,
+  initialData,
+  isEdit = false,
+}) => {
   return (
     <ProductFormProvider
       initialData={initialData}
-      totalSteps={FORM_STEPS.length}>
+      totalSteps={FORM_STEPS.length}
+    >
       <MultiPageFormContent
         onSubmit={onSubmit}
         onCancel={onCancel}

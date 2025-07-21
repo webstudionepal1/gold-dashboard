@@ -97,7 +97,7 @@ export const ProductMediaPage: React.FC = () => {
         <div className="flex items-center justify-center gap-3 mb-3">
           <Icon
             icon="material-symbols:image"
-            className="w-6 h-6 text-[#DF8D28]"
+            className="w-6 h-6 text-customorange"
           />
           <h2 className="text-xl font-bold text-gray-900">Product Media</h2>
         </div>
@@ -110,11 +110,11 @@ export const ProductMediaPage: React.FC = () => {
       {/* Form Fields */}
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Image Upload Section */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+        <div className=" bg-gray-50 rounded-xl p-6 border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <Icon
               icon="material-symbols:photo-library"
-              className="w-5 h-5 text-blue-600"
+              className="w-5 h-5 text-customorange"
             />
             Product Images ({selectedImages.length}/10)
           </h3>
@@ -123,13 +123,14 @@ export const ProductMediaPage: React.FC = () => {
           <div
             className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
               dragActive
-                ? "border-blue-500 bg-blue-50"
-                : "border-blue-300 hover:border-blue-400"
+                ? "border-customorange bg-blue-50"
+                : "border-customorange hover:border-customorangedark"
             }`}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
             onDragOver={handleDrag}
-            onDrop={handleDrop}>
+            onDrop={handleDrop}
+          >
             <input
               type="file"
               multiple
@@ -142,12 +143,15 @@ export const ProductMediaPage: React.FC = () => {
             <label
               htmlFor="product-images"
               className={`cursor-pointer ${
-                selectedImages.length >= 10 ? "cursor-not-allowed opacity-50" : ""
-              }`}>
+                selectedImages.length >= 10
+                  ? "cursor-not-allowed opacity-50"
+                  : ""
+              }`}
+            >
               <div className="flex flex-col items-center gap-3">
                 <Icon
                   icon="material-symbols:add-photo-alternate"
-                  className="w-12 h-12 text-blue-500"
+                  className="w-12 h-12 text-customorange"
                 />
                 <div>
                   <p className="text-lg font-medium text-gray-700">
@@ -180,7 +184,7 @@ export const ProductMediaPage: React.FC = () => {
                         alt={`Product ${index + 1}`}
                         className="w-full h-full object-cover rounded-lg border border-gray-200"
                       />
-                      
+
                       {/* Primary Image Badge */}
                       {index === 0 && (
                         <div className="absolute top-2 left-2 bg-[#DF8D28] text-white text-xs px-2 py-1 rounded-md font-medium">
@@ -196,8 +200,12 @@ export const ProductMediaPage: React.FC = () => {
                             <button
                               type="button"
                               onClick={() => moveImage(index, index - 1)}
-                              className="bg-white text-gray-700 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors">
-                              <Icon icon="material-symbols:chevron-left" className="w-4 h-4" />
+                              className="bg-white text-gray-700 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors"
+                            >
+                              <Icon
+                                icon="material-symbols:chevron-left"
+                                className="w-4 h-4"
+                              />
                             </button>
                           )}
 
@@ -206,8 +214,12 @@ export const ProductMediaPage: React.FC = () => {
                             <button
                               type="button"
                               onClick={() => moveImage(index, index + 1)}
-                              className="bg-white text-gray-700 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors">
-                              <Icon icon="material-symbols:chevron-right" className="w-4 h-4" />
+                              className="bg-white text-gray-700 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors"
+                            >
+                              <Icon
+                                icon="material-symbols:chevron-right"
+                                className="w-4 h-4"
+                              />
                             </button>
                           )}
 
@@ -215,8 +227,12 @@ export const ProductMediaPage: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => removeImage(index)}
-                            className="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors">
-                            <Icon icon="material-symbols:close" className="w-4 h-4" />
+                            className="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors"
+                          >
+                            <Icon
+                              icon="material-symbols:close"
+                              className="w-4 h-4"
+                            />
                           </button>
                         </div>
                       </div>
@@ -250,7 +266,8 @@ export const ProductMediaPage: React.FC = () => {
           {validationState.images?.errors.map((error, index) => (
             <div
               key={index}
-              className="mt-4 p-3 bg-red-50 rounded-lg border border-red-200">
+              className="mt-4 p-3 bg-red-50 rounded-lg border border-red-200"
+            >
               <p className="text-red-600 text-sm flex items-center gap-2">
                 <Icon icon="material-symbols:error" className="w-4 h-4" />
                 {error}
@@ -264,31 +281,33 @@ export const ProductMediaPage: React.FC = () => {
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <Icon
               icon="material-symbols:photo-camera"
-              className="w-5 h-5 text-green-600"
+              className="w-5 h-5 text-customorange"
             />
             Photography Guidelines
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <h4 className="font-medium text-gray-900 mb-2">Essential Shots</h4>
+              <h4 className="font-medium text-gray-900 mb-2">
+                Essential Shots
+              </h4>
               <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Front view (primary image)</li>
-                <li>• Back view</li>
-                <li>• Side profiles</li>
-                <li>• Close-up details</li>
-                <li>• Lifestyle/wearing shots</li>
+                <li>Front view (primary image)</li>
+                <li>Back view</li>
+                <li>Side profiles</li>
+                <li>Close-up details</li>
+                <li>Lifestyle/wearing shots</li>
               </ul>
             </div>
 
             <div>
               <h4 className="font-medium text-gray-900 mb-2">Quality Tips</h4>
               <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Use natural lighting when possible</li>
-                <li>• Maintain consistent background</li>
-                <li>• Ensure sharp focus</li>
-                <li>• Show true colors</li>
-                <li>• Include scale references</li>
+                <li>Use natural lighting when possible</li>
+                <li>Maintain consistent background</li>
+                <li>Ensure sharp focus</li>
+                <li>Show true colors</li>
+                <li>Include scale references</li>
               </ul>
             </div>
           </div>
@@ -299,18 +318,18 @@ export const ProductMediaPage: React.FC = () => {
           <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center gap-2">
             <Icon
               icon="material-symbols:help"
-              className="w-5 h-5 text-gray-600"
+              className="w-5 h-5 text-customorange"
             />
             Image Best Practices
           </h4>
           <div className="space-y-2 text-sm text-gray-600">
             <p>
-              • <strong>Primary Image:</strong> Use your best, most representative
-              image as the first one
+              • <strong>Primary Image:</strong> Use your best, most
+              representative image as the first one
             </p>
             <p>
-              • <strong>Multiple Angles:</strong> Show your product from different
-              perspectives to give customers a complete view
+              • <strong>Multiple Angles:</strong> Show your product from
+              different perspectives to give customers a complete view
             </p>
             <p>
               • <strong>Detail Shots:</strong> Include close-ups of important

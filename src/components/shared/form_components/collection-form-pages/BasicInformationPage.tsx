@@ -72,7 +72,7 @@ export const BasicInformationPage: React.FC = () => {
         <div className="flex items-center justify-center gap-3 mb-3">
           <Icon
             icon="material-symbols:info"
-            className="w-6 h-6 text-[#DF8D28]"
+            className="w-6 h-6 text-customorange"
           />
           <h2 className="text-xl font-bold text-gray-900">Basic Information</h2>
         </div>
@@ -234,7 +234,7 @@ export const BasicInformationPage: React.FC = () => {
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <Icon
               icon="material-symbols:settings"
-              className="w-5 h-5 text-gray-600"
+              className="w-5 h-5 text-customorange"
             />
             Collection Status
           </h3>

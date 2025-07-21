@@ -79,7 +79,7 @@ export const MediaAssetsPage: React.FC = () => {
         <div className="flex items-center justify-center gap-3 mb-3">
           <Icon
             icon="material-symbols:image"
-            className="w-6 h-6 text-[#DF8D28]"
+            className="w-6 h-6 text-customorange"
           />
           <h2 className="text-xl font-bold text-gray-900">Media & Assets</h2>
         </div>
@@ -95,7 +95,7 @@ export const MediaAssetsPage: React.FC = () => {
           <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
             <Icon
               icon="material-symbols:photo-library"
-              className="w-5 h-5 text-gray-600"
+              className="w-5 h-5 text-customorange"
             />
             Collection Gallery Images
           </h3>
@@ -165,8 +165,8 @@ export const MediaAssetsPage: React.FC = () => {
         <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <Icon
-              icon="material-symbols:banner"
-              className="w-5 h-5 text-gray-600"
+              icon="basil:image-outline"
+              className="h-5 w-5 text-customorange"
             />
             Collection Banner Image
           </h3>
@@ -190,13 +190,11 @@ export const MediaAssetsPage: React.FC = () => {
               <h4 className="font-medium text-gray-900 mb-2">
                 Banner Image Guidelines:
               </h4>
-              <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Recommended size: 1920x600 pixels (16:5 aspect ratio)</li>
-                <li>• High resolution for crisp display on all devices</li>
-                <li>
-                  • Avoid text overlay as it may not be readable on mobile
-                </li>
-                <li>• Use your most compelling product or lifestyle image</li>
+              <ul className="text-sm text-gray-600 space-y-1 mx-2">
+                <li>Recommended size: 1920x600 pixels (16:5 aspect ratio)</li>
+                <li>High resolution for crisp display on all devices</li>
+                <li>Avoid text overlay as it may not be readable on mobile</li>
+                <li>Use your most compelling product or lifestyle image</li>
               </ul>
             </div>
           </div>
@@ -207,7 +205,7 @@ export const MediaAssetsPage: React.FC = () => {
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <Icon
               icon="material-symbols:video-library"
-              className="w-5 h-5 text-gray-600"
+              className="w-5 h-5 text-customorange"
             />
             Collection Video (Optional)
           </h3>
@@ -233,12 +231,12 @@ export const MediaAssetsPage: React.FC = () => {
               <h4 className="font-medium text-gray-900 mb-2">
                 Video Guidelines:
               </h4>
-              <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Maximum file size: 200MB</li>
-                <li>• Recommended duration: 30-90 seconds</li>
-                <li>• Supported formats: MP4, WebM, AVI, MOV</li>
-                <li>• Landscape orientation (16:9) works best</li>
-                <li>• Consider adding captions for accessibility</li>
+              <ul className="text-sm text-gray-600 space-y-1 mx-2">
+                <li>Maximum file size: 200MB</li>
+                <li>Recommended duration: 30-90 seconds</li>
+                <li>Supported formats: MP4, WebM, AVI, MOV</li>
+                <li>Landscape orientation (16:9) works best</li>
+                <li>Consider adding captions for accessibility</li>
               </ul>
             </div>
 
@@ -293,7 +291,7 @@ export const MediaAssetsPage: React.FC = () => {
           <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center gap-2">
             <Icon
               icon="material-symbols:help"
-              className="w-5 h-5 text-gray-600"
+              className="w-5 h-5 text-customorange"
             />
             Media Best Practices
           </h4>
