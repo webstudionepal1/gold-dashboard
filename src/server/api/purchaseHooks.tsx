@@ -299,3 +299,32 @@ export const useDeletePurchasReturnMutation = () => {
     },
   });
 };
+
+// Purchase return summary hook
+export interface IReturnSummaryItem {
+  productId: string;
+  productName: string;
+  wt: number;
+  originalQuantity: number;
+  totalReturned: number;
+  remainingQuantity: number;
+  canReturn: boolean;
+}
+
+export interface IReturnSummary {
+  purchaseId: string;
+  returnSummary: IReturnSummaryItem[];
+}
+
+export const useGetPurchaseReturnSummaryQuery = (purchaseId: string) => {
+  return useQuery({
+    queryKey: ["purchase-return-summary", purchaseId],
+    queryFn: async () => {
+      const res = await apiClient.get<{ data: IReturnSummary }>(
+        `purchase/${purchaseId}/return-summary`
+      );
+      return res?.data?.data;
+    },
+    enabled: !!purchaseId,
+  });
+};
