@@ -74,7 +74,7 @@ export const useFirebaseMessaging = (): UseFirebaseMessagingReturn => {
           // Mark as read when clicked
           notificationPersistence.markAsRead(notificationId);
         },
-        autoClose: priority === "critical" ? false : 5000,
+        autoClose: priority === "critical" ? (false as const) : 5000,
         closeOnClick: true,
         hideProgressBar: priority === "critical",
         className:

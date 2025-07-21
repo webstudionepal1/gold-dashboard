@@ -7,7 +7,13 @@ export interface NotificationEvent {
   id: string;
   notificationId: string;
   userId: string;
-  eventType: 'sent' | 'delivered' | 'opened' | 'clicked' | 'dismissed' | 'failed';
+  eventType:
+    | "sent"
+    | "delivered"
+    | "opened"
+    | "clicked"
+    | "dismissed"
+    | "failed";
   timestamp: number;
   metadata?: {
     priority?: string;
@@ -57,7 +63,7 @@ export interface AnalyticsReport {
 }
 
 class NotificationAnalyticsManager {
-  private readonly STORAGE_KEY = 'notification-analytics';
+  private readonly STORAGE_KEY = "notification-analytics";
   private readonly MAX_EVENTS = 10000;
   private events: NotificationEvent[] = [];
 
@@ -70,8 +76,8 @@ class NotificationAnalyticsManager {
    */
   public trackEvent(
     notificationId: string,
-    eventType: NotificationEvent['eventType'],
-    metadata?: NotificationEvent['metadata']
+    eventType: NotificationEvent["eventType"],
+    metadata?: NotificationEvent["metadata"]
   ): void {
     try {
       const event: NotificationEvent = {
@@ -83,23 +89,23 @@ class NotificationAnalyticsManager {
         metadata: {
           ...metadata,
           userAgent: navigator.userAgent,
-          deviceType: this.getDeviceType()
-        }
+          deviceType: this.getDeviceType(),
+        },
       };
 
       this.events.unshift(event);
-      
+
       // Limit events to prevent storage overflow
       if (this.events.length > this.MAX_EVENTS) {
         this.events = this.events.slice(0, this.MAX_EVENTS);
       }
 
       this.saveEvents();
-      
+
       // Send to backend analytics if available
       this.sendToBackend(event);
     } catch (error) {
-      console.error('Failed to track notification event:', error);
+      console.error("Failed to track notification event:", error);
     }
   }
 
@@ -112,14 +118,14 @@ class NotificationAnalyticsManager {
   ): AnalyticsReport {
     const start = startDate.getTime();
     const end = endDate.getTime();
-    
+
     const periodEvents = this.events.filter(
-      event => event.timestamp >= start && event.timestamp <= end
+      (event) => event.timestamp >= start && event.timestamp <= end
     );
 
     const overall = this.calculateMetrics(periodEvents);
-    const byPriority = this.calculateMetricsByField(periodEvents, 'priority');
-    const byType = this.calculateMetricsByField(periodEvents, 'type');
+    const byPriority = this.calculateMetricsByField(periodEvents, "priority");
+    const byType = this.calculateMetricsByField(periodEvents, "type");
     const byHour = this.calculateEventsByHour(periodEvents);
     const byDay = this.calculateEventsByDay(periodEvents);
     const topPerformers = this.calculateTopPerformers(periodEvents);
@@ -133,7 +139,7 @@ class NotificationAnalyticsManager {
       byHour,
       byDay,
       topPerformers,
-      trends
+      trends,
     };
   }
 
@@ -148,16 +154,23 @@ class NotificationAnalyticsManager {
   } {
     const now = Date.now();
     const oneHourAgo = now - 60 * 60 * 1000;
-    const recentEvents = this.events.filter(event => event.timestamp >= oneHourAgo);
-    
-    const errorEvents = recentEvents.filter(event => event.eventType === 'failed');
-    const errorRate = recentEvents.length > 0 ? (errorEvents.length / recentEvents.length) * 100 : 0;
+    const recentEvents = this.events.filter(
+      (event) => event.timestamp >= oneHourAgo
+    );
+
+    const errorEvents = recentEvents.filter(
+      (event) => event.eventType === "failed"
+    );
+    const errorRate =
+      recentEvents.length > 0
+        ? (errorEvents.length / recentEvents.length) * 100
+        : 0;
 
     return {
       activeNotifications: this.getActiveNotificationCount(),
       recentEvents: this.events.slice(0, 10),
       currentHourEvents: recentEvents.length,
-      errorRate
+      errorRate,
     };
   }
 
@@ -165,12 +178,12 @@ class NotificationAnalyticsManager {
    * Calculate metrics for a set of events
    */
   private calculateMetrics(events: NotificationEvent[]): NotificationMetrics {
-    const sent = events.filter(e => e.eventType === 'sent').length;
-    const delivered = events.filter(e => e.eventType === 'delivered').length;
-    const opened = events.filter(e => e.eventType === 'opened').length;
-    const clicked = events.filter(e => e.eventType === 'clicked').length;
-    const dismissed = events.filter(e => e.eventType === 'dismissed').length;
-    const failed = events.filter(e => e.eventType === 'failed').length;
+    const sent = events.filter((e) => e.eventType === "sent").length;
+    const delivered = events.filter((e) => e.eventType === "delivered").length;
+    const opened = events.filter((e) => e.eventType === "opened").length;
+    const clicked = events.filter((e) => e.eventType === "clicked").length;
+    const dismissed = events.filter((e) => e.eventType === "dismissed").length;
+    const failed = events.filter((e) => e.eventType === "failed").length;
 
     return {
       totalSent: sent,
@@ -183,7 +196,7 @@ class NotificationAnalyticsManager {
       openRate: delivered > 0 ? (opened / delivered) * 100 : 0,
       clickRate: opened > 0 ? (clicked / opened) * 100 : 0,
       dismissalRate: delivered > 0 ? (dismissed / delivered) * 100 : 0,
-      failureRate: sent > 0 ? (failed / sent) * 100 : 0
+      failureRate: sent > 0 ? (failed / sent) * 100 : 0,
     };
   }
 
@@ -192,12 +205,12 @@ class NotificationAnalyticsManager {
    */
   private calculateMetricsByField(
     events: NotificationEvent[],
-    field: keyof NotificationEvent['metadata']
+    field: keyof NonNullable<NotificationEvent["metadata"]>
   ): Record<string, NotificationMetrics> {
     const grouped: Record<string, NotificationEvent[]> = {};
-    
-    events.forEach(event => {
-      const value = event.metadata?.[field] || 'unknown';
+
+    events.forEach((event) => {
+      const value = event.metadata?.[field] || "unknown";
       if (!grouped[value]) grouped[value] = [];
       grouped[value].push(event);
     });
@@ -213,14 +226,16 @@ class NotificationAnalyticsManager {
   /**
    * Calculate events by hour of day
    */
-  private calculateEventsByHour(events: NotificationEvent[]): Record<string, number> {
+  private calculateEventsByHour(
+    events: NotificationEvent[]
+  ): Record<string, number> {
     const byHour: Record<string, number> = {};
-    
+
     for (let i = 0; i < 24; i++) {
       byHour[i.toString()] = 0;
     }
 
-    events.forEach(event => {
+    events.forEach((event) => {
       const hour = new Date(event.timestamp).getHours();
       byHour[hour.toString()]++;
     });
@@ -231,11 +246,13 @@ class NotificationAnalyticsManager {
   /**
    * Calculate events by day
    */
-  private calculateEventsByDay(events: NotificationEvent[]): Record<string, number> {
+  private calculateEventsByDay(
+    events: NotificationEvent[]
+  ): Record<string, number> {
     const byDay: Record<string, number> = {};
 
-    events.forEach(event => {
-      const date = new Date(event.timestamp).toISOString().split('T')[0];
+    events.forEach((event) => {
+      const date = new Date(event.timestamp).toISOString().split("T")[0];
       byDay[date] = (byDay[date] || 0) + 1;
     });
 
@@ -252,39 +269,48 @@ class NotificationAnalyticsManager {
     clickRate: number;
   }> {
     const notificationGroups: Record<string, NotificationEvent[]> = {};
-    
-    events.forEach(event => {
+
+    events.forEach((event) => {
       if (!notificationGroups[event.notificationId]) {
         notificationGroups[event.notificationId] = [];
       }
       notificationGroups[event.notificationId].push(event);
     });
 
-    const performers = Object.entries(notificationGroups).map(([notificationId, notificationEvents]) => {
-      const metrics = this.calculateMetrics(notificationEvents);
-      return {
-        notificationId,
-        title: this.getNotificationTitle(notificationId),
-        openRate: metrics.openRate,
-        clickRate: metrics.clickRate
-      };
-    });
+    const performers = Object.entries(notificationGroups).map(
+      ([notificationId, notificationEvents]) => {
+        const metrics = this.calculateMetrics(notificationEvents);
+        return {
+          notificationId,
+          title: this.getNotificationTitle(notificationId),
+          openRate: metrics.openRate,
+          clickRate: metrics.clickRate,
+        };
+      }
+    );
 
     return performers
-      .sort((a, b) => (b.openRate + b.clickRate) - (a.openRate + a.clickRate))
+      .sort((a, b) => b.openRate + b.clickRate - (a.openRate + a.clickRate))
       .slice(0, 10);
   }
 
   /**
    * Calculate trends compared to previous period
    */
-  private calculateTrends(start: number, end: number): AnalyticsReport['trends'] {
+  private calculateTrends(
+    start: number,
+    end: number
+  ): AnalyticsReport["trends"] {
     const periodLength = end - start;
     const previousStart = start - periodLength;
     const previousEnd = start;
 
-    const currentEvents = this.events.filter(e => e.timestamp >= start && e.timestamp <= end);
-    const previousEvents = this.events.filter(e => e.timestamp >= previousStart && e.timestamp <= previousEnd);
+    const currentEvents = this.events.filter(
+      (e) => e.timestamp >= start && e.timestamp <= end
+    );
+    const previousEvents = this.events.filter(
+      (e) => e.timestamp >= previousStart && e.timestamp <= previousEnd
+    );
 
     const currentMetrics = this.calculateMetrics(currentEvents);
     const previousMetrics = this.calculateMetrics(previousEvents);
@@ -295,12 +321,18 @@ class NotificationAnalyticsManager {
     };
 
     return {
-      deliveryTrend: calculateTrend(currentMetrics.deliveryRate, previousMetrics.deliveryRate),
+      deliveryTrend: calculateTrend(
+        currentMetrics.deliveryRate,
+        previousMetrics.deliveryRate
+      ),
       engagementTrend: calculateTrend(
         currentMetrics.openRate + currentMetrics.clickRate,
         previousMetrics.openRate + previousMetrics.clickRate
       ),
-      failureTrend: calculateTrend(currentMetrics.failureRate, previousMetrics.failureRate)
+      failureTrend: calculateTrend(
+        currentMetrics.failureRate,
+        previousMetrics.failureRate
+      ),
     };
   }
 
@@ -309,15 +341,15 @@ class NotificationAnalyticsManager {
    */
   private getCurrentUserId(): string {
     try {
-      const authData = localStorage.getItem('auth-user');
+      const authData = localStorage.getItem("auth-user");
       if (authData) {
         const parsed = JSON.parse(authData);
-        return parsed.id || 'anonymous';
+        return parsed.id || "anonymous";
       }
     } catch (error) {
-      console.warn('Failed to get user ID for analytics:', error);
+      console.warn("Failed to get user ID for analytics:", error);
     }
-    return 'anonymous';
+    return "anonymous";
   }
 
   /**
@@ -325,13 +357,13 @@ class NotificationAnalyticsManager {
    */
   private getDeviceType(): string {
     const userAgent = navigator.userAgent.toLowerCase();
-    
+
     if (/mobile|android|iphone|ipad|phone/i.test(userAgent)) {
-      return 'mobile';
+      return "mobile";
     } else if (/tablet|ipad/i.test(userAgent)) {
-      return 'tablet';
+      return "tablet";
     } else {
-      return 'desktop';
+      return "desktop";
     }
   }
 
@@ -357,14 +389,14 @@ class NotificationAnalyticsManager {
   private async sendToBackend(event: NotificationEvent): Promise<void> {
     try {
       // Only send in production or when analytics endpoint is available
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === "development") {
         return;
       }
 
       // Implementation would send to analytics API
       // await apiClient.post('/analytics/notification-events', event);
     } catch (error) {
-      console.warn('Failed to send analytics event to backend:', error);
+      console.warn("Failed to send analytics event to backend:", error);
     }
   }
 
@@ -378,7 +410,7 @@ class NotificationAnalyticsManager {
         this.events = JSON.parse(stored);
       }
     } catch (error) {
-      console.error('Failed to load analytics events:', error);
+      console.error("Failed to load analytics events:", error);
       this.events = [];
     }
   }
@@ -390,15 +422,18 @@ class NotificationAnalyticsManager {
     try {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.events));
     } catch (error) {
-      console.error('Failed to save analytics events:', error);
-      
+      console.error("Failed to save analytics events:", error);
+
       // If storage is full, remove old events and retry
-      if (error instanceof Error && error.name === 'QuotaExceededError') {
+      if (error instanceof Error && error.name === "QuotaExceededError") {
         this.events = this.events.slice(0, Math.floor(this.MAX_EVENTS / 2));
         try {
           localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.events));
         } catch (retryError) {
-          console.error('Failed to save analytics events after cleanup:', retryError);
+          console.error(
+            "Failed to save analytics events after cleanup:",
+            retryError
+          );
         }
       }
     }
@@ -416,11 +451,15 @@ class NotificationAnalyticsManager {
    * Export analytics data
    */
   public exportAnalytics(): string {
-    return JSON.stringify({
-      events: this.events,
-      exportDate: new Date().toISOString(),
-      version: '1.0'
-    }, null, 2);
+    return JSON.stringify(
+      {
+        events: this.events,
+        exportDate: new Date().toISOString(),
+        version: "1.0",
+      },
+      null,
+      2
+    );
   }
 }
 
@@ -428,22 +467,34 @@ class NotificationAnalyticsManager {
 export const notificationAnalytics = new NotificationAnalyticsManager();
 
 // Convenience functions
-export const trackNotificationSent = (notificationId: string, metadata?: NotificationEvent['metadata']) =>
-  notificationAnalytics.trackEvent(notificationId, 'sent', metadata);
+export const trackNotificationSent = (
+  notificationId: string,
+  metadata?: NotificationEvent["metadata"]
+) => notificationAnalytics.trackEvent(notificationId, "sent", metadata);
 
-export const trackNotificationDelivered = (notificationId: string, metadata?: NotificationEvent['metadata']) =>
-  notificationAnalytics.trackEvent(notificationId, 'delivered', metadata);
+export const trackNotificationDelivered = (
+  notificationId: string,
+  metadata?: NotificationEvent["metadata"]
+) => notificationAnalytics.trackEvent(notificationId, "delivered", metadata);
 
-export const trackNotificationOpened = (notificationId: string, metadata?: NotificationEvent['metadata']) =>
-  notificationAnalytics.trackEvent(notificationId, 'opened', metadata);
+export const trackNotificationOpened = (
+  notificationId: string,
+  metadata?: NotificationEvent["metadata"]
+) => notificationAnalytics.trackEvent(notificationId, "opened", metadata);
 
-export const trackNotificationClicked = (notificationId: string, metadata?: NotificationEvent['metadata']) =>
-  notificationAnalytics.trackEvent(notificationId, 'clicked', metadata);
+export const trackNotificationClicked = (
+  notificationId: string,
+  metadata?: NotificationEvent["metadata"]
+) => notificationAnalytics.trackEvent(notificationId, "clicked", metadata);
 
-export const trackNotificationDismissed = (notificationId: string, metadata?: NotificationEvent['metadata']) =>
-  notificationAnalytics.trackEvent(notificationId, 'dismissed', metadata);
+export const trackNotificationDismissed = (
+  notificationId: string,
+  metadata?: NotificationEvent["metadata"]
+) => notificationAnalytics.trackEvent(notificationId, "dismissed", metadata);
 
-export const trackNotificationFailed = (notificationId: string, metadata?: NotificationEvent['metadata']) =>
-  notificationAnalytics.trackEvent(notificationId, 'failed', metadata);
+export const trackNotificationFailed = (
+  notificationId: string,
+  metadata?: NotificationEvent["metadata"]
+) => notificationAnalytics.trackEvent(notificationId, "failed", metadata);
 
 export default notificationAnalytics;

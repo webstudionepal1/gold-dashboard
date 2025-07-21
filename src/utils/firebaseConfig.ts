@@ -43,7 +43,10 @@ export const getMessagingInstance = async () => {
 };
 
 // Register service worker with enhanced error handling and retry logic
-export const registerServiceWorker = async (retryCount = 0, maxRetries = 2) => {
+export const registerServiceWorker = async (
+  retryCount = 0,
+  maxRetries = 2
+): Promise<ServiceWorkerRegistration | false> => {
   if (!("serviceWorker" in navigator)) {
     console.error("Service Worker is not supported in this browser");
     return false;
@@ -201,14 +204,11 @@ export const checkNotificationPermission = async () => {
 };
 
 // Request FCM Token with enhanced error handling and retry logic
-export const requestFCMToken = async (retryCount = 0, maxRetries = 3) => {
+export const requestFCMToken = async (
+  retryCount = 0,
+  maxRetries = 3
+): Promise<string | null> => {
   try {
-    // Feature detection
-    const isBrave =
-      ((navigator as any)?.brave &&
-        (await (navigator as any)?.brave.isBrave())) ||
-      false;
-
     // Check if FCM is supported
     const isFCMSupported = await isSupported();
     if (!isFCMSupported) {

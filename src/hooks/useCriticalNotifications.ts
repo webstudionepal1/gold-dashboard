@@ -166,7 +166,6 @@ export const useCriticalNotifications = () => {
   // Clear all notifications
   const clearAllNotifications = useCallback(() => {
     setNotifications([]);
-    setUnreadCount(0);
   }, []);
 
   // Get notification statistics using useMemo for performance
