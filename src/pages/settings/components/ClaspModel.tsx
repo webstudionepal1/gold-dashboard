@@ -265,8 +265,7 @@ const ClaspModel: React.FC<IClaspProps> = ({ onClose, data, edit = false }) => {
           e.preventDefault();
           form.handleSubmit();
         }}
-        className="space-y-4"
-      >
+        className="space-y-4">
         <form.Field name="name">
           {(field) => (
             <div>
@@ -302,8 +301,7 @@ const ClaspModel: React.FC<IClaspProps> = ({ onClose, data, edit = false }) => {
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 bg-[#c9c9c9] px-7 py-2 rounded-xl"
-          >
+            className="flex-1 bg-[#c9c9c9] px-7 py-2 rounded-xl">
             Cancel
           </button>
           <button
@@ -312,8 +310,7 @@ const ClaspModel: React.FC<IClaspProps> = ({ onClose, data, edit = false }) => {
             className={clsx(
               "flex-1 bg-[#df8d29] text-white px-7 py-2 rounded-xl",
               (isPending || updatePending) && "cursor-pending"
-            )}
-          >
+            )}>
             {edit ? "Update" : "Create"}
           </button>
         </div>

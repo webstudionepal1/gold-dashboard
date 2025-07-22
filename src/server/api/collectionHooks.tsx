@@ -276,8 +276,12 @@ export const useCreateCollectionMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ["collections"],
-    mutationFn: async (body: Partial<IFetchCollection>) => {
-      const res = await apiClient.post("collection", body);
+    mutationFn: async (body: FormData) => {
+      const res = await apiClient.post("collection", body, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       return res?.data?.data;
     },
     onSuccess() {
@@ -295,14 +299,12 @@ export const useUpdateCollectionMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ["collections"],
-    mutationFn: async ({
-      id,
-      body,
-    }: {
-      id: string;
-      body: Partial<IFetchCollection>;
-    }) => {
-      const res = await apiClient.put(`collection/${id}`, body);
+    mutationFn: async ({ id, body }: { id: string; body: FormData }) => {
+      const res = await apiClient.put(`collection/${id}`, body, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       return res?.data?.data;
     },
     onSuccess() {

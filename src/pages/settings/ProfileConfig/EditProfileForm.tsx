@@ -95,8 +95,7 @@ const EditProfileForm = () => {
           e.preventDefault();
           e.stopPropagation();
           form.handleSubmit();
-        }}
-      >
+        }}>
         <div className="col-span-4 p-4 space-y-4 bg-white rounded-lg shadow-lg border-2 border-[#eeeeee]">
           <div>
             <div>
@@ -446,8 +445,7 @@ const EditProfileForm = () => {
             <button
               type="submit"
               className="self-end bg-[#df8d29] text-white px-7 py-2 rounded-xl disabled:bg-[#966830]"
-              disabled={isPending}
-            >
+              disabled={isPending}>
               {isPending ? "Saving..." : "Save"}
             </button>
           </div>

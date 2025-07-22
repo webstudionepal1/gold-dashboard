@@ -100,8 +100,7 @@ const ExpenseForm = ({ editData, closeModal }: propTypes) => {
             e.stopPropagation();
             form.handleSubmit();
             closeModal();
-          }}
-        >
+          }}>
           <h1 className="flex items-center justify-center text-xl font-semibold">
             Add Expenses
           </h1>
@@ -193,14 +192,12 @@ const ExpenseForm = ({ editData, closeModal }: propTypes) => {
           <div className="flex items-center w-full gap-5">
             <button
               onClick={() => closeModal()}
-              className=" bg-[#c9c9c9] flex-1  px-7 py-2 rounded-xl "
-            >
+              className=" bg-[#c9c9c9] flex-1  px-7 py-2 rounded-xl ">
               Cancel
             </button>
             <button
               type="submit"
-              className=" bg-[#df8d29] flex-1 text-white px-7 py-2 rounded-xl "
-            >
+              className=" bg-[#df8d29] flex-1 text-white px-7 py-2 rounded-xl ">
               {editData ? "Update" : "Add"}
             </button>
           </div>

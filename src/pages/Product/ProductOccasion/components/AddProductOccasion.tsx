@@ -95,36 +95,36 @@ const AddProductOccasion = ({ modalRef, closeModal, editData }: PropTypes) => {
         value.seasonality || "year-round"
       );
 
-      // Create the occasion data object
-      const occasionData: Partial<IFetchOccasion> = {
-        name: value.name,
-        slug: editData?.slug || seoData.slug,
-        description: value.description || "",
-        isActive: value.isActive,
-        metadata: {
-          seasonality: value.seasonality || "year-round",
-          seoTitle: seoData.seoTitle,
-          seoDescription: seoData.seoDescription,
-          keywords: seoData.keywords,
-        },
-      };
+      const formData = new FormData();
 
-      // Handle file uploads - for now, we'll use existing URLs if editing
-      if (editData) {
-        occasionData.image = editData.image;
-        occasionData.video = editData.video;
+      // Append basic fields
+      formData.append("name", value.name);
+      formData.append("slug", editData?.slug || seoData.slug);
+      formData.append("description", value.description || "");
+      formData.append("isActive", String(value.isActive));
+
+      // Handle metadata as JSON string
+      const metadata = {
+        seasonality: value.seasonality || "year-round",
+        seoTitle: seoData.seoTitle,
+        seoDescription: seoData.seoDescription,
+        keywords: seoData.keywords,
+      };
+      formData.append("metadata", JSON.stringify(metadata));
+
+      // Handle image file
+      if (value.image instanceof File) {
+        formData.append("image", value.image);
+      } else if (editData?.image) {
+        formData.append("existingImage", editData.image);
       }
 
-      const formData = new FormData();
-      Object.entries(occasionData).forEach(([key, value]) => {
-        if (value !== null && value !== undefined) {
-          if (value instanceof File) {
-            formData.append(key, value);
-          } else {
-            formData.append(key, String(value));
-          }
-        }
-      });
+      // Handle video file
+      if (value.video instanceof File) {
+        formData.append("video", value.video);
+      } else if (editData?.video) {
+        formData.append("existingVideo", editData.video);
+      }
 
       if (editData) {
         updateOccasion({ id: editData._id, body: formData });

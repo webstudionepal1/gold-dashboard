@@ -10,7 +10,7 @@ export const ProductMediaPage: React.FC = () => {
   const [dragActive, setDragActive] = useState(false);
 
   // Handle multiple image uploads
-  const handleImageUpload = (files: File[]) => {
+  const handleImageUpload = async (files: File[]) => {
     // Limit to 10 images total
     const maxImages = 10;
     const currentImageCount = selectedImages.length;
@@ -21,16 +21,17 @@ export const ProductMediaPage: React.FC = () => {
       updateValidation("images", false, [
         `Maximum ${maxImages} images allowed. Only ${filesToAdd.length} images were added.`,
       ]);
-    } else {
-      updateValidation("images", true, []);
     }
 
     const newImages = [...selectedImages, ...filesToAdd];
     setSelectedImages(newImages);
 
-    // Convert files to URLs for form data (in real app, upload to server first)
-    const imageUrls = newImages.map((file) => URL.createObjectURL(file));
-    updateFormData({ images: imageUrls });
+    // Store actual File objects instead of uploading immediately
+    const existingImages = formData.images || [];
+    const allImages = [...existingImages, ...filesToAdd];
+
+    updateFormData({ images: allImages });
+    updateValidation("images", true, []);
   };
 
   // Handle file input change
@@ -129,8 +130,7 @@ export const ProductMediaPage: React.FC = () => {
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
             onDragOver={handleDrag}
-            onDrop={handleDrop}
-          >
+            onDrop={handleDrop}>
             <input
               type="file"
               multiple
@@ -146,8 +146,7 @@ export const ProductMediaPage: React.FC = () => {
                 selectedImages.length >= 10
                   ? "cursor-not-allowed opacity-50"
                   : ""
-              }`}
-            >
+              }`}>
               <div className="flex flex-col items-center gap-3">
                 <Icon
                   icon="material-symbols:add-photo-alternate"
@@ -200,8 +199,7 @@ export const ProductMediaPage: React.FC = () => {
                             <button
                               type="button"
                               onClick={() => moveImage(index, index - 1)}
-                              className="bg-white text-gray-700 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors"
-                            >
+                              className="bg-white text-gray-700 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors">
                               <Icon
                                 icon="material-symbols:chevron-left"
                                 className="w-4 h-4"
@@ -214,8 +212,7 @@ export const ProductMediaPage: React.FC = () => {
                             <button
                               type="button"
                               onClick={() => moveImage(index, index + 1)}
-                              className="bg-white text-gray-700 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors"
-                            >
+                              className="bg-white text-gray-700 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors">
                               <Icon
                                 icon="material-symbols:chevron-right"
                                 className="w-4 h-4"
@@ -227,8 +224,7 @@ export const ProductMediaPage: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => removeImage(index)}
-                            className="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors"
-                          >
+                            className="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors">
                             <Icon
                               icon="material-symbols:close"
                               className="w-4 h-4"
@@ -266,8 +262,7 @@ export const ProductMediaPage: React.FC = () => {
           {validationState.images?.errors.map((error, index) => (
             <div
               key={index}
-              className="mt-4 p-3 bg-red-50 rounded-lg border border-red-200"
-            >
+              className="mt-4 p-3 bg-red-50 rounded-lg border border-red-200">
               <p className="text-red-600 text-sm flex items-center gap-2">
                 <Icon icon="material-symbols:error" className="w-4 h-4" />
                 {error}

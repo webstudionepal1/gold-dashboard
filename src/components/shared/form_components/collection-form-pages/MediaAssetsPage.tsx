@@ -15,56 +15,51 @@ export const MediaAssetsPage: React.FC = () => {
   // Handle multiple image uploads for collection gallery
   const handleImageUpload = (files: File[]) => {
     setSelectedImages(files);
-    // Create proper placeholder URLs that match expected format
-    const imageUrls =
-      files && files.length > 0
-        ? files.map(
-            (file, index) =>
-              `https://placeholder.com/collection-image-${index + 1}-${
-                file.name
-              }`
-          )
-        : [];
-    updateFormData({ images: imageUrls });
 
-    // Validate images
+    // Validate images first
     const errors: string[] = [];
     if (files && files.length > 10) {
       errors.push("Maximum 10 images allowed");
+      updateValidation("images", false, errors);
+      return;
     }
-    // Images are optional, so no error if empty
-    updateValidation("images", true, errors);
+
+    if (files && files.length > 0) {
+      // Store actual File objects instead of uploading immediately
+      updateFormData({ images: files });
+      updateValidation("images", true, []);
+    } else {
+      updateFormData({ images: [] });
+      updateValidation("images", true, []);
+    }
   };
 
   // Handle banner image upload
   const handleBannerImageUpload = (file: File | null) => {
     setBannerImage(file);
+
     if (file) {
-      // Create proper placeholder URL that matches expected format
-      updateFormData({
-        bannerImage: `https://placeholder.com/banner-${file.name}`,
-      });
+      // Store actual File object instead of uploading immediately
+      updateFormData({ bannerImage: file });
+      updateValidation("bannerImage", true, []);
     } else {
-      updateFormData({ bannerImage: "" });
+      updateFormData({ bannerImage: null });
+      updateValidation("bannerImage", true, []);
     }
-    // Banner image is optional, so always valid
-    updateValidation("bannerImage", true, []);
   };
 
   // Handle video upload
   const handleVideoUpload = (file: File | null) => {
     setVideoFile(file);
-    if (file) {
-      // Create proper placeholder URL that matches expected format
-      updateFormData({ video: `https://placeholder.com/video-${file.name}` });
-    } else {
-      updateFormData({ video: "" });
-    }
-  };
 
-  // Handle video upload completion
-  const handleVideoUploadComplete = (url: string) => {
-    updateFormData({ video: url });
+    if (file) {
+      // Store actual File object instead of uploading immediately
+      updateFormData({ video: file });
+      updateValidation("video", true, []);
+    } else {
+      updateFormData({ video: null });
+      updateValidation("video", true, []);
+    }
   };
 
   // Handle video upload error
@@ -135,8 +130,7 @@ export const MediaAssetsPage: React.FC = () => {
                           );
                           handleImageUpload(newImages);
                         }}
-                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
-                      >
+                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600">
                         ×
                       </button>
                       <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
@@ -151,8 +145,7 @@ export const MediaAssetsPage: React.FC = () => {
               {validationState.images?.errors.map((error, index) => (
                 <p
                   key={index}
-                  className="text-red-500 text-sm flex items-center gap-1"
-                >
+                  className="text-red-500 text-sm flex items-center gap-1">
                   <Icon icon="material-symbols:error" className="w-4 h-4" />
                   {error}
                 </p>
@@ -221,10 +214,11 @@ export const MediaAssetsPage: React.FC = () => {
               label="Collection Video"
               value={videoFile}
               onChange={handleVideoUpload}
-              onUploadComplete={handleVideoUploadComplete}
               onUploadError={handleVideoUploadError}
               maxFileSize={200}
-              existingVideoUrl={formData.video}
+              existingVideoUrl={
+                typeof formData.video === "string" ? formData.video : undefined
+              }
             />
 
             <div className="bg-white rounded-lg p-4 border border-gray-200">
@@ -244,8 +238,7 @@ export const MediaAssetsPage: React.FC = () => {
             {validationState.video?.errors.map((error, index) => (
               <p
                 key={index}
-                className="text-red-500 text-sm flex items-center gap-1"
-              >
+                className="text-red-500 text-sm flex items-center gap-1">
                 <Icon icon="material-symbols:error" className="w-4 h-4" />
                 {error}
               </p>
