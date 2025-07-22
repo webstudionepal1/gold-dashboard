@@ -118,7 +118,7 @@ export const MediaAssetsPage: React.FC = () => {
               />
 
               {/* Image Preview Grid */}
-              {selectedImages.length > 0 && (
+              {/* {selectedImages.length > 0 && (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {selectedImages.map((file, index) => (
                     <div key={index} className="relative group">
@@ -145,7 +145,7 @@ export const MediaAssetsPage: React.FC = () => {
                     </div>
                   ))}
                 </div>
-              )}
+              )} */}
 
               {/* Validation Errors */}
               {validationState.images?.errors.map((error, index) => (

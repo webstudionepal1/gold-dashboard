@@ -480,9 +480,9 @@ export interface IFetchStone {
 
 export const useGetAllStonesQuery = (params: IParams = {}) => {
   return useQuery({
-    queryKey: ["stones", params],
+    queryKey: ["stone", params],
     queryFn: async () => {
-      const res = await apiClient.get<{ data: IFetchStone[] }>("stones", {
+      const res = await apiClient.get<{ data: IFetchStone[] }>("stone", {
         params,
       });
       return res?.data?.data;
@@ -493,14 +493,14 @@ export const useGetAllStonesQuery = (params: IParams = {}) => {
 export const useCreateStoneMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["stones"],
+    mutationKey: ["stone"],
     mutationFn: async (body: FormData) => {
-      const res = await apiClient.post("stones", body);
+      const res = await apiClient.post("stone", body);
       return res?.data?.data;
     },
     onSuccess() {
       toast.success("Stone created successfully");
-      queryClient.invalidateQueries({ queryKey: ["stones"] });
+      queryClient.invalidateQueries({ queryKey: ["stone"] });
     },
     onError(err: string) {
       toast.error(err || "Error creating stone");
@@ -511,14 +511,14 @@ export const useCreateStoneMutation = () => {
 export const useUpdateStoneMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["stones"],
+    mutationKey: ["stone"],
     mutationFn: async ({ id, body }: { id: string; body: FormData }) => {
-      const res = await apiClient.patch(`stones/${id}`, body);
+      const res = await apiClient.patch(`stone/${id}`, body);
       return res?.data?.data;
     },
     onSuccess() {
       toast.success("Stone updated successfully");
-      queryClient.invalidateQueries({ queryKey: ["stones"] });
+      queryClient.invalidateQueries({ queryKey: ["stone"] });
     },
     onError(err: string) {
       toast.error(err || "Error updating stone");
