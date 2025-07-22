@@ -52,7 +52,7 @@ export interface ProductFormData {
   occasions?: string[];
 
   // Page 5: Media Assets
-  images: string[];
+  images: (string | File)[];
 
   // Page 6: SEO & Marketing
   tags: string[];
@@ -216,13 +216,10 @@ export const ProductFormProvider: React.FC<ProductFormProviderProps> = ({
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
 
   // Update form data
-  const updateFormData = useCallback(
-    (updates: Partial<ProductFormData>) => {
-      setFormData((prev) => ({ ...prev, ...updates }));
-      setIsDirty(true);
-    },
-    []
-  );
+  const updateFormData = useCallback((updates: Partial<ProductFormData>) => {
+    setFormData((prev) => ({ ...prev, ...updates }));
+    setIsDirty(true);
+  }, []);
 
   // Reset form data
   const resetFormData = useCallback(() => {
@@ -313,9 +310,7 @@ export const ProductFormProvider: React.FC<ProductFormProviderProps> = ({
 export const useProductForm = (): ProductFormContextType => {
   const context = useContext(ProductFormContext);
   if (!context) {
-    throw new Error(
-      "useProductForm must be used within a ProductFormProvider"
-    );
+    throw new Error("useProductForm must be used within a ProductFormProvider");
   }
   return context;
 };

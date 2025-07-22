@@ -176,7 +176,11 @@ export const MediaAssetsPage: React.FC = () => {
               label="Banner Image"
               value={bannerImage}
               onChange={handleBannerImageUpload}
-              existingImageUrl={formData.bannerImage}
+              existingImageUrl={
+                typeof formData.bannerImage === "string"
+                  ? formData.bannerImage
+                  : undefined
+              }
             />
 
             <div className="bg-white rounded-lg p-4 border border-gray-200">
