@@ -108,6 +108,7 @@ export interface IFetchProduct {
   tags: string[];
   visibleAs: string;
   images: string[];
+  isActive: boolean;
 }
 
 //clasps interfaces

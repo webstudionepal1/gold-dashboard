@@ -193,6 +193,7 @@ export const productListColumns = [
   { title: "Price", key: "price" },
   { title: "Stock", key: "stock" },
   { title: "Sold", key: "sold" },
+  { title: "Status", key: "status" },
 ];
 
 export const occasionColumns = [
