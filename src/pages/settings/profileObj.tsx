@@ -7,10 +7,6 @@ export const attributeObj = [
     label: "Clasp Type",
     value: "clasp-type",
   },
-  {
-    label: "Raw Material",
-    value: "raw-material",
-  },
 ];
 
 export const claspsColumn = [
@@ -29,14 +25,7 @@ export const claspsColumn = [
     title: "Status",
   },
 ];
-export const rawColumns = [
-  { key: "sn", title: "S.N" },
-  {
-    key: "name",
-    title: "name",
-  },
-  { key: "unit", title: "unit" },
-];
+
 const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
 // export const editCustomerSchema = z.object({
