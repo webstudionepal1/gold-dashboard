@@ -10,6 +10,7 @@ import {
 import MasterTable from "../../components/shared/MasterTable";
 import Header from "../../components/shared/table_heading/Header";
 import { get } from "lodash";
+import SafeImage from "../../components/ui/SafeImage";
 
 // Filter and sort options for collections
 const filterOptions = [
@@ -53,13 +54,10 @@ const CollectionIndex: React.FC = () => {
         render: (value: string, row: IFetchCollection) => (
           <div className="flex items-center gap-3">
             {row.images && row.images.length > 0 && (
-              <img
+              <SafeImage
                 src={row.images[0]}
                 alt={row.name}
                 className="w-10 h-10 rounded-lg object-cover"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = "/placeholder.svg";
-                }}
               />
             )}
             <div>
@@ -75,7 +73,7 @@ const CollectionIndex: React.FC = () => {
         width: "12%",
         render: (value: string) => (
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 capitalize">
-            {value?.replace("_", " ")}
+            {value?.replace("_", " ") || "Custom"}
           </span>
         ),
       },
@@ -112,7 +110,7 @@ const CollectionIndex: React.FC = () => {
         render: (value: string) =>
           value ? (
             <span className="text-sm capitalize">
-              {value.replace("_", " ")}
+              {value?.replace("_", " ") || value}
             </span>
           ) : (
             <span className="text-gray-400">-</span>

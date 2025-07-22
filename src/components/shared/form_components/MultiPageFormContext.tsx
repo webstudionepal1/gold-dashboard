@@ -10,6 +10,8 @@ export interface CollectionFormData {
   shortDescription: string;
   isActive: boolean;
   isFeatured: boolean;
+  collectionType: string;
+  sortOrder: number;
 
   // Page 2: Collection Properties
   materialType: string;
@@ -41,7 +43,6 @@ export interface CollectionFormData {
   isLimitedEdition: boolean;
   availableFrom: string;
   availableUntil: string;
-  sortOrder: number;
 }
 
 // Form Validation State
@@ -97,6 +98,8 @@ const defaultFormData: CollectionFormData = {
   shortDescription: "",
   isActive: true,
   isFeatured: false,
+  collectionType: "custom",
+  sortOrder: 0,
 
   // Page 2: Collection Properties
   materialType: "",
@@ -134,7 +137,6 @@ const defaultFormData: CollectionFormData = {
   isLimitedEdition: false,
   availableFrom: "",
   availableUntil: "",
-  sortOrder: 0,
 };
 
 // Create Context

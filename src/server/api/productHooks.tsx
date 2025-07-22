@@ -393,7 +393,7 @@ export const useGetAllProductClaspsQuery = (params: IParams = {}) => {
   return useQuery({
     queryKey: ["clasptype"],
     queryFn: async () => {
-      const res = await apiClient.get<{ data: IFetchClasps[] }>("calsptype", {
+      const res = await apiClient.get<{ data: IFetchClasps[] }>("clasptype", {
         params,
       });
       return res?.data?.data;
@@ -406,7 +406,7 @@ export const useCreateProductClaspsMutation = () => {
   return useMutation({
     mutationKey: ["clasptype"],
     mutationFn: async (body: FormData) => {
-      const res = await apiClient.post("calsptype", body, {
+      const res = await apiClient.post("clasptype", body, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       return res?.data?.data;
@@ -426,7 +426,7 @@ export const useUpdateProductClaspsMutation = () => {
   return useMutation({
     mutationKey: ["clasptype"],
     mutationFn: async ({ id, body }: { id: string; body: FormData }) => {
-      const res = await apiClient.patch(`calsptype/${id}`, body, {
+      const res = await apiClient.patch(`clasptype/${id}`, body, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       return res?.data?.data;
@@ -446,7 +446,7 @@ export const useDeleteProductClaspsMutation = () => {
   return useMutation({
     mutationKey: ["clasptype"],
     mutationFn: async (id: string) => {
-      const res = await apiClient.delete(`calsptype/${id}`);
+      const res = await apiClient.delete(`clasptype/${id}`);
       return res?.data?.data;
     },
     onSuccess() {
@@ -483,10 +483,13 @@ export const useGetAllStonesQuery = (params: IParams = {}) => {
   return useQuery({
     queryKey: ["stone", params],
     queryFn: async () => {
-      const res = await apiClient.get<{ data: IFetchStone[] }>("stone", {
-        params,
-      });
-      return res?.data?.data;
+      const res = await apiClient.get<{ data: { stones: IFetchStone[] } }>(
+        "stone",
+        {
+          params,
+        }
+      );
+      return res?.data?.data?.stones;
     },
   });
 };
@@ -514,7 +517,7 @@ export const useUpdateStoneMutation = () => {
   return useMutation({
     mutationKey: ["stone"],
     mutationFn: async ({ id, body }: { id: string; body: FormData }) => {
-      const res = await apiClient.patch(`stone/${id}`, body);
+      const res = await apiClient.put(`stone/${id}`, body);
       return res?.data?.data;
     },
     onSuccess() {
@@ -532,7 +535,7 @@ export const useDeleteStoneMutation = () => {
   return useMutation({
     mutationKey: ["stones"],
     mutationFn: async (id: string) => {
-      const res = await apiClient.delete(`stones/${id}`);
+      const res = await apiClient.delete(`stone/${id}`);
       return res?.data?.data;
     },
     onSuccess() {
@@ -563,7 +566,7 @@ export const useCreateProductOccasionMutation = () => {
   return useMutation({
     mutationKey: ["occasions"],
     mutationFn: async (body: FormData) => {
-      const res = await apiClient.post("occasions", body);
+      const res = await apiClient.post("occasion", body);
       return res?.data?.data;
     },
     onSuccess() {
@@ -581,7 +584,7 @@ export const useUpdateProductOccasionMutation = () => {
   return useMutation({
     mutationKey: ["occasions"],
     mutationFn: async ({ id, body }: { id: string; body: FormData }) => {
-      const res = await apiClient.patch(`occasions/${id}`, body);
+      const res = await apiClient.patch(`occasion/${id}`, body);
       return res?.data?.data;
     },
     onSuccess() {
@@ -599,7 +602,7 @@ export const useDeleteProductOccasionMutation = () => {
   return useMutation({
     mutationKey: ["occasions"],
     mutationFn: async (id: string) => {
-      const res = await apiClient.delete(`occasions/${id}`);
+      const res = await apiClient.delete(`occasion/${id}`);
       return res?.data?.data;
     },
     onSuccess() {

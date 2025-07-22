@@ -9,11 +9,19 @@ import Header from "../../../../components/shared/table_heading/Header";
 
 const ProductDescription: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { data: product, isLoading } = useGetProductById(id ?? "");
+  const { data: product, isLoading, error } = useGetProductById(id ?? "");
   const { data: review } = useGetAllReviews({ product: id ?? "" });
+
   if (isLoading) return <div className="text-center">Loading...</div>;
+  if (error)
+    return (
+      <div className="text-center text-red-500">
+        Error loading product: {error as any}
+      </div>
+    );
   if (!product) return <div className="text-center">Product not found.</div>;
-  const images = product.images.map(
+
+  const images = (product.images || []).map(
     (item) => `${import.meta.env.VITE_API_IMAGE_BASE_URL}${item}`
   );
   return (

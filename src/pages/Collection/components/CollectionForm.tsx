@@ -35,6 +35,18 @@ const collectionSchema = z.object({
     .max(500, "Short description cannot exceed 500 characters")
     .optional(),
   collectionMode: z.enum(["manual", "automatic", "hybrid"]),
+  collectionType: z.enum([
+    "material",
+    "gemstone",
+    "style",
+    "occasion",
+    "product_type",
+    "designer",
+    "price_range",
+    "seasonal",
+    "custom",
+  ]),
+  sortOrder: z.number().min(0, "Sort order must be non-negative"),
   materialType: z
     .enum([
       "gold",
@@ -183,6 +195,8 @@ const CollectionForm = () => {
       description: "",
       shortDescription: "",
       collectionMode: "manual",
+      collectionType: "custom",
+      sortOrder: 0,
       materialType: "",
       gemstoneType: "",
       styleCategory: "",
@@ -271,6 +285,11 @@ const CollectionForm = () => {
         collectionData.shortDescription || ""
       );
       form.setFieldValue("collectionMode", collectionData.collectionMode);
+      form.setFieldValue(
+        "collectionType",
+        collectionData.collectionType || "custom"
+      );
+      form.setFieldValue("sortOrder", collectionData.sortOrder || 0);
       form.setFieldValue("materialType", collectionData.materialType || "");
       form.setFieldValue("gemstoneType", collectionData.gemstoneType || "");
       form.setFieldValue("styleCategory", collectionData.styleCategory || "");
@@ -371,16 +390,14 @@ const CollectionForm = () => {
             e.stopPropagation();
             form.handleSubmit();
           }}
-          className="space-y-8"
-        >
+          className="space-y-8">
           {/* Basic Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <form.Field
               name="name"
               validators={{
                 onChange: collectionSchema.shape.name,
-              }}
-            >
+              }}>
               {(field) => (
                 <div>
                   <InputField
@@ -409,8 +426,7 @@ const CollectionForm = () => {
               name="slug"
               validators={{
                 onChange: collectionSchema.shape.slug,
-              }}
-            >
+              }}>
               {(field) => (
                 <div>
                   <InputField
@@ -431,8 +447,7 @@ const CollectionForm = () => {
             name="description"
             validators={{
               onChange: collectionSchema.shape.description,
-            }}
-          >
+            }}>
             {(field) => (
               <div>
                 <TextareaField
@@ -477,8 +492,7 @@ const CollectionForm = () => {
               name="collectionMode"
               validators={{
                 onChange: collectionSchema.shape.collectionMode,
-              }}
-            >
+              }}>
               {(field) => (
                 <div>
                   <DropdownField
@@ -537,6 +551,65 @@ const CollectionForm = () => {
               </>
             )}
           </form.Field>
+
+          {/* Collection Type and Sort Order */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <form.Field
+              name="collectionType"
+              validators={{
+                onChange: collectionSchema.shape.collectionType,
+              }}>
+              {(field) => (
+                <div>
+                  <DropdownField
+                    label="Collection Type"
+                    firstInput="Select collection type"
+                    required
+                    options={[
+                      { label: "Material", value: "material" },
+                      { label: "Gemstone", value: "gemstone" },
+                      { label: "Style", value: "style" },
+                      { label: "Occasion", value: "occasion" },
+                      { label: "Product Type", value: "product_type" },
+                      { label: "Designer", value: "designer" },
+                      { label: "Price Range", value: "price_range" },
+                      { label: "Seasonal", value: "seasonal" },
+                      { label: "Custom", value: "custom" },
+                    ]}
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    onBlur={field.handleBlur}
+                  />
+                  <FieldError field={field} />
+                </div>
+              )}
+            </form.Field>
+
+            <form.Field
+              name="sortOrder"
+              validators={{
+                onChange: collectionSchema.shape.sortOrder,
+              }}>
+              {(field) => (
+                <div>
+                  <InputField
+                    label="Sort Order"
+                    placeholder="0"
+                    type="number"
+                    value={field.state.value.toString()}
+                    onChange={(e) =>
+                      field.handleChange(parseInt(e.target.value) || 0)
+                    }
+                    onBlur={field.handleBlur}
+                  />
+                  <FieldError field={field} />
+                  <div className="mt-1 text-sm text-gray-600">
+                    Lower numbers appear first in listings
+                  </div>
+                </div>
+              )}
+            </form.Field>
+          </div>
 
           {/* Material and Gemstone Properties */}
           <div className="bg-gradient-to-r from-amber-50 to-yellow-50 rounded-xl p-6 border border-amber-200">
@@ -620,8 +693,7 @@ const CollectionForm = () => {
                     />
                     <label
                       htmlFor="isActive"
-                      className="text-sm font-medium text-gray-700 flex items-center gap-2"
-                    >
+                      className="text-sm font-medium text-gray-700 flex items-center gap-2">
                       <Icon
                         icon="material-symbols:visibility"
                         className="w-4 h-4"
@@ -644,8 +716,7 @@ const CollectionForm = () => {
                     />
                     <label
                       htmlFor="isFeatured"
-                      className="text-sm font-medium text-gray-700 flex items-center gap-2"
-                    >
+                      className="text-sm font-medium text-gray-700 flex items-center gap-2">
                       <Icon icon="material-symbols:star" className="w-4 h-4" />
                       Featured Collection
                     </label>
@@ -665,8 +736,7 @@ const CollectionForm = () => {
                     />
                     <label
                       htmlFor="isLimitedEdition"
-                      className="text-sm font-medium text-gray-700 flex items-center gap-2"
-                    >
+                      className="text-sm font-medium text-gray-700 flex items-center gap-2">
                       <Icon
                         icon="material-symbols:schedule"
                         className="w-4 h-4"
@@ -722,8 +792,7 @@ const CollectionForm = () => {
                       type="button"
                       onClick={() => calculatePriceRangeMutation.mutate(id!)}
                       disabled={calculatePriceRangeMutation.isPending}
-                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                    >
+                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
                       {calculatePriceRangeMutation.isPending && (
                         <Icon icon="eos-icons:loading" className="w-4 h-4" />
                       )}
@@ -964,8 +1033,7 @@ const CollectionForm = () => {
             <button
               type="button"
               onClick={() => navigate("/collection")}
-              className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-            >
+              className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
               Cancel
             </button>
             <button
@@ -974,8 +1042,7 @@ const CollectionForm = () => {
                 createCollectionMutation.isPending ||
                 updateCollectionMutation.isPending
               }
-              className="px-6 py-2 bg-[#DF8D28] text-white rounded-lg hover:bg-[#DF8D28]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-            >
+              className="px-6 py-2 bg-[#DF8D28] text-white rounded-lg hover:bg-[#DF8D28]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
               {(createCollectionMutation.isPending ||
                 updateCollectionMutation.isPending) && (
                 <Icon icon="eos-icons:loading" className="w-4 h-4" />

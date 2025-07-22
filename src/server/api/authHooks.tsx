@@ -16,11 +16,10 @@ export const useGetLoginMutation = () => {
     onSuccess: (data) => {
       toast.success("User logged in successfully");
       Cookies.set("_UPLFMMATRIX", data.token);
-      Cookies.set("user", data.user);
+      Cookies.set("user", JSON.stringify(data.user));
     },
     onError: (err: string) => {
       toast.error(err);
     },
   });
 };
-
