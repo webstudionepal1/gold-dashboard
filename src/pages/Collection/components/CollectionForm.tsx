@@ -370,7 +370,7 @@ const CollectionForm = () => {
   }
 
   return (
-    <div className="container mx-auto max-h-screen overflow-y-auto h-full p-6">
+    <div className=" mx-auto max-h-screen overflow-y-auto h-full p-6">
       <Breadcrumbs />
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mt-6">
@@ -390,14 +390,16 @@ const CollectionForm = () => {
             e.stopPropagation();
             form.handleSubmit();
           }}
-          className="space-y-8">
+          className="space-y-8"
+        >
           {/* Basic Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <form.Field
               name="name"
               validators={{
                 onChange: collectionSchema.shape.name,
-              }}>
+              }}
+            >
               {(field) => (
                 <div>
                   <InputField
@@ -426,7 +428,8 @@ const CollectionForm = () => {
               name="slug"
               validators={{
                 onChange: collectionSchema.shape.slug,
-              }}>
+              }}
+            >
               {(field) => (
                 <div>
                   <InputField
@@ -447,7 +450,8 @@ const CollectionForm = () => {
             name="description"
             validators={{
               onChange: collectionSchema.shape.description,
-            }}>
+            }}
+          >
             {(field) => (
               <div>
                 <TextareaField
@@ -492,7 +496,8 @@ const CollectionForm = () => {
               name="collectionMode"
               validators={{
                 onChange: collectionSchema.shape.collectionMode,
-              }}>
+              }}
+            >
               {(field) => (
                 <div>
                   <DropdownField
@@ -558,7 +563,8 @@ const CollectionForm = () => {
               name="collectionType"
               validators={{
                 onChange: collectionSchema.shape.collectionType,
-              }}>
+              }}
+            >
               {(field) => (
                 <div>
                   <DropdownField
@@ -589,7 +595,8 @@ const CollectionForm = () => {
               name="sortOrder"
               validators={{
                 onChange: collectionSchema.shape.sortOrder,
-              }}>
+              }}
+            >
               {(field) => (
                 <div>
                   <InputField
@@ -693,7 +700,8 @@ const CollectionForm = () => {
                     />
                     <label
                       htmlFor="isActive"
-                      className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                      className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                    >
                       <Icon
                         icon="material-symbols:visibility"
                         className="w-4 h-4"
@@ -716,7 +724,8 @@ const CollectionForm = () => {
                     />
                     <label
                       htmlFor="isFeatured"
-                      className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                      className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                    >
                       <Icon icon="material-symbols:star" className="w-4 h-4" />
                       Featured Collection
                     </label>
@@ -736,7 +745,8 @@ const CollectionForm = () => {
                     />
                     <label
                       htmlFor="isLimitedEdition"
-                      className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                      className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                    >
                       <Icon
                         icon="material-symbols:schedule"
                         className="w-4 h-4"
@@ -792,7 +802,8 @@ const CollectionForm = () => {
                       type="button"
                       onClick={() => calculatePriceRangeMutation.mutate(id!)}
                       disabled={calculatePriceRangeMutation.isPending}
-                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    >
                       {calculatePriceRangeMutation.isPending && (
                         <Icon icon="eos-icons:loading" className="w-4 h-4" />
                       )}
@@ -1033,7 +1044,8 @@ const CollectionForm = () => {
             <button
               type="button"
               onClick={() => navigate("/collection")}
-              className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+              className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+            >
               Cancel
             </button>
             <button
@@ -1042,7 +1054,8 @@ const CollectionForm = () => {
                 createCollectionMutation.isPending ||
                 updateCollectionMutation.isPending
               }
-              className="px-6 py-2 bg-[#DF8D28] text-white rounded-lg hover:bg-[#DF8D28]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+              className="px-6 py-2 bg-[#DF8D28] text-white rounded-lg hover:bg-[#DF8D28]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
               {(createCollectionMutation.isPending ||
                 updateCollectionMutation.isPending) && (
                 <Icon icon="eos-icons:loading" className="w-4 h-4" />

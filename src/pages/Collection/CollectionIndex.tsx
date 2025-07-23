@@ -9,7 +9,6 @@ import {
 } from "../../server/api/collectionHooks";
 import MasterTable from "../../components/shared/MasterTable";
 import Header from "../../components/shared/table_heading/Header";
-import { get } from "lodash";
 import SafeImage from "../../components/ui/SafeImage";
 
 // Filter and sort options for collections
@@ -44,6 +43,8 @@ const CollectionIndex: React.FC = () => {
   const { data: collections = [], isLoading } = useGetAllCollectionsQuery();
   const deleteCollectionMutation = useDeleteCollectionMutation();
 
+  console.log(collections, "collectin");
+
   // Table columns configuration
   const columns = useMemo(
     () => [
@@ -52,7 +53,7 @@ const CollectionIndex: React.FC = () => {
         title: "Collection Name",
         width: "20%",
         render: (value: string, row: IFetchCollection) => (
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             {row.images && row.images.length > 0 && (
               <SafeImage
                 src={row.images[0]}
@@ -89,7 +90,8 @@ const CollectionIndex: React.FC = () => {
                 : value === "hybrid"
                 ? "bg-yellow-100 text-yellow-800"
                 : "bg-gray-100 text-gray-800"
-            }`}>
+            }`}
+          >
             {value}
           </span>
         ),
@@ -134,7 +136,8 @@ const CollectionIndex: React.FC = () => {
           <span
             className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
               value ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-            }`}>
+            }`}
+          >
             {value ? "Active" : "Inactive"}
           </span>
         ),

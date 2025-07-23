@@ -154,10 +154,16 @@ export const useGetCollectionByIdQuery = (id: string) => {
   return useQuery({
     queryKey: ["collection", id],
     queryFn: async () => {
-      const res = await apiClient.get<{ data: IFetchCollection }>(
-        `collection/${id}`
-      );
-      return res?.data?.data;
+      try {
+        const res = await apiClient.get<{ data: IFetchCollection }>(
+          `collection/${id}`
+        );
+
+        return res?.data?.data;
+      } catch (error) {
+        console.error("Error fetching collection:", error);
+        throw error;
+      }
     },
     enabled: !!id,
   });

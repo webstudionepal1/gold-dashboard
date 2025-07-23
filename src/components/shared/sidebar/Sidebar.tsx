@@ -248,9 +248,12 @@ const Sidebar: React.FC<{ config: { sections: SidebarSection[] } }> = ({
   };
 
   const toggleExpand = (id: number) => {
-    setExpandedItems((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
+    setExpandedItems((prev) => {
+      if (prev.includes(id)) {
+        return prev.filter((item) => item !== id);
+      }
+      return [id];
+    });
   };
 
   const currentParentId = findActiveParentId();

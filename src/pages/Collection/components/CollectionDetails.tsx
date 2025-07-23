@@ -15,6 +15,8 @@ const CollectionDetails = () => {
     error,
   } = useGetCollectionByIdQuery(id || "");
 
+  console.log(collection, "collection single");
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -34,12 +36,28 @@ const CollectionDetails = () => {
           <h2 className="text-2xl font-semibold text-gray-900 mb-2">
             Collection Not Found
           </h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 mb-4">
             The collection you're looking for doesn't exist or has been removed.
           </p>
+          {/* Debug information */}
+          <div className="text-left bg-gray-100 p-4 rounded-lg mb-6 max-w-md mx-auto">
+            <p className="text-sm text-gray-700 mb-2">
+              <strong>Debug Info:</strong>
+            </p>
+            <p className="text-sm text-gray-600">
+              ID: {id || "No ID provided"}
+            </p>
+            <p className="text-sm text-gray-600">
+              Error: {error ? JSON.stringify(error) : "No error"}
+            </p>
+            <p className="text-sm text-gray-600">
+              Collection: {collection ? "Found" : "Not found"}
+            </p>
+          </div>
           <button
             onClick={() => navigate("/collection")}
-            className="px-6 py-2 bg-[#DF8D28] text-white rounded-lg hover:bg-[#DF8D28]/90 transition-colors">
+            className="px-6 py-2 bg-[#DF8D28] text-white rounded-lg hover:bg-[#DF8D28]/90 transition-colors"
+          >
             Back to Collections
           </button>
         </div>
@@ -101,13 +119,15 @@ const CollectionDetails = () => {
             <div className="flex gap-2">
               <button
                 onClick={() => navigate(`/collection/edit/${collection._id}`)}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2">
+                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2"
+              >
                 <Icon icon="material-symbols:edit" className="w-4 h-4" />
                 Edit
               </button>
               <button
                 onClick={() => navigate("/collection")}
-                className="px-4 py-2 bg-[#DF8D28] text-white rounded-lg hover:bg-[#DF8D28]/90 transition-colors">
+                className="px-4 py-2 bg-[#DF8D28] text-white rounded-lg hover:bg-[#DF8D28]/90 transition-colors"
+              >
                 Back to Collections
               </button>
             </div>
@@ -261,7 +281,8 @@ const CollectionDetails = () => {
             <video
               src={collection.video}
               controls
-              className="w-full max-w-2xl rounded-lg">
+              className="w-full max-w-2xl rounded-lg"
+            >
               Your browser does not support the video tag.
             </video>
           </div>
@@ -333,7 +354,8 @@ const CollectionDetails = () => {
                         {collection.metadata.keywords.map((keyword, index) => (
                           <span
                             key={index}
-                            className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                          >
                             {keyword}
                           </span>
                         ))}
@@ -348,7 +370,8 @@ const CollectionDetails = () => {
                         {collection.metadata.tags.map((tag, index) => (
                           <span
                             key={index}
-                            className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                            className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+                          >
                             {tag}
                           </span>
                         ))}
@@ -388,7 +411,8 @@ const CollectionDetails = () => {
                     {collection.conditions.groups.map((group, groupIndex) => (
                       <div
                         key={groupIndex}
-                        className="border border-gray-200 rounded-lg p-4">
+                        className="border border-gray-200 rounded-lg p-4"
+                      >
                         <p className="text-sm font-medium text-gray-700 mb-2">
                           Group {groupIndex + 1} (Rules combined with:{" "}
                           {group.operator})
@@ -397,7 +421,8 @@ const CollectionDetails = () => {
                           {group.rules.map((rule, ruleIndex) => (
                             <div
                               key={ruleIndex}
-                              className="text-sm text-gray-600 bg-gray-50 p-2 rounded">
+                              className="text-sm text-gray-600 bg-gray-50 p-2 rounded"
+                            >
                               <span className="font-medium">{rule.field}</span>{" "}
                               {rule.operator}{" "}
                               <span className="font-medium">
