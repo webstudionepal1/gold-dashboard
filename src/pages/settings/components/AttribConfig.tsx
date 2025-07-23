@@ -1,22 +1,17 @@
 import { useMemo, useState } from "react";
 import MasterTable from "../../../components/shared/MasterTable";
 import { DynamicTab } from "../../PurchaseManagement/components/DynamicTab";
-import { attributeObj, claspsColumn, rawColumns } from "../profileObj";
+import { attributeObj, claspsColumn } from "../profileObj";
 import {
   IFetchClasps,
   useDeleteProductClaspsMutation,
   useGetAllProductClaspsQuery,
 } from "../../../server/api/productHooks";
-import {
-  IFetchItems,
-  useDeleteRawMaterial,
-} from "../../../server/api/purchaseHooks";
-import { useGetRawMaterialsQuery } from "../../../server/api/rawMaterialHook";
+
 import { map } from "lodash";
 import { ITable } from "../../PurchaseManagement/purchaseObj";
 import Header from "../../../components/shared/table_heading/Header";
 import ClaspModel from "./ClaspModel";
-import RawMaterialModal from "./RawMaterialModal";
 import { Icon } from "@iconify/react/dist/iconify.js";
 
 interface IModalProps {
@@ -34,21 +29,13 @@ const AttribConfig = () => {
   const [tab, setTab] = useState("clasp-type");
   const { data: claspsType, isLoading } = useGetAllProductClaspsQuery();
 
-  const { data: rawmaterial, isLoading: materialLoading } =
-    useGetRawMaterialsQuery();
   const { mutate: deleteClasp } = useDeleteProductClaspsMutation();
-  const { mutate: deleteRawMaterial } = useDeleteRawMaterial();
   const [modal, setModal] = useState<IModalProps>({
     of: "",
     data: null,
     edit: false,
   });
   const buttonObj: IButtonObj = {
-    "raw-material": {
-      text: "Add Raw Material",
-      handleClick: () =>
-        setModal({ of: "raw-material", edit: false, data: null }),
-    },
     "clasp-type": {
       text: "Add Clasp Type",
       handleClick: () =>
@@ -101,27 +88,9 @@ const AttribConfig = () => {
     }),
     [claspsType]
   );
-  const rawTableData = useMemo(
-    () => ({
-      columns: rawColumns,
-      rows: map(rawmaterial, (item, index: number) => ({
-        ...item,
-        id: item.id,
-        sn: index + 1,
-      })),
-      editAction(rows: IFetchItems) {
-        setModal({ of: "raw-material", edit: true, data: rows });
-      },
-      onDelete(id: string) {
-        deleteRawMaterial(id);
-      },
-    }),
 
-    [rawmaterial]
-  );
   const tableDataObj: ITable = {
     "clasp-type": claspsTableData,
-    "raw-material": rawTableData,
   };
   return (
     <div>
@@ -140,7 +109,7 @@ const AttribConfig = () => {
       </Header>
       <div className="p-4 bg-white border-2 rounded-lg">
         <MasterTable
-          loading={isLoading || materialLoading}
+          loading={isLoading}
           showAction
           {...tableDataObj[tab]}
           tabsOptions={
@@ -154,13 +123,6 @@ const AttribConfig = () => {
       </div>
       {modal.of === "clasp-type" && (
         <ClaspModel
-          onClose={() => setModal({ of: "", data: null, edit: false })}
-          data={modal.data}
-          edit={modal.edit}
-        />
-      )}
-      {modal.of === "raw-material" && (
-        <RawMaterialModal
           onClose={() => setModal({ of: "", data: null, edit: false })}
           data={modal.data}
           edit={modal.edit}

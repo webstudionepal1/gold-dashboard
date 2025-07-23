@@ -27,6 +27,8 @@ const StoneIndex: React.FC = () => {
   );
 
   const { data: stones, isSuccess } = useGetAllStonesQuery({});
+
+  console.log("Stone data", stones);
   const { mutate: deleteStone } = useDeleteStoneMutation();
 
   const stonesData = useMemo(

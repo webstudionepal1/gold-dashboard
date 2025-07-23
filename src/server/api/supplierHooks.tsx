@@ -34,6 +34,7 @@ export interface IFetchSupplier {
   products: IFetchProduct[];
   logo: string[];
   _id: string;
+  updatedAt?: string;
 }
 export const useGetSupplierQuery = (params = {}) => {
   return useQuery({

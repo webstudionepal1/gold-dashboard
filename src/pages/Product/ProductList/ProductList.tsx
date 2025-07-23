@@ -8,9 +8,11 @@ import {
   IFetchProduct,
   useDeleteProductsMutation,
   useGetAllProductsQuery,
+  useUpdateProductsMutation,
 } from "../../../server/api/productHooks";
 import { updateProductState } from "../../../store/productStore";
 import { productListColumns } from "../productObj";
+import { StatusSwitch } from "../../../components/shared/StatusSwitch";
 
 // Filter state interface
 // interface FilterState {
@@ -43,7 +45,96 @@ const ProductList: React.FC = () => {
     [isSuccess, productsList]
   );
   const { mutate: deleteProduct } = useDeleteProductsMutation();
+  const { mutate: updateProduct } = useUpdateProductsMutation();
   const navigate = useNavigate();
+
+  // const handleStatusToggle = async (productId: string, newStatus: boolean) => {
+  //   const product = productsList?.find((product) => product._id === productId);
+  //   if (product) {
+  //     updateProduct({
+  //       id: productId,
+  //       body: {
+  //         ...product,
+  //         isActive: newStatus,
+  //       },
+  //     });
+  //   }
+  // };
+
+  // const handleStatusToggle = async (productId: string, newStatus: boolean) => {
+  //   const product = productsList?.find((product) => product._id === productId);
+  //   if (product) {
+  //     const formData = new FormData();
+  //     // Append required fields from IFetchProduct
+  //     formData.append("name", product.name);
+  //     formData.append("ratings", product.ratings.toString());
+  //     formData.append("description", product.description);
+  //     formData.append("category", product.category._id); // Assuming category is an object with _id
+  //     formData.append("subCategory", product.subCategory._id); // Assuming subCategory is an object with _id
+  //     product.variant.forEach((v, index) => {
+  //       formData.append(`variant[${index}][price]`, v.price.toString());
+  //       formData.append(`variant[${index}][wt]`, v.wt.toString());
+  //       formData.append(`variant[${index}][unit]`, v.unit);
+  //       formData.append(
+  //         `variant[${index}][totalStock]`,
+  //         v.totalStock.toString()
+  //       );
+  //       formData.append(`variant[${index}][usedStock]`, v.usedStock.toString());
+  //       formData.append(
+  //         `variant[${index}][remainingStock]`,
+  //         v.remainingStock.toString()
+  //       );
+  //       formData.append(
+  //         `variant[${index}][reorderPoint]`,
+  //         v.reorderPoint.toString()
+  //       );
+  //     });
+  //     formData.append("makingCharges", product.makingCharges.toString());
+  //     formData.append("length", product.length.toString());
+  //     formData.append("claspType", product.claspType._id); // Assuming claspType is an object with _id
+  //     formData.append("rhodoumFinishes", product.rhodoumFinishes.toString());
+  //     formData.append("shape", product.shape);
+  //     formData.append("quantity", product.quantity.toString());
+  //     formData.append("totalCarat", product.totalCarat.toString());
+  //     formData.append("color", product.color);
+  //     formData.append("clarity", product.clarity);
+  //     formData.append("dimension", product.dimension.toString());
+  //     product.tags.forEach((tag, index) =>
+  //       formData.append(`tags[${index}]`, tag)
+  //     );
+  //     formData.append("visibleAs", product.visibleAs);
+  //     product.images.forEach((image, index) =>
+  //       formData.append(`images[${index}]`, image)
+  //     );
+  //     // Append isActive (assuming the API expects it)
+  //     formData.append("isActive", newStatus.toString());
+
+  //     updateProduct({
+  //       id: productId,
+  //       body: formData,
+  //     });
+  //   }
+  // };
+
+  const handleStatusToggle = async (productId: string, newStatus: boolean) => {
+    console.log(
+      "Toggling status for productId:",
+      productId,
+      "newStatus:",
+      newStatus
+    );
+    const formData = new FormData();
+    formData.append("isActive", newStatus.toString());
+    updateProduct(
+      {
+        id: productId,
+        body: formData,
+      },
+      {
+        onError: (err) => console.error("Update failed:", err),
+      }
+    );
+  };
 
   // Consolidated filter state
   // const [filterState, setFilterState] = useState<FilterState>({
@@ -169,6 +260,12 @@ const ProductList: React.FC = () => {
     price: get(product, "price", 0),
     stock: get(product, "variant[0].remainingStock", 0),
     sold: get(product, "variant[0].usedStock", 0),
+    status: (
+      <StatusSwitch
+        isActive={get(product, "isActive", true)}
+        onToggle={(newStatus) => handleStatusToggle(product._id, newStatus)}
+      />
+    ),
   }));
 
   return (
