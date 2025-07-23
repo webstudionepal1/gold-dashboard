@@ -175,7 +175,7 @@ export const useUpdateProductsMutation = () => {
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Product created successfully");
+      toast.success("Product updated successfully");
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
     onError(err: string) {

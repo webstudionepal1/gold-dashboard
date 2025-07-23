@@ -17,7 +17,7 @@ export const StatusSwitch: React.FC<StatusSwitchProps> = ({
 
   const handleToggle = async () => {
     if (disabled || isLoading) return;
-    
+
     setIsLoading(true);
     try {
       await onToggle(!isActive);
@@ -60,7 +60,11 @@ export const StatusSwitch: React.FC<StatusSwitchProps> = ({
               ? "bg-amber-500 hover:bg-amber-600"
               : "bg-gray-200 hover:bg-gray-300"
           }
-          ${disabled || isLoading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
+          ${
+            disabled || isLoading
+              ? "opacity-50 cursor-not-allowed"
+              : "cursor-pointer"
+          }
         `}
         aria-pressed={isActive}
         aria-label={`Toggle status ${isActive ? "off" : "on"}`}
@@ -74,10 +78,12 @@ export const StatusSwitch: React.FC<StatusSwitchProps> = ({
           `}
         />
       </button>
-      
-      <span className={`text-xs font-medium ${
-        isActive ? "text-green-600" : "text-gray-500"
-      }`}>
+
+      <span
+        className={`text-xs font-medium ${
+          isActive ? "text-green-600" : "text-gray-500"
+        }`}
+      >
         {isActive ? "Active" : "Inactive"}
       </span>
     </div>
