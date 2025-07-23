@@ -10,7 +10,6 @@ const SupplierDetail = () => {
   let { id } = useParams();
   id ??= "";
   const { data: supplierData } = useGetSupplierByIdQuery(id);
-
   const navigate = useNavigate();
   const contactDataList = [
     {
