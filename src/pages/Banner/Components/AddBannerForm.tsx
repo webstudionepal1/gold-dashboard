@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useForm, useStore } from "@tanstack/react-form";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import * as z from "zod";
 
 import { InputField } from "../../../components/shared/form_components/InputField";
@@ -18,38 +18,41 @@ import {
   useGetAllProductSubCategoriesQuery,
 } from "../../../server/api/productHooks";
 import { bannerStore } from "./bannerStore";
-import {
-  generateBannerFormDefaultValue,
-  type IBannerFormData,
-} from "./bannerobj";
+import { generateBannerFormDefaultValue } from "./bannerobj";
 import MultiImageUploader from "../../../components/shared/form_components/FileDropInput";
 import { cleanObject } from "../../../utils/cleanObject";
 
-const AddBannerSchema = z.object({
-  title: z.string().min(1, "Banner Title is required"),
-  description: z.string().min(1, "Description is required"),
-  category: z.string().min(1, "Category is required"),
-  subCategory: z.string().min(1, "Sub Category is required"),
-  priority: z.number().min(0, "Price must be a positive number"),
-  locations: z.array(z.string()).min(1, "Location is required"),
-  image: z
-    .instanceof(File)
-    .nullable()
-    .refine((val) => val !== null, {
-      message: "At least one image is required",
-    }),
-  mobImage: z
-    .instanceof(File)
-    .nullable()
-    .refine((val) => val !== null, {
-      message: "At least one image is required",
-    }),
-});
+const createAddBannerSchema = (isEditMode: boolean) =>
+  z.object({
+    title: z.string().min(1, "Banner Title is required"),
+    description: z.string().min(1, "Description is required"),
+    category: z.string().min(1, "Category is required"),
+    subCategory: z.string().min(1, "Sub Category is required"),
+    priority: z.number().min(0, "Price must be a positive number"),
+    locations: z.array(z.string()).min(1, "Location is required"),
+    image: isEditMode
+      ? z.instanceof(File).nullable().optional()
+      : z
+          .instanceof(File)
+          .nullable()
+          .refine((val) => val !== null, {
+            message: "At least one image is required",
+          }),
+
+    existingImage: z.string().optional(),
+  });
 
 const AddBannerForm = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const bannerData = useStore(bannerStore, (state) => state);
-  const [selectedTagItems, setSelectedTagItems] = useState<string[]>([]);
+
+  const formState = id ?? "add";
+  const isEditMode = id !== "add";
+
+  const [selectedTagItems, setSelectedTagItems] = useState<string[]>(
+    isEditMode && bannerData?.locations ? bannerData.locations : []
+  );
 
   const {
     mutate: createBanner,
@@ -63,21 +66,11 @@ const AddBannerForm = () => {
     isSuccess: bannerUpdateSuccess,
   } = useUpdateBannerMutation();
 
-  const { data: banners = [], isLoading, error } = useGetAllBannerQuery();
+  const { data: categories, isSuccess: categorySuccess } =
+    useGetAllProductCategoriesQuery();
 
-  const {
-    data: categories,
-    isLoading: isCategoryLoading,
-    isSuccess: categorySuccess,
-    error: categoryError,
-  } = useGetAllProductCategoriesQuery();
-
-  const {
-    data: subCategories,
-    isLoading: isSubCategoryLoading,
-    isSuccess: subCategorySuccess,
-    error: subCategoryError,
-  } = useGetAllProductSubCategoriesQuery();
+  const { data: subCategories, isSuccess: subCategorySuccess } =
+    useGetAllProductSubCategoriesQuery();
 
   const categoryOptions = useMemo(
     () =>
@@ -95,14 +88,11 @@ const AddBannerForm = () => {
     [subCategorySuccess, subCategories]
   );
 
-  const formState = id ?? "add";
-  const isEditMode = id !== "add";
-
   // UseForm with inferred types from defaultValues
   const form = useForm({
     defaultValues: generateBannerFormDefaultValue(formState, bannerData),
     validators: {
-      onSubmit: AddBannerSchema,
+      onSubmit: createAddBannerSchema(isEditMode),
     },
     onSubmit: async ({ value }) => {
       try {
@@ -111,8 +101,6 @@ const AddBannerForm = () => {
 
         delete formattedData["image"];
         delete formattedData["existingImage"];
-        delete formattedData["mobImage"];
-        delete formattedData["existingMobImage"];
 
         formData.append("title", value.title);
         formData.append("description", value.description);
@@ -128,12 +116,18 @@ const AddBannerForm = () => {
           formData.append("image", value.image);
         }
 
-        if (value.mobImage) {
-          formData.append("mobImage", value.mobImage);
+        console.log("FormData contents:");
+        for (let [key, value] of formData.entries()) {
+          console.log(key, value);
         }
 
-        if (id === "add") createBanner(formData);
-        else updateBanner({ id: bannerData._id, body: formData });
+        if (id === "add") {
+          console.log("Creating new banner");
+          createBanner(formData);
+        } else {
+          console.log("Updating banner with ID:", bannerData._id);
+          updateBanner({ id: bannerData._id, body: formData });
+        }
       } catch (error) {
         console.error("Failed to create banner", error);
       }
@@ -158,8 +152,20 @@ const AddBannerForm = () => {
   };
 
   useEffect(() => {
-    if (bannerSuccess || bannerUpdateSuccess) form.reset();
-  }, [bannerSuccess, bannerUpdateSuccess]);
+    if (bannerSuccess || bannerUpdateSuccess) {
+      form.reset();
+      setTimeout(() => {
+        navigate("/banner");
+      }, 1000);
+    }
+  }, [bannerSuccess, bannerUpdateSuccess, navigate]);
+
+  useEffect(() => {
+    if (isEditMode && bannerData?.locations) {
+      console.log("Updating selectedTagItems with:", bannerData.locations);
+      setSelectedTagItems(bannerData.locations);
+    }
+  }, [isEditMode, bannerData?.locations]);
 
   return (
     <div className="mx-8 my-3">
@@ -168,7 +174,7 @@ const AddBannerForm = () => {
         <Breadcrumbs />
       </div>
 
-      <div className="flex items-center justify-between my-2 gap-4">
+      <div className="flex items-start justify-between my-2 gap-4">
         <div className="bg-[#ffffff] border-[#eeeeee] border-2 shadow-lg rounded-xl w-full">
           <form
             className="flex flex-col gap-4 mx-4 my-6"
@@ -305,11 +311,11 @@ const AddBannerForm = () => {
           </form>
         </div>
 
-        <div className="flex flex-col gap-2 mt-8 w-[50%]">
+        <div className="flex flex-col gap-2  w-[50%]">
           <div className="bg-[#ffffff] border-[#eeeeee] border-2 shadow-lg rounded-xl w-full">
             <div className="mx-6 my-4">
               <div>
-                <h1 className="text-xl font-semibold">Upload Web Image</h1>
+                <h1 className="text-xl font-semibold">Upload Image</h1>
                 <div className="border-b border-[#dedde2] w-full my-2"></div>
               </div>
 
@@ -319,38 +325,12 @@ const AddBannerForm = () => {
                     multiple={false}
                     form={form}
                     label=""
-                    value={field.state.value}
+                    value={field.state.value || null}
                     existingFileField="existingImage"
                     accept={{
                       "image/*": [".png", ".jpg", ".jpeg", ".svg"],
                     }}
                     existingFile={form.getFieldValue("existingImage")}
-                    onChange={(file) => field.handleChange(file)}
-                  />
-                )}
-              </form.Field>
-            </div>
-          </div>
-
-          <div className="bg-[#ffffff] border-[#eeeeee] border-2 shadow-lg rounded-xl w-full">
-            <div className="mx-6 my-4">
-              <div>
-                <h1 className="text-xl font-semibold">Upload Mobile Image</h1>
-                <div className="border-b border-[#dedde2] w-full my-2"></div>
-              </div>
-
-              <form.Field name="mobImage">
-                {(field) => (
-                  <MultiImageUploader
-                    multiple={false}
-                    form={form}
-                    label=""
-                    value={field.state.value}
-                    existingFileField="existingMobImage"
-                    accept={{
-                      "image/*": [".png", ".jpg", ".jpeg", ".svg", ".webp"],
-                    }}
-                    existingFile={form.getFieldValue("existingMobImage")}
                     onChange={(file) => field.handleChange(file)}
                   />
                 )}

@@ -6,10 +6,10 @@ export interface IBannerFormData {
   category: string;
   subCategory: string;
   priority: number;
-  image: File | null; // Changed to File | null for single file
+  image?: File | null; // Optional for edit mode
   existingImage?: string;
   existingMobImage?: string;
-  mobImage: File | null; // Changed to File | null for single file
+  mobImage?: File | null; // Optional for edit mode
   locations: string[];
 }
 
@@ -31,6 +31,10 @@ export const generateBannerFormDefaultValue = (
       locations: [],
     };
   } else {
+    console.log("Edit data received:", editData);
+    const locations = get(editData, "locations", []);
+    console.log("Extracted locations:", locations);
+
     return {
       title: get(editData, "title", ""),
       description: get(editData, "description", ""),
@@ -41,7 +45,7 @@ export const generateBannerFormDefaultValue = (
       existingImage: get(editData, "image[0]"),
       mobImage: null, // Null for edit, new file will be uploaded
       existingMobImage: get(editData, "mobImage[0]"),
-      locations: get(editData, "locations", []),
+      locations: Array.isArray(locations) ? locations : [],
     };
   }
 };

@@ -504,7 +504,6 @@ import {
   useGetAllBannerQuery,
 } from "../../server/api/bannerHook";
 import { updateBannerState } from "./Components/bannerStore";
-import { ensureStreamingUrl } from "../../utils/videoUtils";
 
 interface BannerItem {
   _id: string;
@@ -557,8 +556,6 @@ interface ITable {
 const BannerIndex: React.FC = () => {
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState("homepage");
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<IFetchBanner | null>(null);
   const [filterState, setFilterState] = useState<FilterState>({
     searchQuery: "",
     filterValue: "",
@@ -665,28 +662,30 @@ const BannerIndex: React.FC = () => {
     return result;
   }, [banners, selectedTab, filterState]);
 
+  console.log(banners, "banners");
+
   const tableDataObj: ITable = useMemo(
     () => ({
       homepage: {
         columns: [
           { key: "title", title: "Title" },
-          { key: "type", title: "Banner Type" },
-          { key: "image", title: "Web Image" },
-          { key: "mobImage", title: "Mobile Image" },
+          { key: "category", title: "Category" },
+          { key: "image", title: "Image" },
         ],
         rows: filteredBanners.map((banner) => ({
           id: banner._id,
           _id: banner._id,
           title: banner.title,
-          type: banner.type,
+          category: banner.category || "N/A",
+
           image: banner.image?.length ? (
-            <div className="flex justify-center items-center p-2">
+            <div className="flex justify-center items-center  h-12 ">
               {banner.image.map((item, index) => (
                 <img
                   key={index}
                   src={`https://gold-api.webstudiomatrix.com/${item}`}
-                  width={120}
-                  className="rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+                  width={80}
+                  className="  cursor-pointer object-contain h-full  hover:opacity-80 transition-opacity"
                   alt={banner.title}
                   onClick={() =>
                     handleImageClick(
@@ -698,28 +697,9 @@ const BannerIndex: React.FC = () => {
               ))}
             </div>
           ) : (
-            <div className="flex justify-center items-center p-2">No Image</div>
-          ),
-          mobImage: banner.mobImage?.length ? (
-            <div className="flex justify-center items-center p-2">
-              {banner.mobImage.map((item, index) => (
-                <img
-                  key={index}
-                  src={`https://gold-api.webstudiomatrix.com/${item}`}
-                  width={120}
-                  className="rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
-                  alt={banner.title}
-                  onClick={() =>
-                    handleImageClick(
-                      `https://gold-api.webstudiomatrix.com/${item}`,
-                      "mobile"
-                    )
-                  }
-                />
-              ))}
+            <div className="flex justify-center items-center p-2 text-gray-500">
+              No Image
             </div>
-          ) : (
-            <div className="flex justify-center items-center p-2">No Image</div>
           ),
           original: banner,
         })),
@@ -727,23 +707,24 @@ const BannerIndex: React.FC = () => {
       "category-page": {
         columns: [
           { key: "title", title: "Title" },
-          { key: "type", title: "Banner Type" },
-          { key: "image", title: "Web Image" },
-          { key: "mobImage", title: "Mobile Image" },
+          { key: "category", title: "Category" },
+
+          { key: "image", title: "Image" },
         ],
         rows: filteredBanners.map((banner) => ({
           id: banner._id,
           _id: banner._id,
           title: banner.title,
-          type: banner.type,
+          category: banner.category || "N/A",
+
           image: banner.image?.length ? (
-            <div className="flex justify-center items-center p-2">
+            <div className="flex justify-center items-center h-12">
               {banner.image.map((item, index) => (
                 <img
                   key={index}
                   src={`https://gold-api.webstudiomatrix.com/${item}`}
-                  width={120}
-                  className="rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+                  width={80}
+                  className="rounded-lg h-full object-contain  cursor-pointer hover:opacity-80 transition-opacity"
                   alt={banner.title}
                   onClick={() =>
                     handleImageClick(
@@ -755,28 +736,9 @@ const BannerIndex: React.FC = () => {
               ))}
             </div>
           ) : (
-            <div className="flex justify-center items-center p-2">No Image</div>
-          ),
-          mobImage: banner.mobImage?.length ? (
-            <div className="flex justify-center items-center p-2">
-              {banner.mobImage.map((item, index) => (
-                <img
-                  key={index}
-                  src={`https://gold-api.webstudiomatrix.com/${item}`}
-                  width={120}
-                  className="rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
-                  alt={banner.title}
-                  onClick={() =>
-                    handleImageClick(
-                      `https://gold-api.webstudiomatrix.com/${item}`,
-                      "mobile"
-                    )
-                  }
-                />
-              ))}
+            <div className="flex justify-center items-center p-2 text-gray-500">
+              No Image
             </div>
-          ) : (
-            <div className="flex justify-center items-center p-2">No Image</div>
           ),
           original: banner,
         })),
@@ -784,23 +746,23 @@ const BannerIndex: React.FC = () => {
       "product-page": {
         columns: [
           { key: "title", title: "Title" },
-          { key: "type", title: "Banner Type" },
-          { key: "image", title: "Web Image" },
-          { key: "mobImage", title: "Mobile Image" },
+          { key: "category", title: "Category" },
+          { key: "image", title: "Image" },
         ],
         rows: filteredBanners.map((banner) => ({
           id: banner._id,
           _id: banner._id,
           title: banner.title,
-          type: banner.type,
+          category: banner.category || "N/A",
+
           image: banner.image?.length ? (
-            <div className="flex justify-center items-center p-2">
+            <div className="flex justify-center items-center h-12">
               {banner.image.map((item, index) => (
                 <img
                   key={index}
                   src={`https://gold-api.webstudiomatrix.com/${item}`}
-                  width={120}
-                  className="rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+                  width={80}
+                  className="object-contain cursor-pointer hover:opacity-80 transition-opacity"
                   alt={banner.title}
                   onClick={() =>
                     handleImageClick(
@@ -812,28 +774,9 @@ const BannerIndex: React.FC = () => {
               ))}
             </div>
           ) : (
-            <div className="flex justify-center items-center p-2">No Image</div>
-          ),
-          mobImage: banner.mobImage?.length ? (
-            <div className="flex justify-center items-center p-2">
-              {banner.mobImage.map((item, index) => (
-                <img
-                  key={index}
-                  src={`https://gold-api.webstudiomatrix.com/${item}`}
-                  width={120}
-                  className="rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
-                  alt={banner.title}
-                  onClick={() =>
-                    handleImageClick(
-                      `https://gold-api.webstudiomatrix.com/${item}`,
-                      "mobile"
-                    )
-                  }
-                />
-              ))}
+            <div className="flex justify-center items-center p-2 text-gray-500">
+              No Image
             </div>
-          ) : (
-            <div className="flex justify-center items-center p-2">No Image</div>
           ),
           original: banner,
         })),
@@ -842,14 +785,9 @@ const BannerIndex: React.FC = () => {
     [filteredBanners]
   );
 
-  const handleViewItem = (row: any) => {
-    setEditingItem(row.original);
-    setIsViewModalOpen(true);
-  };
-
   const handleEditItem = (row: any) => {
     updateBannerState(row.original);
-    navigate(`/banner/edit`);
+    navigate(`/banner/${row.original._id}`);
   };
 
   const handleDeleteItem = (id: string) => {
@@ -914,7 +852,9 @@ const BannerIndex: React.FC = () => {
           <div className="bg-white rounded-lg shadow-lg">
             <div className="flex items-center justify-between p-4 border-b border-gray-200">
               <h2 className="text-lg font-bold text-gray-800">
-                {selectedImage.type === "mobile" ? "Mobile Image" : "Web Image"}
+                {selectedImage.type === "mobile"
+                  ? "Mobile Image"
+                  : "Banner Image"}
               </h2>
               <div className="flex items-center gap-3">
                 <button

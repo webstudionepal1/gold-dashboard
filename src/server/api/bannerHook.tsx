@@ -65,17 +65,28 @@ export const useUpdateBannerMutation = () => {
       id: string | undefined;
       body: FormData;
     }) => {
+      console.log("Update banner mutation called with ID:", id);
+      console.log("FormData for update:");
+      for (let [key, value] of body.entries()) {
+        console.log(key, value);
+      }
+
       const res = await apiClient.patch(`banner/${id}`, body, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+      console.log("Update response:", res);
       return res?.data?.data;
     },
     onSuccess() {
+      console.log("Banner update successful");
       toast.success("Banner updated successfully");
       queryClient.invalidateQueries({ queryKey: ["banner"] });
     },
-    onError(err: string) {
-      toast.error(err || "Error creating banners");
+    onError(err: any) {
+      console.error("Banner update error:", err);
+      toast.error(
+        err?.response?.data?.message || err || "Error updating banner"
+      );
     },
   });
 };
