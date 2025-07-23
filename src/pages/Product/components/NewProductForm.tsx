@@ -254,8 +254,17 @@ const NewProductForm: React.FC = () => {
     //   }
     // }
 
-    // Note: Images would need to be handled separately if they are File objects
-    // For now, assuming images are URLs from the existing product
+    // Handle images - append actual File objects instead of URLs
+    if (formData.images && Array.isArray(formData.images)) {
+      formData.images.forEach((image: File | string, index: number) => {
+        if (image instanceof File) {
+          formDataObj.append(`images`, image);
+        } else if (typeof image === "string" && image.trim() !== "") {
+          // For existing images (URLs), append as string
+          formDataObj.append(`existingImages[${index}]`, image);
+        }
+      });
+    }
 
     return formDataObj;
   };

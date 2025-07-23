@@ -23,9 +23,9 @@ export interface CollectionFormData {
   conditions: ISmartCollectionConditions;
 
   // Page 4: Media and Assets
-  images: string[];
-  bannerImage: string;
-  video: string;
+  images: (File | string)[];
+  bannerImage: File | string | null;
+  video: File | string | null;
 
   // Page 5: SEO and Marketing
   metadata: {
@@ -118,8 +118,8 @@ const defaultFormData: CollectionFormData = {
 
   // Page 4: Media and Assets
   images: [],
-  bannerImage: "",
-  video: "",
+  bannerImage: null,
+  video: null,
 
   // Page 5: SEO and Marketing
   metadata: {

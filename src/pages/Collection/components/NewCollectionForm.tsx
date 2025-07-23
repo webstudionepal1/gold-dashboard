@@ -69,48 +69,95 @@ const NewCollectionForm: React.FC = () => {
   // Handle form submission
   const handleFormSubmit = async (formData: any) => {
     try {
-      // Transform form data to API format
-      const apiData: any = {
-        name: formData.name,
-        slug: formData.slug,
-        description: formData.description,
-        shortDescription: formData.shortDescription,
-        isActive: formData.isActive,
-        isFeatured: formData.isFeatured,
-        materialType: formData.materialType,
-        gemstoneType: formData.gemstoneType,
-        styleCategory: formData.styleCategory,
-        collectionMode: formData.collectionMode,
-        conditions: formData.conditions,
-        metadata: formData.metadata,
-        isLimitedEdition: formData.isLimitedEdition,
-        availableFrom: formData.availableFrom
-          ? new Date(formData.availableFrom)
-          : undefined,
-        availableUntil: formData.availableUntil
-          ? new Date(formData.availableUntil)
-          : undefined,
-        sortOrder: formData.sortOrder,
-      };
+      // Create FormData object for multipart/form-data submission
+      const formDataObj = new FormData();
 
-      // Only include media fields if they have valid values
-      if (Array.isArray(formData.images) && formData.images.length > 0) {
-        apiData.images = formData.images;
+      // Append basic fields
+      formDataObj.append("name", formData.name);
+      if (formData.slug) formDataObj.append("slug", formData.slug);
+      formDataObj.append("description", formData.description);
+      if (formData.shortDescription)
+        formDataObj.append("shortDescription", formData.shortDescription);
+      formDataObj.append("isActive", String(formData.isActive));
+      formDataObj.append("isFeatured", String(formData.isFeatured));
+
+      if (formData.materialType)
+        formDataObj.append("materialType", formData.materialType);
+      if (formData.gemstoneType)
+        formDataObj.append("gemstoneType", formData.gemstoneType);
+      if (formData.styleCategory)
+        formDataObj.append("styleCategory", formData.styleCategory);
+      if (formData.collectionMode)
+        formDataObj.append("collectionMode", formData.collectionMode);
+
+      // Handle conditions array
+      if (formData.conditions && Array.isArray(formData.conditions)) {
+        formData.conditions.forEach((condition: string, index: number) => {
+          formDataObj.append(`conditions[${index}]`, condition);
+        });
       }
 
-      if (formData.bannerImage && formData.bannerImage.trim() !== "") {
-        apiData.bannerImage = formData.bannerImage;
+      // Handle metadata object
+      if (formData.metadata) {
+        formDataObj.append("metadata", JSON.stringify(formData.metadata));
       }
 
-      if (formData.video && formData.video.trim() !== "") {
-        apiData.video = formData.video;
+      formDataObj.append("isLimitedEdition", String(formData.isLimitedEdition));
+
+      if (formData.availableFrom) {
+        formDataObj.append(
+          "availableFrom",
+          new Date(formData.availableFrom).toISOString()
+        );
+      }
+      if (formData.availableUntil) {
+        formDataObj.append(
+          "availableUntil",
+          new Date(formData.availableUntil).toISOString()
+        );
+      }
+
+      formDataObj.append("sortOrder", String(formData.sortOrder));
+
+      // Handle media files - append actual File objects instead of URLs
+      if (formData.images && Array.isArray(formData.images)) {
+        formData.images.forEach((image: File | string, index: number) => {
+          if (image instanceof File) {
+            formDataObj.append(`images`, image);
+          } else if (typeof image === "string" && image.trim() !== "") {
+            // For existing images (URLs), append as string
+            formDataObj.append(`existingImages[${index}]`, image);
+          }
+        });
+      }
+
+      if (formData.bannerImage) {
+        if (formData.bannerImage instanceof File) {
+          formDataObj.append("bannerImage", formData.bannerImage);
+        } else if (
+          typeof formData.bannerImage === "string" &&
+          formData.bannerImage.trim() !== ""
+        ) {
+          formDataObj.append("existingBannerImage", formData.bannerImage);
+        }
+      }
+
+      if (formData.video) {
+        if (formData.video instanceof File) {
+          formDataObj.append("video", formData.video);
+        } else if (
+          typeof formData.video === "string" &&
+          formData.video.trim() !== ""
+        ) {
+          formDataObj.append("existingVideo", formData.video);
+        }
       }
 
       if (isEdit && id) {
-        await updateCollectionMutation.mutateAsync({ id, body: apiData });
+        await updateCollectionMutation.mutateAsync({ id, body: formDataObj });
         console.log("Collection updated successfully");
       } else {
-        await createCollectionMutation.mutateAsync(apiData);
+        await createCollectionMutation.mutateAsync(formDataObj);
         console.log("Collection created successfully");
       }
 

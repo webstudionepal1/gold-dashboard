@@ -243,7 +243,7 @@ const CollectionForm = () => {
         }
 
         // Prepare the data for submission
-        const submissionData = {
+        const dataToSubmit = {
           ...value,
           images: uploadedImages,
           bannerImage: uploadedBannerImage,
@@ -256,7 +256,23 @@ const CollectionForm = () => {
           availableUntil: value.availableUntil
             ? new Date(value.availableUntil)
             : undefined,
-        } as Partial<IFetchCollection>;
+        };
+
+        // Create FormData object for multipart upload
+        const submissionData = new FormData();
+
+        // Append all fields to FormData
+        Object.entries(dataToSubmit).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            if (Array.isArray(value)) {
+              submissionData.append(key, JSON.stringify(value));
+            } else if (typeof value === "object") {
+              submissionData.append(key, JSON.stringify(value));
+            } else {
+              submissionData.append(key, String(value));
+            }
+          }
+        });
 
         if (isEdit && id) {
           await updateCollectionMutation.mutateAsync({

@@ -176,8 +176,7 @@ const AddBannerForm = () => {
               e.preventDefault();
               e.stopPropagation();
               form.handleSubmit();
-            }}
-          >
+            }}>
             <div>
               <h1 className="text-xl font-semibold">General Information</h1>
               <div className="border-b border-[#dedde2] w-full my-2"></div>
@@ -298,8 +297,7 @@ const AddBannerForm = () => {
             <button
               type="submit"
               disabled={bannerPending || bannerUpdatePending}
-              className="self-end bg-[#df8d29] text-white px-7 py-2 rounded-xl disabled:opacity-50"
-            >
+              className="self-end bg-[#df8d29] text-white px-7 py-2 rounded-xl disabled:opacity-50">
               {bannerPending || bannerUpdatePending ? "Saving..." : "Save"}
             </button>
           </form>

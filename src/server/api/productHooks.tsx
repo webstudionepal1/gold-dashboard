@@ -553,7 +553,7 @@ export const useGetAllProductOccasionsQuery = (params: IParams = {}) => {
   return useQuery({
     queryKey: ["occasions", params],
     queryFn: async () => {
-      const res = await apiClient.get<{ data: IFetchOccasion[] }>("occasions", {
+      const res = await apiClient.get<{ data: IFetchOccasion[] }>("occasion", {
         params,
       });
       return res?.data?.data;
@@ -566,7 +566,11 @@ export const useCreateProductOccasionMutation = () => {
   return useMutation({
     mutationKey: ["occasions"],
     mutationFn: async (body: FormData) => {
-      const res = await apiClient.post("occasion", body);
+      const res = await apiClient.post("occasion", body, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       return res?.data?.data;
     },
     onSuccess() {
@@ -584,7 +588,11 @@ export const useUpdateProductOccasionMutation = () => {
   return useMutation({
     mutationKey: ["occasions"],
     mutationFn: async ({ id, body }: { id: string; body: FormData }) => {
-      const res = await apiClient.patch(`occasion/${id}`, body);
+      const res = await apiClient.patch(`occasion/${id}`, body, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       return res?.data?.data;
     },
     onSuccess() {
