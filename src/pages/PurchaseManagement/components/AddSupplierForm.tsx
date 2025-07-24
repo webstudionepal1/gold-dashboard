@@ -90,11 +90,9 @@ const AddSupplierForm = () => {
   });
   useEffect(() => {
     if (createSuccess || updateSuccess) {
-      console.log("Form reset triggered");
       // Reset with initial values to ensure proper reset
       form.reset(getSupplierInitialFormValues("add"));
-      // Force complete form re-render by changing key
-      // setFormKey((prev) => prev + 1);
+
       history.back();
     }
   }, [updateSuccess, createSuccess, form]);
@@ -107,7 +105,7 @@ const AddSupplierForm = () => {
         </Header>
 
         <form
-          key={formKey} // Force re-render when key changes
+          key={formKey}
           className="grid grid-cols-1 gap-4 lg:grid-cols-6 "
           onSubmit={(e) => {
             e.preventDefault();
