@@ -21,16 +21,16 @@ const addExpenseSchema = z.object({
   expenseCategory: z.string().min(1, "Category is required"),
   amount: z.number().min(0, "Amount cannot be negative"),
   description: z.string().min(1, "Description is required"),
-  image: z.array(z.instanceof(File)),
-  existingImages: z.array(z.string()),
+  image: z.array(z.instanceof(File)).optional().default([]),
+  existingImages: z.array(z.string()).optional().default([]),
 });
 interface IExpenseForm {
   date: string;
   expenseCategory: string;
   amount: number;
   description: string;
-  image: File[];
-  existingImages: string[];
+  image?: File[];
+  existingImages?: string[];
 }
 const ExpenseForm = ({ editData, closeModal }: propTypes) => {
   {
@@ -65,6 +65,10 @@ const ExpenseForm = ({ editData, closeModal }: propTypes) => {
       onSubmit: addExpenseSchema,
     },
     onSubmit: async ({ value }) => {
+      console.log("Form submission values:", value);
+      console.log("Existing images:", value.existingImages);
+      console.log("New images:", value.image);
+
       const formData = new FormData();
 
       formData.append("date", value.date);
@@ -72,11 +76,24 @@ const ExpenseForm = ({ editData, closeModal }: propTypes) => {
       formData.append("amount", `${value.amount}`);
       formData.append("description", value.description);
 
-      // formData.append("images", value.image);
-      if (Array.isArray(value.image)) {
+      // Add new images
+      if (Array.isArray(value.image) && value.image.length > 0) {
         value.image.forEach((file: any) => {
           formData.append("images", file);
         });
+      }
+
+      // For edit mode, preserve existing images
+      if (editData && Array.isArray(value.existingImages)) {
+        value.existingImages.forEach((imagePath: string) => {
+          formData.append("existingImages", imagePath);
+        });
+      }
+
+      // Debug FormData contents
+      console.log("FormData contents:");
+      for (let [key, value] of formData.entries()) {
+        console.log(key, value);
       }
 
       if (editData) {
@@ -88,8 +105,12 @@ const ExpenseForm = ({ editData, closeModal }: propTypes) => {
   });
 
   useEffect(() => {
-    if (ExpenseSuccess) form.reset();
-  }, [ExpenseSuccess]);
+    if (ExpenseSuccess || updateExpenseSuccess) {
+      console.log("Expense operation successful, closing modal");
+      form.reset();
+      closeModal();
+    }
+  }, [ExpenseSuccess, updateExpenseSuccess, closeModal]);
   return (
     <>
       <div className="bg-[#ffffff]">
@@ -99,7 +120,6 @@ const ExpenseForm = ({ editData, closeModal }: propTypes) => {
             e.preventDefault();
             e.stopPropagation();
             form.handleSubmit();
-            closeModal();
           }}
         >
           <h1 className="flex items-center justify-center text-xl font-semibold">
@@ -178,15 +198,37 @@ const ExpenseForm = ({ editData, closeModal }: propTypes) => {
 
           <form.Field name="image">
             {(field) => (
-              <MultiImageUploader
-                existingFiles={form.getFieldValue("existingImages")}
-                multiple={true}
-                form={form}
-                existingFileField="existingImages"
-                label="Upload Receipts"
-                value={field.state.value}
-                onChange={(files) => field.handleChange(files)}
-              />
+              <form.Field name="existingImages">
+                {(existingField) => {
+                  const existingImages = existingField.state.value || [];
+                  console.log(
+                    "Current form state - existing images:",
+                    existingImages
+                  );
+                  console.log(
+                    "Current form state - new images:",
+                    field.state.value
+                  );
+
+                  return (
+                    <MultiImageUploader
+                      key={`uploader-${existingImages.length}-${
+                        (field.state.value || []).length
+                      }`}
+                      existingFiles={existingImages}
+                      multiple={true}
+                      form={form}
+                      existingFileField="existingImages"
+                      label="Upload Receipts"
+                      value={field.state.value || []}
+                      onChange={(files) => {
+                        console.log("New images changed to:", files);
+                        field.handleChange(files);
+                      }}
+                    />
+                  );
+                }}
+              </form.Field>
             )}
           </form.Field>
 
@@ -199,9 +241,16 @@ const ExpenseForm = ({ editData, closeModal }: propTypes) => {
             </button>
             <button
               type="submit"
-              className=" bg-[#df8d29] flex-1 text-white px-7 py-2 rounded-xl "
+              disabled={ExpensePending || updateExpensePending}
+              className=" bg-[#df8d29] flex-1 text-white px-7 py-2 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {editData ? "Update" : "Add"}
+              {ExpensePending || updateExpensePending
+                ? editData
+                  ? "Updating..."
+                  : "Adding..."
+                : editData
+                ? "Update"
+                : "Add"}
             </button>
           </div>
         </form>

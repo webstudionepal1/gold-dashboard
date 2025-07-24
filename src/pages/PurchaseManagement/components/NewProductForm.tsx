@@ -394,13 +394,6 @@ const NewProductForm = ({
     ? products?.map((item) => ({ label: item.name, value: item._id }))
     : [];
 
-  // Debug logging for edit mode
-  if (edit && data) {
-    console.log("Edit mode - New Product Form data:", data);
-    console.log("Supplier data:", get(data, "supplier"));
-    console.log("Products data:", get(data, "products"));
-  }
-
   const form = useForm({
     defaultValues: {
       billNo: edit ? get(data, "billNo", "") : "",

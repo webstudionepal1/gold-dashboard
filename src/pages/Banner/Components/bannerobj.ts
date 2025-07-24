@@ -9,7 +9,7 @@ export interface IBannerFormData {
   image: File | null; // Changed to File | null for single file
   existingImage?: string;
   existingMobImage?: string;
-  mobImage: File | null; // Changed to File | null for single file
+  mobImage?: File | null; // Changed to File | null for single file
   locations: string[];
 }
 
