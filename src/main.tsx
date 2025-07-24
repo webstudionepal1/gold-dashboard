@@ -50,7 +50,6 @@ createRoot(document.getElementById("root")!).render(
           draggable
           pauseOnHover={true}
           toastClassName="font-semibold text-sm"
-          bodyClassName="text-sm"
           theme="colored"
           className="z-[999999999999999999] mt-16"
           style={{ marginTop: "80px" }}
