@@ -35,10 +35,34 @@ const AddSupplierForm = () => {
   } = useUpdateSupplierMutation();
 
   const editData = useStore(supplierStore, (state) => state);
+
+  // Debug logging to understand the data structure
+  console.log("Page parameter:", page);
+  console.log("Edit data from store:", editData);
+  console.log("Edit data type:", typeof editData);
+  console.log("Is edit data an array?", Array.isArray(editData));
+  console.log("Edit data keys:", editData ? Object.keys(editData) : "No data");
+
+  // If editData is an array, log the first element
+  if (Array.isArray(editData) && editData.length > 0) {
+    console.log("First element of edit data array:", editData[0]);
+    console.log("First element keys:", Object.keys(editData[0]));
+  }
+  // Handle array data if needed
+  const actualEditData =
+    Array.isArray(editData) && editData.length > 0 ? editData[0] : editData;
+
+  // Determine if we're in edit mode
+  const isEditMode = page === "edit" || (actualEditData && actualEditData._id);
+  const formState = isEditMode ? "edit" : "add";
+
+  console.log("Is edit mode:", isEditMode);
+  console.log("Form state:", formState);
+
   const form = useForm({
     defaultValues: getSupplierInitialFormValues(
-      page,
-      editData
+      formState,
+      actualEditData
     ) as SupplierFormValues,
     // validators: {
     //   onChange: supplierSchema,
@@ -55,17 +79,20 @@ const AddSupplierForm = () => {
         formdata.append("logo", value.logo);
       }
 
-      if (page === "add") createSupplier(formdata);
-      else updateSupplier({ id: editData?._id, body: formdata });
+      if (formState === "add") {
+        console.log("Creating new supplier");
+        createSupplier(formdata);
+      } else {
+        console.log("Updating supplier with ID:", editData?._id);
+        updateSupplier({ id: editData?._id, body: formdata });
+      }
     },
   });
   useEffect(() => {
     if (createSuccess || updateSuccess) {
-      console.log("Form reset triggered");
       // Reset with initial values to ensure proper reset
       form.reset(getSupplierInitialFormValues("add"));
-      // Force complete form re-render by changing key
-      // setFormKey((prev) => prev + 1);
+
       history.back();
     }
   }, [updateSuccess, createSuccess, form]);
@@ -73,12 +100,12 @@ const AddSupplierForm = () => {
   return (
     <>
       <div className="">
-        <Header text={page === "Edit" ? "Edit Supplier" : "Add Supplier"}>
+        <Header text={isEditMode ? "Edit Supplier" : "Add Supplier"}>
           <Breadcrumbs />
         </Header>
 
         <form
-          key={formKey} // Force re-render when key changes
+          key={formKey}
           className="grid grid-cols-1 gap-4 lg:grid-cols-6 "
           onSubmit={(e) => {
             e.preventDefault();
@@ -449,7 +476,7 @@ const AddSupplierForm = () => {
                   (updatePending || isPending) && "cursor-progress"
                 )}
               >
-                {page === "Edit" ? "Update" : "Save"}
+                {isEditMode ? "Update" : "Save"}
               </button>
             </div>
           </div>

@@ -17,7 +17,7 @@ export const inventoryColumns = [
 export const columns = [
   { key: "name", title: "Items" },
   { key: "category", title: "Category" },
-  { key: "price", title: "Price (Rs)" },
+  // { key: "price", title: "Price (Rs)" },
   { key: "wt", title: "Weight" },
   { key: "unit", title: "Unit" },
   { key: "totalStock", title: "Total Stock" },

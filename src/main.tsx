@@ -41,17 +41,18 @@ createRoot(document.getElementById("root")!).render(
           </Routes>
         </BrowserRouter>
         <ToastContainer
-          position="top-left"
-          autoClose={3000}
+          position="top-right"
+          autoClose={4000}
           hideProgressBar={false}
-          newestOnTop={false}
+          newestOnTop={true}
           closeOnClick
           rtl={false}
           draggable
-          pauseOnHover={false}
-          toastClassName="font-semibold"
+          pauseOnHover={true}
+          toastClassName="font-semibold text-sm"
           theme="colored"
-          className="z-[999999999999999999]"
+          className="z-[999999999999999999] mt-16"
+          style={{ marginTop: "80px" }}
         />
       </ErrorBoundary>
     </ReactQueryProvider>

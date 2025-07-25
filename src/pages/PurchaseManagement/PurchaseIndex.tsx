@@ -109,8 +109,16 @@ const PurchaseIndex = () => {
       },
 
       editAction(row: IFetchSupplier) {
-        updateSuplierState(row);
-        navigate("/inventory/suppliers/edit");
+        console.log("Edit action called with row:", row);
+        console.log("Row type:", typeof row);
+        console.log("Is row an array?", Array.isArray(row));
+
+        // Ensure we're storing the correct supplier object
+        const supplierToEdit = Array.isArray(row) ? row[0] : row;
+        console.log("Supplier to edit:", supplierToEdit);
+
+        updateSuplierState(supplierToEdit);
+        navigate(`/inventory/suppliers/edit`);
       },
       onDelete(id: string) {
         deleteSupplier(id);

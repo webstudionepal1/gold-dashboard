@@ -102,28 +102,83 @@ const transformProductToInventoryItems = (
     ];
   }
 
-  // Transform each variant to inventory item
-  return product.variant.map((variant, index) => {
-    const totalStock = variant.totalStock || 0;
-    const remainingStock = variant.remainingStock || 0;
-    const reorderPoint = variant.reorderPoint || Math.floor(totalStock * 0.2);
+  // Combine all variants into a single inventory item
+  const combinedData = product.variant.reduce(
+    (acc, variant) => {
+      acc.totalStock += variant.totalStock || 0;
+      acc.remainingStock += variant.remainingStock || 0;
+      acc.usedStock += variant.usedStock || 0;
+      acc.totalWeight += variant.wt || 0;
+      acc.reorderPoints.push(variant.reorderPoint || 0);
 
-    return {
-      _id: `${product._id}-${index}`,
+      // Collect unique units
+      if (variant.unit && !acc.units.includes(variant.unit)) {
+        acc.units.push(variant.unit);
+      }
+
+      // Keep track of price range (min and max)
+      const price = variant.price || 0;
+      if (price > 0) {
+        acc.minPrice =
+          acc.minPrice === 0 ? price : Math.min(acc.minPrice, price);
+        acc.maxPrice = Math.max(acc.maxPrice, price);
+      }
+
+      return acc;
+    },
+    {
+      totalStock: 0,
+      remainingStock: 0,
+      usedStock: 0,
+      totalWeight: 0,
+      units: [] as string[],
+      reorderPoints: [] as number[],
+      minPrice: 0,
+      maxPrice: 0,
+    }
+  );
+
+  // Calculate combined reorder point (average of all variant reorder points)
+  const avgReorderPoint =
+    combinedData.reorderPoints.length > 0
+      ? Math.round(
+          combinedData.reorderPoints.reduce((sum, point) => sum + point, 0) /
+            combinedData.reorderPoints.length
+        )
+      : Math.floor(combinedData.totalStock * 0.2);
+
+  // Create display strings for combined data
+  const unitDisplay =
+    combinedData.units.length > 1
+      ? `${combinedData.units.join(", ")}`
+      : combinedData.units[0] || "";
+
+  const priceDisplay =
+    combinedData.minPrice === combinedData.maxPrice
+      ? combinedData.minPrice
+      : combinedData.minPrice; // Show minimum price for sorting
+
+  return [
+    {
+      _id: product._id || "",
       name: product.name || "",
-      totalStock,
-      remainingStock,
-      usedStock: variant.usedStock || 0,
-      unit: variant.unit || "",
-      reorder_point: reorderPoint,
-      status: getStockStatus(remainingStock, totalStock, reorderPoint),
+      totalStock: combinedData.totalStock,
+      remainingStock: combinedData.remainingStock,
+      usedStock: combinedData.usedStock,
+      unit: unitDisplay,
+      reorder_point: avgReorderPoint,
+      status: getStockStatus(
+        combinedData.remainingStock,
+        combinedData.totalStock,
+        avgReorderPoint
+      ),
       image: productImage,
       category: categoryName,
       subCategory: subCategoryName,
-      price: variant.price || 0,
-      wt: variant.wt || 0,
-    };
-  });
+      price: priceDisplay,
+      wt: combinedData.totalWeight,
+    },
+  ];
 };
 
 const sortItems = (
