@@ -260,9 +260,11 @@ const PurchaseReturnForm: React.FC<IPurchaseReturnForm> = ({
                   label="Refund Amount"
                   required
                   type="number"
-                  placeholder="Enter Refund Amount"
-                  value={field.state.value}
-                  onChange={(e) => field.handleChange(Number(e.target.value))}
+                  placeholder="0"
+                  value={field.state.value === 0 ? "" : field.state.value}
+                  onChange={(e) =>
+                    field.handleChange(Number(e.target.value) || 0)
+                  }
                 />
                 <FieldError field={field} />
               </div>
@@ -309,8 +311,10 @@ const PurchaseReturnForm: React.FC<IPurchaseReturnForm> = ({
                 <InputField
                   label="Available for Return"
                   type="number"
-                  placeholder="Available Quantity"
-                  value={dynamicForm.maxQuantity}
+                  placeholder="0"
+                  value={
+                    dynamicForm.maxQuantity === 0 ? "" : dynamicForm.maxQuantity
+                  }
                   disabled
                 />
               </div>
@@ -319,10 +323,10 @@ const PurchaseReturnForm: React.FC<IPurchaseReturnForm> = ({
                   label="Quantity"
                   required
                   type="number"
-                  placeholder="Enter Quantity"
-                  value={dynamicForm.quantity}
+                  placeholder="0"
+                  value={dynamicForm.quantity === 0 ? "" : dynamicForm.quantity}
                   onChange={(e) => {
-                    const value = Number(e.target.value);
+                    const value = Number(e.target.value) || 0;
                     console.log(
                       "Quantity input:",
                       value,
@@ -345,10 +349,10 @@ const PurchaseReturnForm: React.FC<IPurchaseReturnForm> = ({
                   required
                   type="number"
                   step="0.01"
-                  placeholder="Enter Weight"
-                  value={dynamicForm.wt}
+                  placeholder="0"
+                  value={dynamicForm.wt === 0 ? "" : dynamicForm.wt}
                   onChange={(e) => {
-                    const value = Number(e.target.value);
+                    const value = Number(e.target.value) || 0;
                     if (value >= 0) {
                       setDynamicForm({
                         ...dynamicForm,

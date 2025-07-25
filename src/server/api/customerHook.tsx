@@ -1,6 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../utils/ApiGateway";
 import { toast } from "react-toastify";
+import {
+  handleMutationError,
+  handleMutationSuccess,
+} from "../../utils/errorHandler";
 export interface IParams {
   [key: string]: string;
 }
@@ -77,11 +81,11 @@ export const useDeleteCustomerMutation = () => {
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Customer Deleted Successfully");
+      handleMutationSuccess("Customer Deleted Successfully");
       queryClient.invalidateQueries({ queryKey: ["user"] });
     },
-    onError(err: string) {
-      toast.error(err || "Error deleting Customers");
+    onError(err: any) {
+      handleMutationError(err, "Error deleting Customers");
     },
   });
 };

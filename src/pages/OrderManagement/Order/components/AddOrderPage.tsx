@@ -510,10 +510,10 @@ export default function AddOrderForm() {
                         type="number"
                         required
                         min={0}
-                        placeholder="Enter the number of quantities"
-                        value={field.state.value}
+                        placeholder="0"
+                        value={field.state.value === 0 ? "" : field.state.value}
                         onChange={(e) =>
-                          field.handleChange(Number(e.target.value))
+                          field.handleChange(Number(e.target.value) || 0)
                         }
                       />
                       <FieldError field={field} />
@@ -528,6 +528,11 @@ export default function AddOrderForm() {
                         type="number"
                         min={0}
                         required
+                        placeholder={
+                          field.state.value === 0
+                            ? "0"
+                            : "Enter discount amount"
+                        }
                         value={field.state.value}
                         onChange={(e) =>
                           field.handleChange(Number(e.target.value))
@@ -548,6 +553,9 @@ export default function AddOrderForm() {
                         type="number"
                         min={0}
                         required
+                        placeholder={
+                          field.state.value === 0 ? "0" : "Enter shipping cost"
+                        }
                         value={field.state.value}
                         onChange={(e) =>
                           field.handleChange(Number(e.target.value))
@@ -566,6 +574,9 @@ export default function AddOrderForm() {
                         type="number"
                         min={0}
                         required
+                        placeholder={
+                          field.state.value === 0 ? "0" : "Enter taxes"
+                        }
                         value={field.state.value}
                         onChange={(e) =>
                           field.handleChange(Number(e.target.value))
@@ -583,6 +594,9 @@ export default function AddOrderForm() {
                         type="number"
                         min={0}
                         required
+                        placeholder={
+                          field.state.value === 0 ? "0" : "Enter price"
+                        }
                         value={field.state.value}
                         onChange={(e) =>
                           field.handleChange(e.target.value as any)

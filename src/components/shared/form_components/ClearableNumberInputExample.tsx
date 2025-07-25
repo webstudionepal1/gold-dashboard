@@ -7,7 +7,7 @@ import { useClearableNumberInput } from "../../../utils/numberInputHelpers";
  */
 export const ClearableNumberInputExample: React.FC = () => {
   const [value, setValue] = useState(0);
-  
+
   const numberInput = useClearableNumberInput(value, setValue);
 
   return (
@@ -20,7 +20,7 @@ export const ClearableNumberInputExample: React.FC = () => {
         <br />• Prevents negative values
         <br />• Blocks invalid characters (e, E, +, -)
       </p>
-      
+
       <div className="space-y-2">
         <label className="block text-sm font-medium">
           Example Number Input:
@@ -28,7 +28,7 @@ export const ClearableNumberInputExample: React.FC = () => {
         <input
           type="number"
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Enter a number"
+          placeholder={numberInput.value === "" ? "0" : "Enter a number"}
           min="0"
           {...numberInput}
         />

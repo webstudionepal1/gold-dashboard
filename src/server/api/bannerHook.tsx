@@ -1,6 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../utils/ApiGateway";
 import { toast } from "react-toastify";
+import {
+  handleMutationError,
+  handleMutationSuccess,
+} from "../../utils/errorHandler";
 export interface IParams {
   [key: string]: string;
 }
@@ -45,11 +49,11 @@ export const useCreateBannerMutation = () => {
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Banner created successfully");
+      handleMutationSuccess("Banner created successfully");
       queryClient.invalidateQueries({ queryKey: ["banner"] });
     },
-    onError(err: string) {
-      toast.error(err || "Error creating banner");
+    onError(err: any) {
+      handleMutationError(err, "Error creating banner");
     },
   });
 };
@@ -70,11 +74,11 @@ export const useUpdateBannerMutation = () => {
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Banner updated successfully");
+      handleMutationSuccess("Banner updated successfully");
       queryClient.invalidateQueries({ queryKey: ["banner"] });
     },
-    onError(err: string) {
-      toast.error(err || "Error creating banners");
+    onError(err: any) {
+      handleMutationError(err, "Error updating banners");
     },
   });
 };
@@ -88,11 +92,11 @@ export const useDeleteBannerMutation = () => {
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Banner deleted successfully");
+      handleMutationSuccess("Banner deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["banner"] });
     },
-    onError(err: string) {
-      toast.error(err || "Error deleting banner");
+    onError(err: any) {
+      handleMutationError(err, "Error deleting banner");
     },
   });
 };

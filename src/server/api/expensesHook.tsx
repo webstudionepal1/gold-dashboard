@@ -1,6 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { apiClient } from "../utils/ApiGateway";
+import {
+  handleMutationError,
+  handleMutationSuccess,
+} from "../../utils/errorHandler";
 
 export interface IItem {
   item: string;
@@ -80,11 +84,11 @@ export const useCreateExpenseMutation = () => {
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Expense created successfully");
+      handleMutationSuccess("Expense created successfully");
       queryClient.invalidateQueries({ queryKey: ["expense"] });
     },
-    onError(err: string) {
-      toast.error(err || "Error creating expense");
+    onError(err: any) {
+      handleMutationError(err, "Error creating expense");
     },
   });
 };

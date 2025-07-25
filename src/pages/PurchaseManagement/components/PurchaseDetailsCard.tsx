@@ -39,6 +39,13 @@ export const PurchaseDetailsCard: React.FC<PropDetails> = ({
   data,
   summary = "Purchase",
 }) => {
+  // Debug logging for view modal
+  console.log("=== VIEW MODAL DEBUG ===");
+  console.log("Raw data received:", data);
+  console.log("Supplier field:", get(data, "supplier"));
+  console.log("Supplier type:", typeof get(data, "supplier"));
+  console.log("Supplier name:", get(data, "supplier.name"));
+  console.log("========================");
   const rows =
     data?.items.length > 0
       ? data.items.map((item: any) => ({
@@ -76,7 +83,11 @@ export const PurchaseDetailsCard: React.FC<PropDetails> = ({
 
         <div className="flex items-center mt-2 gap-7">
           <div className="text-xs text-gray-500">Suppliers</div>
-          <div className="font-semibold">{get(data, "supplier", "")}</div>
+          <div className="font-semibold">
+            {typeof get(data, "supplier") === "object"
+              ? get(data, "supplier.name", "Unknown Supplier")
+              : get(data, "supplier", "Unknown Supplier")}
+          </div>
         </div>
       </div>
 

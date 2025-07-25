@@ -1,6 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../utils/ApiGateway";
 import { toast } from "react-toastify";
+import {
+  handleMutationError,
+  handleMutationSuccess,
+} from "../../utils/errorHandler";
 import { IFetchProduct } from "./productHooks";
 export interface IParams {
   id?: string;
@@ -71,11 +75,11 @@ export const useCreateSupplierMutation = () => {
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Supplier added successfully");
+      handleMutationSuccess("Supplier added successfully");
       queryClient.invalidateQueries({ queryKey: ["supplier"] });
     },
-    onError(err: string) {
-      toast.error(err || "Error adding supplier");
+    onError(err: any) {
+      handleMutationError(err, "Error adding supplier");
     },
   });
 };
@@ -93,11 +97,11 @@ export const useUpdateSupplierMutation = () => {
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Supplier updated successfully");
+      handleMutationSuccess("Supplier updated successfully");
       queryClient.invalidateQueries({ queryKey: ["supplier"] });
     },
-    onError(err: string) {
-      toast.error(err || "Error updating supplier");
+    onError(err: any) {
+      handleMutationError(err, "Error updating supplier");
     },
   });
 };
@@ -111,11 +115,11 @@ export const useDeleteSupplierMutation = () => {
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Supplier deleted successfully");
+      handleMutationSuccess("Supplier deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["supplier"] });
     },
-    onError(err: string) {
-      toast.error(err || "Error deleting supplier");
+    onError(err: any) {
+      handleMutationError(err, "Error deleting supplier");
     },
   });
 };

@@ -5,7 +5,7 @@
 /**
  * Formats a number value for display in an input field
  * @param value - The numeric value from the form state
- * @param showZero - Whether to show 0 as "0" or empty string (default: true)
+ * @param showZero - Whether to show 0 as "0" or empty string (default: true to maintain existing behavior)
  * @returns String representation for the input field
  */
 export const formatNumberInputValue = (
@@ -119,7 +119,7 @@ export const useClearableNumberInput = (
   };
 
   return {
-    value: String(value), // Always show the actual value, including 0
+    value: value === 0 ? "" : String(value), // Show empty string for 0 to improve UX, actual value otherwise
     onChange: handleChange,
     onKeyDown: handleKeyDown,
     onFocus: handleFocus,
