@@ -13,6 +13,7 @@ import {
 import { subCategoryColumns } from "../productObj";
 import { AddProductSubCategory } from "./components/AddProductSubCategory";
 import { StatusSwitch } from "../../../components/shared/StatusSwitch";
+import ViewProductSubCategory from "./components/ViewProductSubCategory";
 
 interface IEditModal {
   state: boolean;
@@ -22,6 +23,14 @@ const Productsubcategory: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<IEditModal>({
     state: false,
     editData: null,
+  });
+
+  const [isViewModalOpen, setIsViewModalOpen] = useState<{
+    state: boolean;
+    viewData: IFetchSubCategory | null;
+  }>({
+    state: false,
+    viewData: null,
   });
   const modalRef = useOutsideClick(() =>
     setIsModalOpen({ state: false, editData: null })
@@ -64,6 +73,8 @@ const Productsubcategory: React.FC = () => {
                 ? `${get(item, "description", "").slice(0, 50)}...`
                 : get(item, "description", ""),
             sn: index + 1,
+            rawDescription: get(item, "description", ""),
+            totalProducts: get(item, "totalProducts", "N/A"),
             // category: get(item, "category._id", "-"),
             status: (
               <StatusSwitch
@@ -102,6 +113,9 @@ const Productsubcategory: React.FC = () => {
           showAction
           editAction={(row) => setIsModalOpen({ state: true, editData: row })}
           onDelete={(id) => deleteSubCategory(id)}
+          viewAction={(row) =>
+            setIsViewModalOpen({ state: true, viewData: row })
+          }
         />
       </div>
       {isModalOpen.state && (
@@ -109,6 +123,17 @@ const Productsubcategory: React.FC = () => {
           modalRef={modalRef}
           closeModal={() => setIsModalOpen({ state: false, editData: null })}
           editData={isModalOpen.editData}
+        />
+      )}
+
+      {isViewModalOpen.state && (
+        <ViewProductSubCategory
+          modalRef={modalRef}
+          closeModal={() =>
+            setIsViewModalOpen({ state: false, viewData: null })
+          }
+          viewData={isViewModalOpen.viewData}
+          isOpen={isViewModalOpen.state}
         />
       )}
     </div>

@@ -49,11 +49,12 @@ const ExpenseCategoryForm = ({ editData, closeModal }: propTypes) => {
   });
 
   useEffect(() => {
-    if (createExpenseCatSuccess) {
+    if (createExpenseCatSuccess || updateExpenseCatSuccess) {
+      console.log("Expense category operation successful, closing modal");
       form.reset();
       closeModal();
     }
-  }, [createExpenseCatSuccess, closeModal]);
+  }, [createExpenseCatSuccess, updateExpenseCatSuccess, closeModal]);
   return (
     <>
       <div className="bg-[#ffffff]">
@@ -109,9 +110,16 @@ const ExpenseCategoryForm = ({ editData, closeModal }: propTypes) => {
             </button>
             <button
               type="submit"
-              className=" bg-[#df8d29] flex-1 text-white px-7 py-2 rounded-xl "
+              disabled={createExpenseCatPending || updateExpenseCatPending}
+              className=" bg-[#df8d29] flex-1 text-white px-7 py-2 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Save
+              {createExpenseCatPending || updateExpenseCatPending
+                ? editData
+                  ? "Updating..."
+                  : "Adding..."
+                : editData
+                ? "Update"
+                : "Save"}
             </button>
           </div>
         </form>

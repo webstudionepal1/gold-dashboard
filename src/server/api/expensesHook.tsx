@@ -121,8 +121,10 @@ export const useUpdateExpenseMutation = () => {
       toast.success("Expense updated successfully");
       queryClient.invalidateQueries({ queryKey: ["expense"] });
     },
-    onError(err: string) {
-      toast.error(err || "Error updating Expense");
+    onError(err: any) {
+      toast.error(
+        err?.response?.data?.message || err || "Error updating Expense"
+      );
     },
   });
 };

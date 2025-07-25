@@ -30,9 +30,9 @@ interface SidebarSection {
   routes: Route[];
 }
 
-const CompanyLogo = () => {
-  return;
-};
+// const CompanyLogo = () => {
+//   return;
+// };
 
 const SidebarHeader: React.FC = () => {
   const { isCollapsed } = useSidebar();
@@ -177,19 +177,19 @@ const RouteItem: React.FC<{
     </div>
   );
 };
-const MobileToggleButton: React.FC = () => {
-  const { toggleSidebar } = useSidebar();
+// const MobileToggleButton: React.FC = () => {
+//   const { toggleSidebar } = useSidebar();
 
-  return (
-    <button
-      onClick={toggleSidebar}
-      className="fixed z-40 p-2 text-white rounded-full shadow-lg top-4 left-4 md:hidden bg-primary-blue"
-      aria-label="Toggle Sidebar"
-    >
-      <Icon icon={"mdi-light:unfold-more-vertical"} className="size-6" />
-    </button>
-  );
-};
+//   return (
+//     <button
+//       onClick={toggleSidebar}
+//       className="fixed z-40 p-2 text-white rounded-full shadow-lg top-4 left-4 md:hidden bg-primary-blue"
+//       aria-label="Toggle Sidebar"
+//     >
+//       <Icon icon={"mdi-light:unfold-more-vertical"} className="size-6" />
+//     </button>
+//   );
+// };
 
 const Overlay: React.FC = () => {
   const { isSidebarOpen, closeSidebar } = useSidebar();
@@ -251,9 +251,14 @@ const Sidebar: React.FC<{ config: { sections: SidebarSection[] } }> = ({
   };
 
   const toggleExpand = (id: number) => {
-    setExpandedItems((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
+    setExpandedItems((prev) => {
+      // If the clicked item is already expanded, close it
+      if (prev.includes(id)) {
+        return prev.filter((item) => item !== id);
+      }
+      // Otherwise, close all other items and open only the clicked one
+      return [id];
+    });
   };
 
   const currentParentId = findActiveParentId();

@@ -9,6 +9,7 @@ interface PriceInputFieldProps
   defaultPadding?: boolean;
   border?: boolean;
   readonly?: boolean;
+  step?: string | "any";
 }
 
 export const PriceInputField = React.forwardRef<
@@ -21,6 +22,7 @@ export const PriceInputField = React.forwardRef<
       placeholder,
       type = "text",
       required = false,
+      step,
       border = true,
       readonly = false,
       inputClassName,
@@ -42,6 +44,7 @@ export const PriceInputField = React.forwardRef<
         <input
           ref={ref}
           type={type}
+          step={step}
           placeholder={placeholder}
           className={twMerge(
             `min-h-[44px] ${border && "border"} border-grey-200 ${

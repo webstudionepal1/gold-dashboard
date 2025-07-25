@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm, useStore } from "@tanstack/react-form";
 import { InputField } from "../../../../components/shared/form_components/InputField";
 import { DropdownField } from "../../../../components/shared/form_components/Dropdown";
@@ -30,6 +30,7 @@ const ProductForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const productData = useStore(productStore, (state) => state);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
 
   const {
     mutate: createProduct,
@@ -58,13 +59,17 @@ const ProductForm = () => {
     [categorySuccess, categories]
   );
 
-  const subCategoriesList = useMemo(
-    () =>
-      subSuccess
-        ? subCategories.map((item) => ({ label: item.name, value: item._id }))
-        : [],
-    [subSuccess, subCategories]
-  );
+  // Filter subcategories based on selected category
+  const filteredSubCategoriesList = useMemo(() => {
+    if (!selectedCategory || !subSuccess) {
+      return [];
+    }
+
+    // Filter subcategories that belong to the selected category
+    return subCategories
+      .filter((item) => (item as any).category === selectedCategory)
+      .map((item) => ({ label: item.name, value: item._id }));
+  }, [selectedCategory, subCategories, subSuccess]);
 
   const claspsList = useMemo(
     () =>
@@ -90,7 +95,7 @@ const ProductForm = () => {
       productData
     ) as IProductFormValues,
     validators: {
-      onSubmit: productFormSchema, // Re-enabled validation
+      onSubmit: productFormSchema,
     },
     onSubmit: async ({ value }) => {
       try {
@@ -116,7 +121,7 @@ const ProductForm = () => {
         if (value.claspType) formData.append("claspType", value.claspType);
         formData.append("rhodoumFinishes", String(value.rhodoumFinishes));
         formData.append("shape", value.shape);
-        formData.append("clarity", value.clarity);
+        if (value.clarity) formData.append("clarity", value.clarity);
         formData.append("dimension", String(value.dimension));
         formData.append("visibleAs", value.visibleAs);
 
@@ -142,6 +147,17 @@ const ProductForm = () => {
       }
     },
   });
+
+  // Initialize selectedCategory with form value if in edit mode
+  useEffect(() => {
+    if (productData && productData.category) {
+      const categoryId =
+        typeof productData.category === "string"
+          ? productData.category
+          : productData.category._id || "";
+      setSelectedCategory(categoryId);
+    }
+  }, [productData]);
 
   useEffect(() => {
     if (productCreateSuccess || productUpdateSuccess) {
@@ -247,7 +263,13 @@ const ProductForm = () => {
                           firstInput="Select Category"
                           options={categoriesList}
                           value={field.state.value}
-                          onChange={(e) => field.handleChange(e.target.value)}
+                          onChange={(e) => {
+                            const newValue = e.target.value;
+                            field.handleChange(newValue);
+                            setSelectedCategory(newValue);
+                            // Reset subcategory when category changes
+                            form.setFieldValue("subCategory", "");
+                          }}
                         />
                         <FieldError field={field} />
                         {getFieldError("category").length > 0 && (
@@ -265,9 +287,10 @@ const ProductForm = () => {
                         <DropdownField
                           label="Product Sub-Category"
                           firstInput="Select Sub Category"
-                          options={subCategoriesList}
+                          options={filteredSubCategoriesList}
                           value={field.state.value}
                           onChange={(e) => field.handleChange(e.target.value)}
+                          disabled={!selectedCategory}
                         />
                         <FieldError field={field} />
                         {getFieldError("subCategory").length > 0 && (
@@ -415,6 +438,7 @@ const ProductForm = () => {
                           label="Length"
                           required
                           type="number"
+                          step="any"
                           placeholder="Enter length"
                           min="0"
                           {...lengthInput}
@@ -509,17 +533,16 @@ const ProductForm = () => {
                     <div>
                       <InputField
                         label="Clarity"
-                        required
                         placeholder="Enter clarity"
                         value={field.state.value}
                         onChange={(e) => field.handleChange(e.target.value)}
                       />
                       <FieldError field={field} />
-                      {getFieldError("clarity").length > 0 && (
+                      {/* {getFieldError("clarity").length > 0 && (
                         <div className="text-red-500 text-sm mt-1">
                           {getFieldError("clarity").join(", ")}
                         </div>
-                      )}
+                      )} */}
                     </div>
                   )}
                 </form.Field>
@@ -536,6 +559,7 @@ const ProductForm = () => {
                           label="Dimension"
                           required
                           type="number"
+                          step="any"
                           placeholder="Enter dimension"
                           min="0"
                           {...dimensionInput}

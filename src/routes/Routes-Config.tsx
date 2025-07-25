@@ -155,6 +155,10 @@ export const routesConfig = [
     element: <AddSupplierForm />,
   },
   {
+    path: "/inventory/suppliers/edit",
+    element: <AddSupplierForm />,
+  },
+  {
     path: FrontendRoutes.SUPPLIERDETAIL,
     element: <SupplierDetail />,
   },

@@ -5,7 +5,7 @@ import {
   TabsTrigger,
   TabsContent,
 } from "../../../components/shared/tab";
-import RawMaterialForm from "./RawMaterialForm";
+// import RawMaterialForm from "./RawMaterialForm";
 import NewProductForm from "./NewProductForm";
 import { IFetchPurchase } from "../../../server/api/purchaseHooks";
 
@@ -19,15 +19,15 @@ interface PurchaseProps {
 const PurchaseForm = ({ onClose, data, edit = false }: PurchaseProps) => {
   const defaultValue = data
     ? data.items.length > 0
-      ? "raw-material"
+      ? "new-product" // Changed from "raw-material" to "new-product"
       : "new-product"
-    : "raw-material";
+    : "new-product"; // Changed from "raw-material" to "new-product"
   const tabOptions = [
-    {
-      label: "Raw Material",
-      value: "raw-material",
-      content: <RawMaterialForm edit={edit} data={data} onClose={onClose} />,
-    },
+    // {
+    //   label: "Raw Material",
+    //   value: "raw-material",
+    //   content: <RawMaterialForm edit={edit} data={data} onClose={onClose} />,
+    // },
     {
       label: "New Product",
       value: "new-product",
