@@ -22,7 +22,7 @@ export const FrontendRoutes = {
   SUPPLIERS: "/inventory/suppliers",
   ADDSUPPLIERS: "/inventory/suppliers/:page",
   SUPPLIERDETAIL: "/inventory/supplier/:id",
-  SUPPLIERHISTORY: "/inventory/suppliers/supplier-history",
+  SUPPLIERHISTORY: "/inventory/supplier/:id/history",
 
   BANNER: "/banner",
   ADDBANNER: "/banner/add-banner",
