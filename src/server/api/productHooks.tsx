@@ -537,6 +537,28 @@ export interface IFetchClasps {
 }
 
 // Products routes
+// export const useGetAllProductsQuery = (params: IParams = {}) => {
+//   return useQuery({
+//     queryKey: ["products", params],
+//     queryFn: async () => {
+//       const res = await apiClient.get<{
+//         data: {
+//           products: IFetchProduct[];
+//           pagination?: any;
+//           searchQuery?: string;
+//           appliedFilters?: any;
+//         };
+//       }>("search", {
+//         params: {
+//           ...params,
+//           inStock: true, // Always fetch in-stock products
+//         },
+//       });
+//       return res?.data?.data?.products || []; // Extract products array, default to empty array
+//     },
+//   });
+// };
+
 export const useGetAllProductsQuery = (params: IParams = {}) => {
   return useQuery({
     queryKey: ["products", params],
@@ -551,10 +573,11 @@ export const useGetAllProductsQuery = (params: IParams = {}) => {
       }>("search", {
         params: {
           ...params,
-          inStock: true, // Always fetch in-stock products
+          inStock: true, // Keep your existing stock filter
+          includeAll: true, // Add this to get both active and inactive products
         },
       });
-      return res?.data?.data?.products || []; // Extract products array, default to empty array
+      return res?.data?.data?.products || [];
     },
   });
 };
