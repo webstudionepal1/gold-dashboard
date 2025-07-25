@@ -176,6 +176,8 @@ export const StepperObj: Record<string, number> = {
   confirmed: 1,
   assigned: 2,
   delivery: 3,
+  delivered: 3, // Completed orders should show step 3 (Delivery Completion)
+  cancelled: 3, // Cancelled orders should also show step 3 but with different styling
 };
 
 export const getStatusColor = (status: string) => {
@@ -248,6 +250,7 @@ export const confirmedColumns = [
 ];
 
 export const order_details_columns = [
+  { key: "image", title: "Image" },
   { key: "name", title: "Item Name" },
   { key: "qty", title: "QTY" },
   { key: "price", title: `Price (${Constants.currency})` },

@@ -173,8 +173,11 @@ const ExpenseForm = ({ editData, closeModal }: propTypes) => {
                     label="Amount"
                     required
                     min={0}
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(Number(e.target.value))}
+                    placeholder="0"
+                    value={field.state.value === 0 ? "" : field.state.value}
+                    onChange={(e) =>
+                      field.handleChange(Number(e.target.value) || 0)
+                    }
                   />
                   <FieldError field={field} />
                 </div>

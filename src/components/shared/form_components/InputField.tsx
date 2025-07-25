@@ -40,7 +40,7 @@ export const InputField = React.forwardRef<
         ref={ref}
         step={step}
         type={type}
-        placeholder={placeholder}
+        placeholder={type === "number" ? placeholder || "0" : placeholder}
         className={twMerge(
           `min-h-[44px] ${border && "border"} border-grey-200 ${
             defaultPadding && "py-2 px-4"

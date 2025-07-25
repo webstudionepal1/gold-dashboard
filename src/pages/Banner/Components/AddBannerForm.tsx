@@ -278,9 +278,10 @@ const AddBannerForm = () => {
                       type="number"
                       min="0"
                       required
-                      value={field.state.value}
+                      placeholder="0"
+                      value={field.state.value === 0 ? "" : field.state.value}
                       onChange={(e) =>
-                        field.handleChange(Number(e.target.value))
+                        field.handleChange(Number(e.target.value) || 0)
                       }
                     />
                     <FieldError field={field} />

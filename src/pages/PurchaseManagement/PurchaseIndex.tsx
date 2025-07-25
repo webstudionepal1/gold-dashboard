@@ -69,17 +69,25 @@ const PurchaseIndex = () => {
         }`,
       })),
       viewAction(row: IFetchProduct) {
+        // Find the original purchase data by ID to avoid using transformed data
+        const originalPurchase = purchaseList?.find(
+          (item) => item._id === row._id
+        );
         setModal({
           of: "purchase-view",
           edit: false,
-          data: row,
+          data: originalPurchase || row,
         });
       },
       editAction(row: IFetchProduct) {
+        // Find the original purchase data by ID to avoid using transformed data
+        const originalPurchase = purchaseList?.find(
+          (item) => item._id === row._id
+        );
         setModal({
           of: "purchase",
           edit: true,
-          data: row,
+          data: originalPurchase || row,
         });
       },
       onDelete(id: string) {

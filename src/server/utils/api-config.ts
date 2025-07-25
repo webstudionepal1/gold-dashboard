@@ -7,6 +7,10 @@ import {
 } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { apiClient } from "../utils/ApiGateway";
+import {
+  handleMutationError,
+  handleMutationSuccess,
+} from "../../utils/errorHandler";
 
 /**
  * Creates a set of API hooks for a specific entity
@@ -77,13 +81,10 @@ export function createApiConfig<T>(
       },
       onSuccess: () => {
         invalidateQueries(queryClient);
-        toast.success(`${entityNameFormatted} Created Successfully`);
+        handleMutationSuccess(`${entityNameFormatted} Created Successfully`);
       },
       onError: (error: any) => {
-        const errorMessage = `Error Creating ${entityNameFormatted}: ${
-          error?.error || error?.message
-        }`;
-        toast.error(errorMessage);
+        handleMutationError(error, `Error Creating ${entityNameFormatted}`);
       },
       retry: false,
       onMutate: () => {
@@ -117,54 +118,10 @@ export function createApiConfig<T>(
       },
       onSuccess: () => {
         invalidateQueries(queryClient);
-        toast.success(`${entityNameFormatted} Updated Successfully`);
+        handleMutationSuccess(`${entityNameFormatted} Updated Successfully`);
       },
       onError: (error: any) => {
-        console.log("Error type:", typeof error);
-        console.log("Full error:", error);
-
-        console.log(error?.error, "errorsssss");
-
-        // Handle string error
-        if (typeof error === "string") {
-          toast.error(error);
-          return;
-        }
-
-        // Handle axios error
-        if (error.response?.data) {
-          const errorData = error.response.data;
-          console.log("Error response data:", errorData);
-
-          // Try to get the duplicate entry message
-          if (
-            errorData.error &&
-            Array.isArray(errorData.error) &&
-            errorData.error.length > 0
-          ) {
-            toast.error(errorData.error[0].message);
-            return;
-          }
-
-          // Fallback to general message
-          if (errorData.message) {
-            toast.error(errorData.message);
-            return;
-          }
-        }
-
-        // Direct access attempt if the error might be the response itself
-        if (
-          error.error &&
-          Array.isArray(error.error) &&
-          error.error.length > 0
-        ) {
-          toast.error(error.error[0].message);
-          return;
-        }
-
-        // Last resort
-        toast.error(`Error Updating ${entityNameFormatted}`);
+        handleMutationError(error, `Error Updating ${entityNameFormatted}`);
       },
       retry: false,
       onMutate: () => {
@@ -182,10 +139,10 @@ export function createApiConfig<T>(
       },
       onSuccess: () => {
         invalidateQueries(queryClient);
-        toast.success(`${entityNameFormatted} Deleted Successfully`);
+        handleMutationSuccess(`${entityNameFormatted} Deleted Successfully`);
       },
-      onError: () => {
-        toast.error(`Error Deleting ${entityNameFormatted}`);
+      onError: (error: any) => {
+        handleMutationError(error, `Error Deleting ${entityNameFormatted}`);
       },
     });
   };

@@ -350,7 +350,6 @@ export const PurchaseSchema = z.object({
       })
     )
     .min(1, "**At least one product is required**"),
-  description: z.string().optional(),
 });
 
 export interface IPurchaseForm {
@@ -363,7 +362,6 @@ export interface IPurchaseForm {
     paidAmount: number;
     wt?: number;
   }[];
-  description?: string;
 }
 
 interface NewProductProps {
@@ -377,6 +375,15 @@ const NewProductForm = ({
   edit = false,
   data = null,
 }: NewProductProps) => {
+  // Debug logging for edit mode
+  if (edit && data) {
+    console.log("=== EDIT MODE DEBUG ===");
+    console.log("Raw data received:", data);
+    console.log("Supplier field:", get(data, "supplier"));
+    console.log("Supplier type:", typeof get(data, "supplier"));
+    console.log("Products field:", get(data, "products"));
+    console.log("=======================");
+  }
   const { mutate: createPurchase, isSuccess: createSuccess } =
     useCreatePurchaseMutation();
   const { mutate: updatePurchase, isSuccess: updateSuccess } =
@@ -398,7 +405,10 @@ const NewProductForm = ({
     defaultValues: {
       billNo: edit ? get(data, "billNo", "") : "",
       supplier: edit
-        ? get(data, "supplier._id", "") || get(data, "supplier", "")
+        ? // Handle both populated object and string ID cases
+          typeof get(data, "supplier") === "object"
+          ? get(data, "supplier._id", "") || get(data, "supplier.id", "")
+          : get(data, "supplier", "")
         : "",
       phone_no: edit ? get(data, "phone", "") : "",
       products: edit
@@ -421,7 +431,6 @@ const NewProductForm = ({
               wt: 0,
             },
           ],
-      description: edit ? get(data, "description", "") : "",
     } as IPurchaseForm,
     validators: {
       onSubmit: PurchaseSchema,
@@ -549,9 +558,12 @@ const NewProductForm = ({
                             label="Quantity"
                             type="number"
                             min={0} // Prevent negative input
-                            value={field.state.value}
+                            placeholder="0"
+                            value={
+                              field.state.value === 0 ? "" : field.state.value
+                            }
                             onChange={(e) =>
-                              field.handleChange(Number(e.target.value))
+                              field.handleChange(Number(e.target.value) || 0)
                             }
                           />
                           <FieldError field={field} />
@@ -566,11 +578,14 @@ const NewProductForm = ({
                         <div className="w-full">
                           <InputField
                             label="Price (Rs.)"
-                            placeholder="Tola"
+                            type="number"
+                            placeholder="0"
                             required
-                            value={field.state.value}
+                            value={
+                              field.state.value === 0 ? "" : field.state.value
+                            }
                             onChange={(e) =>
-                              field.handleChange(Number(e.target.value))
+                              field.handleChange(Number(e.target.value) || 0)
                             }
                           />
                           <FieldError field={field} />
@@ -582,11 +597,14 @@ const NewProductForm = ({
                         <div className="w-full">
                           <InputField
                             label="Paid Price (Rs.)"
+                            type="number"
                             required
-                            placeholder="176,000"
-                            value={field.state.value}
+                            placeholder="0"
+                            value={
+                              field.state.value === 0 ? "" : field.state.value
+                            }
                             onChange={(e) =>
-                              field.handleChange(Number(e.target.value))
+                              field.handleChange(Number(e.target.value) || 0)
                             }
                           />
                           <FieldError field={field} />
@@ -598,10 +616,13 @@ const NewProductForm = ({
                         <div className="w-full">
                           <InputField
                             label="Weight"
-                            placeholder="Weight"
-                            value={field.state.value}
+                            type="number"
+                            placeholder="0"
+                            value={
+                              field.state.value === 0 ? "" : field.state.value
+                            }
                             onChange={(e) =>
-                              field.handleChange(Number(e.target.value))
+                              field.handleChange(Number(e.target.value) || 0)
                             }
                           />
                           <FieldError field={field} />
@@ -623,22 +644,6 @@ const NewProductForm = ({
                   )}
                 </div>
               ))}
-            </div>
-          )}
-        </form.Field>
-
-        <form.Field name="description">
-          {(field) => (
-            <div className="flex flex-col">
-              <label className="text-[#98999e] font-semibold mb-2">
-                Description
-              </label>
-              <textarea
-                value={field.state.value}
-                onChange={(e) => field.handleChange(e.target.value)}
-                className="resize-none bg-[#f6f7f9] border-2 border-[#d3dae4] focus:outline-none rounded-xl px-3 py-1 placeholder:text-[#858492]"
-                placeholder="Enter Short Description"
-              ></textarea>
             </div>
           )}
         </form.Field>

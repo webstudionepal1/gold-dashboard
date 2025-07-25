@@ -66,13 +66,9 @@ apiClient.interceptors.response.use(
       return Promise.resolve({ canceled: true });
     }
 
-    // Format error message
-    const errorMessage =
-      error.response?.data?.message ||
-      error.message ||
-      "An unexpected error occurred";
-
-    return Promise.reject(errorMessage);
+    // Return the full error object so error handlers can extract detailed messages
+    // Don't format here - let individual error handlers decide what to show
+    return Promise.reject(error);
   }
 );
 

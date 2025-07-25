@@ -336,7 +336,6 @@ export interface IRawMaterialForm {
     wt?: number;
     paidAmount: number;
   }[];
-  description?: string;
 }
 export const RawMaterialSchema = z.object({
   billNo: z.string().min(1, "**Bill No is required**"),
@@ -353,7 +352,6 @@ export const RawMaterialSchema = z.object({
       })
     )
     .min(1, "**At least one item is required**"),
-  description: z.string().optional(),
 });
 
 export interface IPurchaseForm {
@@ -367,7 +365,6 @@ export interface IPurchaseForm {
     paidAmount: number;
     wt?: number;
   }[];
-  description?: string;
 }
 export const PurchaseSchema = z.object({
   billNo: z.string().min(1, "**Bill No is required**"),
@@ -384,7 +381,6 @@ export const PurchaseSchema = z.object({
       })
     )
     .min(1, "**At least one item is required**"),
-  description: z.string().optional(),
 });
 export const supplierfieldSchemas = {
   name: supplierSchema.shape.name,

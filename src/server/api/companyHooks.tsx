@@ -1,6 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../utils/ApiGateway";
 import { toast } from "react-toastify";
+import {
+  handleMutationError,
+  handleMutationSuccess,
+} from "../../utils/errorHandler";
 
 export interface IFetchCompany {
   _id: string;
@@ -73,11 +77,11 @@ export const useUpdateCompanyDetailsMutation = () => {
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Successfully updated details");
+      handleMutationSuccess("Successfully updated details");
       queryClient.invalidateQueries({ queryKey: ["company"] });
     },
-    onError(err: string) {
-      toast.success(err || "Error Updating Details");
+    onError(err: any) {
+      handleMutationError(err, "Error Updating Details");
     },
   });
 };

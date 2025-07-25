@@ -423,6 +423,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../utils/ApiGateway";
 import { toast } from "react-toastify";
+import {
+  handleMutationError,
+  handleMutationSuccess,
+} from "../../utils/errorHandler";
 
 export interface IParams {
   [key: string]: string | boolean | undefined;
@@ -537,6 +541,28 @@ export interface IFetchClasps {
 }
 
 // Products routes
+// export const useGetAllProductsQuery = (params: IParams = {}) => {
+//   return useQuery({
+//     queryKey: ["products", params],
+//     queryFn: async () => {
+//       const res = await apiClient.get<{
+//         data: {
+//           products: IFetchProduct[];
+//           pagination?: any;
+//           searchQuery?: string;
+//           appliedFilters?: any;
+//         };
+//       }>("search", {
+//         params: {
+//           ...params,
+//           inStock: true, // Always fetch in-stock products
+//         },
+//       });
+//       return res?.data?.data?.products || []; // Extract products array, default to empty array
+//     },
+//   });
+// };
+
 export const useGetAllProductsQuery = (params: IParams = {}) => {
   return useQuery({
     queryKey: ["products", params],
@@ -551,10 +577,11 @@ export const useGetAllProductsQuery = (params: IParams = {}) => {
       }>("search", {
         params: {
           ...params,
-          inStock: true, // Always fetch in-stock products
+          inStock: true, // Keep your existing stock filter
+          includeAll: true, // Add this to get both active and inactive products
         },
       });
-      return res?.data?.data?.products || []; // Extract products array, default to empty array
+      return res?.data?.data?.products || [];
     },
   });
 };
@@ -582,11 +609,11 @@ export const useCreateProductsMutation = () => {
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Product created successfully");
+      handleMutationSuccess("Product created successfully");
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
-    onError(err: string) {
-      toast.error(err || "Error creating products");
+    onError(err: any) {
+      handleMutationError(err, "Error creating products");
     },
   });
 };
@@ -610,11 +637,11 @@ export const useUpdateProductsMutation = () => {
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Product updated successfully");
+      handleMutationSuccess("Product updated successfully");
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
-    onError(err: string) {
-      toast.error(err || "Error creating products");
+    onError(err: any) {
+      handleMutationError(err, "Error updating products");
     },
   });
 };

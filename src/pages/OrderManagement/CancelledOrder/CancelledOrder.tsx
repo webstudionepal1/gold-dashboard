@@ -41,8 +41,8 @@ const CancelledOrder = () => {
         ...item,
         orderedProducts: size(item.orderedProducts),
         orderStatus: (
-          <div className="px-2 py-1 text-xs text-white rounded-full bg-green">
-            {item.orderStatus}
+          <div className="px-2 py-1 text-xs text-white rounded-full bg-red-600">
+            Cancelled
           </div>
         ),
         customer: get(item, "customer.name", "-"),
@@ -71,7 +71,7 @@ const CancelledOrder = () => {
           showAction
           loading={isLoading}
           viewAction={(row) =>
-            navigate(`/order/assigned-order-details/${row._id}`)
+            navigate(`/order/cancelled-order-details/${row._id}`)
           }
           columns={confirmedColumns}
           rows={filteredItems}

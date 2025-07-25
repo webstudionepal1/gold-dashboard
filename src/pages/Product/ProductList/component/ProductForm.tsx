@@ -87,6 +87,16 @@ const ProductForm = () => {
     { value: "recommended", label: "Recommended for you" },
   ];
 
+  // Weight unit options for jewelry
+  const weightUnitOptions = [
+    { value: "gm", label: "gm" },
+    { value: "kg", label: "kg" },
+    { value: "mg", label: "mg" },
+    { value: "oz", label: "oz" },
+    { value: "ct", label: "ct" },
+    { value: "dwt", label: "dwt" },
+  ];
+
   const formstate = id ?? "add";
 
   const form = useForm({
@@ -322,7 +332,7 @@ const ProductForm = () => {
                         className="flex bg-[#DF8D28] rounded-md text-white items-center gap-2 px-3 py-2"
                       >
                         <Icon icon="ep:plus" width="18" height="18" />
-                        Product Size
+                        Product Variant
                       </button>
                     </div>
                     {getFieldError("variant").length > 0 && (
@@ -335,7 +345,7 @@ const ProductForm = () => {
                         key={i.toString()}
                         className="border rounded-md p-3 mb-2"
                       >
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                           <form.Field name={`variant[${i}].price`}>
                             {(subField) => {
                               const priceInput = useClearableNumberInput(
@@ -346,7 +356,11 @@ const ProductForm = () => {
                                 <div>
                                   <PriceInputField
                                     label="Base Price"
-                                    placeholder="Enter base price"
+                                    placeholder={
+                                      priceInput.value === ""
+                                        ? "0"
+                                        : "Enter base price"
+                                    }
                                     type="number"
                                     required
                                     min="0"
@@ -374,12 +388,16 @@ const ProductForm = () => {
                               return (
                                 <div>
                                   <InputField
-                                    label="Size"
+                                    label="Weight (wt)"
                                     type="number"
                                     required
                                     step="any"
                                     min="0"
-                                    placeholder="Enter in gram"
+                                    placeholder={
+                                      weightInput.value === ""
+                                        ? "0"
+                                        : "Enter weight"
+                                    }
                                     {...weightInput}
                                   />
                                   <FieldError field={subField} />
@@ -394,6 +412,32 @@ const ProductForm = () => {
                                 </div>
                               );
                             }}
+                          </form.Field>
+
+                          <form.Field name={`variant[${i}].unit`}>
+                            {(subField) => (
+                              <div>
+                                <DropdownField
+                                  label="Unit"
+                                  required
+                                  firstInput="Select unit"
+                                  options={weightUnitOptions}
+                                  value={subField.state.value || "gm"}
+                                  onChange={(e) =>
+                                    subField.handleChange(e.target.value)
+                                  }
+                                />
+                                <FieldError field={subField} />
+                                {getFieldError(`variant.${i}.unit`).length >
+                                  0 && (
+                                  <div className="text-red-500 text-sm mt-1">
+                                    {getFieldError(`variant.${i}.unit`).join(
+                                      ", "
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            )}
                           </form.Field>
                         </div>
                         {i > 0 && (
@@ -439,7 +483,9 @@ const ProductForm = () => {
                           required
                           type="number"
                           step="any"
-                          placeholder="Enter length"
+                          placeholder={
+                            lengthInput.value === "" ? "0" : "Enter length"
+                          }
                           min="0"
                           {...lengthInput}
                         />
@@ -560,7 +606,11 @@ const ProductForm = () => {
                           required
                           type="number"
                           step="any"
-                          placeholder="Enter dimension"
+                          placeholder={
+                            dimensionInput.value === ""
+                              ? "0"
+                              : "Enter dimension"
+                          }
                           min="0"
                           {...dimensionInput}
                         />
