@@ -1,13 +1,11 @@
 import { useForm, useStore } from "@tanstack/react-form";
 import clsx from "clsx";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Breadcrumbs from "../../../components/shared/Breadcrumb";
-import { DropdownTagField } from "../../../components/shared/form_components/DropdownTags";
 import MultiImageUploader from "../../../components/shared/form_components/FileDropInput";
 import { InputField } from "../../../components/shared/form_components/InputField";
 import Header from "../../../components/shared/table_heading/Header";
-import { useGetAllProductsQuery } from "../../../server/api/productHooks";
 import {
   useCreateSupplierMutation,
   useUpdateSupplierMutation,
@@ -23,7 +21,8 @@ import { cleanObject } from "../../../utils/cleanObject";
 
 const AddSupplierForm = () => {
   const { page = "add" } = useParams();
-  const { data: products, isSuccess } = useGetAllProductsQuery();
+  const [formKey, setFormKey] = useState(0); // Force re-render key
+
   const {
     mutate: createSupplier,
     isPending,
@@ -34,15 +33,36 @@ const AddSupplierForm = () => {
     isPending: updatePending,
     isSuccess: updateSuccess,
   } = useUpdateSupplierMutation();
-  const productsList = isSuccess
-    ? products?.map((item) => ({ label: item.name, value: item._id }))
-    : [];
 
   const editData = useStore(supplierStore, (state) => state);
+
+  // Debug logging to understand the data structure
+  console.log("Page parameter:", page);
+  console.log("Edit data from store:", editData);
+  console.log("Edit data type:", typeof editData);
+  console.log("Is edit data an array?", Array.isArray(editData));
+  console.log("Edit data keys:", editData ? Object.keys(editData) : "No data");
+
+  // If editData is an array, log the first element
+  if (Array.isArray(editData) && editData.length > 0) {
+    console.log("First element of edit data array:", editData[0]);
+    console.log("First element keys:", Object.keys(editData[0]));
+  }
+  // Handle array data if needed
+  const actualEditData =
+    Array.isArray(editData) && editData.length > 0 ? editData[0] : editData;
+
+  // Determine if we're in edit mode
+  const isEditMode = page === "edit" || (actualEditData && actualEditData._id);
+  const formState = isEditMode ? "edit" : "add";
+
+  console.log("Is edit mode:", isEditMode);
+  console.log("Form state:", formState);
+
   const form = useForm({
     defaultValues: getSupplierInitialFormValues(
-      page,
-      editData
+      formState,
+      actualEditData
     ) as SupplierFormValues,
     // validators: {
     //   onChange: supplierSchema,
@@ -59,22 +79,33 @@ const AddSupplierForm = () => {
         formdata.append("logo", value.logo);
       }
 
-      if (page === "add") createSupplier(formdata);
-      else updateSupplier({ id: editData?._id, body: formdata });
+      if (formState === "add") {
+        console.log("Creating new supplier");
+        createSupplier(formdata);
+      } else {
+        console.log("Updating supplier with ID:", editData?._id);
+        updateSupplier({ id: editData?._id, body: formdata });
+      }
     },
   });
   useEffect(() => {
-    if (createSuccess || updateSuccess) form.reset();
-  }, [updateSuccess, createSuccess]);
+    if (createSuccess || updateSuccess) {
+      // Reset with initial values to ensure proper reset
+      form.reset(getSupplierInitialFormValues("add"));
+
+      history.back();
+    }
+  }, [updateSuccess, createSuccess, form]);
 
   return (
     <>
       <div className="">
-        <Header text={page === "Edit" ? "Edit Supplier" : "Add Supplier"}>
+        <Header text={isEditMode ? "Edit Supplier" : "Add Supplier"}>
           <Breadcrumbs />
         </Header>
 
         <form
+          key={formKey}
           className="grid grid-cols-1 gap-4 lg:grid-cols-6 "
           onSubmit={(e) => {
             e.preventDefault();
@@ -436,29 +467,7 @@ const AddSupplierForm = () => {
                 </div>
               </div>
             </div>
-            <div className="p-6 bg-white border rounded-xl">
-              <div>
-                <h1 className="text-xl font-semibold">Item Supplied</h1>
-                <div className="border-b border-[#dedde2] w-full mt-2 mb-4"></div>
-              </div>
-              <div className="w-full">
-                <form.Field name="products" mode="array">
-                  {(field) => (
-                    <div className="w-full">
-                      <DropdownTagField
-                        required
-                        values={field.state.value}
-                        onChange={(newValues) => {
-                          field.handleChange(newValues);
-                        }}
-                        options={productsList}
-                      />
-                      <FieldError field={field} />
-                    </div>
-                  )}
-                </form.Field>
-              </div>
-            </div>
+
             <div className="flex items-center justify-end">
               <button
                 type="submit"
@@ -467,7 +476,7 @@ const AddSupplierForm = () => {
                   (updatePending || isPending) && "cursor-progress"
                 )}
               >
-                {page === "Edit" ? "Update" : "Save"}
+                {isEditMode ? "Update" : "Save"}
               </button>
             </div>
           </div>

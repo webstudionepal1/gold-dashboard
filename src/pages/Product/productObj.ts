@@ -24,7 +24,7 @@ export interface IProductFormValues {
   claspType?: string;
   rhodoumFinishes: boolean;
   shape: string;
-  clarity: string;
+  clarity?: string;
   dimension: number;
   visibleAs: VisibilityType;
   tags: string[];
@@ -64,7 +64,7 @@ export const productFormSchema = z
 
     // Material Information
     shape: z.string().min(1, "Shape is required"),
-    clarity: z.string().min(1, "Clarity is required"),
+    // clarity: z.string().min(1, "Clarity is required"),
     dimension: z.number().min(0.01, "Dimension must be greater than 0"),
 
     // Image - Fixed field name
@@ -100,6 +100,7 @@ export const categoryColumns = [
   { title: "Name", key: "name" },
   { title: "Description", key: "description" },
   { title: "Total Products", key: "totalProducts" },
+  { title: "Status", key: "status" },
 ];
 
 export const subCategoryColumns = [
@@ -108,6 +109,7 @@ export const subCategoryColumns = [
   // { title: "Category", key: "category" },
   { title: "Description", key: "description" },
   { title: "Total Products", key: "totalProducts" },
+  { title: "Status", key: "status" },
 ];
 
 export const generateProductDefaultValue = (state: string, editData?: any) => {
@@ -166,7 +168,7 @@ export const productListColumns = [
   { title: "Product", key: "product" },
   { title: "Category", key: "categ" },
   { title: "Sub Category", key: "subCate" },
-  { title: "Price", key: "price" },
   { title: "Stock", key: "stock" },
   { title: "Sold", key: "sold" },
+  { title: "Status", key: "status" },
 ];

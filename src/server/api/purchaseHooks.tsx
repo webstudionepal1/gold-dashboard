@@ -1,6 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { apiClient } from "../utils/ApiGateway";
+import {
+  handleMutationError,
+  handleMutationSuccess,
+} from "../../utils/errorHandler";
 // import { IFetchSupplier } from "./supplierHooks";
 import { IFetchProduct } from "./productHooks";
 
@@ -24,7 +28,7 @@ export interface IFetchPurchase {
   billNo: string;
   items: IItem[];
   products: IProducts[];
-  supplier: string;
+  supplier: any; // Can be string ID or populated object with name, _id, etc.
   discount: number;
   discountType: string;
   totalAmount: number;
@@ -72,11 +76,11 @@ export const useCreatePurchaseMutation = () => {
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Purchase created successfully");
+      handleMutationSuccess("Purchase created successfully");
       queryClient.invalidateQueries({ queryKey: ["purchases"] });
     },
-    onError(err: string) {
-      toast.error(err || "Error creating purchase");
+    onError(err: any) {
+      handleMutationError(err, "Error creating purchase");
     },
   });
 };
@@ -90,11 +94,11 @@ export const useUpdatePurchaseMutation = () => {
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Purchase updated successfully");
+      handleMutationSuccess("Purchase updated successfully");
       queryClient.invalidateQueries({ queryKey: ["purchases"] });
     },
-    onError(err: string) {
-      toast.error(err || "Error updating purchase");
+    onError(err: any) {
+      handleMutationError(err, "Error updating purchase");
     },
   });
 };
@@ -297,5 +301,54 @@ export const useDeletePurchasReturnMutation = () => {
     onError(err: string) {
       toast.error(err || "Error deleting purchase return");
     },
+  });
+};
+
+// Purchase return summary hook
+export interface IReturnSummaryItem {
+  productId: string;
+  productName: string;
+  wt: number;
+  originalQuantity: number;
+  totalReturned: number;
+  remainingQuantity: number;
+  canReturn: boolean;
+}
+
+export interface IReturnSummary {
+  purchaseId: string;
+  returnSummary: IReturnSummaryItem[];
+}
+
+export const useGetPurchaseReturnSummaryQuery = (purchaseId: string) => {
+  return useQuery({
+    queryKey: ["purchase-return-summary", purchaseId],
+    queryFn: async () => {
+      const res = await apiClient.get<{ data: IReturnSummary }>(
+        `purchase/${purchaseId}/return-summary`
+      );
+      return res?.data?.data;
+    },
+    enabled: !!purchaseId,
+  });
+};
+
+// Hook to get purchase history for a specific supplier
+export const useGetSupplierPurchaseHistoryQuery = (
+  supplierId: string,
+  params = {}
+) => {
+  return useQuery({
+    queryKey: ["supplier-purchase-history", supplierId, params],
+    queryFn: async () => {
+      const res = await apiClient.get<{ data: IFetchPurchase[] }>("purchase", {
+        params: {
+          supplier: supplierId,
+          ...params,
+        },
+      });
+      return res?.data?.data;
+    },
+    enabled: !!supplierId,
   });
 };

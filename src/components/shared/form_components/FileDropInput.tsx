@@ -1,6 +1,7 @@
 import type React from "react";
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
+import { Icon } from "@iconify/react/dist/iconify.js";
 
 interface SingleFileProps {
   multiple: false;
@@ -40,6 +41,13 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
     maxFiles = 10,
   } = props;
 
+  const [renderKey, setRenderKey] = useState(0);
+
+  useEffect(() => {
+    console.log("Existing files changed, forcing re-render");
+    setRenderKey((prev) => prev + 1);
+  }, [props.multiple && "existingFiles" in props ? props.existingFiles : null]);
+
   const defaultPlaceholder = props.multiple
     ? "Drag 'n' drop files here, or click to select files"
     : "Drag 'n' drop a file here, or click to select a file";
@@ -47,7 +55,6 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       if (props.multiple) {
-        // Multi-file mode
         const currentFiles = props.value || [];
         const newFiles = [...currentFiles, ...acceptedFiles];
         const limitedFiles = newFiles.slice(0, maxFiles);
@@ -69,10 +76,18 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
   });
 
   const handleRemoveFile = (index?: number) => {
+    console.log("handleRemoveFile called with index:", index);
+    console.log(
+      "Current files:",
+      props.multiple ? props.value : "single file mode"
+    );
+
     if (props.multiple) {
       if (typeof index === "number") {
         const newFiles = [...props.value];
+        console.log("Before removal:", newFiles);
         newFiles.splice(index, 1);
+        console.log("After removal:", newFiles);
         props.onChange(newFiles);
       }
     } else {
@@ -81,23 +96,42 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
   };
 
   const handleRemoveExistingFile = (index?: number) => {
-    if (!form) return;
+    console.log("Removing existing file at index:", index);
+
+    if (!form) {
+      console.log("No form available, returning");
+      return;
+    }
 
     if (props.multiple && "existingFiles" in props && props.existingFiles) {
       if (typeof index === "number" && props.existingFileField) {
+        const currentFiles = [...props.existingFiles];
+        console.log("Current existing files before removal:", currentFiles);
+
         const newFiles = [
-          ...props.existingFiles.slice(0, index),
-          ...props.existingFiles.slice(index + 1),
+          ...currentFiles.slice(0, index),
+          ...currentFiles.slice(index + 1),
         ];
 
+        console.log("New files after removal:", newFiles);
+
+        // Update the form field value
         form.setFieldValue(props.existingFileField, newFiles);
-        // console.log(form.getFieldValue(props.existingFileField));
+
+        // Force a re-render by triggering the form's state update
+        setTimeout(() => {
+          console.log(
+            "Form field value after update:",
+            form.getFieldValue(props.existingFileField)
+          );
+        }, 0);
       }
     } else if (
       !props.multiple &&
       "existingFile" in props &&
       props.existingFileField
     ) {
+      console.log("Removing single existing file");
       form.setFieldValue(props.existingFileField, null);
     }
   };
@@ -160,13 +194,18 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
           />
         )}
         <button
-          onClick={() =>
-            isExisting
-              ? handleRemoveExistingFile(index)
-              : handleRemoveFile(index)
-          }
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log("Remove button clicked:", { isExisting, index });
+            if (isExisting) {
+              handleRemoveExistingFile(index);
+            } else {
+              handleRemoveFile(index);
+            }
+          }}
           type="button"
-          className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 text-xs opacity-0 group-hover:opacity-100 transition"
+          className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-80 group-hover:opacity-100 hover:bg-red-600 transition-all duration-200 z-10 cursor-pointer shadow-md"
         >
           ✕
         </button>

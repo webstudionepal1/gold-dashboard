@@ -42,7 +42,6 @@ export interface SupplierFormValues {
   };
   logo: File | null; // Optional logo file
   existingLogo?: string; // Optional existing logo URL
-  products: string[];
 }
 export const buttonObj: IButtonObj = {
   purchase: {
@@ -100,9 +99,23 @@ export const supplierSchema = z.object({
   }),
   // logo: z.instanceof(File).nullable(),
   logo: z.instanceof(File).nullable(),
-  products: z.array(z.string()).optional(),
 });
 export const getSupplierInitialFormValues = (state: string, editData?: any) => {
+  console.log("getSupplierInitialFormValues called with:");
+  console.log("State:", state);
+  console.log("EditData:", editData);
+  console.log("EditData type:", typeof editData);
+  console.log("Is EditData an array?", Array.isArray(editData));
+
+  // Handle case where editData might be an array (API returns array instead of single object)
+  let supplierData = editData;
+  if (Array.isArray(editData) && editData.length > 0) {
+    console.log("EditData is an array, using first element");
+    supplierData = editData[0];
+  }
+
+  console.log("Final supplier data to use:", supplierData);
+
   if (state === "add")
     return {
       name: "",
@@ -133,43 +146,42 @@ export const getSupplierInitialFormValues = (state: string, editData?: any) => {
         branch: "",
       },
       logo: null, // Fix: null instead of File constructor
-      products: [],
     };
 
-  return {
-    name: get(editData, "name", ""),
-    description: get(editData, "description", ""),
-    email: get(editData, "email", ""),
-    phone: get(editData, "phone", ""),
+  const formValues = {
+    name: get(supplierData, "name", ""),
+    description: get(supplierData, "description", ""),
+    email: get(supplierData, "email", ""),
+    phone: get(supplierData, "phone", ""),
     contactPerson: {
-      name: get(editData, "contactPerson.name", ""),
-      phone: get(editData, "contactPerson.phone", ""),
-      email: get(editData, "contactPerson.email", ""),
+      name: get(supplierData, "contactPerson.name", ""),
+      phone: get(supplierData, "contactPerson.phone", ""),
+      email: get(supplierData, "contactPerson.email", ""),
     },
-    businessType: get(editData, "businessType", ""),
+    businessType: get(supplierData, "businessType", ""),
     addresses: {
-      district: get(editData, "addresses.district", ""),
-      address: get(editData, "addresses.address", ""),
-      province: get(editData, "addresses.province", ""),
+      district: get(supplierData, "addresses.district", ""),
+      address: get(supplierData, "addresses.address", ""),
+      province: get(supplierData, "addresses.province", ""),
     },
     businessInfo: {
-      company: get(editData, "businessInfo.company", ""),
-      companyNumber: get(editData, "businessInfo.companyNumber", ""),
-      PAN: get(editData, "businessInfo.PAN", ""),
+      company: get(supplierData, "businessInfo.company", ""),
+      companyNumber: get(supplierData, "businessInfo.companyNumber", ""),
+      PAN: get(supplierData, "businessInfo.PAN", ""),
     },
     bankDetails: {
-      accountHolderName: get(editData, "bankDetails.accountHolderName", ""),
-      accountNumber: get(editData, "bankDetails.accountNumber", ""),
-      bankName: get(editData, "bankDetails.bankName", ""),
-      paymentTerms: get(editData, "bankDetails.paymentTerms", ""),
-      branch: get(editData, "bankDetails.branch", ""),
+      accountHolderName: get(supplierData, "bankDetails.accountHolderName", ""),
+      accountNumber: get(supplierData, "bankDetails.accountNumber", ""),
+      bankName: get(supplierData, "bankDetails.bankName", ""),
+      paymentTerms: get(supplierData, "bankDetails.paymentTerms", ""),
+      branch: get(supplierData, "bankDetails.branch", ""),
     },
     logo: null, // Fix: null instead of File constructor
-    existingLogo: get(editData, "logo[0]"),
-    products: get(editData, "products", []).map((item: { _id: string }) =>
-      get(item, "_id")
-    ),
+    existingLogo: get(supplierData, "logo[0]"),
   };
+
+  console.log("Generated form values:", formValues);
+  return formValues;
 };
 
 export function appendFormData(
@@ -324,7 +336,6 @@ export interface IRawMaterialForm {
     wt?: number;
     paidAmount: number;
   }[];
-  description?: string;
 }
 export const RawMaterialSchema = z.object({
   billNo: z.string().min(1, "**Bill No is required**"),
@@ -341,7 +352,6 @@ export const RawMaterialSchema = z.object({
       })
     )
     .min(1, "**At least one item is required**"),
-  description: z.string().optional(),
 });
 
 export interface IPurchaseForm {
@@ -355,7 +365,6 @@ export interface IPurchaseForm {
     paidAmount: number;
     wt?: number;
   }[];
-  description?: string;
 }
 export const PurchaseSchema = z.object({
   billNo: z.string().min(1, "**Bill No is required**"),
@@ -372,7 +381,6 @@ export const PurchaseSchema = z.object({
       })
     )
     .min(1, "**At least one item is required**"),
-  description: z.string().optional(),
 });
 export const supplierfieldSchemas = {
   name: supplierSchema.shape.name,
@@ -402,6 +410,5 @@ export const supplierfieldSchemas = {
     companyNumber: supplierSchema.shape.businessInfo.shape.companyNumber,
     PAN: supplierSchema.shape.businessInfo.shape.PAN,
   },
-  products: supplierSchema.shape.products,
   logo: supplierSchema.shape.logo,
 };

@@ -6,6 +6,10 @@ import {
 } from "@tanstack/react-query";
 import { apiClient } from "../utils/ApiGateway";
 import { toast } from "react-toastify";
+import {
+  handleMutationError,
+  handleMutationSuccess,
+} from "../../utils/errorHandler";
 
 interface ShippingAddress {
   fullname: string;
@@ -133,11 +137,11 @@ export const useCreateOrderMutation = () => {
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Order created successfully");
+      handleMutationSuccess("Order created successfully");
       queryClient.invalidateQueries({ queryKey: ["orders"] });
     },
-    onError(error: string) {
-      toast.error(error || "Error creating order");
+    onError(error: any) {
+      handleMutationError(error, "Error creating order");
     },
   });
 };
@@ -152,11 +156,11 @@ export const useUpdateOrderMutation = () => {
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Order updated successfully");
+      handleMutationSuccess("Order updated successfully");
       queryClient.invalidateQueries({ queryKey: ["orders"] });
     },
-    onError(error: string) {
-      toast.error(error || "Error updating order");
+    onError(error: any) {
+      handleMutationError(error, "Error updating order");
     },
   });
 };
@@ -171,11 +175,11 @@ export const useDeleteOrderMutation = () => {
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Order deleted successfully");
+      handleMutationSuccess("Order deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["orders"] });
     },
-    onError(error: string) {
-      toast.error(error || "Error deleting order");
+    onError(error: any) {
+      handleMutationError(error, "Error deleting order");
     },
   });
 };

@@ -79,6 +79,12 @@ const EditProfileForm = () => {
       if (Array.isArray(value.qr)) {
         value.qr.forEach((item: File) => formdata.append("qr", item));
       }
+      if (Array.isArray(value.existingQr)) {
+        value.existingQr.forEach((item: string) =>
+          formdata.append("existingQr", item)
+        );
+      }
+      console.log("formdata", value);
       updateProfile({ id: companyData._id, body: formdata });
     },
   });

@@ -39,6 +39,13 @@ export const PurchaseDetailsCard: React.FC<PropDetails> = ({
   data,
   summary = "Purchase",
 }) => {
+  // Debug logging for view modal
+  console.log("=== VIEW MODAL DEBUG ===");
+  console.log("Raw data received:", data);
+  console.log("Supplier field:", get(data, "supplier"));
+  console.log("Supplier type:", typeof get(data, "supplier"));
+  console.log("Supplier name:", get(data, "supplier.name"));
+  console.log("========================");
   const rows =
     data?.items.length > 0
       ? data.items.map((item: any) => ({
@@ -56,30 +63,37 @@ export const PurchaseDetailsCard: React.FC<PropDetails> = ({
           total: get(item, "quantity", 0) * get(item, "price", 0),
         }));
   return (
-    <div className="max-w-2xl p-6 mx-auto space-y-4 font-sans text-sm text-gray-700 bg-white shadow-md rounded-xl">
+    <div className="max-w-4xl p-4 mx-auto font-sans text-sm text-gray-700 bg-white shadow-md rounded-xl">
       <div className="text-lg font-semibold text-center">{summary}</div>
 
       {/* Header Info */}
-      <div className="flex justify-between gap-10 text-gray-500">
-        <div className="flex items-center gap-10">
-          <div className="text-xs">Bill No.</div>
-          <div className="font-semibold">#{get(data, "billNo", "-")}</div>
+      <div>
+        <div className="flex justify-between text-gray-500">
+          <div className="flex items-center gap-10">
+            <div className="text-xs">Bill No.</div>
+            <div className="font-semibold">#{get(data, "billNo", "-")}</div>
+          </div>
+          <div className="flex items-center gap-10">
+            <div className="text-xs">Date:</div>
+            <div className="font-semibold">
+              {dayjs(data?.createdAt).format("MMM-DD-YYYY")}
+            </div>
+          </div>
         </div>
-        <div className="flex items-center gap-2 pl-[">
-          <div className="text-xs">Date:</div>
+
+        <div className="flex items-center mt-2 gap-7">
+          <div className="text-xs text-gray-500">Suppliers</div>
           <div className="font-semibold">
-            {dayjs(data?.createdAt).format("MMM-DD-YYYY")}
+            {typeof get(data, "supplier") === "object"
+              ? get(data, "supplier.name", "Unknown Supplier")
+              : get(data, "supplier", "Unknown Supplier")}
           </div>
         </div>
       </div>
 
-      <div className="flex items-center gap-10">
-        <div className="text-xs text-gray-500">Suppliers</div>
-        <div className="font-semibold">{get(data, "supplier", "")}</div>
-      </div>
-
       {/* Reused Table Component */}
       <MasterTable
+        className="p-0"
         canSearch={false}
         columns={viewPurchaseColumns}
         rows={rows}

@@ -40,10 +40,10 @@ const InfoSection: React.FC<InfoSectionProps> = ({
 
       <div className="border-b-2 border-[#d5d9e4] my-2" />
 
-      <div className="space-y-4">
+      <div className="space-y-1">
         {info.map((item) => (
           <div key={item.id} className="flex items-center justify-between">
-            <p className="text-sm min-w-[150px]">{item.title}</p>
+            <p className="text-sm w-auto">{item.title}</p>
             <p className="text-sm">
               {item.value || item.Note || item.date || item.reason}
             </p>

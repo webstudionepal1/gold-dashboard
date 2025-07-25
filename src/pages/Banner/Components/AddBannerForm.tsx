@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useForm, useStore } from "@tanstack/react-form";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import * as z from "zod";
 
 import { InputField } from "../../../components/shared/form_components/InputField";
@@ -32,24 +32,17 @@ const AddBannerSchema = z.object({
   subCategory: z.string().min(1, "Sub Category is required"),
   priority: z.number().min(0, "Price must be a positive number"),
   locations: z.array(z.string()).min(1, "Location is required"),
-  image: z
-    .instanceof(File)
-    .nullable()
-    .refine((val) => val !== null, {
-      message: "At least one image is required",
-    }),
-  mobImage: z
-    .instanceof(File)
-    .nullable()
-    .refine((val) => val !== null, {
-      message: "At least one image is required",
-    }),
+  image: z.instanceof(File).nullable(),
+
+  mobImage: z.instanceof(File).nullable(),
 });
 
 const AddBannerForm = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const bannerData = useStore(bannerStore, (state) => state);
   const [selectedTagItems, setSelectedTagItems] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
 
   const {
     mutate: createBanner,
@@ -79,6 +72,8 @@ const AddBannerForm = () => {
     error: subCategoryError,
   } = useGetAllProductSubCategoriesQuery();
 
+  console.log(subCategories, "sub");
+
   const categoryOptions = useMemo(
     () =>
       categorySuccess
@@ -87,18 +82,19 @@ const AddBannerForm = () => {
     [categorySuccess, categories]
   );
 
-  const subCategoryOptions = useMemo(
-    () =>
-      subCategorySuccess
-        ? subCategories.map((item) => ({ label: item.name, value: item._id }))
-        : [],
-    [subCategorySuccess, subCategories]
-  );
+  const filteredSubCategoryOptions = useMemo(() => {
+    if (!selectedCategory || !subCategorySuccess) {
+      return [];
+    }
+
+    return subCategories
+      .filter((item) => (item as any).category === selectedCategory)
+      .map((item) => ({ label: item.name, value: item._id }));
+  }, [selectedCategory, subCategories, subCategorySuccess]);
 
   const formState = id ?? "add";
   const isEditMode = id !== "add";
 
-  // UseForm with inferred types from defaultValues
   const form = useForm({
     defaultValues: generateBannerFormDefaultValue(formState, bannerData),
     validators: {
@@ -157,9 +153,22 @@ const AddBannerForm = () => {
     return null;
   };
 
+  // Initialize selectedCategory and selectedTagItems with form values if in edit mode
   useEffect(() => {
-    if (bannerSuccess || bannerUpdateSuccess) form.reset();
-  }, [bannerSuccess, bannerUpdateSuccess]);
+    if (bannerData && bannerData.category) {
+      setSelectedCategory(bannerData.category);
+    }
+    if (bannerData && bannerData.locations) {
+      setSelectedTagItems(bannerData.locations);
+    }
+  }, [bannerData]);
+
+  useEffect(() => {
+    if (bannerSuccess || bannerUpdateSuccess) {
+      form.reset();
+      navigate("/banner");
+    }
+  }, [bannerSuccess, bannerUpdateSuccess, navigate]);
 
   return (
     <div className="mx-8 my-3">
@@ -225,7 +234,13 @@ const AddBannerForm = () => {
                       firstInput="Category"
                       options={categoryOptions}
                       value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
+                      onChange={(e) => {
+                        const newValue = e.target.value;
+                        field.handleChange(newValue);
+                        setSelectedCategory(newValue);
+                        // Reset subcategory when category changes
+                        form.setFieldValue("subCategory", "");
+                      }}
                     />
                     <FieldError field={field} />
                   </div>
@@ -238,9 +253,10 @@ const AddBannerForm = () => {
                     <DropdownField
                       label="Sub Category"
                       firstInput="Sub Category"
-                      options={subCategoryOptions}
+                      options={filteredSubCategoryOptions}
                       value={field.state.value}
                       onChange={(e) => field.handleChange(e.target.value)}
+                      disabled={!selectedCategory}
                     />
                     <FieldError field={field} />
                   </div>
@@ -262,9 +278,10 @@ const AddBannerForm = () => {
                       type="number"
                       min="0"
                       required
-                      value={field.state.value}
+                      placeholder="0"
+                      value={field.state.value === 0 ? "" : field.state.value}
                       onChange={(e) =>
-                        field.handleChange(Number(e.target.value))
+                        field.handleChange(Number(e.target.value) || 0)
                       }
                     />
                     <FieldError field={field} />
@@ -319,7 +336,7 @@ const AddBannerForm = () => {
                     multiple={false}
                     form={form}
                     label=""
-                    value={field.state.value}
+                    value={field.state.value || null}
                     existingFileField="existingImage"
                     accept={{
                       "image/*": [".png", ".jpg", ".jpeg", ".svg"],
@@ -345,7 +362,7 @@ const AddBannerForm = () => {
                     multiple={false}
                     form={form}
                     label=""
-                    value={field.state.value}
+                    value={field.state.value || null}
                     existingFileField="existingMobImage"
                     accept={{
                       "image/*": [".png", ".jpg", ".jpeg", ".svg", ".webp"],

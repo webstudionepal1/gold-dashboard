@@ -69,17 +69,25 @@ const PurchaseIndex = () => {
         }`,
       })),
       viewAction(row: IFetchProduct) {
+        // Find the original purchase data by ID to avoid using transformed data
+        const originalPurchase = purchaseList?.find(
+          (item) => item._id === row._id
+        );
         setModal({
           of: "purchase-view",
           edit: false,
-          data: row,
+          data: originalPurchase || row,
         });
       },
       editAction(row: IFetchProduct) {
+        // Find the original purchase data by ID to avoid using transformed data
+        const originalPurchase = purchaseList?.find(
+          (item) => item._id === row._id
+        );
         setModal({
           of: "purchase",
           edit: true,
-          data: row,
+          data: originalPurchase || row,
         });
       },
       onDelete(id: string) {
@@ -109,8 +117,16 @@ const PurchaseIndex = () => {
       },
 
       editAction(row: IFetchSupplier) {
-        updateSuplierState(row);
-        navigate("/inventory/suppliers/edit");
+        console.log("Edit action called with row:", row);
+        console.log("Row type:", typeof row);
+        console.log("Is row an array?", Array.isArray(row));
+
+        // Ensure we're storing the correct supplier object
+        const supplierToEdit = Array.isArray(row) ? row[0] : row;
+        console.log("Supplier to edit:", supplierToEdit);
+
+        updateSuplierState(supplierToEdit);
+        navigate(`/inventory/suppliers/edit`);
       },
       onDelete(id: string) {
         deleteSupplier(id);
@@ -170,7 +186,7 @@ const PurchaseIndex = () => {
           </button>
         )}
       </Header>
-      <div className="p-4 bg-white border-2 rounded-lg">
+      <div className="bg-white border-2 rounded-lg">
         <MasterTable
           showAction
           tabsOptions={
@@ -196,7 +212,7 @@ const PurchaseIndex = () => {
       )}
 
       {modal.of === "purchase-view" && modal.data && (
-        <ScrollableModal classname="w-full max-w-2xl" onClose={closeModal}>
+        <ScrollableModal classname="w-full max-w-3xl" onClose={closeModal}>
           <PurchaseDetailsCard data={modal.data} />
         </ScrollableModal>
       )}
