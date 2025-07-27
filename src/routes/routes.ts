@@ -52,4 +52,12 @@ export const FrontendRoutes = {
 
   SETTINGS: "/settings",
   PROFILECONFIG: "/settings/profile-config",
+
+  // Blog routes
+  BLOG: "/blog",
+  BLOGLIST: "/blog/list",
+  ADDBLOG: "/blog/add",
+  EDITBLOG: "/blog/edit/:id",
+  BLOGDETAILS: "/blog/details/:id",
+  BLOGANALYTICS: "/blog/analytics",
 };

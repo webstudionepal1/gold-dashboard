@@ -220,6 +220,32 @@ export const SidebarConfig = {
           title: "Notification",
           icon: "iconamoon:notification-bold",
         },
+        {
+          id: 20,
+          path: "#",
+          title: "Blog",
+          icon: "material-symbols:article-outline",
+          children: [
+            {
+              id: 201,
+              path: FrontendRoutes.BLOGLIST,
+              title: "Blog List",
+              icon: "",
+            },
+            {
+              id: 202,
+              path: FrontendRoutes.ADDBLOG,
+              title: "Create Blog",
+              icon: "",
+            },
+            {
+              id: 203,
+              path: FrontendRoutes.BLOGANALYTICS,
+              title: "Blog Analytics",
+              icon: "",
+            },
+          ],
+        },
         // MyPostBusiness commented out - will be integrated later
         // {
         //   id: 9,
