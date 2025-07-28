@@ -257,8 +257,8 @@ const BlogList: React.FC = () => {
 
           <div className="flex items-center">
             <StatusSwitch
-              checked={blog.isFeatured}
-              onChange={() => handleToggleFeatured(blog)}
+              isActive={blog.isFeatured}
+              onToggle={() => handleToggleFeatured(blog)}
               size="sm"
             />
             <Text size="body-xs-default" className="ml-2 text-gray-500">

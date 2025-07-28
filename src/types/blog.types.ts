@@ -72,6 +72,7 @@ export interface IBlogSearchParams {
   tag?: string;
   status?: "draft" | "published" | "archived";
   featured?: boolean;
+  q?: string;
   author?: string;
   dateFrom?: string;
   dateTo?: string;
