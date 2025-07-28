@@ -247,6 +247,14 @@ export const purchaseReturnColumns = [
     key: "returnNo",
   },
   {
+    key: "totalQuantityPurchased",
+    title: "Total Qty Purchased",
+  },
+  {
+    key: "totalQuantityReturned",
+    title: "Qty Returned",
+  },
+  {
     key: "totalAmount",
     title: "Total Amount",
   },

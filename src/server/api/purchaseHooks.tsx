@@ -204,6 +204,8 @@ export interface IFetchPurchaseReturn {
   totalReturnAmount: number;
   refundAmount: number;
   reason: string;
+  totalQuantityPurchased: number;
+  totalQuantityReturned: number;
   createdAt: Date;
   updatedAt: Date;
 }
