@@ -927,7 +927,7 @@
 
 // Second
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -952,6 +952,12 @@ import {
 } from "../../../server/api/blogHooks";
 import { IBlogFormData } from "../../../types/blog.types";
 import { FrontendRoutes } from "../../../routes/routes";
+
+// Fallback base URL for canonical URL generation
+const BASE_URL =
+  typeof window !== "undefined" && window.location.origin
+    ? window.location.origin
+    : "https://your-default-domain.com"; // Replace with your actual domain
 
 // Validation schema
 const blogValidationSchema = Yup.object({
@@ -986,7 +992,7 @@ const blogValidationSchema = Yup.object({
       "SEO description must be less than 160 characters"
     ),
     keywords: Yup.array().of(Yup.string()),
-    canonicalUrl: Yup.string().optional().url("Must be a valid URL").nullable(),
+    canonicalUrl: Yup.string().optional().nullable(), // Simplified to plain string
   }),
 });
 
@@ -1044,12 +1050,9 @@ const BlogEditor: React.FC = () => {
       console.log("🔍 Formik isValid:", formik.isValid);
 
       try {
-        // Create FormData for file uploads
         const formData = new FormData();
-
         console.log("📦 Building FormData...");
 
-        // Add text fields
         formData.append("title", values.title.trim());
         formData.append("slug", values.slug.trim());
         formData.append("content", values.content.trim());
@@ -1057,44 +1060,10 @@ const BlogEditor: React.FC = () => {
         formData.append("status", values.status);
         formData.append("isFeatured", values.isFeatured.toString());
         formData.append("author", values.author.trim());
-
-        // Add createdBy from JWT token
-        const token = Cookies.get("token");
-        if (!token) {
-          console.error("❌ No JWT token found");
-          toast.error("User not authenticated. Please log in.");
-          setSubmitting(false);
-          return;
-        }
-
-        let createdBy: string;
-        try {
-          const decodedToken: any = jwtDecode(token);
-          createdBy = decodedToken.id || decodedToken.sub;
-          if (!createdBy) {
-            console.error("❌ No user ID found in JWT token");
-            toast.error("Invalid user authentication data");
-            setSubmitting(false);
-            return;
-          }
-          formData.append("createdBy", createdBy);
-        } catch (error) {
-          console.error("❌ JWT decode error:", error);
-          toast.error("Failed to authenticate user");
-          setSubmitting(false);
-          return;
-        }
-
-        // Add arrays as JSON strings
         formData.append("tags", JSON.stringify(values.tags));
         formData.append("categories", JSON.stringify(values.categories));
-
-        // Add metadata as JSON string
         formData.append("metadata", JSON.stringify(values.metadata));
 
-        console.log("✅ Text fields added to FormData");
-
-        // Add files
         if (values.featuredImage) {
           formData.append("featuredImage", values.featuredImage);
           console.log("✅ Featured image added");
@@ -1110,10 +1079,47 @@ const BlogEditor: React.FC = () => {
           });
         }
 
-        console.log("📤 FormData ready for submission");
+        const token = Cookies.get("token");
+        console.log("🔍 Token from cookies:", token);
+        if (!token) {
+          console.error("❌ No JWT token found");
+          toast.error("User not authenticated. Please log in.");
+          setSubmitting(false);
+          navigate(FrontendRoutes.LOGIN);
+          return;
+        }
 
-        // Log FormData contents for debugging
-        console.log("📋 FormData contents:");
+        let createdBy: string;
+        try {
+          const decodedToken: any = jwtDecode(token);
+          console.log("🔍 Decoded token:", decodedToken);
+          const currentTime = Math.floor(Date.now() / 1000);
+          if (decodedToken.exp && decodedToken.exp < currentTime) {
+            console.error("❌ Token expired");
+            toast.error("Session expired. Please log in again.");
+            Cookies.remove("token");
+            navigate(FrontendRoutes.LOGIN);
+            setSubmitting(false);
+            return;
+          }
+          createdBy = decodedToken.id || decodedToken.sub;
+          if (!createdBy) {
+            console.error("❌ No user ID found in JWT token");
+            toast.error("Invalid user authentication data");
+            setSubmitting(false);
+            navigate(FrontendRoutes.LOGIN);
+            return;
+          }
+          formData.append("createdBy", createdBy);
+        } catch (error) {
+          console.error("❌ JWT decode error:", error);
+          toast.error("Failed to authenticate user");
+          setSubmitting(false);
+          navigate(FrontendRoutes.LOGIN);
+          return;
+        }
+
+        console.log("📤 FormData ready for submission");
         for (let [key, value] of formData.entries()) {
           if (value instanceof File) {
             console.log(`  ${key}: File(${value.name}, ${value.size} bytes)`);
@@ -1132,7 +1138,7 @@ const BlogEditor: React.FC = () => {
                 toast.success("Blog updated successfully!");
                 navigate(FrontendRoutes.BLOGLIST);
               },
-              onError: (error) => {
+              onError: (error: any) => {
                 console.error("❌ Update error:", error);
                 toast.error(`Failed to update blog: ${error.message}`);
               },
@@ -1149,7 +1155,7 @@ const BlogEditor: React.FC = () => {
               toast.success("Blog created successfully!");
               navigate(FrontendRoutes.BLOGLIST);
             },
-            onError: (error) => {
+            onError: (error: any) => {
               console.error("❌ Blog creation error:", error);
               toast.error(`Failed to create blog: ${error.message}`);
             },
@@ -1202,12 +1208,14 @@ const BlogEditor: React.FC = () => {
     }
   }, [existingBlog, isEditing]);
 
-  // Memoize image blob URLs to prevent multiple creations
+  // Memoize image blob URLs with immediate cleanup
   const imagePreviews = useMemo(() => {
-    return formik.values.images.map((file) => URL.createObjectURL(file));
+    console.log("🔍 Computing imagePreviews for images:", formik.values.images);
+    const urls = formik.values.images.map((file) => URL.createObjectURL(file));
+    return urls;
   }, [formik.values.images]);
 
-  // Clean up blob URLs on unmount or when images change
+  // Cleanup blob URLs on unmount or when images change
   useEffect(() => {
     return () => {
       imagePreviews.forEach((url) => URL.revokeObjectURL(url));
@@ -1216,11 +1224,30 @@ const BlogEditor: React.FC = () => {
   }, [imagePreviews]);
 
   // Handle title change
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const title = e.target.value;
-    formik.setFieldValue("title", title);
-    formik.validateField("title");
-  };
+  const handleTitleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const title = e.target.value;
+      formik.setFieldValue("title", title);
+      formik.validateField("title");
+    },
+    [formik]
+  );
+
+  // Handle slug change
+  const handleSlugChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      let slug = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "");
+      slug = slug.replace(/^-+|-+$/g, "").replace(/-+/g, "-");
+      console.log("📍 Slug:", slug);
+      formik.setFieldValue("slug", slug);
+      formik.validateField("slug");
+      const canonicalUrl = slug ? `${BASE_URL}/blog/${slug}` : "";
+      console.log("📍 Canonical URL:", canonicalUrl);
+      formik.setFieldValue("metadata.canonicalUrl", canonicalUrl);
+      formik.validateField("metadata.canonicalUrl");
+    },
+    [formik]
+  );
 
   // ReactQuill modules and formats
   const quillModules = useMemo(
@@ -1260,21 +1287,24 @@ const BlogEditor: React.FC = () => {
   ];
 
   // Helper functions
-  const addTag = () => {
+  const addTag = useCallback(() => {
     if (tagInput.trim() && !formik.values.tags.includes(tagInput.trim())) {
       formik.setFieldValue("tags", [...formik.values.tags, tagInput.trim()]);
       setTagInput("");
     }
-  };
+  }, [tagInput, formik]);
 
-  const removeTag = (tagToRemove: string) => {
-    formik.setFieldValue(
-      "tags",
-      formik.values.tags.filter((tag) => tag !== tagToRemove)
-    );
-  };
+  const removeTag = useCallback(
+    (tagToRemove: string) => {
+      formik.setFieldValue(
+        "tags",
+        formik.values.tags.filter((tag) => tag !== tagToRemove)
+      );
+    },
+    [formik]
+  );
 
-  const addCategory = () => {
+  const addCategory = useCallback(() => {
     if (
       categoryInput.trim() &&
       !formik.values.categories.includes(categoryInput.trim())
@@ -1285,16 +1315,19 @@ const BlogEditor: React.FC = () => {
       ]);
       setCategoryInput("");
     }
-  };
+  }, [categoryInput, formik]);
 
-  const removeCategory = (categoryToRemove: string) => {
-    formik.setFieldValue(
-      "categories",
-      formik.values.categories.filter((cat) => cat !== categoryToRemove)
-    );
-  };
+  const removeCategory = useCallback(
+    (categoryToRemove: string) => {
+      formik.setFieldValue(
+        "categories",
+        formik.values.categories.filter((cat) => cat !== categoryToRemove)
+      );
+    },
+    [formik]
+  );
 
-  const addKeyword = () => {
+  const addKeyword = useCallback(() => {
     if (
       keywordInput.trim() &&
       !formik.values.metadata.keywords.includes(keywordInput.trim())
@@ -1305,24 +1338,17 @@ const BlogEditor: React.FC = () => {
       ]);
       setKeywordInput("");
     }
-  };
+  }, [keywordInput, formik]);
 
-  const removeKeyword = (keywordToRemove: string) => {
-    formik.setFieldValue(
-      "metadata.keywords",
-      formik.values.metadata.keywords.filter((kw) => kw !== keywordToRemove)
-    );
-  };
-
-  // Handle slug change and update canonical URL
-  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const slug = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "");
-    formik.setFieldValue("slug", slug);
-    formik.validateField("slug");
-    const canonicalUrl = slug ? `${window.location.origin}/blog/${slug}` : "";
-    formik.setFieldValue("metadata.canonicalUrl", canonicalUrl);
-    formik.validateField("metadata.canonicalUrl");
-  };
+  const removeKeyword = useCallback(
+    (keywordToRemove: string) => {
+      formik.setFieldValue(
+        "metadata.keywords",
+        formik.values.metadata.keywords.filter((kw) => kw !== keywordToRemove)
+      );
+    },
+    [formik]
+  );
 
   if (isLoadingBlog && isEditing) {
     return (
@@ -1752,20 +1778,17 @@ const BlogEditor: React.FC = () => {
               </div>
 
               {/* Categories Card */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-customorange/10 rounded-lg">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
+                <div className="flex items-center gap-2 sm:gap-3 mb-4">
+                  <div className="p-1.5 sm:p-2 bg-customorange/10 rounded-lg">
                     <Icon
                       icon="material-symbols:category"
-                      className="w-5 h-5 text-customorange"
+                      className="w-4 h-4 sm:w-5 sm:h-5 text-customorange"
                     />
                   </div>
-                  <Text
-                    size="body-lg-lg"
-                    className="font-semibold text-gray-900"
-                  >
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900">
                     Categories
-                  </Text>
+                  </h3>
                 </div>
                 <div className="flex gap-2 mb-4">
                   <input
@@ -1775,33 +1798,36 @@ const BlogEditor: React.FC = () => {
                     onKeyPress={(e) =>
                       e.key === "Enter" && (e.preventDefault(), addCategory())
                     }
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-customorange focus:border-transparent"
+                    className="flex-1 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-customorange focus:border-transparent text-sm sm:text-base"
                     placeholder="Add category..."
                   />
                   <Button
                     type="button"
                     size="sm"
                     onClick={addCategory}
-                    className="bg-customorange hover:bg-customorangedark"
+                    className="bg-customorange hover:bg-customorangedark px-2 sm:px-3"
                   >
-                    <Icon icon="material-symbols:add" className="w-4 h-4" />
+                    <Icon
+                      icon="material-symbols:add"
+                      className="w-3 h-3 sm:w-4 sm:h-4"
+                    />
                   </Button>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5 sm:gap-2">
                   {formik.values.categories.map((category, index) => (
                     <span
                       key={index}
-                      className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200"
+                      className="inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200"
                     >
                       {category}
                       <button
                         type="button"
                         onClick={() => removeCategory(category)}
-                        className="ml-2 text-blue-700 hover:text-blue-900"
+                        className="ml-1 sm:ml-2 text-blue-700 hover:text-blue-900"
                       >
                         <Icon
                           icon="material-symbols:close"
-                          className="w-3 h-3"
+                          className="w-2.5 h-2.5 sm:w-3 sm:h-3"
                         />
                       </button>
                     </span>
@@ -1890,7 +1916,7 @@ const BlogEditor: React.FC = () => {
               </div>
 
               <div className="lg:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+                <label className="block text-sm font-medium text-gray-700 mb-2 sm:mb-3">
                   SEO Description
                 </label>
                 <textarea
@@ -1899,21 +1925,17 @@ const BlogEditor: React.FC = () => {
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   rows={4}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-customorange focus:border-transparent resize-none"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-customorange focus:border-transparent resize-none text-sm sm:text-base"
                   placeholder="SEO meta description..."
                   maxLength={160}
                 />
-                <Text
-                  size="body-xs-default"
-                  className="mt-2"
-                  variant="grey-400"
-                >
+                <span className="text-xs sm:text-sm text-gray-400 mt-1 block">
                   {formik.values.metadata.seoDescription.length}/160 characters
-                </Text>
+                </span>
               </div>
 
               <div className="lg:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+                <label className="block text-sm font-medium text-gray-700 mb-2 sm:mb-3">
                   SEO Keywords
                 </label>
                 <div className="flex gap-2 mb-4">
@@ -1924,33 +1946,36 @@ const BlogEditor: React.FC = () => {
                     onKeyPress={(e) =>
                       e.key === "Enter" && (e.preventDefault(), addKeyword())
                     }
-                    className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-customorange focus:border-transparent"
+                    className="flex-1 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-customorange focus:border-transparent text-sm sm:text-base"
                     placeholder="Add SEO keyword..."
                   />
                   <Button
                     type="button"
                     size="sm"
                     onClick={addKeyword}
-                    className="bg-customorange hover:bg-customorangedark"
+                    className="bg-customorange hover:bg-customorangedark px-2 sm:px-3"
                   >
-                    <Icon icon="material-symbols:add" className="w-4 h-4" />
+                    <Icon
+                      icon="material-symbols:add"
+                      className="w-3 h-3 sm:w-4 sm:h-4"
+                    />
                   </Button>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5 sm:gap-2">
                   {formik.values.metadata.keywords.map((keyword, index) => (
                     <span
                       key={index}
-                      className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200"
+                      className="inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200"
                     >
                       {keyword}
                       <button
                         type="button"
                         onClick={() => removeKeyword(keyword)}
-                        className="ml-2 text-green-700 hover:text-green-900"
+                        className="ml-1 sm:ml-2 text-green-700 hover:text-green-900"
                       >
                         <Icon
                           icon="material-symbols:close"
-                          className="w-3 h-3"
+                          className="w-2.5 h-2.5 sm:w-3 sm:h-3"
                         />
                       </button>
                     </span>
