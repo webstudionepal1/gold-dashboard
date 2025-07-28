@@ -22,7 +22,7 @@ export default function App() {
 
   return (
     <SidebarProvider>
-      <div className="flex">
+      <div className="flex max-h-screen h-full overflow-y-auto">
         <Sidebar config={SidebarConfig} />
         <SidebarInset className="max-h-screen p-2 space-y-2 overflow-y-auto bg-gray-50">
           {/* Critical Notification Banner - Re-enabled after fixing infinite loop issues */}
@@ -31,7 +31,7 @@ export default function App() {
           <Navbar />
 
           {/* Page Content */}
-          <main className="flex-1 overflow-y-auto">
+          <main className="flex-1">
             <Outlet />
           </main>
         </SidebarInset>

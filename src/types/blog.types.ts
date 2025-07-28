@@ -104,6 +104,7 @@ export interface IBlogFormData {
   tags: string[];
   categories: string[];
   featuredImage: File | null;
+  author: string;
   images: File[];
   video: File | null;
   status: "draft" | "published" | "archived";
