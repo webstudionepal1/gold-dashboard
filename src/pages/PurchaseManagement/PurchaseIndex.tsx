@@ -63,9 +63,11 @@ const PurchaseIndex = () => {
         supplier: get(item, "supplier.name", "-"),
         billNo: get(item, "billNo", "-"),
         totalCost: `${Constants.currency} ${
-          item?.items.length > 0
-            ? item.items.reduce((acc, item) => acc + item.price, 0)
-            : item?.products.reduce((acc, item) => acc + item.price, 0)
+          item?.items && item.items.length > 0
+            ? item.items.reduce((acc, item) => acc + (item.price || 0), 0)
+            : item?.products && item.products.length > 0
+            ? item.products.reduce((acc, item) => acc + (item.price || 0), 0)
+            : 0
         }`,
       })),
       viewAction(row: IFetchProduct) {
@@ -143,6 +145,8 @@ const PurchaseIndex = () => {
         date: dayjs(get(item, "createdAt", "-")).format("MMM-DD-YYYY"),
         totalAmount: get(item, "totalReturnAmount", 0),
         refundAmount: get(item, "refundAmount", 0),
+        totalQuantityPurchased: get(item, "totalQuantityPurchased", 0),
+        totalQuantityReturned: get(item, "totalQuantityReturned", 0),
       })),
       viewAction(row: IFetchPurchaseReturn) {
         setModal({ of: "purchase-return", data: row, edit: false });
@@ -174,8 +178,7 @@ const PurchaseIndex = () => {
                 navigate("/inventory/suppliers/add");
               }
             }}
-            className="px-3 py-2 flex items-center text-white bg-[#d49327] rounded-lg"
-          >
+            className="px-3 py-2 flex items-center text-white bg-[#d49327] rounded-lg">
             <Icon
               icon="material-symbols-light:add-rounded"
               width="24"
