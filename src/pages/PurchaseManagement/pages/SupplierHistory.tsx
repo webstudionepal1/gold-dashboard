@@ -92,26 +92,63 @@ const SupplierHistory = () => {
 
   // Transform purchase data to match the table format
   const supplierHistoryItems: SupplierHistoryItem[] =
-    purchaseData?.map((purchase) => ({
-      _id: purchase._id,
-      purchase_id:
-        purchase.billNo || `PUR-${purchase._id.slice(-6).toUpperCase()}`,
-      purchase_date: dayjs(purchase.createdAt).format("YYYY-MM-DD"),
-      total_amount: `Rs.${purchase.totalAmount?.toLocaleString() || "0"}`,
-      paid: `Rs.${purchase.paid?.toLocaleString() || "0"}`,
-      due: `Rs.${(
-        (purchase.totalAmount || 0) - (purchase.paid || 0)
-      ).toLocaleString()}`,
-      qty:
-        (purchase.items?.reduce((sum, item) => sum + (item.quantity || 0), 0) ||
-          0) +
-        (purchase.products?.reduce(
-          (sum, product) => sum + (product.quantity || 0),
+    purchaseData?.map((purchase) => {
+      // Calculate total amount from products and items
+      const totalAmountFromProducts =
+        purchase.products?.reduce(
+          (sum, product) =>
+            sum + (product.price * (product.quantity || 1) || 0),
           0
-        ) || 0),
-      // Store original purchase data for modal
-      originalData: purchase,
-    })) || [];
+        ) || 0;
+
+      const totalAmountFromItems =
+        purchase.items?.reduce(
+          (sum, item) => sum + (item.price * (item.quantity || 1) || 0),
+          0
+        ) || 0;
+
+      const calculatedTotalAmount =
+        totalAmountFromProducts + totalAmountFromItems;
+
+      // Calculate paid amount from products and items
+      const paidAmountFromProducts =
+        purchase.products?.reduce(
+          (sum, product) => sum + (product.paidAmount || 0),
+          0
+        ) || 0;
+
+      const paidAmountFromItems =
+        purchase.items?.reduce(
+          (sum, item) => sum + (item.paidAmount || 0),
+          0
+        ) || 0;
+
+      const calculatedPaidAmount = paidAmountFromProducts + paidAmountFromItems;
+
+      // Calculate due amount
+      const calculatedDueAmount = calculatedTotalAmount - calculatedPaidAmount;
+
+      return {
+        _id: purchase._id,
+        purchase_id:
+          purchase.billNo || `PUR-${purchase._id.slice(-6).toUpperCase()}`,
+        purchase_date: dayjs(purchase.createdAt).format("YYYY-MM-DD"),
+        total_amount: `Rs.${calculatedTotalAmount.toLocaleString()}`,
+        paid: `Rs.${calculatedPaidAmount.toLocaleString()}`,
+        due: `Rs.${calculatedDueAmount.toLocaleString()}`,
+        qty:
+          (purchase.items?.reduce(
+            (sum, item) => sum + (item.quantity || 0),
+            0
+          ) || 0) +
+          (purchase.products?.reduce(
+            (sum, product) => sum + (product.quantity || 0),
+            0
+          ) || 0),
+        // Store original purchase data for modal
+        originalData: purchase,
+      };
+    }) || [];
 
   // Extract unique products from purchase history
   const itemsSupplied = useMemo(() => {
@@ -270,8 +307,7 @@ const SupplierHistory = () => {
       {isViewModalOpen && (
         <ScrollableModal
           onClose={() => setIsViewModalOpen(false)}
-          classname="w-[90%] max-w-4xl p-6"
-        >
+          classname="w-[90%] max-w-4xl p-6">
           {selectedPurchase && (
             <div className="space-y-4">
               {/* Modal Header */}
@@ -281,8 +317,7 @@ const SupplierHistory = () => {
                 </h2>
                 <button
                   onClick={() => setIsViewModalOpen(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
+                  className="text-gray-400 hover:text-gray-600">
                   <Icon icon="mdi:close" className="w-6 h-6" />
                 </button>
               </div>
@@ -357,8 +392,7 @@ const SupplierHistory = () => {
                             (item: any, index: number) => (
                               <div
                                 key={index}
-                                className="flex justify-between items-center p-2 bg-gray-50 rounded"
-                              >
+                                className="flex justify-between items-center p-2 bg-gray-50 rounded">
                                 <span>
                                   {item.name ||
                                     item.item?.name ||
@@ -384,8 +418,7 @@ const SupplierHistory = () => {
                             (product: any, index: number) => (
                               <div
                                 key={index}
-                                className="flex justify-between items-center p-2 bg-gray-50 rounded"
-                              >
+                                className="flex justify-between items-center p-2 bg-gray-50 rounded">
                                 <span>
                                   {product.name ||
                                     product.product?.name ||
