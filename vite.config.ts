@@ -8,4 +8,15 @@ export default defineConfig({
     host: true,
     port: 5173,
   },
+  define: {
+    global: 'globalThis',
+  },
+  build: {
+    rollupOptions: {
+      external: [],
+    },
+  },
+  optimizeDeps: {
+    include: ['crypto-js'],
+  },
 });
