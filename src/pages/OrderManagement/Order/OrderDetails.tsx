@@ -254,8 +254,7 @@ const OrderDetails: React.FC = () => {
               order?.paymentStatus === "paid"
                 ? "text-white bg-green text-sm rounded-full py-1 px-4"
                 : "text-white bg-red text-sm rounded-full py-1 px-4"
-            }
-          >
+            }>
             {get(order, "paymentStatus", "pending")}
           </div>
         ),
@@ -350,8 +349,7 @@ const OrderDetails: React.FC = () => {
         </p>
         <button
           onClick={() => window.location.reload()}
-          className="px-4 py-2 mt-4 text-white rounded-lg bg-primary"
-        >
+          className="px-4 py-2 mt-4 text-white rounded-lg bg-primary">
           Retry
         </button>
       </div>
@@ -470,8 +468,7 @@ const OrderDetails: React.FC = () => {
                     ([key, { label, value }]) => (
                       <div
                         key={key}
-                        className="flex items-center justify-between text-sm"
-                      >
+                        className="flex items-center justify-between text-sm">
                         <p>{label}</p>
                         <p>
                           {Constants.currency}{" "}
@@ -525,15 +522,13 @@ const OrderDetails: React.FC = () => {
                     isPending
                       ? "opacity-70 cursor-not-allowed"
                       : "hover:bg-[#c97d24]"
-                  )}
-                >
+                  )}>
                   {isPending ? "Processing..." : "Accept Order"}
                 </button>
                 <button
                   className="bg-red-600 px-4 py-2 text-white rounded-xl font-medium hover:bg-red-700 transition-all flex items-center gap-2"
                   onClick={() => setShowCancelModal(true)}
-                  disabled={isPending}
-                >
+                  disabled={isPending}>
                   <Icon icon="mdi:cancel" className="w-4 h-4" />
                   Cancel Order
                 </button>
@@ -549,36 +544,24 @@ const OrderDetails: React.FC = () => {
                   isPending
                     ? "opacity-70 cursor-not-allowed"
                     : "hover:bg-[#c97d24]"
-                )}
-              >
+                )}>
                 {isPending ? "Processing..." : "Assign Delivery"}
               </button>
             )}
 
             {page === "assigned-order-details" && (
-              <>
-                <button
-                  onClick={() => setShowCompleteModal(true)}
-                  disabled={isPending}
-                  className={clsx(
-                    "bg-[#de8d29] hover:bg-[#c97d24] px-4 py-2 text-white rounded-xl font-medium transition-all flex items-center gap-2 text-nowrap",
-                    isPending
-                      ? "opacity-70 cursor-not-allowed"
-                      : "hover:bg-green-700"
-                  )}
-                >
-                  <Icon icon="mdi:check-circle" className="w-4 h-4" />
-                  Complete Order
-                </button>
-                <button
-                  onClick={() => setShowCancelModal(true)}
-                  disabled={isPending}
-                  className="bg-[#de8d29] px-4 py-2 text-nowrap text-white rounded-xl font-medium hover:bg-[#c97d24] transition-all flex items-center gap-2"
-                >
-                  <Icon icon="mdi:cancel" className="w-4 h-4" />
-                  Cancel Order
-                </button>
-              </>
+              <button
+                onClick={() => setShowCompleteModal(true)}
+                disabled={isPending}
+                className={clsx(
+                  "bg-[#de8d29] hover:bg-[#c97d24] px-4 py-2 text-white rounded-xl font-medium transition-all flex items-center gap-2 text-nowrap",
+                  isPending
+                    ? "opacity-70 cursor-not-allowed"
+                    : "hover:bg-green-700"
+                )}>
+                <Icon icon="mdi:check-circle" className="w-4 h-4" />
+                Complete Order
+              </button>
             )}
           </div>
         </div>
