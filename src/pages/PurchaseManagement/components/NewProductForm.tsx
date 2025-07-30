@@ -1,6 +1,7 @@
 // import { Icon } from "@iconify/react/dist/iconify.js";
 // import { useForm } from "@tanstack/react-form";
 // import { get } from "lodash";
+// import { z } from "zod";
 // import { DropdownField } from "../../../components/shared/form_components/Dropdown";
 // import { InputField } from "../../../components/shared/form_components/InputField";
 // import {
@@ -13,8 +14,39 @@
 // } from "../../../server/api/purchaseHooks";
 // import { useGetSupplierQuery } from "../../../server/api/supplierHooks";
 // import { FieldError } from "../../auth/LoginPage";
-// import { IPurchaseForm, PurchaseSchema } from "../purchaseObj";
 // import { useEffect } from "react";
+
+// // Updated PurchaseSchema to enforce non-negative quantity
+// export const PurchaseSchema = z.object({
+//   billNo: z.string().min(1, "**Bill No is required**"),
+//   supplier: z.string().min(1, "**Supplier name is required**"),
+//   products: z
+//     .array(
+//       z.object({
+//         product: z.string().min(1, "**Product name is required**"),
+//         quantity: z.coerce
+//           .number()
+//           .min(0, "**Quantity must be non-negative**")
+//           .optional(),
+//         price: z.coerce.number().min(1, "**Price is required**"),
+//         paidAmount: z.coerce.number().min(1, "**Paid Amount is required**"),
+//         wt: z.coerce.number().optional(),
+//       })
+//     )
+//     .min(1, "**At least one product is required**"),
+// });
+
+// export interface IPurchaseForm {
+//   billNo: string;
+//   supplier: string;
+//   products: {
+//     product: string;
+//     quantity?: number;
+//     price: number;
+//     paidAmount: number;
+//     wt?: number;
+//   }[];
+// }
 
 // interface NewProductProps {
 //   onClose: () => void;
@@ -27,6 +59,15 @@
 //   edit = false,
 //   data = null,
 // }: NewProductProps) => {
+//   // Debug logging for edit mode
+//   if (edit && data) {
+//     console.log("=== EDIT MODE DEBUG ===");
+//     console.log("Raw data received:", data);
+//     console.log("Supplier field:", get(data, "supplier"));
+//     console.log("Supplier type:", typeof get(data, "supplier"));
+//     console.log("Products field:", get(data, "products"));
+//     console.log("=======================");
+//   }
 //   const { mutate: createPurchase, isSuccess: createSuccess } =
 //     useCreatePurchaseMutation();
 //   const { mutate: updatePurchase, isSuccess: updateSuccess } =
@@ -46,19 +87,25 @@
 
 //   const form = useForm({
 //     defaultValues: {
-//       billNo: edit ? get(data, "billNo") : "",
-//       supplier: edit ? get(data, "supplier._id") : "",
+//       billNo: edit ? get(data, "billNo", "") : "",
+//       supplier: edit
+//         ? // Handle both populated object and string ID cases
+//           typeof get(data, "supplier") === "object"
+//           ? get(data, "supplier._id", "") || get(data, "supplier.id", "")
+//           : get(data, "supplier", "")
+//         : "",
 //       phone_no: edit ? get(data, "phone", "") : "",
 //       products: edit
-//         ? get(data, "products", [
-//             {
-//               product: "",
-//               quantity: 1,
-//               price: 0,
-//               paidAmount: 0,
-//               wt: 0,
-//             },
-//           ])
+//         ? get(data, "products", []).map((product: any) => ({
+//             product:
+//               typeof product.product === "object"
+//                 ? product.product._id || product.product.id || ""
+//                 : product.product || "",
+//             quantity: product.quantity || 1,
+//             price: product.price || 0,
+//             paidAmount: product.paidAmount || 0,
+//             wt: product.wt || 0,
+//           }))
 //         : [
 //             {
 //               product: "",
@@ -68,7 +115,6 @@
 //               wt: 0,
 //             },
 //           ],
-//       description: edit ? get(data, "description", "") : "",
 //     } as IPurchaseForm,
 //     validators: {
 //       onSubmit: PurchaseSchema,
@@ -195,9 +241,13 @@
 //                           <InputField
 //                             label="Quantity"
 //                             type="number"
-//                             value={field.state.value}
+//                             min={0} // Prevent negative input
+//                             placeholder="0"
+//                             value={
+//                               field.state.value === 0 ? "" : field.state.value
+//                             }
 //                             onChange={(e) =>
-//                               field.handleChange(Number(e.target.value))
+//                               field.handleChange(Number(e.target.value) || 0)
 //                             }
 //                           />
 //                           <FieldError field={field} />
@@ -212,11 +262,14 @@
 //                         <div className="w-full">
 //                           <InputField
 //                             label="Price (Rs.)"
-//                             placeholder="Tola"
+//                             type="number"
+//                             placeholder="0"
 //                             required
-//                             value={field.state.value}
+//                             value={
+//                               field.state.value === 0 ? "" : field.state.value
+//                             }
 //                             onChange={(e) =>
-//                               field.handleChange(Number(e.target.value))
+//                               field.handleChange(Number(e.target.value) || 0)
 //                             }
 //                           />
 //                           <FieldError field={field} />
@@ -228,11 +281,14 @@
 //                         <div className="w-full">
 //                           <InputField
 //                             label="Paid Price (Rs.)"
+//                             type="number"
 //                             required
-//                             placeholder="176,000"
-//                             value={field.state.value}
+//                             placeholder="0"
+//                             value={
+//                               field.state.value === 0 ? "" : field.state.value
+//                             }
 //                             onChange={(e) =>
-//                               field.handleChange(Number(e.target.value))
+//                               field.handleChange(Number(e.target.value) || 0)
 //                             }
 //                           />
 //                           <FieldError field={field} />
@@ -244,10 +300,13 @@
 //                         <div className="w-full">
 //                           <InputField
 //                             label="Weight"
-//                             placeholder="Weight"
-//                             value={field.state.value}
+//                             type="number"
+//                             placeholder="0"
+//                             value={
+//                               field.state.value === 0 ? "" : field.state.value
+//                             }
 //                             onChange={(e) =>
-//                               field.handleChange(Number(e.target.value))
+//                               field.handleChange(Number(e.target.value) || 0)
 //                             }
 //                           />
 //                           <FieldError field={field} />
@@ -269,22 +328,6 @@
 //                   )}
 //                 </div>
 //               ))}
-//             </div>
-//           )}
-//         </form.Field>
-
-//         <form.Field name="description">
-//           {(field) => (
-//             <div className="flex flex-col">
-//               <label className="text-[#98999e] font-semibold mb-2">
-//                 Description
-//               </label>
-//               <textarea
-//                 value={field.state.value}
-//                 onChange={(e) => field.handleChange(e.target.value)}
-//                 className="resize-none bg-[#f6f7f9] border-2 border-[#d3dae4] focus:outline-none rounded-xl px-3 py-1 placeholder:text-[#858492]"
-//                 placeholder="Enter Short Description"
-//               ></textarea>
 //             </div>
 //           )}
 //         </form.Field>
@@ -313,7 +356,6 @@
 // export default NewProductForm;
 
 // Second
-
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useForm } from "@tanstack/react-form";
 import { get } from "lodash";
@@ -331,6 +373,21 @@ import {
 import { useGetSupplierQuery } from "../../../server/api/supplierHooks";
 import { FieldError } from "../../auth/LoginPage";
 import { useEffect } from "react";
+
+// Define the IFetchProduct interface
+interface IFetchProduct {
+  _id: string;
+  name: string;
+  variant?: { wt: number }[];
+}
+
+// Define the query result type for useGetAllProductsQuery
+interface ProductsQueryResult {
+  products: IFetchProduct[];
+  pagination?: any;
+  searchQuery?: string;
+  appliedFilters?: any;
+}
 
 // Updated PurchaseSchema to enforce non-negative quantity
 export const PurchaseSchema = z.object({
@@ -398,7 +455,12 @@ const NewProductForm = ({
       }))
     : [];
   const productList = productSuccess
-    ? products?.map((item) => ({ label: item.name, value: item._id }))
+    ? (products as ProductsQueryResult)?.products?.map(
+        (item: IFetchProduct) => ({
+          label: item.name,
+          value: item._id,
+        })
+      ) ?? []
     : [];
 
   const form = useForm({
@@ -449,7 +511,9 @@ const NewProductForm = ({
 
   // Function to get product weight by ID
   const getProductWeight = (productId: string) => {
-    const product = products?.find((p) => p._id === productId);
+    const product = (products as ProductsQueryResult)?.products?.find(
+      (p: IFetchProduct) => p._id === productId
+    );
     return product?.variant?.[0]?.wt ?? 0;
   };
 
