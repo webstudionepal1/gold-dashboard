@@ -672,7 +672,9 @@ export const useGetAllProductCategoriesQuery = (params: IParams = {}) => {
       const res = await apiClient.get<{ data: IFetchCategory[] }>("category", {
         params,
       });
-      return res?.data?.data;
+      // Ensure we always return an array
+      const data = res?.data?.data;
+      return Array.isArray(data) ? data : [];
     },
   });
 };
@@ -742,11 +744,20 @@ export const useGetAllProductSubCategoriesQuery = (params: IParams = {}) => {
   return useQuery({
     queryKey: ["subcategory"],
     queryFn: async () => {
-      const res = await apiClient.get<{ data: IFetchSubCategory[] }>(
-        "subcategory",
-        { params }
-      );
-      return res?.data?.data;
+      const res = await apiClient.get<{
+        data: {
+          subcategories: IFetchSubCategory[];
+          pagination?: any;
+        };
+      }>("subcategory", { params });
+
+      // Debug logging
+      console.log("API Response:", res?.data);
+      console.log("Subcategories:", res?.data?.data?.subcategories);
+
+      // Handle the new API response structure
+      const subcategories = res?.data?.data?.subcategories;
+      return Array.isArray(subcategories) ? subcategories : [];
     },
   });
 };

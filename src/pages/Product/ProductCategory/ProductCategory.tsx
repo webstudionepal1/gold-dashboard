@@ -49,32 +49,31 @@ const ProductCategory: React.FC = () => {
     }
   };
 
-  const categoriesData = useMemo(
-    () =>
-      isSuccess
-        ? categories?.map((item, index) => ({
-            ...item,
-            // subCategory: get(item, "subCategory", [])
-            //   .map((subItem) => get(subItem, "name", ""))
-            //   .join(", "),
-            sn: index + 1,
-            description:
-              get(item, "description", "").length > 50
-                ? `${get(item, "description", "").slice(0, 50)}...`
-                : get(item, "description", ""),
-            totalProducts: get(item, "totalProducts", 0),
-            status: (
-              <StatusSwitch
-                isActive={get(item, "isActive", true)}
-                onToggle={(newStatus) =>
-                  handleStatusToggle(item._id, newStatus)
-                }
-              />
-            ),
-          }))
-        : [],
-    [isSuccess, categories]
-  );
+  const categoriesData = useMemo(() => {
+    // Ensure we have valid data and it's an array
+    if (!isSuccess || !categories || !Array.isArray(categories)) {
+      return [];
+    }
+
+    return categories.map((item, index) => ({
+      ...item,
+      // subCategory: get(item, "subCategory", [])
+      //   .map((subItem) => get(subItem, "name", ""))
+      //   .join(", "),
+      sn: index + 1,
+      description:
+        get(item, "description", "").length > 50
+          ? `${get(item, "description", "").slice(0, 50)}...`
+          : get(item, "description", ""),
+      totalProducts: get(item, "totalProducts", 0),
+      status: (
+        <StatusSwitch
+          isActive={get(item, "isActive", true)}
+          onToggle={(newStatus) => handleStatusToggle(item._id, newStatus)}
+        />
+      ),
+    }));
+  }, [isSuccess, categories]);
 
   return (
     <div>
@@ -86,8 +85,7 @@ const ProductCategory: React.FC = () => {
               editData: null,
             });
           }}
-          className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-sm text-white px-4 py-2 flex rounded-lg transition-colors duration-200"
-        >
+          className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-sm text-white px-4 py-2 flex rounded-lg transition-colors duration-200">
           <Icon icon="ic:outline-add" fontSize={24} />
           New Category
         </button>
