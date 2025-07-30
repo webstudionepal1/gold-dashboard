@@ -17,8 +17,5 @@ export default defineConfig({
     rollupOptions: {
       external: [],
     },
-  },
-  optimizeDeps: {
-    include: ["crypto-js"],
-  },
+  }
 });
