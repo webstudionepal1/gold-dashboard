@@ -26,7 +26,7 @@ const CompletedOrder = () => {
   const navigate = useNavigate();
 
   const orderList = useMemo(
-    () => (isSuccess ? orders : []),
+    () => (isSuccess && orders ? orders : []),
     [isSuccess, orders]
   );
 

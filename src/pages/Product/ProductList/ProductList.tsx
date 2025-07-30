@@ -39,7 +39,7 @@ const useDebounce = (value: string, delay: number) => {
 const ProductList: React.FC = () => {
   const { data: productsList, isSuccess, isLoading } = useGetAllProductsQuery();
   const productsData = useMemo(
-    () => (isSuccess ? productsList : []),
+    () => (isSuccess && productsList ? productsList : []),
     [isSuccess, productsList]
   );
   const { mutate: deleteProduct } = useDeleteProductsMutation();

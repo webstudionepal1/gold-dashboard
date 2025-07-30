@@ -28,7 +28,7 @@ const ConfirmedOrder = () => {
 
   const orderList = useMemo(
     () =>
-      isSuccess
+      isSuccess && orders
         ? map(orders, (item) => ({
             ...item,
             orderedProducts: size(item.orderedProducts),
