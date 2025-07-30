@@ -11,28 +11,11 @@ export default defineConfig({
   define: {
     global: "globalThis",
   },
-  resolve: {
-    alias: {
-      // Add Node.js polyfills for browser compatibility
-      crypto: "crypto-browserify",
-      stream: "stream-browserify",
-      util: "util",
-      buffer: "buffer",
-    },
-  },
+
   build: {
     target: "esnext",
     rollupOptions: {
       external: [],
     },
-  },
-  optimizeDeps: {
-    include: [
-      "crypto-js",
-      "crypto-browserify",
-      "stream-browserify",
-      "util",
-      "buffer",
-    ],
-  },
+  }
 });
