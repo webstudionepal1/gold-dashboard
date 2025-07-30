@@ -63,31 +63,30 @@ const Productsubcategory: React.FC = () => {
     }
   };
 
-  const subCategoriesData = useMemo(
-    () =>
-      isSuccess
-        ? subCategories?.map((item, index: number) => ({
-            ...item,
-            description:
-              get(item, "description", "").length > 50
-                ? `${get(item, "description", "").slice(0, 50)}...`
-                : get(item, "description", ""),
-            sn: index + 1,
-            rawDescription: get(item, "description", ""),
-            totalProducts: get(item, "totalProducts", "N/A"),
-            // category: get(item, "category._id", "-"),
-            status: (
-              <StatusSwitch
-                isActive={get(item, "isActive", true)}
-                onToggle={(newStatus) =>
-                  handleStatusToggle(item._id, newStatus)
-                }
-              />
-            ),
-          }))
-        : [],
-    [isSuccess, subCategories]
-  );
+  const subCategoriesData = useMemo(() => {
+    // Ensure we have valid data and it's an array
+    if (!isSuccess || !subCategories || !Array.isArray(subCategories)) {
+      return [];
+    }
+
+    return subCategories.map((item, index: number) => ({
+      ...item,
+      description:
+        get(item, "description", "").length > 50
+          ? `${get(item, "description", "").slice(0, 50)}...`
+          : get(item, "description", ""),
+      sn: index + 1,
+      rawDescription: get(item, "description", ""),
+      totalProducts: Math.max(get(item, "totalProducts", 0) || 0, 0),
+      category: get(item, "category.name", "-"),
+      status: (
+        <StatusSwitch
+          isActive={get(item, "isActive", true)}
+          onToggle={(newStatus) => handleStatusToggle(item._id, newStatus)}
+        />
+      ),
+    }));
+  }, [isSuccess, subCategories]);
 
   return (
     <div>
@@ -99,8 +98,7 @@ const Productsubcategory: React.FC = () => {
               editData: null,
             });
           }}
-          className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-sm text-white px-4 py-2 flex rounded-lg transition-colors duration-200"
-        >
+          className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-sm text-white px-4 py-2 flex rounded-lg transition-colors duration-200">
           <Icon icon="ic:outline-add" fontSize={24} />
           New Subcategory
         </button>
