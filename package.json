@@ -21,6 +21,7 @@
     "chart.js": "^4.4.8",
     "classnames": "^2.5.1",
     "clsx": "^2.1.1",
+    "crypto-js": "^4.2.0",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "firebase": "^11.10.0",
@@ -49,6 +50,7 @@
   "devDependencies": {
     "@eslint/js": "^9.21.0",
     "@iconify/react": "^5.2.0",
+    "@types/crypto-js": "^4.2.2",
     "@types/js-cookie": "^3.0.6",
     "@types/lodash": "^4.17.16",
     "@types/react": "^19.0.10",
