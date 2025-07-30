@@ -430,7 +430,7 @@ import {
 
 export interface IParams {
   [key: string]: string | boolean | undefined;
-  inStock?: boolean;
+  inStock?: boolean | string;
 }
 
 export interface IBaseProductSubCategory {
@@ -563,10 +563,74 @@ export interface IFetchClasps {
 //   });
 // };
 
-export const useGetAllProductsQuery = (params: IParams = {}) => {
+// export const useGetAllProductsQuery = (params: IParams = {}) => {
+//   return useQuery({
+//     queryKey: ["products", params],
+//     queryFn: async () => {
+//       const res = await apiClient.get<{
+//         data: {
+//           products: IFetchProduct[];
+//           pagination?: any;
+//           searchQuery?: string;
+//           appliedFilters?: any;
+//         };
+//       }>("search", {
+//         params: {
+//           ...params,
+//           inStock: true, // Keep your existing stock filter
+//           includeAll: true, // Add this to get both active and inactive products
+//         },
+//       });
+//       return res?.data?.data?.products || [];
+//     },
+//   });
+// };
+
+// export const useGetAllProductsQuery = (
+//   params: IParams = {},
+//   endpoint: string = "product"
+// ) => {
+//   return useQuery({
+//     queryKey: ["product", endpoint, params],
+//     queryFn: async () => {
+//       const res = await apiClient.get<{
+//         data: {
+//           products: IFetchProduct[];
+//           pagination?: any;
+//           searchQuery?: string;
+//           appliedFilters?: any;
+//         };
+//       }>(endpoint, {
+//         params: {
+//           ...params,
+//           inStock: true,
+//           includeAll: true,
+//         },
+//       });
+//       return res?.data?.data?.products || [];
+//     },
+//   });
+// };
+
+export const useGetAllProductsQuery = (
+  params: IParams = {},
+  endpoint: string = "product"
+) => {
   return useQuery({
-    queryKey: ["products", params],
+    queryKey: ["product", endpoint, params],
     queryFn: async () => {
+      // Apply the same logic as your backend
+      const queryParams = { ...params };
+
+      // If none of these flags are explicitly set, default to filtering out zero stock
+      if (
+        !queryParams.includeAll &&
+        !queryParams.inStock &&
+        !queryParams.hasStock
+      ) {
+        queryParams.inStock = "false"; // This will filter out products with zero stock
+      }
+
       const res = await apiClient.get<{
         data: {
           products: IFetchProduct[];
@@ -574,18 +638,30 @@ export const useGetAllProductsQuery = (params: IParams = {}) => {
           searchQuery?: string;
           appliedFilters?: any;
         };
-      }>("search", {
-        params: {
-          ...params,
-          inStock: true, // Keep your existing stock filter
-          includeAll: true, // Add this to get both active and inactive products
-        },
+      }>(endpoint, {
+        params: queryParams,
       });
-      return res?.data?.data?.products || [];
+      return res?.data?.data || [];
     },
   });
 };
 
+// export const useGetAllProductsQuery = () => {
+//   return useQuery({
+//     queryKey: ["product"],
+//     queryFn: async () => {
+//       const res = await apiClient.get<{
+//         data: {
+//           products: IFetchProduct[];
+//           pagination?: any;
+//           searchQuery?: string;
+//           appliedFilters?: any;
+//         };
+//       }>("product");
+//       return res?.data?.data?.products || [];
+//     },
+//   });
+// };
 export const useGetProductById = (id: string) => {
   return useQuery({
     queryKey: ["products", id],
