@@ -742,7 +742,7 @@ export const useDeleteProductCategoriesMutation = () => {
 // Product sub category
 export const useGetAllProductSubCategoriesQuery = (params: IParams = {}) => {
   return useQuery({
-    queryKey: ["subcategory"],
+    queryKey: ["subcategory", params],
     queryFn: async () => {
       const res = await apiClient.get<{
         data: {

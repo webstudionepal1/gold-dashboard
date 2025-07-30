@@ -77,8 +77,8 @@ const Productsubcategory: React.FC = () => {
           : get(item, "description", ""),
       sn: index + 1,
       rawDescription: get(item, "description", ""),
-      totalProducts: get(item, "totalProducts", "N/A"),
-      // category: get(item, "category._id", "-"),
+      totalProducts: Math.max(get(item, "totalProducts", 0) || 0, 0),
+      category: get(item, "category.name", "-"),
       status: (
         <StatusSwitch
           isActive={get(item, "isActive", true)}
