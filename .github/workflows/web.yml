@@ -1,4 +1,5 @@
 name: CI/CD for Web Deployment (VPS)
+
 on:
   push:
     branches:
@@ -6,27 +7,34 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
+    
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
-
+        uses: actions/checkout@v4
+       
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+       
       - name: Build Web Application
         run: |
           npm install
           npm run build
-
+       
       - name: Create Web Production Bundle
         run: |
           tar -czf dist-web.tar.gz dist
-
+       
       - name: Setup SSH Key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -p 72 -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
-
+       
       - name: Deploy Web to VPS
         env:
           VPS_HOST: ${{ secrets.VPS_HOST }}
@@ -34,7 +42,7 @@ jobs:
         run: |
           # Copy web bundle using SSH key
           scp -P 72 dist-web.tar.gz $VPS_USER@$VPS_HOST:/tmp/
-
+          
           # SSH into the VPS and extract the bundle
           ssh -p 72 $VPS_USER@$VPS_HOST << 'EOF'
             # Create and extract web files
@@ -42,7 +50,7 @@ jobs:
             tar -xzf /tmp/dist-web.tar.gz -C "/home/nabin/ridhisiddhiadmin"
             rm /tmp/dist-web.tar.gz
           EOF
-
+       
       - name: Cleanup SSH Key
         if: always()
         run: rm -f ~/.ssh/id_rsa
