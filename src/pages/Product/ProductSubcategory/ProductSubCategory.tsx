@@ -11,6 +11,8 @@ import { AddProductSubCategory } from "./components/AddProductSubCategory";
 import Header from "../../../components/shared/table_heading/Header";
 import { subCategoryColumns } from "../productObj";
 import MasterTable from "../../../components/shared/MasterTable";
+import { get } from "lodash";
+import ViewProductSubCategory from "./components/ViewProductSubCategory";
 // import { get } from "lodash";
 
 interface IEditModal {
@@ -21,6 +23,13 @@ const Productsubcategory: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<IEditModal>({
     state: false,
     editData: null,
+  });
+  const [isViewModalOpen, setIsViewModalOpen] = useState<{
+    state: boolean;
+    viewData: IFetchSubCategory | null;
+  }>({
+    state: false,
+    viewData: null,
   });
   const modalRef = useOutsideClick(() =>
     setIsModalOpen({ state: false, editData: null })
@@ -39,6 +48,13 @@ const Productsubcategory: React.FC = () => {
         ? subCategories?.map((item, index: number) => ({
             ...item,
             sn: index + 1,
+            rawDescription: get(item, "description", ""),
+            description: (
+              <p className="truncate max-w-xl">
+                {get(item, "description", "")}
+              </p>
+            ),
+            totalProducts: get(item, "totalProducts", "N/A"),
             // category: get(item, "category._id", "-"),
           }))
         : [],
@@ -69,6 +85,9 @@ const Productsubcategory: React.FC = () => {
           showAction
           editAction={(row) => setIsModalOpen({ state: true, editData: row })}
           onDelete={(id) => deleteSubCategory(id)}
+          viewAction={(row) =>
+            setIsViewModalOpen({ state: true, viewData: row })
+          }
         />
       </div>
       {isModalOpen.state && (
@@ -76,6 +95,16 @@ const Productsubcategory: React.FC = () => {
           modalRef={modalRef}
           closeModal={() => setIsModalOpen({ state: false, editData: null })}
           editData={isModalOpen.editData}
+        />
+      )}
+      {isViewModalOpen.state && (
+        <ViewProductSubCategory
+          modalRef={modalRef}
+          closeModal={() =>
+            setIsViewModalOpen({ state: false, viewData: null })
+          }
+          viewData={isViewModalOpen.viewData}
+          isOpen={isViewModalOpen.state}
         />
       )}
     </div>

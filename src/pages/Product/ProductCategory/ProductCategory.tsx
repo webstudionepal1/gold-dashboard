@@ -11,6 +11,7 @@ import {
 } from "../../../server/api/productHooks";
 import { categoryColumns } from "../productObj";
 import AddProductCategory from "./components/AddProductCategory";
+import ViewProductCategory from "./components/ViewProductCategory";
 // import { AddProductCategory } from "./components/AddProductCategory";
 
 interface IEditModal {
@@ -21,6 +22,14 @@ const ProductCategory: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<IEditModal>({
     state: false,
     editData: null,
+  });
+
+  const [isViewModalOpen, setIsViewModalOpen] = useState<{
+    state: boolean;
+    viewData: IFetchCategory | null;
+  }>({
+    state: false,
+    viewData: null,
   });
   const modalRef = useOutsideClick(() =>
     setIsModalOpen({ state: false, editData: null })
@@ -38,8 +47,12 @@ const ProductCategory: React.FC = () => {
         ? categories?.map((item, index) => ({
             ...item,
             sn: index + 1,
-
-            description: get(item, "description", ""),
+            rawDescription: get(item, "description", ""),
+            description: (
+              <p className=" truncate max-w-xl">
+                {get(item, "description", "")}
+              </p>
+            ),
             totalProducts: get(item, "totalProducts", 0),
           }))
         : [],
@@ -69,6 +82,9 @@ const ProductCategory: React.FC = () => {
           loading={isLoading}
           onDelete={(id) => deleteCategory(id)}
           editAction={(row) => setIsModalOpen({ state: true, editData: row })}
+          viewAction={(row) =>
+            setIsViewModalOpen({ state: true, viewData: row })
+          }
           showAction
         />
       </div>
@@ -77,6 +93,16 @@ const ProductCategory: React.FC = () => {
           modalRef={modalRef}
           closeModal={() => setIsModalOpen({ state: false, editData: null })}
           editData={isModalOpen.editData}
+        />
+      )}
+      {isViewModalOpen.state && (
+        <ViewProductCategory
+          modalRef={modalRef}
+          closeModal={() =>
+            setIsViewModalOpen({ state: false, viewData: null })
+          }
+          viewData={isViewModalOpen.viewData}
+          isOpen={isViewModalOpen.state}
         />
       )}
     </div>

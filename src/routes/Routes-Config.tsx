@@ -55,6 +55,10 @@ import StoneIndex from "../pages/Stone/StoneIndex";
 import TestUpload from "../pages/TestUpload";
 import { ProductDetails } from "../pages/Product/ProductList/[id]/components/ProductDetails";
 import ProductImageDemo from "../pages/Product/ProductImageDemo";
+import BlogList from "@/pages/Blog/BlogList/BlogList";
+import BlogEditor from "@/pages/Blog/BlogEditor/BlogEditor";
+import BlogView from "@/pages/Blog/BlogView/BlogView";
+import BlogAnalytics from "@/pages/Blog/BlogAnalytics/BlogAnalytics";
 
 export const routesConfig = [
   {
@@ -301,6 +305,27 @@ export const routesConfig = [
   {
     path: "/test-upload",
     element: <TestUpload />,
+  },
+  // Blog routes
+  {
+    path: FrontendRoutes.BLOGLIST,
+    element: <BlogList />,
+  },
+  {
+    path: FrontendRoutes.ADDBLOG,
+    element: <BlogEditor />,
+  },
+  {
+    path: FrontendRoutes.EDITBLOG,
+    element: <BlogEditor />,
+  },
+  {
+    path: FrontendRoutes.BLOGDETAILS,
+    element: <BlogView />,
+  },
+  {
+    path: FrontendRoutes.BLOGANALYTICS,
+    element: <BlogAnalytics />,
   },
   {
     path: "*",
