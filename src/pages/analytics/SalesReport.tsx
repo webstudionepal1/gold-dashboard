@@ -15,7 +15,6 @@ import { SearchFilterSort } from "../../components/global/SearchFilterSort";
 import {
   useGetCategoryWiseDataQuery,
   useGetProductWiseDataQuery,
-  useGetSubCategoryWiseDataQuery,
 } from "../../server/api/salesReportHook";
 import {
   DateFilter,
@@ -45,7 +44,6 @@ const SalesReport = () => {
   const initialTabFilters: Record<string, TabFilter> = {
     productWise: { date: todayFilter, period: "Yearly" },
     categoryWise: { date: todayFilter, period: "Yearly" },
-    subCategoryWise: { date: todayFilter, period: "Yearly" },
   };
 
   const [tabFilters, setTabFilters] = useState(initialTabFilters);
@@ -79,15 +77,12 @@ const SalesReport = () => {
   const filterOptions = [
     { label: "All", value: "" },
     { label: "Category: Uncategorized", value: "Uncategorized" },
-    { label: "Subcategory: Uncategorized", value: "Uncategorized_sub" },
   ];
 
   // Define sort options for product-wise tab
   const productWiseSortOptions = [
     { label: "Category A-Z", value: "category_asc" },
     { label: "Category Z-A", value: "category_desc" },
-    { label: "Subcategory A-Z", value: "subCategory_asc" },
-    { label: "Subcategory Z-A", value: "subCategory_desc" },
     { label: "Product A-Z", value: "product_asc" },
     { label: "Product Z-A", value: "product_desc" },
     { label: "Units Sold (Low to High)", value: "unitsSold_asc" },
@@ -114,29 +109,11 @@ const SalesReport = () => {
     { label: "Percentage Share (High to Low)", value: "percentageShare_desc" },
   ];
 
-  // Define sort options for subcategory-wise tab
-  const subCategoryWiseSortOptions = [
-    { label: "Subcategory A-Z", value: "subCategory_asc" },
-    { label: "Subcategory Z-A", value: "subCategory_desc" },
-    { label: "Units Sold (Low to High)", value: "unitsSold_asc" },
-    { label: "Units Sold (High to Low)", value: "unitsSold_desc" },
-    { label: "Total Orders (Low to High)", value: "totalOrders_asc" },
-    { label: "Total Orders (High to Low)", value: "totalOrders_desc" },
-    { label: "Total Revenue (Low to High)", value: "totalRevenue_asc" },
-    { label: "Total Revenue (High to Low)", value: "totalRevenue_desc" },
-    { label: "Average Price (Low to High)", value: "averagePrice_asc" },
-    { label: "Average Price (High to Low)", value: "averagePrice_desc" },
-    { label: "Percentage Share (Low to High)", value: "percentageShare_asc" },
-    { label: "Percentage Share (High to Low)", value: "percentageShare_desc" },
-  ];
-
   // Get current sort options based on selected tab
   const currentSortOptions =
     selectedTab === "productWise"
       ? productWiseSortOptions
-      : selectedTab === "categoryWise"
-      ? categoryWiseSortOptions
-      : subCategoryWiseSortOptions;
+      : categoryWiseSortOptions;
 
   // Log filter and sort options to debug
 
@@ -156,15 +133,6 @@ const SalesReport = () => {
   } = useGetCategoryWiseDataQuery({
     date: tabFilters.categoryWise.date,
     period: tabFilters.categoryWise.period.toLowerCase(),
-  });
-
-  const {
-    data: subCategoryWiseDataList,
-    isLoading: isSubCategoryWiseDataLoading,
-    isSuccess: isSubCategoryWiseDataSuccess,
-  } = useGetSubCategoryWiseDataQuery({
-    date: tabFilters.subCategoryWise.date,
-    period: tabFilters.subCategoryWise.period.toLowerCase(),
   });
 
   const { mutate: deleteExpense } = useDeleteExpenseMutation();
@@ -197,7 +165,6 @@ const SalesReport = () => {
       result = result.filter(
         (item) =>
           item.category?.toLowerCase().includes(query) ||
-          item.subCategory?.toLowerCase().includes(query) ||
           item.product?.toLowerCase().includes(query) ||
           String(item.unitsSold).includes(query) ||
           String(item.totalRevenue).includes(query) ||
@@ -209,9 +176,6 @@ const SalesReport = () => {
       result = result.filter((item) => {
         if (filterState.filterValue === "Uncategorized") {
           return item.category === "Uncategorized";
-        }
-        if (filterState.filterValue === "Uncategorized_sub") {
-          return item.subCategory === "Uncategorized";
         }
 
         return false;
@@ -228,16 +192,6 @@ const SalesReport = () => {
         case "category_desc":
           result.sort((a, b) =>
             (b.category || "").localeCompare(a.category || "")
-          );
-          break;
-        case "subCategory_asc":
-          result.sort((a, b) =>
-            (a.subCategory || "").localeCompare(b.subCategory || "")
-          );
-          break;
-        case "subCategory_desc":
-          result.sort((a, b) =>
-            (b.subCategory || "").localeCompare(a.subCategory || "")
           );
           break;
         case "product_asc":
@@ -372,98 +326,6 @@ const SalesReport = () => {
     return result;
   }, [categoryWiseDataList, filterState]);
 
-  const subCategoryWiseDataFiltered = useMemo(() => {
-    if (
-      !subCategoryWiseDataList ||
-      !subCategoryWiseDataList.data ||
-      subCategoryWiseDataList.data.length === 0
-    ) {
-      return [];
-    }
-
-    let result = [...subCategoryWiseDataList.data];
-
-    if (filterState.searchQuery) {
-      const query = filterState.searchQuery.toLowerCase();
-      result = result.filter(
-        (item) =>
-          item.subCategory?.toLowerCase().includes(query) ||
-          String(item.unitsSold).includes(query) ||
-          String(item.totalOrders).includes(query) ||
-          String(item.totalRevenue).includes(query) ||
-          String(item.averagePrice).includes(query) ||
-          String(item.percentageShare).includes(query)
-      );
-    }
-
-    if (filterState.filterValue) {
-      result = result.filter((item) => {
-        if (filterState.filterValue === "Uncategorized_sub") {
-          return item.subCategory === "Uncategorized";
-        }
-
-        return false;
-      });
-    }
-
-    if (filterState.sortValue) {
-      switch (filterState.sortValue) {
-        case "subCategory_asc":
-          result.sort((a, b) =>
-            (a.subCategory || "").localeCompare(b.subCategory || "")
-          );
-          break;
-        case "subCategory_desc":
-          result.sort((a, b) =>
-            (b.subCategory || "").localeCompare(a.subCategory || "")
-          );
-          break;
-        case "unitsSold_asc":
-          result.sort((a, b) => (a.unitsSold || 0) - (b.unitsSold || 0));
-          break;
-        case "unitsSold_desc":
-          result.sort((a, b) => (b.unitsSold || 0) - (a.unitsSold || 0));
-          break;
-        case "totalOrders_asc":
-          result.sort((a, b) => (a.totalOrders || 0) - (b.totalOrders || 0));
-          break;
-        case "totalOrders_desc":
-          result.sort((a, b) => (b.totalOrders || 0) - (a.totalOrders || 0));
-          break;
-        case "totalRevenue_asc":
-          result.sort((a, b) => (a.totalRevenue || 0) - (b.totalRevenue || 0));
-          break;
-        case "totalRevenue_desc":
-          result.sort((a, b) => (b.totalRevenue || 0) - (a.totalRevenue || 0));
-          break;
-        case "averagePrice_asc":
-          result.sort((a, b) => (a.averagePrice || 0) - (b.averagePrice || 0));
-          break;
-        case "averagePrice_desc":
-          result.sort((a, b) => (b.averagePrice || 0) - (a.averagePrice || 0));
-          break;
-        case "percentageShare_asc":
-          result.sort(
-            (a, b) => (a.percentageShare || 0) - (b.percentageShare || 0)
-          );
-          break;
-        case "percentageShare_desc":
-          result.sort(
-            (a, b) => (b.percentageShare || 0) - (a.percentageShare || 0)
-          );
-          break;
-        default:
-          console.log(
-            "No matching sort value for subcategory wise data:",
-            filterState.sortValue
-          );
-          break;
-      }
-    }
-
-    return result;
-  }, [subCategoryWiseDataList, filterState]);
-
   const handleSearch = (query: string) => {
     setFilterState((prev) => ({ ...prev, searchQuery: query }));
   };
@@ -486,14 +348,12 @@ const SalesReport = () => {
     () => ({
       columns: [
         { key: "category", title: "Category" },
-        { key: "subCategory", title: "Sub Category" },
         { key: "product", title: "Products" },
         { key: "totalRevenue", title: "Revenue" },
       ],
       rows: map(productWiseDataFiltered, (item) => {
         const row = {
           category: item.category || "N/A",
-          subCategory: item.subCategory || "N/A",
           product: item.product || "N/A",
           totalRevenue: item.totalRevenue ?? 0,
         };
@@ -524,31 +384,9 @@ const SalesReport = () => {
     [categoryWiseDataFiltered]
   );
 
-  const subCategoryTableData = useMemo(
-    () => ({
-      columns: [
-        { key: "subCategory", title: "Sub Category" },
-        { key: "totalOrders", title: "Total Orders" },
-        { key: "totalRevenue", title: "Revenue" },
-        { key: "percentageSharee", title: "Percentage Share" },
-      ],
-      rows: map(subCategoryWiseDataFiltered, (item) => {
-        const row = {
-          subCategory: item.subCategory || "N/A",
-          totalOrders: item.totalOrders ?? 0,
-          totalRevenue: item.totalRevenue ?? 0,
-          percentageSharee: <div>{item.percentageShare ?? 0} %</div>,
-        };
-        return row;
-      }),
-    }),
-    [subCategoryWiseDataFiltered]
-  );
-
   const tableDataObj: ITable = {
     productWise: productWiseTableData,
     categoryWise: categoryWiseTableData,
-    subCategoryWise: subCategoryTableData,
   };
 
   const [modal, setModal] = useState({
@@ -598,7 +436,6 @@ const SalesReport = () => {
           loading={
             isProductWiseDataLoading ||
             isCategoryWiseDataLoading ||
-            isSubCategoryWiseDataLoading ||
             expensesLoading ||
             expenseCatLoading
           }

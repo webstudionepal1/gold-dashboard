@@ -5,12 +5,9 @@ export const FrontendRoutes = {
   PRODUCTDESCRIPTION: "/product/:productId",
   PRODUCTCATEGORY: "/product/product-category",
   PRODUCTSUBCATEGORY: "/product/sub-category",
-  ASSIGNEDORDER: "/order/assigned-order",
-  CONFIRMEDORDER: "/order/confirmed-order",
+
   ADDORDER: "/order/add-order",
 
-  CANCELLEDORDER: "/order/cancelled-order",
-  COMPLETEDORDER: "/order/completed-order",
   ORDER: "/order/orders",
   ORDERDETAILS: "/order/order-details",
   CUSTOMER: "/customer/customer-list",

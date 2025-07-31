@@ -70,38 +70,3 @@ export const useGetCategoryWiseDataQuery = ({
     enabled: !!date && !!period,
   });
 };
-
-interface subCategoryWiseData {
-  subCategory: string;
-  unitsSold: number;
-  totalOrders: number;
-  totalRevenue: number;
-  percentageShare: number;
-  averagePrice: number;
-}
-
-interface subCategoryWiseResponse {
-  data: subCategoryWiseData[];
-}
-
-export const useGetSubCategoryWiseDataQuery = ({
-  date,
-  period,
-}: {
-  date: string;
-  period: string;
-}) => {
-  return useQuery<subCategoryWiseResponse>({
-    queryKey: ["orderSubCategory", date, period],
-    queryFn: async () => {
-      const res = await apiClient.get<subCategoryWiseResponse>(
-        "orderSubCategory",
-        {
-          params: { date, period },
-        }
-      );
-      return res?.data;
-    },
-    enabled: !!date && !!period,
-  });
-};

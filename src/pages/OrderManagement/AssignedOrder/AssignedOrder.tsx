@@ -58,8 +58,38 @@ const AssignedOrder = () => {
     setFilterState((prev) => ({ ...prev, sort }));
   };
   return (
-    <div>
-      <Header text="Orders"></Header>
+    <div className="container mx-auto px-4 py-3">
+      <Header text="Assigned Orders" />
+
+      {/* Status Indicator */}
+      <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+            <div>
+              <h3 className="text-lg font-semibold text-yellow-800">
+                Assigned Orders
+              </h3>
+              <p className="text-sm text-yellow-600">
+                Orders that have been assigned for delivery
+              </p>
+            </div>
+          </div>
+          <div className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">
+            {filteredItems.length} orders
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Navigation */}
+      <div className="mb-4 flex gap-2 text-sm">
+        <button
+          onClick={() => navigate("/order/orders")}
+          className="px-3 py-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors">
+          ← Back to Order Management
+        </button>
+      </div>
+
       <div className="p-4 bg-white border-2 rounded-lg">
         <MasterTable
           showAction

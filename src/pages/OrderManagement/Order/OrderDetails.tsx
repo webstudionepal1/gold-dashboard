@@ -92,15 +92,10 @@ const OrderDetails: React.FC = () => {
   // Handle navigation after successful order update
   useEffect(() => {
     if (isSuccess) {
-      if (page === "order-details") {
-        navigate("/order/confirmed-order");
-      } else if (page === "confirmed-order-details") {
-        navigate("/order/assigned-order");
-      }
-      // Note: For assigned orders, navigation is handled in individual handlers
-      // to differentiate between completion and cancellation
+      // Navigate back to main order management page
+      navigate("/order/orders");
     }
-  }, [isSuccess, navigate, page]);
+  }, [isSuccess, navigate]);
 
   // Handle order completion
   const handleCompleteOrder = (notes?: string) => {
@@ -117,8 +112,8 @@ const OrderDetails: React.FC = () => {
       },
     });
     setShowCompleteModal(false);
-    // Navigate to completed orders page after successful completion
-    setTimeout(() => navigate("/order/completed-order"), 1000);
+    // Navigate back to main order management page after successful completion
+    setTimeout(() => navigate("/order/orders"), 1000);
   };
 
   // Handle order cancellation

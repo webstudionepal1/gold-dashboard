@@ -65,8 +65,7 @@ export const CompleteOrderModal: React.FC<CompleteOrderModalProps> = ({
           </div>
           <button
             onClick={handleClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
-          >
+            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
             <Icon icon="mdi:close" className="w-5 h-5 text-gray-500" />
           </button>
         </div>
@@ -113,7 +112,7 @@ export const CompleteOrderModal: React.FC<CompleteOrderModalProps> = ({
             </li>
             <li className="flex items-center gap-2">
               <Icon icon="mdi:check" className="w-4 h-4 text-green-500" />
-              Move the order to completed orders list
+              Update the order in the management system
             </li>
           </ul>
 
@@ -134,15 +133,13 @@ export const CompleteOrderModal: React.FC<CompleteOrderModalProps> = ({
           <button
             onClick={handleClose}
             disabled={isLoading}
-            className="px-4 py-2 text-white bg-[#de8d29] hover:bg-[#c97d24]  rounded-xl font-medium  transition-colors disabled:opacity-50"
-          >
+            className="px-4 py-2 text-white bg-[#de8d29] hover:bg-[#c97d24]  rounded-xl font-medium  transition-colors disabled:opacity-50">
             Cancel
           </button>
           <button
             onClick={handleConfirm}
             disabled={isLoading}
-            className="px-4 py-2 bg-[#de8d29] text-white rounded-xl font-medium hover:bg-[#c97d24]  transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-          >
+            className="px-4 py-2 bg-[#de8d29] text-white rounded-xl font-medium hover:bg-[#c97d24]  transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
             {isLoading && (
               <Icon icon="mdi:loading" className="w-4 h-4 animate-spin" />
             )}

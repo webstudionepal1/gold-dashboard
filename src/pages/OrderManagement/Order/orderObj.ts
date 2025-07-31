@@ -261,8 +261,10 @@ export const order_details_columns = [
 export const filterOptions = [
   { value: "", label: "All Orders" },
   { value: "pending", label: "Pending" },
-  { value: "completed", label: "Completed" },
+  { value: "confirmed", label: "Confirmed" },
+  { value: "assigned", label: "Assigned" },
   { value: "delivered", label: "Delivered" },
+  { value: "completed", label: "Completed" },
   { value: "cancelled", label: "Cancelled" },
 ];
 

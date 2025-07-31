@@ -39,38 +39,9 @@ export const SidebarConfig = {
         },
         {
           id: 3,
-          path: "#",
-          title: "Order",
+          path: FrontendRoutes.ORDER,
+          title: "Order Management",
           icon: "lets-icons:order",
-          children: [
-            {
-              id: 34,
-              path: FrontendRoutes.ORDER,
-              title: "Orders",
-            },
-
-            {
-              id: 38,
-              path: FrontendRoutes.CONFIRMEDORDER,
-              title: "Confirmed Order",
-            },
-            {
-              id: 30,
-              path: FrontendRoutes.ASSIGNEDORDER,
-              title: "Assigned Order",
-              icon: "",
-            },
-            {
-              id: 32,
-              path: FrontendRoutes.COMPLETEDORDER,
-              title: "Completed Order",
-            },
-            {
-              id: 33,
-              path: FrontendRoutes.CANCELLEDORDER,
-              title: "Cancelled Order",
-            },
-          ],
         },
         {
           id: 4,
@@ -177,8 +148,16 @@ export const SidebarConfig = {
           title: "Settings",
           icon: "mdi-light:settings",
           children: [
-            { id: 107, path: "/settings/profile-config", title: "Profile config" },
-            { id: 108, path: "/settings/attribute-config", title: "Attribute config" },
+            {
+              id: 107,
+              path: "/settings/profile-config",
+              title: "Profile config",
+            },
+            {
+              id: 108,
+              path: "/settings/attribute-config",
+              title: "Attribute config",
+            },
           ],
         },
         {
