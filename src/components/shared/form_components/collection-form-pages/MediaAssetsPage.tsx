@@ -86,240 +86,257 @@ export const MediaAssetsPage: React.FC = () => {
 
         {/* Form Fields */}
         <div className="w-full space-y-6">
-        {/* Collection Images Gallery */}
-        <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
-            <Icon
-              icon="material-symbols:photo-library"
-              className="w-5 h-5 text-customorange"
-            />
-            Collection Gallery Images
-          </h3>
+          {/* Collection Images Gallery */}
+          <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <Icon
+                icon="material-symbols:photo-library"
+                className="w-5 h-5 text-customorange"
+              />
+              Collection Gallery Images
+            </h3>
 
-          <div className="space-y-4">
-            <p className="text-sm text-gray-600">
-              Upload multiple images to create a beautiful gallery for your
-              collection. These images will be displayed on the collection page.
-            </p>
-
-            {/* Multiple Image Upload */}
             <div className="space-y-4">
+              <p className="text-sm text-gray-600">
+                Upload multiple images to create a beautiful gallery for your
+                collection. These images will be displayed on the collection
+                page.
+              </p>
+
+              {/* Multiple Image Upload */}
+              <div className="space-y-4">
+                <FileDropInput
+                  multiple={true}
+                  label="Collection Images"
+                  value={selectedImages}
+                  onChange={handleImageUpload}
+                  maxFiles={10}
+                  placeholder="Drag and drop or click to select multiple images"
+                />
+
+                {/* Image Preview Grid */}
+                {selectedImages.length > 0 && (
+                  <div className="w-full min-w-0">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
+                      {selectedImages.map((file, index) => (
+                        <div
+                          key={index}
+                          className="relative group aspect-square min-w-0"
+                        >
+                          <img
+                            src={URL.createObjectURL(file)}
+                            alt={`Gallery ${index + 1}`}
+                            className="w-full h-full object-cover rounded-lg border border-gray-200"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newImages = selectedImages.filter(
+                                (_, i) => i !== index
+                              );
+                              handleImageUpload(newImages);
+                            }}
+                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 text-xs"
+                          >
+                            ×
+                          </button>
+                          <div className="absolute bottom-1 left-1 bg-black bg-opacity-70 text-white text-xs px-1.5 py-0.5 rounded">
+                            {index + 1}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Validation Errors */}
+                {validationState.images?.errors.map((error, index) => (
+                  <p
+                    key={index}
+                    className="text-red-500 text-sm flex items-center gap-1"
+                  >
+                    <Icon icon="material-symbols:error" className="w-4 h-4" />
+                    {error}
+                  </p>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Banner Image */}
+          <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <Icon
+                icon="basil:image-outline"
+                className="h-5 w-5 text-customorange"
+              />
+              Collection Banner Image
+            </h3>
+
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600">
+                Upload a hero banner image that will be prominently displayed at
+                the top of your collection page. This should be your best, most
+                eye-catching image.
+              </p>
+
               <FileDropInput
-                multiple={true}
-                label="Collection Images"
-                value={selectedImages}
-                onChange={handleImageUpload}
-                maxFiles={10}
-                placeholder="Drag and drop or click to select multiple images"
+                multiple={false}
+                label="Banner Image"
+                value={bannerImage}
+                onChange={handleBannerImageUpload}
+                existingImageUrl={
+                  typeof formData.bannerImage === "string"
+                    ? formData.bannerImage
+                    : undefined
+                }
               />
 
-              {/* Image Preview Grid */}
-              {selectedImages.length > 0 && (
-                <div className="w-full min-w-0">
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
-                    {selectedImages.map((file, index) => (
-                      <div key={index} className="relative group aspect-square min-w-0">
-                        <img
-                          src={URL.createObjectURL(file)}
-                          alt={`Gallery ${index + 1}`}
-                          className="w-full h-full object-cover rounded-lg border border-gray-200"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const newImages = selectedImages.filter(
-                              (_, i) => i !== index
-                            );
-                            handleImageUpload(newImages);
-                          }}
-                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 text-xs">
-                          ×
-                        </button>
-                        <div className="absolute bottom-1 left-1 bg-black bg-opacity-70 text-white text-xs px-1.5 py-0.5 rounded">
-                          {index + 1}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )} */}
+              <div className="bg-white rounded-lg p-4 border border-gray-200">
+                <h4 className="font-medium text-gray-900 mb-2">
+                  Banner Image Guidelines:
+                </h4>
+                <ul className="text-sm text-gray-600 space-y-1 mx-2">
+                  <li>Recommended size: 1920x600 pixels (16:5 aspect ratio)</li>
+                  <li>High resolution for crisp display on all devices</li>
+                  <li>
+                    Avoid text overlay as it may not be readable on mobile
+                  </li>
+                  <li>Use your most compelling product or lifestyle image</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Video Upload */}
+          <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <Icon
+                icon="material-symbols:video-library"
+                className="w-5 h-5 text-customorange"
+              />
+              Collection Video (Optional)
+            </h3>
+
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600">
+                Add a video to bring your collection to life. Videos can
+                showcase the craftsmanship, styling options, or the story behind
+                your collection.
+              </p>
+
+              <VideoUploadField
+                label="Collection Video"
+                value={videoFile}
+                onChange={handleVideoUpload}
+                onUploadError={handleVideoUploadError}
+                maxFileSize={200}
+                existingVideoUrl={
+                  typeof formData.video === "string"
+                    ? formData.video
+                    : undefined
+                }
+              />
+
+              <div className="bg-white rounded-lg p-4 border border-gray-200">
+                <h4 className="font-medium text-gray-900 mb-2">
+                  Video Guidelines:
+                </h4>
+                <ul className="text-sm text-gray-600 space-y-1 mx-2">
+                  <li>Maximum file size: 200MB</li>
+                  <li>Recommended duration: 30-90 seconds</li>
+                  <li>Supported formats: MP4, WebM, AVI, MOV</li>
+                  <li>Landscape orientation (16:9) works best</li>
+                  <li>Consider adding captions for accessibility</li>
+                </ul>
+              </div>
 
               {/* Validation Errors */}
-              {validationState.images?.errors.map((error, index) => (
+              {validationState.video?.errors.map((error, index) => (
                 <p
                   key={index}
-                  className="text-red-500 text-sm flex items-center gap-1">
+                  className="text-red-500 text-sm flex items-center gap-1"
+                >
                   <Icon icon="material-symbols:error" className="w-4 h-4" />
                   {error}
                 </p>
               ))}
             </div>
           </div>
-        </div>
 
-        {/* Banner Image */}
-        <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <Icon
-              icon="basil:image-outline"
-              className="h-5 w-5 text-customorange"
-            />
-            Collection Banner Image
-          </h3>
-
-          <div className="space-y-4">
-            <p className="text-sm text-gray-600">
-              Upload a hero banner image that will be prominently displayed at
-              the top of your collection page. This should be your best, most
-              eye-catching image.
-            </p>
-
-            <FileDropInput
-              multiple={false}
-              label="Banner Image"
-              value={bannerImage}
-              onChange={handleBannerImageUpload}
-              existingImageUrl={
-                typeof formData.bannerImage === "string"
-                  ? formData.bannerImage
-                  : undefined
-              }
-            />
-
-            <div className="bg-white rounded-lg p-4 border border-gray-200">
-              <h4 className="font-medium text-gray-900 mb-2">
-                Banner Image Guidelines:
+          {/* Media Summary */}
+          {(selectedImages.length > 0 || bannerImage || videoFile) && (
+            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+              <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <Icon
+                  icon="material-symbols:summarize"
+                  className="w-5 h-5 text-gray-600"
+                />
+                Media Summary
               </h4>
-              <ul className="text-sm text-gray-600 space-y-1 mx-2">
-                <li>Recommended size: 1920x600 pixels (16:5 aspect ratio)</li>
-                <li>High resolution for crisp display on all devices</li>
-                <li>Avoid text overlay as it may not be readable on mobile</li>
-                <li>Use your most compelling product or lifestyle image</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        {/* Video Upload */}
-        <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <Icon
-              icon="material-symbols:video-library"
-              className="w-5 h-5 text-customorange"
-            />
-            Collection Video (Optional)
-          </h3>
-
-          <div className="space-y-4">
-            <p className="text-sm text-gray-600">
-              Add a video to bring your collection to life. Videos can showcase
-              the craftsmanship, styling options, or the story behind your
-              collection.
-            </p>
-
-            <VideoUploadField
-              label="Collection Video"
-              value={videoFile}
-              onChange={handleVideoUpload}
-              onUploadError={handleVideoUploadError}
-              maxFileSize={200}
-              existingVideoUrl={
-                typeof formData.video === "string" ? formData.video : undefined
-              }
-            />
-
-            <div className="bg-white rounded-lg p-4 border border-gray-200">
-              <h4 className="font-medium text-gray-900 mb-2">
-                Video Guidelines:
-              </h4>
-              <ul className="text-sm text-gray-600 space-y-1 mx-2">
-                <li>Maximum file size: 200MB</li>
-                <li>Recommended duration: 30-90 seconds</li>
-                <li>Supported formats: MP4, WebM, AVI, MOV</li>
-                <li>Landscape orientation (16:9) works best</li>
-                <li>Consider adding captions for accessibility</li>
-              </ul>
-            </div>
-
-            {/* Validation Errors */}
-            {validationState.video?.errors.map((error, index) => (
-              <p
-                key={index}
-                className="text-red-500 text-sm flex items-center gap-1">
-                <Icon icon="material-symbols:error" className="w-4 h-4" />
-                {error}
-              </p>
-            ))}
-          </div>
-        </div>
-
-        {/* Media Summary */}
-        {(selectedImages.length > 0 || bannerImage || videoFile) && (
-          <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-            <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center gap-2">
-              <Icon
-                icon="material-symbols:summarize"
-                className="w-5 h-5 text-gray-600"
-              />
-              Media Summary
-            </h4>
-            <div className="w-full min-w-0">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
-                <div className="bg-white rounded-lg p-3 border border-gray-200 min-w-0">
-                  <p className="font-medium text-gray-700 truncate">Gallery Images</p>
-                  <p className="text-gray-600 truncate">
-                    {selectedImages.length} images selected
-                  </p>
-                </div>
-                <div className="bg-white rounded-lg p-3 border border-gray-200 min-w-0">
-                  <p className="font-medium text-gray-700 truncate">Banner Image</p>
-                  <p className="text-gray-600 truncate">
-                    {bannerImage ? "✓ Uploaded" : "Not uploaded"}
-                  </p>
-                </div>
-                <div className="bg-white rounded-lg p-3 border border-gray-200 min-w-0">
-                  <p className="font-medium text-gray-700 truncate">Collection Video</p>
-                  <p className="text-gray-600 truncate">
-                    {videoFile ? "✓ Uploaded" : "Not uploaded"}
-                  </p>
+              <div className="w-full min-w-0">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                  <div className="bg-white rounded-lg p-3 border border-gray-200 min-w-0">
+                    <p className="font-medium text-gray-700 truncate">
+                      Gallery Images
+                    </p>
+                    <p className="text-gray-600 truncate">
+                      {selectedImages.length} images selected
+                    </p>
+                  </div>
+                  <div className="bg-white rounded-lg p-3 border border-gray-200 min-w-0">
+                    <p className="font-medium text-gray-700 truncate">
+                      Banner Image
+                    </p>
+                    <p className="text-gray-600 truncate">
+                      {bannerImage ? "✓ Uploaded" : "Not uploaded"}
+                    </p>
+                  </div>
+                  <div className="bg-white rounded-lg p-3 border border-gray-200 min-w-0">
+                    <p className="font-medium text-gray-700 truncate">
+                      Collection Video
+                    </p>
+                    <p className="text-gray-600 truncate">
+                      {videoFile ? "✓ Uploaded" : "Not uploaded"}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Help Section */}
-        <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-          <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center gap-2">
-            <Icon
-              icon="material-symbols:help"
-              className="w-5 h-5 text-customorange"
-            />
-            Media Best Practices
-          </h4>
-          <div className="space-y-2 text-sm text-gray-600">
-            <p>
-              • <strong>Quality over quantity:</strong> Use high-resolution,
-              well-lit images that showcase your products beautifully
-            </p>
-            <p>
-              • <strong>Consistent style:</strong> Maintain a consistent
-              photography style across all images for a professional look
-            </p>
-            <p>
-              • <strong>Multiple angles:</strong> Include various angles and
-              close-up details to give customers a complete view
-            </p>
-            <p>
-              • <strong>Lifestyle shots:</strong> Mix product shots with
-              lifestyle images showing items being worn or used
-            </p>
-            <p>
-              • <strong>Mobile optimization:</strong> Ensure images look great
-              on mobile devices where most customers browse
-            </p>
+          {/* Help Section */}
+          <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+            <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <Icon
+                icon="material-symbols:help"
+                className="w-5 h-5 text-customorange"
+              />
+              Media Best Practices
+            </h4>
+            <div className="space-y-2 text-sm text-gray-600">
+              <p>
+                • <strong>Quality over quantity:</strong> Use high-resolution,
+                well-lit images that showcase your products beautifully
+              </p>
+              <p>
+                • <strong>Consistent style:</strong> Maintain a consistent
+                photography style across all images for a professional look
+              </p>
+              <p>
+                • <strong>Multiple angles:</strong> Include various angles and
+                close-up details to give customers a complete view
+              </p>
+              <p>
+                • <strong>Lifestyle shots:</strong> Mix product shots with
+                lifestyle images showing items being worn or used
+              </p>
+              <p>
+                • <strong>Mobile optimization:</strong> Ensure images look great
+                on mobile devices where most customers browse
+              </p>
+            </div>
           </div>
-        </div>
         </div>
       </div>
     </div>
