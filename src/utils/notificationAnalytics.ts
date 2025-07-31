@@ -3,6 +3,31 @@
  * Tracks notification delivery, engagement, and performance metrics
  */
 
+/**
+ * Type guard to check if an object is a valid NotificationEvent
+ */
+function isNotificationEvent(obj: unknown): obj is NotificationEvent {
+  return (
+    typeof obj === "object" &&
+    obj !== null &&
+    typeof (obj as NotificationEvent).id === "string" &&
+    typeof (obj as NotificationEvent).notificationId === "string" &&
+    typeof (obj as NotificationEvent).userId === "string" &&
+    typeof (obj as NotificationEvent).eventType === "string" &&
+    typeof (obj as NotificationEvent).timestamp === "number" &&
+    ["sent", "delivered", "opened", "clicked", "dismissed", "failed"].includes(
+      (obj as NotificationEvent).eventType
+    )
+  );
+}
+
+/**
+ * Check if we're in development mode
+ */
+function isDevelopmentMode(): boolean {
+  return import.meta.env?.DEV === true || import.meta.env?.MODE === "development";
+}
+
 export interface NotificationEvent {
   id: string;
   notificationId: string;
@@ -81,7 +106,7 @@ class NotificationAnalyticsManager {
   ): void {
     try {
       const event: NotificationEvent = {
-        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id: `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
         notificationId,
         userId: this.getCurrentUserId(),
         eventType,
@@ -210,7 +235,7 @@ class NotificationAnalyticsManager {
     const grouped: Record<string, NotificationEvent[]> = {};
 
     events.forEach((event) => {
-      const value = event.metadata?.[field] || "unknown";
+      const value = String(event.metadata?.[field] || "unknown");
       if (!grouped[value]) grouped[value] = [];
       grouped[value].push(event);
     });
@@ -343,8 +368,10 @@ class NotificationAnalyticsManager {
     try {
       const authData = localStorage.getItem("auth-user");
       if (authData) {
-        const parsed = JSON.parse(authData);
-        return parsed.id || "anonymous";
+        const parsed: unknown = JSON.parse(authData);
+        if (parsed && typeof parsed === "object" && "id" in parsed) {
+          return String((parsed as { id: unknown }).id) || "anonymous";
+        }
       }
     } catch (error) {
       console.warn("Failed to get user ID for analytics:", error);
@@ -386,15 +413,15 @@ class NotificationAnalyticsManager {
   /**
    * Send event to backend analytics
    */
-  private async sendToBackend(event: NotificationEvent): Promise<void> {
+  private async sendToBackend(_event: NotificationEvent): Promise<void> {
     try {
       // Only send in production or when analytics endpoint is available
-      if (process.env.NODE_ENV === "development") {
+      if (isDevelopmentMode()) {
         return;
       }
 
       // Implementation would send to analytics API
-      // await apiClient.post('/analytics/notification-events', event);
+      // await apiClient.post('/analytics/notification-events', _event);
     } catch (error) {
       console.warn("Failed to send analytics event to backend:", error);
     }
@@ -407,7 +434,10 @@ class NotificationAnalyticsManager {
     try {
       const stored = localStorage.getItem(this.STORAGE_KEY);
       if (stored) {
-        this.events = JSON.parse(stored);
+        const parsed: unknown = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          this.events = parsed.filter(isNotificationEvent);
+        }
       }
     } catch (error) {
       console.error("Failed to load analytics events:", error);

@@ -46,9 +46,6 @@ const ProductCategory: React.FC = () => {
       isSuccess
         ? categories?.map((item, index) => ({
             ...item,
-            // subCategory: get(item, "subCategory", [])
-            //   .map((subItem) => get(subItem, "name", ""))
-            //   .join(", "),
             sn: index + 1,
             rawDescription: get(item, "description", ""),
             description: (

@@ -129,7 +129,7 @@ const AddStone = ({ modalRef, editData, closeModal }: propTypes) => {
 
   return (
     <Modal
-      classname="w-[500px] h-auto max-h-[90vh] overflow-y-auto"
+      classname="w-full max-w-4xl h-auto max-h-[90vh] overflow-y-auto"
       ref={modalRef}>
       <form
         className="p-6"
@@ -143,7 +143,7 @@ const AddStone = ({ modalRef, editData, closeModal }: propTypes) => {
 
         <div className="space-y-4">
           {/* Basic Information */}
-          <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             <form.Field name="name">
               {(field) => (
                 <div>

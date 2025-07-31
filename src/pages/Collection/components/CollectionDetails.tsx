@@ -58,7 +58,7 @@ const CollectionDetails = () => {
             <div className="flex items-start gap-4">
               {collection.bannerImage && (
                 <SafeImage
-                  src={collection.bannerImage}
+                  src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${collection.bannerImage || `/no-image.png` }`}
                   alt={collection.name}
                   className="w-24 h-24 rounded-lg object-cover"
                 />

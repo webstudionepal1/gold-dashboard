@@ -75,7 +75,7 @@ export const ProductSpecificationsPage: React.FC = () => {
   // Add "No Clasp" option at the beginning
   const claspOptions = [
     { value: "", label: "Select Clasp Type" },
-    { value: "none", label: "No Clasp" },
+    { value: "", label: "No Clasp" },
     ...claspsList,
   ];
 

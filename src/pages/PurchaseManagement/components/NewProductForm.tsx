@@ -393,7 +393,7 @@ const NewProductForm = ({
   // Function to get product weight by ID
   const getProductWeight = (productId: string) => {
     const product = products?.find((p) => p._id === productId);
-    return product?.variant?.[0]?.wt ?? 0;
+    return product?.variants?.[0]?.wt ?? 0;
   };
 
   return (

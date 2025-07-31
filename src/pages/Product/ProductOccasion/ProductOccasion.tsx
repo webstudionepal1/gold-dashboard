@@ -29,33 +29,35 @@ const ProductOccasion: React.FC = () => {
   const { data: occasions, isSuccess } = useGetAllProductOccasionsQuery();
   const { mutate: deleteOccasion } = useDeleteProductOccasionMutation();
 
+  console.log('occasions', occasions)
   const occasionsData = useMemo(
     () =>
       isSuccess
-        ? occasions?.map((item) => ({
-            ...item,
-            description: get(item, "description", ""),
-            totalProducts: get(item, "totalProducts", 0),
-            image: get(item, "image", "") ? (
-              <img
-                src={get(item, "image", "")}
-                alt={item.name}
-                className="w-12 h-12 object-cover rounded"
-              />
-            ) : (
-              <span className="text-gray-400">No image</span>
-            ),
-            video: get(item, "video", "") ? (
-              <video
-                src={get(item, "video", "")}
-                className="w-12 h-12 object-cover rounded"
-                controls={false}
-              />
-            ) : (
-              <span className="text-gray-400">No video</span>
-            ),
-            isActive: get(item, "isActive", false) ? "Active" : "Inactive",
-          }))
+        ? occasions?.map((item, index) => ({
+          ...item,
+         sn: (index + 1).toString(),
+          description: get(item, "description", ""),
+          totalProducts: get(item, "totalProducts", 0),
+          image: get(item, "image", "") ? (
+            <img
+              src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${item.image.length > 0 ? item.image[0] : '/no-image.png'}`}
+              alt={item.name}
+              className="w-12 h-12 object-cover rounded"
+            />
+          ) : (
+            <span className="text-gray-400">No image</span>
+          ),
+          video: get(item, "video", "") ? (
+            <video
+              src={get(item, "video", "")}
+              className="w-12 h-12 object-cover rounded"
+              controls={false}
+            />
+          ) : (
+            <span className="text-gray-400">No video</span>
+          ),
+          isActive: get(item, "isActive", false) ? "Active" : "Inactive",
+        }))
         : [],
     [isSuccess, occasions]
   );

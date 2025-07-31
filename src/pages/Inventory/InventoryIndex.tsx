@@ -82,7 +82,7 @@ const transformProductToInventoryItems = (
   const productImage = product.images?.[0];
 
   // Handle products without variants
-  if (!product.variant?.length) {
+  if (!product.variants?.length) {
     return [
       {
         _id: product._id || "",
@@ -103,7 +103,7 @@ const transformProductToInventoryItems = (
   }
 
   // Transform each variant to inventory item
-  return product.variant.map((variant, index) => {
+  return product.variants.map((variant, index) => {
     const totalStock = variant.totalStock || 0;
     const remainingStock = variant.remainingStock || 0;
     const reorderPoint = variant.reorderPoint || Math.floor(totalStock * 0.2);
