@@ -163,3 +163,64 @@ li {
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
+/* React Slick Custom Pagination Styles */
+.custom-pagination {
+  bottom: -60px !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.custom-pagination li {
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: inline-block !important;
+}
+
+.custom-pagination li button {
+  display: block !important;
+  width: 64px !important;
+  height: 64px !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  cursor: pointer !important;
+  border-radius: 6px !important;
+  overflow: hidden !important;
+}
+
+.custom-pagination li button:before {
+  display: none !important;
+}
+
+.custom-pagination .custom-dot-wrapper {
+  width: 64px !important;
+  height: 64px !important;
+  border-radius: 6px !important;
+  overflow: hidden !important;
+}
+
+/* Hide default slick dots when using custom pagination */
+.slick-dots.slick-thumb li button:before {
+  display: none !important;
+}
+
+.slick-dots.slick-thumb li {
+  margin: 0 4px !important;
+}
+
+/* Custom arrow positioning */
+.slick-prev,
+.slick-next {
+  z-index: 10 !important;
+}
+
+.slick-prev:before,
+.slick-next:before {
+  display: none !important;
+}

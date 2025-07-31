@@ -68,23 +68,24 @@ export const MediaAssetsPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="text-center">
-        <div className="flex items-center justify-center gap-3 mb-3">
-          <Icon
-            icon="material-symbols:image"
-            className="w-6 h-6 text-customorange"
-          />
-          <h2 className="text-xl font-bold text-gray-900">Media & Assets</h2>
+    <div className="w-full min-w-0 overflow-x-hidden">
+      <div className="space-y-6">
+        {/* Page Header */}
+        <div className="text-center">
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <Icon
+              icon="material-symbols:image"
+              className="w-6 h-6 text-customorange"
+            />
+            <h2 className="text-xl font-bold text-gray-900">Media & Assets</h2>
+          </div>
+          <p className="text-gray-600 text-sm max-w-md mx-auto">
+            Upload images and videos to showcase your collection.
+          </p>
         </div>
-        <p className="text-gray-600 text-sm max-w-md mx-auto">
-          Upload images and videos to showcase your collection.
-        </p>
-      </div>
 
-      {/* Form Fields */}
-      <div className="max-w-4xl mx-auto space-y-6">
+        {/* Form Fields */}
+        <div className="w-full space-y-6">
         {/* Collection Images Gallery */}
         <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
@@ -114,30 +115,32 @@ export const MediaAssetsPage: React.FC = () => {
 
               {/* Image Preview Grid */}
               {selectedImages.length > 0 && (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {selectedImages.map((file, index) => (
-                    <div key={index} className="relative group">
-                      <img
-                        src={URL.createObjectURL(file)}
-                        alt={`Gallery ${index + 1}`}
-                        className="w-full h-32 object-cover rounded-lg border border-gray-200"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const newImages = selectedImages.filter(
-                            (_, i) => i !== index
-                          );
-                          handleImageUpload(newImages);
-                        }}
-                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600">
-                        ×
-                      </button>
-                      <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
-                        {index + 1}
+                <div className="w-full min-w-0">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
+                    {selectedImages.map((file, index) => (
+                      <div key={index} className="relative group aspect-square min-w-0">
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt={`Gallery ${index + 1}`}
+                          className="w-full h-full object-cover rounded-lg border border-gray-200"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newImages = selectedImages.filter(
+                              (_, i) => i !== index
+                            );
+                            handleImageUpload(newImages);
+                          }}
+                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 text-xs">
+                          ×
+                        </button>
+                        <div className="absolute bottom-1 left-1 bg-black bg-opacity-70 text-white text-xs px-1.5 py-0.5 rounded">
+                          {index + 1}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               )}
 
@@ -260,24 +263,26 @@ export const MediaAssetsPage: React.FC = () => {
               />
               Media Summary
             </h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-              <div className="bg-white rounded-lg p-3 border border-gray-200">
-                <p className="font-medium text-gray-700">Gallery Images</p>
-                <p className="text-gray-600">
-                  {selectedImages.length} images selected
-                </p>
-              </div>
-              <div className="bg-white rounded-lg p-3 border border-gray-200">
-                <p className="font-medium text-gray-700">Banner Image</p>
-                <p className="text-gray-600">
-                  {bannerImage ? "✓ Uploaded" : "Not uploaded"}
-                </p>
-              </div>
-              <div className="bg-white rounded-lg p-3 border border-gray-200">
-                <p className="font-medium text-gray-700">Collection Video</p>
-                <p className="text-gray-600">
-                  {videoFile ? "✓ Uploaded" : "Not uploaded"}
-                </p>
+            <div className="w-full min-w-0">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                <div className="bg-white rounded-lg p-3 border border-gray-200 min-w-0">
+                  <p className="font-medium text-gray-700 truncate">Gallery Images</p>
+                  <p className="text-gray-600 truncate">
+                    {selectedImages.length} images selected
+                  </p>
+                </div>
+                <div className="bg-white rounded-lg p-3 border border-gray-200 min-w-0">
+                  <p className="font-medium text-gray-700 truncate">Banner Image</p>
+                  <p className="text-gray-600 truncate">
+                    {bannerImage ? "✓ Uploaded" : "Not uploaded"}
+                  </p>
+                </div>
+                <div className="bg-white rounded-lg p-3 border border-gray-200 min-w-0">
+                  <p className="font-medium text-gray-700 truncate">Collection Video</p>
+                  <p className="text-gray-600 truncate">
+                    {videoFile ? "✓ Uploaded" : "Not uploaded"}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -314,6 +319,7 @@ export const MediaAssetsPage: React.FC = () => {
               on mobile devices where most customers browse
             </p>
           </div>
+        </div>
         </div>
       </div>
     </div>

@@ -27,7 +27,7 @@ const ProductDescription: React.FC = () => {
   return (
     <div>
       <Header text="Product Description" />
-      <div className="grid grid-cols-1 gap-4 mt-4 overflow-y-auto md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 overflow-y-auto md:grid-cols-2">
         <ProductImage images={images} />
         <ProductDetails product={product} />
       </div>

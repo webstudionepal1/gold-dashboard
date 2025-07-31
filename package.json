@@ -34,6 +34,7 @@
     "dayjs": "^1.11.13",
     "firebase": "^11.10.0",
     "formik": "^2.4.6",
+    "framer-motion": "^12.23.11",
     "graphql-request": "^7.1.2",
     "html2pdf.js": "^0.10.3",
     "js-cookie": "^3.0.5",

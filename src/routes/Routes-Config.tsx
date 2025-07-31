@@ -54,6 +54,7 @@ import ProductOccasion from "../pages/Product/ProductOccasion/ProductOccasion";
 import StoneIndex from "../pages/Stone/StoneIndex";
 import TestUpload from "../pages/TestUpload";
 import { ProductDetails } from "../pages/Product/ProductList/[id]/components/ProductDetails";
+import ProductImageDemo from "../pages/Product/ProductImageDemo";
 
 export const routesConfig = [
   {
@@ -156,6 +157,10 @@ export const routesConfig = [
   {
     path: FrontendRoutes.STONE,
     element: <StoneIndex />,
+  },
+  {
+    path: "/product/image-demo",
+    element: <ProductImageDemo />,
   },
 
   {

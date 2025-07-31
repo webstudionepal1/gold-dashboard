@@ -148,9 +148,9 @@ const MultiPageFormContent: React.FC<{
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-10 w-full overflow-hidden">
+        <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 min-w-0">
             <div className="flex items-center gap-3">
               <Icon
                 icon="material-symbols:collections"
@@ -176,8 +176,8 @@ const MultiPageFormContent: React.FC<{
       </div>
 
       {/* Compact Progress and Stepper */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <div className="bg-white border-b border-gray-200 w-full overflow-hidden">
+        <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <ProgressBar
             currentStep={currentStep}
             totalSteps={FORM_STEPS.length}
@@ -195,9 +195,9 @@ const MultiPageFormContent: React.FC<{
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-          <div className="p-6">{renderCurrentPage()}</div>
+      <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 w-full min-w-0 overflow-hidden">
+          <div className="p-4 sm:p-6 w-full min-w-0">{renderCurrentPage()}</div>
         </div>
       </div>
 

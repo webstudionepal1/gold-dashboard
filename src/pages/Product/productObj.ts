@@ -190,9 +190,9 @@ export const productListColumns = [
   { title: "Product", key: "product" },
   { title: "Category", key: "categ" },
   { title: "Sub Category", key: "subCate" },
-  { title: "Price", key: "price" },
-  { title: "Stock", key: "stock" },
-  { title: "Sold", key: "sold" },
+  // { title: "Price", key: "price" },
+  // { title: "Stock", key: "stock" },
+  // { title: "Sold", key: "sold" },
 ];
 
 export const occasionColumns = [
@@ -201,6 +201,5 @@ export const occasionColumns = [
   { title: "Name", key: "name" },
   { title: "Description", key: "description" },
   { title: "Total Products", key: "totalProducts" },
-  { title: "Status", key: "status" },
-  { title: "Actions", key: "actions" },
+  // { title: "Status", key: "status" },
 ];

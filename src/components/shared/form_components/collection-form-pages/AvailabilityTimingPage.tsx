@@ -2,6 +2,12 @@ import React from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { InputField } from "../InputField";
 import { useMultiPageForm } from "../MultiPageFormContext";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+import dayjs from "dayjs";
+// Extend dayjs with plugins
+dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
 
 export const AvailabilityTimingPage: React.FC = () => {
   const { formData, updateFormData, updateValidation, validationState } =
@@ -10,21 +16,14 @@ export const AvailabilityTimingPage: React.FC = () => {
   // Validation functions
   const validateDateRange = () => {
     const errors: string[] = [];
-    const fromDate = formData.availableFrom
-      ? new Date(formData.availableFrom)
-      : null;
-    const untilDate = formData.availableUntil
-      ? new Date(formData.availableUntil)
-      : null;
+    const today = dayjs().startOf('day');
+    const fromDate = formData.availableFrom ? dayjs(formData.availableFrom) : null;
+    const untilDate = formData.availableUntil ? dayjs(formData.availableUntil) : null;
 
-    if (fromDate && untilDate && fromDate >= untilDate) {
-      errors.push("Available until date must be after available from date");
-    }
-
-    if (fromDate && fromDate < new Date()) {
+    if (fromDate && fromDate.isBefore(today))
       errors.push("Available from date cannot be in the past");
-    }
-
+    if (fromDate && untilDate && untilDate.isSameOrBefore(fromDate))
+      errors.push("Available until date must be after available from date");
     updateValidation("dateRange", errors.length === 0, errors);
   };
 

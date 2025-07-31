@@ -143,7 +143,7 @@ const AddProductOccasion = ({ modalRef, closeModal, editData }: PropTypes) => {
 
   return (
     <Modal
-      classname="w-[500px] h-auto max-h-[90vh] overflow-y-auto"
+      classname="max-w-3xl w-full h-auto max-h-[90vh] overflow-y-auto"
       ref={modalRef}>
       <form
         className="p-6"
@@ -157,7 +157,7 @@ const AddProductOccasion = ({ modalRef, closeModal, editData }: PropTypes) => {
 
         <div className="space-y-4">
           {/* Basic Information */}
-          <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <form.Field name="name">
               {(field) => (
                 <div>
@@ -185,8 +185,6 @@ const AddProductOccasion = ({ modalRef, closeModal, editData }: PropTypes) => {
                 </div>
               )}
             </form.Field>
-          </div>
-
           {/* Status Setting */}
           <form.Field name="isActive">
             {(field) => (
@@ -203,9 +201,11 @@ const AddProductOccasion = ({ modalRef, closeModal, editData }: PropTypes) => {
               </div>
             )}
           </form.Field>
+          </div>
+
 
           {/* Media Settings */}
-          <div className="space-y-4">
+          <div className="gap-4 grid  grid-cols-1">
             <form.Field name="image">
               {(field) => (
                 <div>

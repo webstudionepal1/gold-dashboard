@@ -84,7 +84,7 @@ export interface IFetchProduct {
   subCategory: IFetchSubCategory;
   averageRating?: number;
   numberOfReviews?: number;
-  variant: [
+  variants: [
     {
       price: number;
       wt: number;
