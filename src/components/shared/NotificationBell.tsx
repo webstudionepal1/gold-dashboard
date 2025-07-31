@@ -9,10 +9,7 @@ const NotificationBell: React.FC = () => {
   const [isNotificationCenterOpen, setIsNotificationCenterOpen] =
     useState(false);
   const {
-    criticalNotifications,
     unreadCount,
-    dismissNotification,
-    markAsRead,
     getNotificationStats,
   } = useCriticalNotifications();
 
@@ -40,7 +37,7 @@ const NotificationBell: React.FC = () => {
       transition: {
         duration: 1.5,
         repeat: hasCriticalNotifications ? Infinity : 0,
-        ease: "easeInOut",
+        ease: "easeInOut" as const,
       },
     },
   };

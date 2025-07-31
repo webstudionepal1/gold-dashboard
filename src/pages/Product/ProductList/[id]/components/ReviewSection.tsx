@@ -3,34 +3,97 @@ import { IFetchReview } from "../../../../../server/api/reviewHooks";
 import { IFetchProduct } from "../../../../../server/api/productHooks";
 import { memo, useState } from "react";
 
-export const ReviewsSection: React.FC<{
+interface ReviewsSectionProps {
   reviews: IFetchReview[];
   product: IFetchProduct;
-}> = memo(({ reviews = [], product }) => {
+  loading?: boolean;
+  error?: string | null;
+}
+
+export const ReviewsSection: React.FC<ReviewsSectionProps> = memo(({
+  reviews = [],
+  product,
+  loading = false,
+  error = null
+}) => {
   const [sortBy, setSortBy] = useState("relevant");
   const [showAllReviews, setShowAllReviews] = useState(false);
 
   // Calculate rating distribution
-  const ratingCounts = [5, 4, 3, 2, 1].map(star =>
-    reviews.filter(review => review.rating === star).length
+  const ratingCounts = [5, 4, 3, 2, 1].map((star: number) =>
+    reviews.filter((review: IFetchReview) => review.rating === star).length
   );
   const totalReviews = reviews.length;
 
   // Sort reviews
   const sortedReviews = [...reviews].sort((a, b) => {
     switch (sortBy) {
-      case "newest":
-        return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+      case "newest": {
+        const dateA = new Date(a.createdAt || 0).getTime();
+        const dateB = new Date(b.createdAt || 0).getTime();
+        return dateB - dateA;
+      }
       case "highest":
         return b.rating - a.rating;
       case "lowest":
         return a.rating - b.rating;
-      default:
-        return 0;
+      default: {
+        // Most relevant: prioritize verified reviews and higher ratings
+        const aScore = (a.isVerified ? 1 : 0) + a.rating * 0.2;
+        const bScore = (b.isVerified ? 1 : 0) + b.rating * 0.2;
+        return bScore - aScore;
+      }
     }
   });
 
   const displayedReviews = showAllReviews ? sortedReviews : sortedReviews.slice(0, 3);
+
+  // Handle loading state
+  if (loading) {
+    return (
+      <div className="mt-6 space-y-4">
+        <div className="bg-gradient-to-r from-white to-gray-50 border border-gray-200 rounded-lg shadow-sm p-4">
+          <div className="animate-pulse">
+            <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-white rounded-lg p-4 border border-gray-100">
+                <div className="h-8 bg-gray-200 rounded w-16 mx-auto mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-20 mx-auto mb-1"></div>
+                <div className="h-3 bg-gray-200 rounded w-16 mx-auto"></div>
+              </div>
+              <div className="md:col-span-2 bg-white rounded-lg p-4 border border-gray-100">
+                <div className="h-4 bg-gray-200 rounded w-32 mb-3"></div>
+                <div className="space-y-2">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div key={i} className="flex items-center gap-3">
+                      <div className="h-2 bg-gray-200 rounded w-8"></div>
+                      <div className="flex-1 h-2 bg-gray-200 rounded"></div>
+                      <div className="h-2 bg-gray-200 rounded w-6"></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Handle error state
+  if (error) {
+    return (
+      <div className="mt-6 space-y-4">
+        <div className="bg-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-lg shadow-sm p-4">
+          <div className="text-center py-8">
+            <Icon icon="mdi:alert-circle-outline" className="w-16 h-16 text-red-400 mx-auto mb-4" />
+            <h4 className="text-lg font-medium text-red-700 mb-2">Failed to Load Reviews</h4>
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mt-6 space-y-4">
@@ -52,7 +115,9 @@ export const ReviewsSection: React.FC<{
           {/* Overall Rating */}
           <div className="flex flex-col items-center justify-center bg-white rounded-lg p-4 border border-gray-100">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-3xl font-bold text-gray-900">{product?.averageRating || 0}</span>
+              <span className="text-3xl font-bold text-gray-900">
+                {product?.averageRating ? product.averageRating.toFixed(1) : "0.0"}
+              </span>
               <Icon icon="mdi:star" className="w-6 h-6 text-amber-500" />
             </div>
             <div className="flex items-center gap-1 mb-1">
@@ -64,7 +129,9 @@ export const ReviewsSection: React.FC<{
                 />
               ))}
             </div>
-            <p className="text-sm text-gray-600">{totalReviews} Reviews</p>
+            <p className="text-sm text-gray-600">
+              {totalReviews} {totalReviews === 1 ? "Review" : "Reviews"}
+            </p>
           </div>
 
           {/* Rating Distribution */}
@@ -159,15 +226,21 @@ export const ReviewsSection: React.FC<{
                       </div>
 
                       {/* Review Text */}
-                      <p className="text-sm text-gray-700 leading-relaxed mb-3">
-                        {review.reviewText || 'No review text provided.'}
-                      </p>
+                      {review.reviewText && review.reviewText.trim() ? (
+                        <p className="text-sm text-gray-700 leading-relaxed mb-3">
+                          {review.reviewText}
+                        </p>
+                      ) : (
+                        <p className="text-sm text-gray-500 italic leading-relaxed mb-3">
+                          No written review provided.
+                        </p>
+                      )}
                     </div>
 
                     {/* Review Images */}
                     {review?.images && review.images.length > 0 && (
                       <div className="flex gap-2 ml-4">
-                        {review.images.slice(0, 3).map((item, imgIndex) => (
+                        {review.images.slice(0, 3).map((item: string, imgIndex: number) => (
                           <div key={imgIndex} className="relative">
                             <img
                               src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${item}`}
