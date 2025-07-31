@@ -335,24 +335,19 @@ const PurchaseIndex = () => {
   const purchaseTableData = useMemo(
     () => ({
       columns: purchaseColumns,
-      rows: map(purchaseList || [], (item) => {
-        const totalCost =
-          item?.items?.length > 0
-            ? item.items.reduce((acc, curr) => acc + (curr.price || 0), 0)
-            : item?.products?.length > 0
-            ? item.products.reduce((acc, curr) => acc + (curr.price || 0), 0)
-            : 0;
-
-        return {
-          ...item,
-          date: item?.createdAt
-            ? dayjs(item.createdAt).format("MMM-DD-YYYY")
-            : "-",
-          supplier: get(item, "supplier.name", "-"),
-          billNo: get(item, "billNo", "-"),
-          totalCost: `${Constants.currency} ${totalCost}`,
-        };
-      }),
+      rows: map(purchaseList, (item) => ({
+        ...item,
+        date: dayjs(item.createdAt).format("MMM-DD-YYYY"),
+        supplier: get(item, "supplier.name", "-"),
+        billNo: get(item, "billNo", "-"),
+        totalCost: `${Constants.currency} ${
+          item?.items && item.items.length > 0
+            ? item.items.reduce((acc, item) => acc + (item.price || 0), 0)
+            : item?.products && item.products.length > 0
+            ? item.products.reduce((acc, item) => acc + (item.price || 0), 0)
+            : 0
+        }`,
+      })),
       viewAction(row: IFetchProduct) {
         setModal({
           of: "purchase-view",
@@ -417,6 +412,8 @@ const PurchaseIndex = () => {
           : "-",
         totalAmount: get(item, "totalReturnAmount", 0),
         refundAmount: get(item, "refundAmount", 0),
+        totalQuantityPurchased: get(item, "totalQuantityPurchased", 0),
+        totalQuantityReturned: get(item, "totalQuantityReturned", 0),
       })),
       viewAction(row: IFetchPurchaseReturn) {
         setModal({ of: "purchase-return", data: row, edit: false });

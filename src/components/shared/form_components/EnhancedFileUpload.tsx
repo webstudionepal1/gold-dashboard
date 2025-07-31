@@ -6,6 +6,19 @@ import EnhancedProgressBar from "./EnhancedProgressBar";
 import { useUploadProgress } from "../../../hooks/useUploadProgress";
 import SocketManager from "../../../utils/SocketManager";
 
+// Import the SocketManager's interface
+type UploadProgressData = {
+  uploadId: string;
+  filename: string;
+  totalSize: number;
+  uploadedSize: number;
+  percentage: number;
+  currentChunk: number;
+  totalChunks: number;
+  status: "initializing" | "uploading" | "completed" | "failed" | "paused";
+  error?: string;
+};
+
 interface UploadProgress {
   uploadId: string;
   filename: string;
@@ -17,6 +30,21 @@ interface UploadProgress {
   status: "initializing" | "uploading" | "completed" | "failed" | "paused";
   error?: string;
 }
+
+// Mapping function to convert SocketManager data to component interface
+const mapSocketDataToProgress = (data: UploadProgressData): UploadProgress => {
+  return {
+    uploadId: data.uploadId,
+    filename: data.filename,
+    totalSize: data.totalSize,
+    uploadedSize: data.uploadedSize,
+    percentage: data.percentage,
+    currentChunk: data.currentChunk,
+    totalChunks: data.totalChunks,
+    status: data.status,
+    error: data.error,
+  };
+};
 
 interface EnhancedFileUploadProps {
   label?: string;
@@ -53,10 +81,11 @@ const EnhancedFileUpload: React.FC<EnhancedFileUploadProps> = ({
         setSocket(socketConnection);
 
         // Set up upload event listeners
-        const handleUploadProgress = (progressData: UploadProgress) => {
+        const handleUploadProgress = (progressData: UploadProgressData) => {
           console.log("Upload progress:", progressData);
-          setProgress(progressData);
-          onUploadProgress?.(progressData);
+          const mappedProgress = mapSocketDataToProgress(progressData);
+          setProgress(mappedProgress);
+          onUploadProgress?.(mappedProgress);
         };
 
         const handleUploadComplete = (data: any) => {
@@ -96,7 +125,7 @@ const EnhancedFileUpload: React.FC<EnhancedFileUploadProps> = ({
     const cleanup = initializeSocket();
 
     return () => {
-      cleanup?.then(cleanupFn => cleanupFn?.());
+      cleanup?.then((cleanupFn) => cleanupFn?.());
     };
   }, [onUploadComplete, onUploadError, onUploadProgress]);
 
@@ -132,9 +161,10 @@ const EnhancedFileUpload: React.FC<EnhancedFileUploadProps> = ({
         const { uploadId, useMultipart, chunkSize } = initResponse.data.data;
 
         // Subscribe to upload progress using SocketManager
-        socketManager.subscribeToUploadProgress(uploadId, (progressData: UploadProgress) => {
-          setProgress(progressData);
-          onUploadProgress?.(progressData);
+        socketManager.subscribeToUploadProgress(uploadId, (progressData) => {
+          const mappedProgress = mapSocketDataToProgress(progressData);
+          setProgress(mappedProgress);
+          onUploadProgress?.(mappedProgress);
         });
 
         if (useMultipart) {

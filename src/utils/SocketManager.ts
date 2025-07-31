@@ -1,5 +1,53 @@
 import { io, Socket } from "socket.io-client";
 
+// Type definitions for socket events
+interface AuthenticationData {
+  userId: string;
+  token: string;
+}
+
+interface AuthenticatedResponse {
+  success: boolean;
+  message?: string;
+  userId?: string;
+}
+
+interface AuthError {
+  error: string;
+  message: string;
+}
+
+interface UploadProgressData {
+  uploadId: string;
+  filename: string;
+  totalSize: number;
+  uploadedSize: number;
+  percentage: number;
+  currentChunk: number;
+  totalChunks: number;
+  status: "initializing" | "uploading" | "completed" | "failed" | "paused";
+  error?: string;
+}
+
+interface UploadCompleteData {
+  uploadId: string;
+  filename: string;
+  fileUrl: string;
+  fileSize: number;
+}
+
+interface UploadErrorData {
+  uploadId: string;
+  error: string;
+  message: string;
+}
+
+type SocketEventCallbacks = {
+  "upload-progress": (data: UploadProgressData) => void;
+  "upload-complete": (data: UploadCompleteData) => void;
+  "upload-error": (data: UploadErrorData) => void;
+};
+
 class SocketManager {
   private static instance: SocketManager;
   private socket: Socket | null = null;
@@ -51,24 +99,25 @@ class SocketManager {
 
       socket.on("connect", () => {
         console.log("Socket connected:", socket.id);
-        
+
         // Authenticate with user token
         const token = localStorage.getItem("token") || "";
         const userId = localStorage.getItem("userId") || "";
-        
+
         if (token && userId) {
-          socket.emit("authenticate", { userId, token });
+          const authData: AuthenticationData = { userId, token };
+          socket.emit("authenticate", authData);
         }
-        
+
         resolve(socket);
       });
 
-      socket.on("connect_error", (error) => {
+      socket.on("connect_error", (error: Error) => {
         console.error("Socket connection error:", error);
         reject(error);
       });
 
-      socket.on("disconnect", (reason) => {
+      socket.on("disconnect", (reason: string) => {
         console.log("Socket disconnected:", reason);
         if (reason === "io server disconnect") {
           // Server disconnected, reconnect manually
@@ -76,11 +125,11 @@ class SocketManager {
         }
       });
 
-      socket.on("authenticated", (data) => {
+      socket.on("authenticated", (data: AuthenticatedResponse) => {
         console.log("Socket authenticated:", data);
       });
 
-      socket.on("auth_error", (error) => {
+      socket.on("auth_error", (error: AuthError) => {
         console.error("Socket authentication error:", error);
         // Handle auth error - maybe redirect to login
       });
@@ -94,36 +143,44 @@ class SocketManager {
     }
   }
 
-  subscribeToUploadProgress(uploadId: string, callback: (data: any) => void): void {
+  subscribeToUploadProgress(
+    uploadId: string,
+    callback: (data: UploadProgressData) => void
+  ): void {
     if (this.socket) {
       this.socket.emit("subscribe-upload-progress", uploadId);
       this.socket.on("upload-progress", callback);
     }
   }
 
-  unsubscribeFromUploadProgress(uploadId: string, callback: (data: any) => void): void {
+  unsubscribeFromUploadProgress(
+    uploadId: string,
+    callback: (data: UploadProgressData) => void
+  ): void {
     if (this.socket) {
       this.socket.emit("unsubscribe-upload-progress", uploadId);
       this.socket.off("upload-progress", callback);
     }
   }
 
-  onUploadComplete(callback: (data: any) => void): void {
+  onUploadComplete(callback: (data: UploadCompleteData) => void): void {
     if (this.socket) {
       this.socket.on("upload-complete", callback);
     }
   }
 
-  onUploadError(callback: (data: any) => void): void {
+  onUploadError(callback: (data: UploadErrorData) => void): void {
     if (this.socket) {
       this.socket.on("upload-error", callback);
     }
   }
 
-  removeUploadListeners(callbacks: { [key: string]: (data: any) => void }): void {
+  removeUploadListeners<K extends keyof SocketEventCallbacks>(callbacks: {
+    [key in K]: SocketEventCallbacks[K];
+  }): void {
     if (this.socket) {
       Object.entries(callbacks).forEach(([event, callback]) => {
-        this.socket!.off(event, callback);
+        this.socket!.off(event, callback as (...args: unknown[]) => void);
       });
     }
   }

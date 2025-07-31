@@ -40,7 +40,7 @@ export const PurchaseDetailsCard: React.FC<PropDetails> = ({
   summary = "Purchase",
 }) => {
   const rows =
-    data?.items.length > 0
+    data?.items && data.items.length > 0
       ? data.items.map((item: any) => ({
           name: get(item, "product.name", "N/A"),
           costPerUnit: get(item, "price", 0),
@@ -48,13 +48,15 @@ export const PurchaseDetailsCard: React.FC<PropDetails> = ({
           wt: get(item, "wt", 0),
           total: get(item, "totalCost", 0),
         }))
-      : data.products.map((item: any) => ({
+      : data?.products && data.products.length > 0
+      ? data.products.map((item: any) => ({
           name: get(item, "product.name", "N/A"),
           costPerUnit: get(item, "price", 0),
           quantity: get(item, "quantity", 0),
           wt: get(item, "wt", 0),
           total: get(item, "quantity", 0) * get(item, "price", 0),
-        }));
+        }))
+      : [];
   return (
     <div className="max-w-2xl p-6 mx-auto space-y-4 font-sans text-sm text-gray-700 bg-white shadow-md rounded-xl">
       <div className="text-lg font-semibold text-center">{summary}</div>
@@ -86,6 +88,37 @@ export const PurchaseDetailsCard: React.FC<PropDetails> = ({
       />
 
       {/* Summary */}
+      {summary === "refund" &&
+        (data as any).totalQuantityPurchased !== undefined && (
+          <div className="pt-4 border-t border-gray-200">
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Total Qty Purchased:</span>
+                <span className="font-semibold">
+                  {(data as any).totalQuantityPurchased || 0}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Qty Returned:</span>
+                <span className="font-semibold">
+                  {(data as any).totalQuantityReturned || 0}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Total Return Amount:</span>
+                <span className="font-semibold">
+                  ₹{(data as any).totalReturnAmount || 0}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Refund Amount:</span>
+                <span className="font-semibold">
+                  ₹{(data as any).refundAmount || 0}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
     </div>
   );
 };

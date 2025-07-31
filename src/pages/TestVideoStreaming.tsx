@@ -18,7 +18,7 @@ const TestVideoStreaming: React.FC = () => {
 
   const testUrls = [
     "banner/1234567890-test.mp4",
-    "http://localhost:4000/api/v1/en/video/stream/banner/test.mp4",
+    "http://localhost:8080/api/v1/en/video/stream/banner/test.mp4",
     "https://gold-api.webstudiomatrix.com/banner/video.mp4",
     "banner/uploads/video-file.mp4",
   ];
