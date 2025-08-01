@@ -20,7 +20,6 @@ import {
 import { bannerStore } from "./bannerStore";
 import {
   generateBannerFormDefaultValue,
-  type IBannerFormData,
 } from "./bannerobj";
 import MultiImageUploader from "../../../components/shared/form_components/FileDropInput";
 import { cleanObject } from "../../../utils/cleanObject";
@@ -36,14 +35,11 @@ const AddBannerSchema = z.object({
     .instanceof(File)
     .nullable()
     .refine((val) => val !== null, {
-      message: "At least one image is required",
+      message: "Web image is required",
     }),
   mobImage: z
     .instanceof(File)
-    .nullable()
-    .refine((val) => val !== null, {
-      message: "At least one image is required",
-    }),
+    .nullable(), // Mobile image is optional
 });
 
 const AddBannerForm = () => {
@@ -63,20 +59,20 @@ const AddBannerForm = () => {
     isSuccess: bannerUpdateSuccess,
   } = useUpdateBannerMutation();
 
-  const { data: banners = [], isLoading, error } = useGetAllBannerQuery();
+  const { data: _banners = [], isLoading: _isLoading, error: _error } = useGetAllBannerQuery();
 
   const {
     data: categories,
-    isLoading: isCategoryLoading,
+    isLoading: _isCategoryLoading,
     isSuccess: categorySuccess,
-    error: categoryError,
+    error: _categoryError,
   } = useGetAllProductCategoriesQuery();
 
   const {
     data: subCategories,
-    isLoading: isSubCategoryLoading,
+    isLoading: _isSubCategoryLoading,
     isSuccess: subCategorySuccess,
-    error: subCategoryError,
+    error: _subCategoryError,
   } = useGetAllProductSubCategoriesQuery();
 
   const categoryOptions = useMemo(
@@ -96,7 +92,6 @@ const AddBannerForm = () => {
   );
 
   const formState = id ?? "add";
-  const isEditMode = id !== "add";
 
   // UseForm with inferred types from defaultValues
   const form = useForm({
@@ -140,21 +135,21 @@ const AddBannerForm = () => {
     },
   });
 
-  const FieldError = ({ field }: { field: any }) => {
+  const FieldError = ({ field }: { field: { state: { meta: { errors: unknown[] } } } }) => {
     if (field.state.meta.errors.length > 0) {
       const error = field.state.meta.errors[0];
       const errorMessage =
         typeof error === "string"
           ? error
-          : error.message || JSON.stringify(error);
+          : (error as { message?: string })?.message || JSON.stringify(error);
 
       return (
-        <div className="min-h-[20px]">
-          <span className="text-xs text-red">{errorMessage}</span>
+        <div className="min-h-[20px] mt-1">
+          <span className="text-xs font-medium" style={{ color: '#ef4444' }}>{errorMessage}</span>
         </div>
       );
     }
-    return null;
+    return <div className="min-h-[20px]"></div>; // Maintain consistent spacing
   };
 
   useEffect(() => {
@@ -162,26 +157,26 @@ const AddBannerForm = () => {
   }, [bannerSuccess, bannerUpdateSuccess]);
 
   return (
-    <div className="mx-8 my-3">
+    <div className="">
       <div className="flex items-center justify-between">
         <Header text={id === "add" ? "Add New Banner" : "Edit Banner"} />
         <Breadcrumbs />
       </div>
 
-      <div className="flex items-center justify-between my-2 gap-4">
-        <div className="bg-[#ffffff] border-[#eeeeee] border-2 shadow-lg rounded-xl w-full">
+      <div className="grid grid-cols-1 lg:grid-cols-4 lg:space-y-0 lg:space-x-4 space-x-0 space-y-4 ">
+        <div className="bg-[#ffffff] col-span-3 border-[#eeeeee] border-2 shadow-lg rounded-xl w-full">
           <form
             className="flex flex-col gap-4 mx-4 my-6"
             onSubmit={(e) => {
               e.preventDefault();
               e.stopPropagation();
               form.handleSubmit();
-            }}>
+            }}
+          >
             <div>
               <h1 className="text-xl font-semibold">General Information</h1>
               <div className="border-b border-[#dedde2] w-full my-2"></div>
             </div>
-
             <div className="flex items-center gap-4 w-full">
               <form.Field name="title">
                 {(field) => (
@@ -285,6 +280,8 @@ const AddBannerForm = () => {
                       options={[
                         { value: "homepage", label: "Home Page" },
                         { value: "category-page", label: "Category Page" },
+                        { value: "marketing", label: "Marketing Section" },
+                        { value: "advertisement", label: "Advertisement" },
                         { value: "product-page", label: "Product Page" },
                       ]}
                     />
@@ -297,34 +294,40 @@ const AddBannerForm = () => {
             <button
               type="submit"
               disabled={bannerPending || bannerUpdatePending}
-              className="self-end bg-[#df8d29] text-white px-7 py-2 rounded-xl disabled:opacity-50">
+              className="self-end bg-[#df8d29] text-white px-7 py-2 rounded-xl disabled:opacity-50"
+            >
               {bannerPending || bannerUpdatePending ? "Saving..." : "Save"}
             </button>
           </form>
         </div>
 
-        <div className="flex flex-col gap-2 mt-8 w-[50%]">
+        <div className="grid gap-2">
           <div className="bg-[#ffffff] border-[#eeeeee] border-2 shadow-lg rounded-xl w-full">
             <div className="mx-6 my-4">
               <div>
-                <h1 className="text-xl font-semibold">Upload Web Image</h1>
+                <h1 className="text-xl font-semibold">
+                  Upload Web Image <span style={{ color: '#ef4444' }}>*</span>
+                </h1>
                 <div className="border-b border-[#dedde2] w-full my-2"></div>
               </div>
 
               <form.Field name="image">
                 {(field) => (
-                  <MultiImageUploader
-                    multiple={false}
-                    form={form}
-                    label=""
-                    value={field.state.value}
-                    existingFileField="existingImage"
-                    accept={{
-                      "image/*": [".png", ".jpg", ".jpeg", ".svg"],
-                    }}
-                    existingFile={form.getFieldValue("existingImage")}
-                    onChange={(file) => field.handleChange(file)}
-                  />
+                  <div>
+                    <MultiImageUploader
+                      multiple={false}
+                      form={form}
+                      label=""
+                      value={field.state.value}
+                      existingFileField="existingImage"
+                      accept={{
+                        "image/*": [".png", ".jpg", ".jpeg", ".svg"],
+                      }}
+                      existingFile={form.getFieldValue("existingImage")}
+                      onChange={(file) => field.handleChange(file)}
+                    />
+                    <FieldError field={field} />
+                  </div>
                 )}
               </form.Field>
             </div>
@@ -333,24 +336,29 @@ const AddBannerForm = () => {
           <div className="bg-[#ffffff] border-[#eeeeee] border-2 shadow-lg rounded-xl w-full">
             <div className="mx-6 my-4">
               <div>
-                <h1 className="text-xl font-semibold">Upload Mobile Image</h1>
+                <h1 className="text-xl font-semibold">
+                  Upload Mobile Image <span className="text-gray-500 text-sm">(Optional)</span>
+                </h1>
                 <div className="border-b border-[#dedde2] w-full my-2"></div>
               </div>
 
               <form.Field name="mobImage">
                 {(field) => (
-                  <MultiImageUploader
-                    multiple={false}
-                    form={form}
-                    label=""
-                    value={field.state.value}
-                    existingFileField="existingMobImage"
-                    accept={{
-                      "image/*": [".png", ".jpg", ".jpeg", ".svg", ".webp"],
-                    }}
-                    existingFile={form.getFieldValue("existingMobImage")}
-                    onChange={(file) => field.handleChange(file)}
-                  />
+                  <div>
+                    <MultiImageUploader
+                      multiple={false}
+                      form={form}
+                      label=""
+                      value={field.state.value}
+                      existingFileField="existingMobImage"
+                      accept={{
+                        "image/*": [".png", ".jpg", ".jpeg", ".svg", ".webp"],
+                      }}
+                      existingFile={form.getFieldValue("existingMobImage")}
+                      onChange={(file) => field.handleChange(file)}
+                    />
+                    <FieldError field={field} />
+                  </div>
                 )}
               </form.Field>
             </div>

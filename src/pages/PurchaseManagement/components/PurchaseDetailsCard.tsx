@@ -82,6 +82,7 @@ export const PurchaseDetailsCard: React.FC<PropDetails> = ({
 
       {/* Reused Table Component */}
       <MasterTable
+      mainClassName="p-0"
         canSearch={false}
         columns={viewPurchaseColumns}
         rows={rows}

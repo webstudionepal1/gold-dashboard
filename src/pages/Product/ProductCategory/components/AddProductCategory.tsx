@@ -16,7 +16,7 @@ interface propTypes {
 
 const schema = z.object({
   name: z.string().min(1, "**Name is required"),
-  description: z.string().optional(),
+  description: z.string().max(500, "**Description must be less than 500 characters").optional(),
 });
 interface ICategoryValue {
   name: string;
@@ -30,7 +30,7 @@ const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
   const form = useForm({
     defaultValues: {
       name: editData ? get(editData, "name", "") : "",
-      description: editData ? get(editData, "description", "") : "",
+      description: editData ? get(editData, "rawDescription", "") : "",
     } as ICategoryValue,
     validators: {
       onChange: schema,
@@ -51,7 +51,7 @@ const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
     }
   }, [createSuccess, updateSuccess]);
   return (
-    <Modal classname="w-[450px]" ref={modalRef}>
+    <Modal classname="max-w-md w-full" ref={modalRef}>
       <form
         className="p-6"
         onSubmit={(e) => {
@@ -100,7 +100,14 @@ const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
                     rows={3}
+                    maxLength={500}
                   />
+                  <div className="flex justify-between items-center mt-1">
+                    <div></div>
+                    <span className={`text-xs ${(field.state.value?.length || 0) > 450 ? 'text-red-500' : 'text-gray-500'}`}>
+                      {field.state.value?.length || 0}/500
+                    </span>
+                  </div>
                 </div>
                 <FieldError field={field} />
               </div>

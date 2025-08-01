@@ -45,8 +45,8 @@ const SidebarHeader: React.FC = () => {
         src="/companylogo.png"
         alt="company-logo"
         className={clsx(
-          isCollapsed ? "h-[50px] w-[44px]" : "h-full w-full",
-          "transition-all duration-300"
+          isCollapsed ? "h-[50px] w-[44px]" : "w-28",
+          "transition-all duration-300 mx-auto aspect-video"
         )}
       />
     </section>

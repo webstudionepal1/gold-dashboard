@@ -39,6 +39,7 @@ interface MasterTableProps {
   returnAction?: (row: any) => void;
   emptyStateMessage?: string;
   printAction?: (row: any) => void;
+  mainClassName?:string;
 }
 
 const MasterTable: React.FC<MasterTableProps> = ({
@@ -62,6 +63,7 @@ const MasterTable: React.FC<MasterTableProps> = ({
   editAction,
   returnAction,
   printAction,
+  mainClassName,
   emptyStateMessage = "No data available",
 }) => {
   // State
@@ -268,7 +270,7 @@ const MasterTable: React.FC<MasterTableProps> = ({
   };
 
   return (
-    <div className="p-4 bg-white rounded-md">
+    <div className={clsx("p-4 bg-white rounded-md", mainClassName)}>
       <div className="flex flex-col justify-between gap-3 pb-4 md:flex-row md:items-center">
         {tabsOptions && tabsOptions}
 

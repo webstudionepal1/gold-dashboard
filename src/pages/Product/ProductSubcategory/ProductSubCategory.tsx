@@ -1,17 +1,16 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { get } from "lodash";
 import React, { useMemo, useState } from "react";
-import { Table } from "../../../components/shared/Table";
+import MasterTable from "../../../components/shared/MasterTable";
+import Header from "../../../components/shared/table_heading/Header";
 import { useOutsideClick } from "../../../hooks/UseOutsideClick";
 import {
   IFetchSubCategory,
   useDeleteProductSubCategoryMutation,
   useGetAllProductSubCategoriesQuery,
 } from "../../../server/api/productHooks";
-import { AddProductSubCategory } from "./components/AddProductSubCategory";
-import Header from "../../../components/shared/table_heading/Header";
 import { subCategoryColumns } from "../productObj";
-import MasterTable from "../../../components/shared/MasterTable";
-import { get } from "lodash";
+import { AddProductSubCategory } from "./components/AddProductSubCategory";
 import ViewProductSubCategory from "./components/ViewProductSubCategory";
 // import { get } from "lodash";
 
@@ -48,12 +47,14 @@ const Productsubcategory: React.FC = () => {
         ? subCategories?.map((item, index: number) => ({
             ...item,
             sn: index + 1,
-            rawDescription: get(item, "description", ""),
             description: (
               <p className="truncate max-w-xl">
-                {get(item, "description", "")}
+              { get(item, "description", "") !== ""
+                ? get(item, "description")
+                : "-"}
               </p>
             ),
+            rawDescription: get(item, "description", ""),
             totalProducts: get(item, "totalProducts", "N/A"),
             // category: get(item, "category._id", "-"),
           }))
@@ -71,9 +72,9 @@ const Productsubcategory: React.FC = () => {
               editData: null,
             });
           }}
-          className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-sm text-white px-4 py-2 flex rounded-lg transition-colors duration-200"
+          className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-sm text-white px-4 gap-1 py-2 flex rounded-lg transition-colors duration-200"
         >
-          <Icon icon="ic:outline-add" fontSize={24} />
+          <Icon icon="ic:outline-add" fontSize={18} />
           New Subcategory
         </button>
       </Header>

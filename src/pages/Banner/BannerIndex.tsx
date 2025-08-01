@@ -496,7 +496,6 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import { SearchFilterSort } from "../../components/global/SearchFilterSort";
 import Header from "../../components/shared/table_heading/Header";
 import { ScrollableModal } from "../../components/shared/ScrollableModal";
-import { DynamicTab } from "../PurchaseManagement/components/DynamicTab";
 import MasterTable from "../../components/shared/MasterTable";
 import {
   IFetchBanner,
@@ -504,28 +503,15 @@ import {
   useGetAllBannerQuery,
 } from "../../server/api/bannerHook";
 import { updateBannerState } from "./Components/bannerStore";
-import { ensureStreamingUrl } from "../../utils/videoUtils";
 
-interface BannerItem {
-  _id: string;
-  title: string;
-  banner_type: string;
-  image: string[];
-  category: string;
-  subCategory: string;
-  banner_title?: string;
-  description?: string;
-  select_by?: string;
-  priority?: number;
-  locations?: string[];
-  type: string;
-}
-
-const bannerTabOptions = [
-  { value: "homepage", label: "Home Page" },
-  { value: "category-page", label: "Category Page" },
-  { value: "product-page", label: "Product Page" },
-];
+// Location labels mapping for better display
+const LOCATION_LABELS: Record<string, string> = {
+  "homepage": "Home Page",
+  "category-page": "Category Page",
+  "product-page": "Product Page",
+  "marketing": "Marketing Section",
+  "advertisement": "Advertisement",
+};
 
 const filterOptions = [
   { value: "", label: "All Banners" },
@@ -547,18 +533,10 @@ interface FilterState {
   sortValue: string;
 }
 
-interface ITable {
-  [key: string]: {
-    columns: { key: string; title: string }[];
-    rows: any[];
-  };
-}
-
+// Simplified table structure - no need for complex ITable interface
 const BannerIndex: React.FC = () => {
   const navigate = useNavigate();
-  const [selectedTab, setSelectedTab] = useState("homepage");
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<IFetchBanner | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<string>("all");
   const [filterState, setFilterState] = useState<FilterState>({
     searchQuery: "",
     filterValue: "",
@@ -570,8 +548,26 @@ const BannerIndex: React.FC = () => {
     type: "web" | "mobile" | null;
   }>({ url: null, type: null });
 
-  const { data: banners = [], isLoading, error } = useGetAllBannerQuery();
+  const { data: banners = [], isLoading } = useGetAllBannerQuery();
   const { mutate: deleteBanner } = useDeleteBannerMutation();
+
+  // Dynamically generate location options from existing banners
+  const locationOptions = useMemo(() => {
+    const allLocations = new Set<string>();
+    banners.forEach(banner => {
+      banner.locations?.forEach(location => allLocations.add(location));
+    });
+
+    const options = [{ value: "all", label: "All Locations" }];
+    Array.from(allLocations).sort().forEach(location => {
+      options.push({
+        value: location,
+        label: LOCATION_LABELS[location] || location.charAt(0).toUpperCase() + location.slice(1).replace(/-/g, ' ')
+      });
+    });
+
+    return options;
+  }, [banners]);
 
   const handleSearch = (query: string) => {
     setFilterState((prev: FilterState) => ({ ...prev, searchQuery: query }));
@@ -628,9 +624,9 @@ const BannerIndex: React.FC = () => {
   };
 
   const filteredBanners = useMemo(() => {
-    let result = banners.filter((item) =>
-      item.locations?.includes(selectedTab)
-    );
+    let result = selectedLocation === "all"
+      ? banners
+      : banners.filter((item) => item.locations?.includes(selectedLocation));
 
     if (filterState.searchQuery) {
       const query = filterState.searchQuery.toLowerCase();
@@ -663,194 +659,97 @@ const BannerIndex: React.FC = () => {
     }
 
     return result;
-  }, [banners, selectedTab, filterState]);
+  }, [banners, selectedLocation, filterState]);
 
-  const tableDataObj: ITable = useMemo(
-    () => ({
-      homepage: {
-        columns: [
-          { key: "title", title: "Title" },
-          { key: "type", title: "Banner Type" },
-          { key: "image", title: "Web Image" },
-          { key: "mobImage", title: "Mobile Image" },
-        ],
-        rows: filteredBanners.map((banner) => ({
-          id: banner._id,
-          _id: banner._id,
-          title: banner.title,
-          type: banner.type,
-          image: banner.image?.length ? (
-            <div className="flex justify-center items-center p-2">
-              {banner.image.map((item, index) => (
-                <img
-                  key={index}
-                  src={`https://gold-api.webstudiomatrix.com/${item}`}
-                  width={120}
-                  className="rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
-                  alt={banner.title}
-                  onClick={() =>
-                    handleImageClick(
-                      `https://gold-api.webstudiomatrix.com/${item}`,
-                      "web"
-                    )
-                  }
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="flex justify-center items-center p-2">No Image</div>
-          ),
-          mobImage: banner.mobImage?.length ? (
-            <div className="flex justify-center items-center p-2">
-              {banner.mobImage.map((item, index) => (
-                <img
-                  key={index}
-                  src={`https://gold-api.webstudiomatrix.com/${item}`}
-                  width={120}
-                  className="rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
-                  alt={banner.title}
-                  onClick={() =>
-                    handleImageClick(
-                      `https://gold-api.webstudiomatrix.com/${item}`,
-                      "mobile"
-                    )
-                  }
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="flex justify-center items-center p-2">No Image</div>
-          ),
-          original: banner,
-        })),
-      },
-      "category-page": {
-        columns: [
-          { key: "title", title: "Title" },
-          { key: "type", title: "Banner Type" },
-          { key: "image", title: "Web Image" },
-          { key: "mobImage", title: "Mobile Image" },
-        ],
-        rows: filteredBanners.map((banner) => ({
-          id: banner._id,
-          _id: banner._id,
-          title: banner.title,
-          type: banner.type,
-          image: banner.image?.length ? (
-            <div className="flex justify-center items-center p-2">
-              {banner.image.map((item, index) => (
-                <img
-                  key={index}
-                  src={`https://gold-api.webstudiomatrix.com/${item}`}
-                  width={120}
-                  className="rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
-                  alt={banner.title}
-                  onClick={() =>
-                    handleImageClick(
-                      `https://gold-api.webstudiomatrix.com/${item}`,
-                      "web"
-                    )
-                  }
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="flex justify-center items-center p-2">No Image</div>
-          ),
-          mobImage: banner.mobImage?.length ? (
-            <div className="flex justify-center items-center p-2">
-              {banner.mobImage.map((item, index) => (
-                <img
-                  key={index}
-                  src={`https://gold-api.webstudiomatrix.com/${item}`}
-                  width={120}
-                  className="rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
-                  alt={banner.title}
-                  onClick={() =>
-                    handleImageClick(
-                      `https://gold-api.webstudiomatrix.com/${item}`,
-                      "mobile"
-                    )
-                  }
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="flex justify-center items-center p-2">No Image</div>
-          ),
-          original: banner,
-        })),
-      },
-      "product-page": {
-        columns: [
-          { key: "title", title: "Title" },
-          { key: "type", title: "Banner Type" },
-          { key: "image", title: "Web Image" },
-          { key: "mobImage", title: "Mobile Image" },
-        ],
-        rows: filteredBanners.map((banner) => ({
-          id: banner._id,
-          _id: banner._id,
-          title: banner.title,
-          type: banner.type,
-          image: banner.image?.length ? (
-            <div className="flex justify-center items-center p-2">
-              {banner.image.map((item, index) => (
-                <img
-                  key={index}
-                  src={`https://gold-api.webstudiomatrix.com/${item}`}
-                  width={120}
-                  className="rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
-                  alt={banner.title}
-                  onClick={() =>
-                    handleImageClick(
-                      `https://gold-api.webstudiomatrix.com/${item}`,
-                      "web"
-                    )
-                  }
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="flex justify-center items-center p-2">No Image</div>
-          ),
-          mobImage: banner.mobImage?.length ? (
-            <div className="flex justify-center items-center p-2">
-              {banner.mobImage.map((item, index) => (
-                <img
-                  key={index}
-                  src={`https://gold-api.webstudiomatrix.com/${item}`}
-                  width={120}
-                  className="rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
-                  alt={banner.title}
-                  onClick={() =>
-                    handleImageClick(
-                      `https://gold-api.webstudiomatrix.com/${item}`,
-                      "mobile"
-                    )
-                  }
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="flex justify-center items-center p-2">No Image</div>
-          ),
-          original: banner,
-        })),
-      },
-    }),
-    [filteredBanners]
+  // Single reusable table structure - no duplication!
+  const tableColumns = [
+    { key: "title", title: "Title" },
+    { key: "type", title: "Banner Type" },
+    { key: "location", title: "Location" },
+    { key: "image", title: "Web Image" },
+    { key: "mobImage", title: "Mobile Image" },
+  ];
+
+  const tableRows = useMemo(() =>
+    filteredBanners.map((banner) => ({
+      id: banner._id,
+      _id: banner._id,
+      title: banner.title,
+      type: banner.type,
+      location: banner.locations?.map(loc =>
+        LOCATION_LABELS[loc] || loc.charAt(0).toUpperCase() + loc.slice(1).replace(/-/g, ' ')
+      ).join(", ") || "No Location",
+      image: banner.image?.length ? (
+        <div className="flex justify-center items-center p-2">
+          {banner.image.map((item, index) => (
+            <img
+              key={index}
+              src={`https://gold-api.webstudiomatrix.com/${item}`}
+              width={120}
+              className="rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+              alt={banner.title}
+              onClick={() =>
+                handleImageClick(
+                  `https://gold-api.webstudiomatrix.com/${item}`,
+                  "web"
+                )
+              }
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="flex justify-center items-center p-2 text-gray-500">No Image</div>
+      ),
+      mobImage: banner.mobImage?.length ? (
+        <div className="flex justify-center items-center p-2">
+          {banner.mobImage.map((item, index) => (
+            <img
+              key={index}
+              src={`https://gold-api.webstudiomatrix.com/${item}`}
+              width={120}
+              className="rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+              alt={banner.title}
+              onClick={() =>
+                handleImageClick(
+                  `https://gold-api.webstudiomatrix.com/${item}`,
+                  "mobile"
+                )
+              }
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="flex justify-center items-center p-2 text-gray-500">No Image</div>
+      ),
+      original: banner,
+    })), [filteredBanners]
   );
 
-  const handleViewItem = (row: any) => {
-    setEditingItem(row.original);
-    setIsViewModalOpen(true);
-  };
-
-  const handleEditItem = (row: any) => {
+  const handleEditItem = (row: { original: IFetchBanner }) => {
     updateBannerState(row.original);
     navigate(`/banner/edit`);
   };
+
+  // Location dropdown component
+  const LocationFilter = () => (
+    <div className="flex items-center gap-2">
+      <label htmlFor="location-filter" className="text-sm font-medium text-gray-700">
+        Location:
+      </label>
+      <select
+        id="location-filter"
+        value={selectedLocation}
+        onChange={(e) => setSelectedLocation(e.target.value)}
+        className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      >
+        {locationOptions.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
 
   const handleDeleteItem = (id: string) => {
     deleteBanner(id);
@@ -878,13 +777,7 @@ const BannerIndex: React.FC = () => {
 
       <MasterTable
         loading={isLoading}
-        tabsOptions={
-          <DynamicTab
-            selectedTab={selectedTab}
-            setSelectedTab={setSelectedTab}
-            tabOptions={bannerTabOptions}
-          />
-        }
+        tabsOptions={<LocationFilter />}
         filterSection={
           <SearchFilterSort
             onSearch={handleSearch}
@@ -895,11 +788,10 @@ const BannerIndex: React.FC = () => {
             placeholder="Search banners..."
           />
         }
-        rows={tableDataObj[selectedTab]?.rows || []}
-        columns={tableDataObj[selectedTab]?.columns || []}
+        rows={tableRows}
+        columns={tableColumns}
         canSelect={true}
         showAction={true}
-        // viewAction={handleViewItem}
         editAction={handleEditItem}
         onDelete={handleDeleteItem}
         onMultipleDelete={handleMultipleDelete}

@@ -1,9 +1,24 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import clsx from "clsx";
 import { get, map } from "lodash";
-import { CheckIcon, Download, PackageIcon, TruckIcon } from "lucide-react";
+import { CheckIcon, Download, PackageIcon, TruckIcon, XIcon } from "lucide-react";
 import React, { useEffect, useMemo } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+
+// Constants for styling and configuration
+const CANCELLED_STYLES = {
+  banner: "p-4 bg-red-50 border-2 border-red-200 rounded-xl my-4",
+  section: "bg-red-50 border-2 border-red-200 rounded-xl",
+  text: "text-red-600 font-medium",
+  title: "text-lg font-semibold text-red-700",
+  subtitle: "text-sm text-red-600",
+  badge: "text-white bg-gray-500 text-sm rounded-full py-1 px-4",
+} as const;
+
+const CARD_STYLES = {
+  base: "border-2 rounded-xl border-[#d5d9e4] bg-white",
+  section: "col-span-12 bg-white border-2 rounded-xl border-[#d5d9e4] lg:col-span-4",
+} as const;
 
 import MasterTable from "../../../components/shared/MasterTable";
 import Header from "../../../components/shared/table_heading/Header";
@@ -65,6 +80,92 @@ const STEPS: OrderStep[] = [
   },
 ];
 
+const CANCELLED_STEPS: OrderStep[] = [
+  {
+    id: 0,
+    name: "Pending",
+  },
+  {
+    id: 1,
+    name: "Order Cancelled",
+    icon: <XIcon className="w-6 h-6 text-white" />,
+  },
+];
+
+// Helper functions to reduce repetition
+const getOrderStatusInfo = (isOrderCancelled: boolean, orderStatus: string) => {
+  if (isOrderCancelled) {
+    return {
+      steps: CANCELLED_STEPS,
+      currentStep: 1,
+      trackerProps: {
+        cancelledBg: "bg-red-500",
+        cancelledBorder: "border-red-500",
+        cancelledText: "text-red-500 font-medium",
+      },
+    };
+  }
+
+  return {
+    steps: STEPS,
+    currentStep: StepperObj[orderStatus] || 0,
+    trackerProps: {},
+  };
+};
+
+const createPaymentStatusBadge = (isOrderCancelled: boolean, paymentStatus: string) => {
+  if (isOrderCancelled) {
+    return <div className={CANCELLED_STYLES.badge}>Cancelled</div>;
+  }
+
+  const isPaid = paymentStatus === "paid";
+  const badgeClass = isPaid
+    ? "text-white bg-green text-sm rounded-full py-1 px-4"
+    : "text-white bg-red text-sm rounded-full py-1 px-4";
+
+  return <div className={badgeClass}>{paymentStatus}</div>;
+};
+
+// Component for cancelled order banner
+const CancelledOrderBanner: React.FC = () => (
+  <div className={CANCELLED_STYLES.banner}>
+    <div className="flex items-center gap-3">
+      <XIcon className="w-6 h-6 text-red-500" />
+      <div>
+        <h3 className={CANCELLED_STYLES.title}>Order Cancelled</h3>
+        <p className={CANCELLED_STYLES.subtitle}>
+          This order has been cancelled and will not be processed.
+        </p>
+      </div>
+    </div>
+  </div>
+);
+
+// Component for cancelled order status card
+const CancelledOrderStatusCard: React.FC = () => (
+  <div className="border-2 rounded-xl border-red-200 bg-red-50">
+    <div className="flex flex-col gap-4 px-3 py-2">
+      <h1 className="text-xl font-semibold text-red-700">Order Status</h1>
+      <div className="flex items-center justify-center gap-2 p-4">
+        <XIcon className="w-8 h-8 text-red-500" />
+        <div className="text-center">
+          <h2 className="text-lg font-medium text-red-700">Cancelled</h2>
+          <p className="text-sm text-red-600">No delivery required</p>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// Component for cancelled order message
+const CancelledOrderMessage: React.FC = () => (
+  <div className="flex items-center justify-center p-4 bg-red-50 border border-red-200 rounded-xl">
+    <p className={CANCELLED_STYLES.text}>
+      This order has been cancelled and cannot be modified.
+    </p>
+  </div>
+);
+
 const OrderDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -74,6 +175,8 @@ const OrderDetails: React.FC = () => {
   const pagePath = pathname.split("/");
   const page = pagePath[pagePath.length - 2];
 
+
+
   // API hooks with proper error handling
   const {
     mutate: updateOrder,
@@ -81,18 +184,28 @@ const OrderDetails: React.FC = () => {
     isSuccess,
   } = useUpdateOrderMutation();
 
-  const { data: order, isLoading, isError, error } = useGetOrderById(id);
+  const { data: order, isLoading, isError } = useGetOrderById(id);
+
+  // Check if we're on a cancelled order page based on URL or order status
+  const orderStatus = get(order, "orderStatus", "pending");
+  const isCancelledOrderPage = page === "cancelled-order-details";
+  const isOrderCancelled = orderStatus === "cancelled" || isCancelledOrderPage;
 
   // Handle navigation after successful order update
   useEffect(() => {
     if (isSuccess) {
       if (page === "order-details") {
-        navigate("/order/confirmed-order");
+        // Check if order was cancelled or confirmed
+        if (order?.orderStatus === "cancelled") {
+          navigate("/order/cancelled-order");
+        } else {
+          navigate("/order/confirmed-order");
+        }
       } else if (page === "confirmed-order-details") {
         navigate("/order/assigned-order");
       }
     }
-  }, [isSuccess, navigate, page]);
+  }, [isSuccess, navigate, page, order?.orderStatus]);
 
   // Transform order products data
   const orderMenu = useMemo(() => {
@@ -150,7 +263,7 @@ const OrderDetails: React.FC = () => {
   const shippingInformation = useMemo(() => {
     if (!order) return [];
 
-    return [
+    const baseInfo: InfoItem[] = [
       {
         id: 1,
         title: "Customer ",
@@ -176,23 +289,17 @@ const OrderDetails: React.FC = () => {
         title: "Shipping Method",
         value: get(order, "shippingMethod", "Normal"),
       },
-      {
-        id: 6,
-        title: "Payment Status",
-        value: (
-          <div
-            className={
-              order?.paymentStatus === "paid"
-                ? "text-white bg-green text-sm rounded-full py-1 px-4"
-                : "text-white bg-red text-sm rounded-full py-1 px-4"
-            }
-          >
-            {get(order, "paymentStatus", "pending")}
-          </div>
-        ),
-      },
     ];
-  }, [order]);
+
+    // Add payment status with appropriate styling
+    baseInfo.push({
+      id: 6,
+      title: "Payment Status",
+      value: createPaymentStatusBadge(isOrderCancelled, get(order, "paymentStatus", "pending")),
+    });
+
+    return baseInfo;
+  }, [order, isOrderCancelled]);
 
   // Generate billing address info from customer data
   const billingAddress = useMemo(() => {
@@ -231,20 +338,25 @@ const OrderDetails: React.FC = () => {
   const orderCancelled = useMemo(() => {
     if (!order) return [];
 
+    const cancellationDate = get(order, "cancellation.date", get(order, "updatedAt", "N/A"));
+    const formattedDate = cancellationDate !== "N/A"
+      ? new Date(cancellationDate).toLocaleDateString()
+      : "N/A";
+
     return [
       {
         id: 5,
         title: "Cancelled Date",
         date: (
-          <div className="text-red">
-            {get(order, "cancellation.data", "N/A")}
+          <div className="text-red font-medium">
+            {formattedDate}
           </div>
         ),
       },
       {
         id: 6,
         title: "Reason for cancellation",
-        reason: get(order, "cancellation.reason", "N/A"),
+        reason: get(order, "cancellation.reason", "No reason provided"),
       },
     ];
   }, [order]);
@@ -259,6 +371,13 @@ const OrderDetails: React.FC = () => {
     });
   };
 
+
+
+  // Determine which steps to show and current step based on order status
+  const { steps, currentStep, trackerProps } = useMemo(() =>
+    getOrderStatusInfo(isOrderCancelled, orderStatus),
+    [isOrderCancelled, orderStatus]
+  );
   // Handle loading and error states
   if (isLoading) {
     return (
@@ -289,52 +408,23 @@ const OrderDetails: React.FC = () => {
     );
   }
 
-  const orderStatus = get(order, "orderStatus", "pending");
-  const orderDate = get(order, "orderDate", "").split("T")[0];
-  const orderNumber = get(order, "id", "").slice(-5);
+
 
   return (
-    <div className="container px-4 py-3 mx-auto ">
-      <Header text={Ordertitle[page] || "Order Details"} />
+    <div className="container mx-auto ">
+      <Header text={isOrderCancelled ? "Cancelled Orders" : (Ordertitle[page] || "Order Details")} />
 
       {/* Order Progress Tracker */}
-      <OrderTracker steps={STEPS} currentStep={StepperObj[orderStatus] || 0} />
+      <OrderTracker
+        steps={steps}
+        currentStep={currentStep}
+        {...trackerProps}
+      />
+
+      {/* Cancelled Order Banner */}
+      {isOrderCancelled && <CancelledOrderBanner />}
 
       <div className="py-4rounded-md grid grid-cols-1 md:grid-cols-3 mt-4 gap-4 lg:grid-cols-12">
-        {/* Order Header */}
-        {/* <div className="border-2 border-[#d6dbe4] mx-3 rounded-xl">
-          <div className="flex items-center justify-between px-3 py-3">
-            <div className="flex flex-col">
-              <h1
-                className={clsx(
-                  "text-xl font-bold",
-                  page === "cancelled-order-details" ? "text-[#fe382d]" : ""
-                )}
-              >
-                {page === "cancelled-order-details"
-                  ? "Order Cancelled"
-                  : "Order"}{" "}
-                <span
-                  className={clsx(
-                    "font-bold text-xl",
-                    page === "cancelled-order-details"
-                      ? "text-[#fe382d]"
-                      : "text-[#ffc174]"
-                  )}
-                >
-                  #{orderNumber}
-                </span>
-              </h1>
-              <p className="text-[#b0b0b0] font-semibold">{orderDate}</p>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <button className="flex items-center gap-2 border-2 border-[#d2dae5] px-3 py-2 rounded-xl">
-                Download Invoice <Download size={24} />
-              </button>
-            </div>
-          </div>
-        </div> */}
 
         {/* Main Content Grid */}
         <div className="md:col-span-2 flex flex-col gap-4 lg:col-span-8">
@@ -362,26 +452,30 @@ const OrderDetails: React.FC = () => {
         {/* Additional Information Section */}
         <div className="lg:col-span-4 flex flex-col gap-4">
           <div className="col-span-12 space-y-4 lg:col-span-4">
-            {/* Delivery Partner Card */}
-            <div className="border-2 rounded-xl border-[#d5d9e4] bg-white">
-              <div className="flex flex-col gap-4 px-3 py-2">
-                <h1 className="text-xl font-semibold">Delivery Partner</h1>
-                <div className="flex items-center justify-between gap-2">
-                  <img
-                    src="/testimg.jpg"
-                    alt="Delivery Partner"
-                    className="object-cover w-20 h-20 rounded-md"
-                  />
-                  <h1 className="text-nowrap">Australian Post</h1>
-                  <button className="bg-[#e08d26] px-3 py-1 rounded-xl text-nowrap text-white">
-                    Track Order
-                  </button>
+            {/* Delivery Partner Card - Hide for cancelled orders */}
+            {!isOrderCancelled ? (
+              <div className={CARD_STYLES.base}>
+                <div className="flex flex-col gap-4 px-3 py-2">
+                  <h1 className="text-xl font-semibold">Delivery Partner</h1>
+                  <div className="flex items-center justify-between gap-2">
+                    <img
+                      src="/testimg.jpg"
+                      alt="Delivery Partner"
+                      className="object-cover w-20 h-20 rounded-md"
+                    />
+                    <h1 className="text-nowrap">Australian Post</h1>
+                    <button className="bg-[#e08d26] px-3 py-1 rounded-xl text-nowrap text-white">
+                      Track Order
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <CancelledOrderStatusCard />
+            )}
 
             {/* Order Total Card */}
-            <div className="border-2 rounded-xl border-[#d5d9e4] bg-white">
+            <div className={CARD_STYLES.base}>
               <div className="px-3 py-2 space-y-3">
                 <h1 className="text-2xl font-semibold">Total Amount</h1>
                 <div className="border-b-2 border-[#d5d9e4] my-1"></div>
@@ -414,16 +508,18 @@ const OrderDetails: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="col-span-12 bg-white border-2 rounded-xl border-[#d5d9e4] lg:col-span-4">
-            {page === "cancelled-order-details" ? (
-              <InfoSection
-                title="Order Cancelled"
-                info={orderCancelled}
-                showEdit={false}
-                onEditClick={() => {
-                  /* Implement edit functionality */
-                }}
-              />
+          <div className={CARD_STYLES.section}>
+            {isOrderCancelled ? (
+              <div className={CANCELLED_STYLES.section}>
+                <InfoSection
+                  title="Order Cancelled"
+                  info={orderCancelled}
+                  showEdit={false}
+                  onEditClick={() => {
+                    /* Implement edit functionality */
+                  }}
+                />
+              </div>
             ) : (
               <InfoSection
                 title="Billing Address"
@@ -435,11 +531,36 @@ const OrderDetails: React.FC = () => {
               />
             )}
           </div>
-          <div className="flex items-center justify-end gap-3">
-            {page === "order-details" && (
-              <>
+          {/* Action Buttons - Hide for cancelled orders */}
+          {!isOrderCancelled && (
+            <div className="flex items-center justify-end gap-3">
+              {page === "order-details" && (
+                <>
+                  <button
+                    onClick={() => handleOrderStatusUpdate("confirmed")}
+                    disabled={isPending}
+                    className={clsx(
+                      "bg-[#de8d29] px-4 py-2 text-white rounded-xl font-medium transition-all",
+                      isPending
+                        ? "opacity-70 cursor-not-allowed"
+                        : "hover:bg-[#c97d24]"
+                    )}
+                  >
+                    {isPending ? "Processing..." : "Accept Order"}
+                  </button>
+                  <button
+                    className="bg-[#d1d1d1] px-4 py-2 text-[#878787] rounded-xl font-semibold hover:bg-[#c1c1c1] transition-all"
+                    onClick={() => handleOrderStatusUpdate("cancelled")}
+                    disabled={isPending}
+                  >
+                    Cancel Order
+                  </button>
+                </>
+              )}
+
+              {page === "confirmed-order-details" && (
                 <button
-                  onClick={() => handleOrderStatusUpdate("confirmed")}
+                  onClick={() => handleOrderStatusUpdate("assigned")}
                   disabled={isPending}
                   className={clsx(
                     "bg-[#de8d29] px-4 py-2 text-white rounded-xl font-medium transition-all",
@@ -448,33 +569,14 @@ const OrderDetails: React.FC = () => {
                       : "hover:bg-[#c97d24]"
                   )}
                 >
-                  {isPending ? "Processing..." : "Accept Order"}
+                  {isPending ? "Processing..." : "Assign Delivery"}
                 </button>
-                <button
-                  className="bg-[#d1d1d1] px-4 py-2 text-[#878787] rounded-xl font-semibold hover:bg-[#c1c1c1] transition-all"
-                  onClick={() => handleOrderStatusUpdate("cancelled")}
-                  disabled={isPending}
-                >
-                  Cancel Order
-                </button>
-              </>
-            )}
+              )}
+            </div>
+          )}
 
-            {page === "confirmed-order-details" && (
-              <button
-                onClick={() => handleOrderStatusUpdate("assigned")}
-                disabled={isPending}
-                className={clsx(
-                  "bg-[#de8d29] px-4 py-2 text-white rounded-xl font-medium transition-all",
-                  isPending
-                    ? "opacity-70 cursor-not-allowed"
-                    : "hover:bg-[#c97d24]"
-                )}
-              >
-                {isPending ? "Processing..." : "Assign Delivery"}
-              </button>
-            )}
-          </div>
+          {/* Cancelled Order Message */}
+          {isOrderCancelled && <CancelledOrderMessage />}
         </div>
       </div>
     </div>

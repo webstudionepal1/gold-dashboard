@@ -33,6 +33,7 @@ export const AddProductSubCategory = ({
   closeModal,
   editData,
 }: propTypes) => {
+  console.log(editData, 'editData');
   const { data: categories, isSuccess: categorySuccess } =
     useGetAllProductCategoriesQuery();
   const { mutate: createSubCategory, isSuccess } =
@@ -50,8 +51,8 @@ export const AddProductSubCategory = ({
   const form = useForm({
     defaultValues: {
       name: editData ? get(editData, "name", "") : "",
-      category: editData ? get(editData, "category._id", "") : "",
-      description: editData ? get(editData, "description", "") : "",
+      category: editData ? get(editData, "category", "") : "",
+      description: editData ? get(editData, "rawDescription", "") : "",
     } as ISubCategorForm,
     validators: {
       onSubmit: validationSchema,

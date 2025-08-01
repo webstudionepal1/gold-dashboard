@@ -109,7 +109,7 @@ export default function OrderTracker({
   cancelledText,
 }: OrderTrackerProps) {
   return (
-    <div className="mx-auto p-6 bg-white rounded-lg border-2 border-[#d5d9e2]">
+    <div className="mx-auto p-4 bg-white rounded-lg border-2 border-[#d5d9e2]">
       <h2 className="text-2xl font-bold text-gray-800 mb-6">Track Order</h2>
       <div className="border-t border-gray-200 pt-6">
         <div className="relative flex items-center">

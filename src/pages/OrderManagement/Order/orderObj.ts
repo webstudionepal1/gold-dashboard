@@ -176,6 +176,7 @@ export const StepperObj: Record<string, number> = {
   confirmed: 1,
   assigned: 2,
   delivery: 3,
+  cancelled: -1, // Special case for cancelled orders
 };
 
 export const getStatusColor = (status: string) => {

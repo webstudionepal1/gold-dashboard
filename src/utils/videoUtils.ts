@@ -34,7 +34,10 @@ export const getVideoStreamUrl = (objectPath: string): string => {
  * @param url - The URL to check
  * @returns True if it's already a streaming URL
  */
-export const isStreamingUrl = (url: string): boolean => {
+export const isStreamingUrl = (url: string | null | undefined): boolean => {
+  if (!url || typeof url !== 'string') {
+    return false;
+  }
   return url.includes("/video/stream/");
 };
 
@@ -43,8 +46,8 @@ export const isStreamingUrl = (url: string): boolean => {
  * @param urlOrPath - Either a full URL or an object path
  * @returns The proper streaming URL
  */
-export const ensureStreamingUrl = (urlOrPath: string): string => {
-  if (!urlOrPath) {
+export const ensureStreamingUrl = (urlOrPath: string | null | undefined): string => {
+  if (!urlOrPath || typeof urlOrPath !== 'string') {
     return "";
   }
 
@@ -98,7 +101,10 @@ export const getVideoMetadataUrl = (objectPath: string): string => {
  * @param streamingUrl - The streaming URL
  * @returns The object path
  */
-export const extractObjectPath = (streamingUrl: string): string => {
+export const extractObjectPath = (streamingUrl: string | null | undefined): string => {
+  if (!streamingUrl || typeof streamingUrl !== 'string') {
+    return "";
+  }
   const match = streamingUrl.match(/\/video\/stream\/(.+)$/);
   return match ? match[1] : "";
 };

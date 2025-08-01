@@ -41,7 +41,7 @@ const CancelledOrder = () => {
         ...item,
         orderedProducts: size(item.orderedProducts),
         orderStatus: (
-          <div className="px-2 py-1 text-xs text-white rounded-full bg-green">
+          <div className="px-2 py-1 text-xs text-white rounded-full bg-red">
             {item.orderStatus}
           </div>
         ),

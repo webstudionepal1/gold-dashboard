@@ -50,7 +50,9 @@ const ViewProductSubCategory: React.FC<ViewProductCategoryProps> = ({
           <div className="bg-gray-50 p-4 rounded-lg">
             <h3 className="text-sm font-semibold text-gray-600">Description</h3>
             <p className="text-gray-700">
-              {get(viewData, "rawDescription", "No description available")}
+              {get(viewData, "rawDescription", "") !== ""
+                ? get(viewData, "rawDescription", "")
+                : "No description available"}
             </p>
           </div>
 

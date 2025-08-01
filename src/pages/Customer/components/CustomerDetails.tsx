@@ -1,13 +1,11 @@
-import React, { useRef, useState } from "react";
+import React, { useState, useMemo } from "react";
 import Header from "../../../components/shared/table_heading/Header";
 import Breadcrumbs from "../../../components/shared/Breadcrumb";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { SimpleTable } from "./SimpleTable";
-import InfoCard from "./InfoCard";
 import { useGetCustomerQuery } from "../../../server/api/customerHook";
 import {
   IFetchOrder,
-  IOrderSummary,
   useGetAllOrdersQuery,
 } from "../../../server/api/orderHooks";
 import { Link, useParams } from "react-router-dom";
@@ -15,272 +13,31 @@ import dayjs from "dayjs";
 import InfoSection from "../../OrderManagement/Order/components/InfoSection";
 import { ScrollableModal } from "../../../components/shared/ScrollableModal";
 import Invoice, { InvoiceData } from "./Invoice";
-import { useReactToPrint, UseReactToPrintOptions } from "react-to-print";
+
 import { FrontendRoutes } from "../../../routes/routes";
-interface CustomerDetails {
-  _id: string;
-  order_id: string;
-  order_date: string;
-  total_price: number;
-  status: "Out of Stock" | "Delivered" | "Canceled" | "In Stock";
-  isActive?: boolean;
-}
 
-interface InvoiceItem {
-  name: string;
-  weight: number;
-  purity: string;
-  makingCharge: number;
-  ratePerGram: number;
-  total: number;
-}
+// Constants for styling and configuration
+const CARD_STYLES = {
+  base: "bg-white border-2 rounded-xl border-[#d5d9e4]",
+  compact: "p-3",
+  section: "space-y-4",
+} as const;
 
-const getShippingStatusColor = (status: string) => {
-  switch (
-    status.toLowerCase() // Converts to lowercase for case-insensitive comparison
-  ) {
-    case "confirmed":
-      return "bg-[#e8faee] text-[#6db289]";
-    case "pending":
-      return "text-[#df8d28]   font-semibold ";
-    case "in progress":
-      return "bg-blue-100 text-blue-800";
-    case "delivered":
-      return "text-[#35c659]  font-semibold";
-    case "cancelled":
-      return "bg-[#feeeee] text-[#ff4d4c]";
-    case "not confirmed":
-      return "bg-[#f9ebea] text-[#ce8b8e]";
-    default:
-      return "bg-gray-100 text-gray-800";
-  }
-};
-
-const todaysOrders = [
-  {
-    order_id: "01",
-    order_date: "2025-02-11",
-    total_price: "$262",
-    status: "Out of Stock",
+const EMPTY_STATES = {
+  noOrders: {
+    icon: "mdi:package-variant-closed",
+    title: "No Orders Found",
+    message: "This customer hasn't placed any orders yet.",
   },
-  {
-    order_id: "01",
-    order_date: "2025-02-15",
-    total_price: "$262",
-    status: "Delivered",
+  noCustomer: {
+    icon: "mdi:account-question",
+    title: "Customer Not Found",
+    message: "The requested customer could not be found.",
   },
-  {
-    order_id: "01",
-    order_date: "2025-01-11",
-    total_price: "$262",
-    status: "Delivered",
-  },
-  {
-    order_id: "01",
-    order_date: "2025-02-12",
-    total_price: "$262",
-    status: "Cancelled",
-  },
-  {
-    order_id: "01",
-    order_date: "2025-02-12",
-    total_price: "$262",
-    status: "In Stock",
-  },
-];
+} as const;
 
-const CustomerDetails = () => {
-  const { id } = useParams();
-  const {
-    data: customers = [],
-    isLoading,
-    error,
-  } = useGetCustomerQuery({ role: "customer" });
-
-  const [selectedOrder, setSelectedOrder] = useState<IFetchOrder | null>(null);
-  const {
-    data: orders,
-    isLoading: ordersLoading,
-    error: ordersError,
-  } = useGetAllOrdersQuery({ customer: id });
-
-  const customer = customers.find((cust) => cust._id === id);
-
-  const printRef = useRef<HTMLDivElement>(null);
-
-  const handlePrint = useReactToPrint({
-    content: () => printRef.current,
-    documentTitle: "Invoice",
-  } as UseReactToPrintOptions);
-
-  const [showModal, setShowModal] = useState(false);
-  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
-  const handleInvoiceClose = () => {
-    setShowInvoiceModal(!showInvoiceModal);
-  };
-  const handleCloseModal = () => {
-    setShowModal(!showModal);
-  };
-  const handleView = (order: IFetchOrder) => {
-    setShowModal(true);
-    setSelectedOrder(order);
-  };
-
-  const shippingInformation = [
-    {
-      id: 1,
-      title: "Name",
-      value: customer?.name || "N/A",
-    },
-    {
-      id: 2,
-      title: "Phone No",
-      value: <div>+977 {customer?.phone}</div>,
-    },
-    {
-      id: 3,
-      title: "Address",
-      value: customer?.address || "N/A",
-    },
-    {
-      id: 4,
-      title: "Email",
-      value: customer?.email || "N/A",
-    },
-
-    // {
-    //   id: 5,
-    //   title: "Shipping Method",
-    //   value: <div>not fixed</div>,
-    // },
-    // {
-    //   id: 5,
-    //   title: "Payment",
-    //   value: customer?.
-    // },
-  ];
-
-  const billingAddress = [
-    {
-      id: 1,
-      title: "Customer Name",
-      value: customer?.name || "N/A",
-    },
-    {
-      id: 2,
-      title: "Phone No",
-      value: <div>+977 {customer?.phone}</div>,
-    },
-    {
-      id: 3,
-      title: "Email",
-      value: customer?.email || "N/A",
-    },
-    {
-      id: 4,
-      title: "Address",
-      value: customer?.address || "N/A",
-    },
-    {
-      id: 5,
-      title: "Payment",
-      value: (
-        <div
-          className={` font-semibold  ${getShippingStatusColor(
-            selectedOrder?.paymentStatus || ""
-          )}`}
-        >
-          {selectedOrder?.paymentStatus}
-        </div>
-      ),
-    },
-  ];
-
-  // const flattenedOrders = orders.flatMap((order) =>
-  //   order.orderedProducts.map((item) => ({
-  // orderId: order._id,
-  // totalAmount: order.totalAmount,
-  // productId: item.product,
-  // image: item.product.image,
-  // qty: item.quantity,
-  // price: item.selectedVariant.price,
-  // totalPrice: item.quantity * item.selectedVariant.price,
-  //   }))
-  // );
-
-  const fla = selectedOrder
-    ? selectedOrder?.orderedProducts.map((item) => ({
-        // name: item?.product?.name || "name",
-        name: "Name",
-        // image:
-        //   (item?.product?.images?.length > 0 && item?.product.images[0]) ||
-        //   "/sdfsdf",
-        image: "/sdfsdf",
-        price: item.selectedVariant.price,
-        quantity: item.selectedVariant.quantity,
-        totalPrice: item.selectedVariant.quantity * item.selectedVariant.price,
-      }))
-    : [];
-
-  interface customerData {
-    _id: string;
-    customer_name: string;
-    email: string;
-    address: string;
-    contact_number: string;
-    total_order: string;
-  }
-
-  // const getStatusColor = (status: string) => {
-  //   switch (status) {
-  //     case "Confirmed":
-  //       return "bg-[#e9fbef] text-[#6db289]";
-  //     case "pending":
-  //       return "bg-yellow-100 text-yellow-800";
-  //     case "In Progress":
-  //       return "bg-blue-100 text-blue-800";
-  //     case "Delivered":
-  //       return "bg-green-100 text-green-800";
-  //     case "Cancelled":
-  //       return "bg-red-100 text-red-800";
-  //     case "Not Confirmed":
-  //       return "bg-[#f9ebea] text-[#ce8b8e]";
-  //     default:
-  //       return "bg-gray-100 text-gray-800";
-  //   }
-  // };
-  // const invoiceData: InvoiceData = {
-  //   invoiceNumber: "INV-00123",
-
-  //   customerName: "Sita Shrestha",
-  //   customerPhone: "9800000000",
-  //   customerAddress: "Lalitpur, Nepal",
-  //   shopName: "Barun Gems Australia",
-  //   shopAddress: "123 Gold Street, Kathmandu, Nepal",
-  //   shopPhone: "+977-9812345678",
-  //   taxRate: 13,
-  //   discount: 1000,
-  //   items: [
-  //     {
-  //       name: "Gold Ring",
-  //       weight: 5.0,
-  //       purity: "22K",
-  //       makingCharge: 500,
-  //       ratePerGram: 9000,
-  //       total: 45500,
-  //     },
-  //     {
-  //       name: "Gold Chain",
-  //       weight: 15.0,
-  //       purity: "24K",
-  //       makingCharge: 1000,
-  //       ratePerGram: 9500,
-  //       total: 143500,
-  //     },
-  //   ],
-  // };
-
-  const getOrderStatusColor = (status: string) => {
+// Utility functions
+ const getOrderStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case "confirmed":
         return "bg-[#e8faee] text-[#6db289]";
@@ -322,166 +79,333 @@ const CustomerDetails = () => {
     }
   };
 
+// Helper Components
+const EmptyState: React.FC<{
+  icon: string;
+  title: string;
+  message: string;
+  className?: string;
+}> = ({ icon, title, message, className = "" }) => (
+  <div className={`flex flex-col items-center justify-center py-12 text-center ${className}`}>
+    <Icon icon={icon} className="w-16 h-16 text-gray-400 mb-4" />
+    <h3 className="text-lg font-semibold text-gray-700 mb-2">{title}</h3>
+    <p className="text-gray-500 max-w-md">{message}</p>
+  </div>
+);
+
+const LoadingState: React.FC<{ message?: string }> = ({ message = "Loading..." }) => (
+  <div className="flex items-center justify-center py-8">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
+    <span className="text-gray-600">{message}</span>
+  </div>
+);
+
+const CustomerDetails = () => {
+  const { id } = useParams();
+  const {
+    data: customers = [],
+    isLoading: customersLoading,
+    error: customersError,
+  } = useGetCustomerQuery({ role: "customer" });
+
+  const [selectedOrder, setSelectedOrder] = useState<IFetchOrder | null>(null);
+  const {
+    data: orders = [],
+    isLoading: ordersLoading,
+    error: ordersError,
+  } = useGetAllOrdersQuery({ customer: id });
+
+  const customer = customers.find((cust) => cust._id === id);
+  const [showModal, setShowModal] = useState(false);
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+
+  // Customer information data - moved before early returns
+  const shippingInformation = useMemo(() => [
+    {
+      id: 1,
+      title: "Name",
+      value: customer?.name || "N/A",
+    },
+    {
+      id: 2,
+      title: "Phone No",
+      value: customer?.phone ? `+977 ${customer.phone}` : "N/A",
+    },
+    {
+      id: 3,
+      title: "Address",
+      value: customer?.address || "N/A",
+    },
+    {
+      id: 4,
+      title: "Email",
+      value: customer?.email || "N/A",
+    },
+  ], [customer]);
+
+  const billingAddress = useMemo(() => [
+    {
+      id: 1,
+      title: "Customer Name",
+      value: customer?.name || "N/A",
+    },
+    {
+      id: 2,
+      title: "Phone No",
+      value: customer?.phone ? `+977 ${customer.phone}` : "N/A",
+    },
+    {
+      id: 3,
+      title: "Email",
+      value: customer?.email || "N/A",
+    },
+    {
+      id: 4,
+      title: "Address",
+      value: customer?.address || "N/A",
+    },
+    {
+      id: 5,
+      title: "Payment",
+      value: selectedOrder?.paymentStatus ? (
+        <div
+          className={`font-semibold ${getStatusColor(
+            selectedOrder.paymentStatus
+          )}`}
+        >
+          {selectedOrder.paymentStatus}
+        </div>
+      ) : "N/A",
+    },
+  ], [customer, selectedOrder]);
+
+  // Early returns after all hooks are called
+  if (customersLoading) {
+    return (
+      <div className="container mx-auto">
+        <div className="flex items-center justify-between mb-4">
+          <Header text="Customer Details" />
+          <Breadcrumbs />
+        </div>
+        <LoadingState message="Loading customer details..." />
+      </div>
+    );
+  }
+
+  if (customersError || !customer) {
+    return (
+      <div className="container mx-auto">
+        <div className="flex items-center justify-between mb-4">
+          <Header text="Customer Details" />
+          <Breadcrumbs />
+        </div>
+        <EmptyState
+          icon={EMPTY_STATES.noCustomer.icon}
+          title={EMPTY_STATES.noCustomer.title}
+          message={EMPTY_STATES.noCustomer.message}
+          className={CARD_STYLES.base}
+        />
+      </div>
+    );
+  }
+
+
+
+
+  const handleInvoiceClose = () => {
+    setShowInvoiceModal(!showInvoiceModal);
+  };
+  const handleCloseModal = () => {
+    setShowModal(!showModal);
+  };
+  const handleView = (order: IFetchOrder) => {
+    setShowModal(true);
+    setSelectedOrder(order);
+  };
+
+
+
+
+
+  const fla = selectedOrder
+    ? selectedOrder?.orderedProducts.map((item) => ({
+        // name: item?.product?.name || "name",
+        name: "Name",
+        // image:
+        //   (item?.product?.images?.length > 0 && item?.product.images[0]) ||
+        //   "/sdfsdf",
+        image: "/sdfsdf",
+        price: item.selectedVariant.price,
+        quantity: item.selectedVariant.quantity,
+        totalPrice: item.selectedVariant.quantity * item.selectedVariant.price,
+      }))
+    : [];
+
+ 
   return (
-    <div className="container mx-auto px-4 py-3">
-      <div className="flex items-center justify-between mb-2 ">
+    <div className="container mx-auto">
+      <div className="flex items-center justify-between">
         <Header text="Customer Details" />
         <Breadcrumbs />
       </div>
 
-      <div className="bg-[#ffffff] shadow-lg rounded-xl h-full w-full pb-4     ">
-        <div className="flex items-center justify-between mx-6 py-6">
-          <div className="flex items-center gap-3">
-            {/* <img src={customer?.image} /> */}
-            <img
-              src={
-                customer?.image || "https://via.placeholder.com/150?text=User"
-              }
-              alt={customer?.name || "Customer"}
-              // className="w-16 h-16 rounded-full object-cover"
-            />
-            <div className="flex flex-col ">
-              <h1 className="font-semibold text-2xl">{customer?.name} </h1>
-              <div className="flex items-center gap-4 my-2">
-                <div className="flex items-center gap-2">
-                  <Icon
-                    icon="mdi:home-location"
-                    width="24"
-                    height="24"
-                    className="text-[#060606]"
-                  />
-                  <p className="text-[#7d7a89] font-semibold">
-                    {customer?.address}
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <Icon icon="mdi-light:phone" width="24" height="24" />
-                  <p className="text-[#7d7a89] font-semibold">
-                    +977-{customer?.phone}
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <Icon icon="ic:outline-mail" width="24" height="24" />
-                  <p className="text-[#7d7a89] font-semibold">
-                    {customer?.email}
-                  </p>
-                </div>
+      {/* Customer Header - More Compact */}
+      <div className={`${CARD_STYLES.base} mb-6`}>
+        <div className="flex items-center gap-4 p-4">
+          <img
+            src={customer.image || "/no-image.png"}
+            alt={customer.name || "Customer"}
+            className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
+          />
+          <div className="flex-1">
+            <h1 className="font-semibold text-xl mb-2">{customer.name}</h1>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
+              <div className="flex items-center gap-2">
+                <Icon icon="mdi:home-location" className="w-4 h-4 text-gray-500" />
+                <span className="text-gray-600">{customer.address || "N/A"}</span>
               </div>
-              <div>
-                <h1>Registered on {customer?.joinDate}</h1>
+              <div className="flex items-center gap-2">
+                <Icon icon="mdi-light:phone" className="w-4 h-4 text-gray-500" />
+                <span className="text-gray-600">
+                  {customer.phone ? `+977-${customer.phone}` : "N/A"}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Icon icon="ic:outline-mail" className="w-4 h-4 text-gray-500" />
+                <span className="text-gray-600">{customer.email || "N/A"}</span>
               </div>
             </div>
+            {customer.joinDate && (
+              <p className="text-xs text-gray-500 mt-2">
+                Registered on {dayjs(customer.joinDate).format("DD MMM YYYY")}
+              </p>
+            )}
           </div>
-
-          {/* <button className="flex items-center gap-2 rounded-lg border-[#b8c5d2] border-2 px-3 py-2 mb-[4rem]">
-            <Icon
-              icon="material-symbols-light:edit-square-outline"
-              width="24"
-              height="24"
-            />
-            <h1>Edit</h1>
-          </button> */}
         </div>
       </div>
 
-      <div className="grid grid-cols-12 gap-4 my-[2rem] ">
-        {/* Order History Table – col-span-3 */}
-        <div className="col-span-8 lg:col-span-8 rounded-xl bg-white border-2  border-[#d5d9e4] ">
-          {ordersLoading && <div>Loading... </div>}
-          <SimpleTable
-            title="Order History"
-            data={orders || []}
-            titlePosition="justify-center"
-            showSerialNumber={true}
-            columns={[
-              {
-                header: "Order Date",
-                key: "createdAt",
-                render: (_, row) => (
-                  <div>
-                    {dayjs(row.createdAt).format("DD MMM YYYY, hh:mm A")}
-                  </div>
-                ),
-              },
-              { key: "totalAmount", header: "Total Price" },
-              {
-                header: "Total Price",
-                key: "totalAmount",
-                render: (_, row) => <div>$ {row.totalAmount}</div>,
-              },
-              {
-                key: "orderStatus",
-                header: "Status",
-                render: (value: string) => {
-                  return (
-                    <span
-                      className={`px-3 py-[6px] rounded-full text-xs ${getStatusColor(
-                        value
-                      )}`}
-                    >
-                      {value}
-                    </span>
-                  );
-                },
-              },
-            ]}
-            onView={handleView}
-            viewAllButton={
-              <Link
-                to={FrontendRoutes.ORDER}
-                className="bg-white border-2 border-[#F1D097] text-[#F1D097] px-2 py-[3px] rounded-md lg:text-base md:text-sm text-xs hover:bg-[#F1D097] hover:text-white transition-colors"
-              >
-                View All
-              </Link>
-            }
-          />
+      {/* Main Content Grid - More Compact */}
+      <div className="grid grid-cols-12 gap-4">
+        {/* Order History Table */}
+        <div className="col-span-12 lg:col-span-8">
+          <div className={CARD_STYLES.base}>
+            {ordersLoading ? (
+              <LoadingState message="Loading orders..." />
+            ) : ordersError ? (
+              <EmptyState
+                icon="mdi:alert-circle"
+                title="Error Loading Orders"
+                message="There was an error loading the order history. Please try again."
+              />
+            ) : orders.length === 0 ? (
+              <EmptyState
+                icon={EMPTY_STATES.noOrders.icon}
+                title={EMPTY_STATES.noOrders.title}
+                message={EMPTY_STATES.noOrders.message}
+              />
+            ) : (
+              <SimpleTable
+                title="Order History"
+                data={orders}
+                titlePosition="justify-center"
+                showSerialNumber={true}
+                columns={[
+                  {
+                    header: "Order Date",
+                    key: "createdAt",
+                    render: (_, row) => (
+                      <div className="text-sm">
+                        {dayjs(row.createdAt).format("DD MMM YYYY")}
+                        <div className="text-xs text-gray-500">
+                          {dayjs(row.createdAt).format("hh:mm A")}
+                        </div>
+                      </div>
+                    ),
+                  },
+                  {
+                    header: "Total Amount",
+                    key: "totalAmount",
+                    render: (_, row) => (
+                      <div className="font-semibold">$ {row.totalAmount}</div>
+                    ),
+                  },
+                  {
+                    key: "orderStatus",
+                    header: "Status",
+                    render: (value: string) => (
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                          value
+                        )}`}
+                      >
+                        {value}
+                      </span>
+                    ),
+                  },
+                ]}
+                onView={handleView}
+                viewAllButton={
+                  <Link
+                    to={FrontendRoutes.ORDER}
+                    className="bg-white border-2 border-[#F1D097] text-[#F1D097] px-3 py-1 rounded-md text-sm hover:bg-[#F1D097] hover:text-white transition-colors"
+                  >
+                    View All Orders
+                  </Link>
+                }
+              />
+            )}
+          </div>
         </div>
 
-        <div className="col-span-4 lg:col-span-4 space-y-8   ">
-          <div className="bg-white border-2 rounded-xl border-[#d5d9e4]">
+        {/* Customer Information Sidebar - More Compact */}
+        <div className="col-span-12 lg:col-span-4 space-y-4">
+          <div className={CARD_STYLES.base}>
             <InfoSection
-              title="Shipping Information"
+              title="Contact Information"
               info={shippingInformation}
               showEdit={false}
               onEditClick={() => console.log("Edit clicked")}
             />
           </div>
 
-          <div className="bg-white border-2 rounded-xl border-[#d5d9e4]">
-            <InfoSection
-              title="Billing Address"
-              info={billingAddress}
-              showEdit={false}
-              onEditClick={() => console.log("Edit clicked")}
-            />
+          {selectedOrder && (
+            <div className={CARD_STYLES.base}>
+              <InfoSection
+                title="Billing Address"
+                info={billingAddress}
+                showEdit={false}
+                onEditClick={() => console.log("Edit clicked")}
+              />
+            </div>
+          )}
+
+          {/* Order Summary Card */}
+          <div className={CARD_STYLES.base}>
+            <div className="p-4">
+              <h3 className="text-lg font-semibold mb-3">Order Summary</h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Total Orders:</span>
+                  <span className="font-semibold">{orders.length}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Total Spent:</span>
+                  <span className="font-semibold">
+                    $ {orders.reduce((sum, order) => sum + (order.totalAmount || 0), 0).toFixed(2)}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Average Order:</span>
+                  <span className="font-semibold">
+                    $ {orders.length > 0
+                      ? (orders.reduce((sum, order) => sum + (order.totalAmount || 0), 0) / orders.length).toFixed(2)
+                      : "0.00"
+                    }
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
-          {/*
-          <InfoCard
-            className="bg-white border border-[#d5d9e2] rounded-lg h-full "
-            title="Address Book"
-            entries={[
-              {
-                label: "Home",
-                address: customer?.address,
-                phone: `+977-${customer?.phone}`,
-              },
-              {
-                label: "Work",
-                address: "123 Main Street, NYC NY 10001",
-                phone: "+977-1234567890",
-              },
-            ]}
-          />
-          <InfoCard
-            title="Account Information"
-            entries={[
-              {
-                username: customer?.email,
-              },
-            ]}
-          /> */}
         </div>
       </div>
 
@@ -555,7 +479,7 @@ const CustomerDetails = () => {
                         {
                           header: "Item Name",
                           key: "name",
-                          render: (_: any, row) => (
+                          render: (_: unknown, row: any) => (
                             <div className="flex items-center justify-center">
                               <img
                                 src={row.image}

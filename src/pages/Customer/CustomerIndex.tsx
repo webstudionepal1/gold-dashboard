@@ -196,7 +196,7 @@ const CustomerIndex = () => {
   ];
 
   return (
-    <div className="container px-4 py-3 mx-auto ">
+    <div className="container mx-auto ">
       <Header text="Customer List" />
 
       <MasterTable

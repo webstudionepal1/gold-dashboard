@@ -14,13 +14,42 @@ export interface IParams {
   [key: string]: any;
 }
 
-// Get all blogs with pagination and filters
+// Get all blogs with pagination and filters using search endpoint
 export const useGetAllBlogsQuery = (params: IBlogSearchParams = {}) => {
   return useQuery({
     queryKey: ["blogs", params],
     queryFn: async () => {
-      const res = await apiClient.get<{ data: IBlogListResponse }>("blog", {
-        params,
+      // Convert frontend params to backend search params
+      const searchParams: any = {
+        page: params.page || 1,
+        limit: params.limit || 12,
+        sortBy: params.sortBy || "createdAt",
+        sortOrder: params.sortOrder || "desc",
+      };
+
+      // Map search query
+      if (params.search) {
+        searchParams.q = params.search;
+      }
+
+      // Map status filter
+      if (params.status) {
+        searchParams.status = params.status;
+      }
+
+      // Map featured filter
+      if (params.featured !== undefined) {
+        searchParams.featured = params.featured.toString();
+      }
+
+      // For admin dashboard, we want to see all statuses, not just published
+      // Remove the default status filter for admin users
+      if (!searchParams.status) {
+        delete searchParams.status;
+      }
+
+      const res = await apiClient.get<{ data: IBlogListResponse }>("blog/search", {
+        params: searchParams,
       });
       return res?.data?.data;
     },
@@ -133,9 +162,6 @@ export const useCreateBlogMutation = () => {
   return useMutation({
     mutationKey: ["create-blog"],
     mutationFn: async (blogData: FormData) => {
-      console.log("🌐 Making API call to create blog...");
-      console.log("📍 Endpoint: POST /blog");
-      console.log("🔗 Full URL:", `${apiClient.defaults.baseURL}/blog`);
 
       const res = await apiClient.post("blog", blogData, {
         headers: {
@@ -143,11 +169,6 @@ export const useCreateBlogMutation = () => {
         },
       });
 
-      console.log("✅ API response received:");
-      console.log("  Status:", res.status);
-      console.log("  Success:", res.data?.success);
-      console.log("  Message:", res.data?.message);
-      console.log("  Data:", res.data?.data);
 
       if (!res.data?.success) {
         throw new Error(res.data?.message || "Failed to create blog");
@@ -162,11 +183,6 @@ export const useCreateBlogMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["blog-analytics"] });
     },
     onError: (error: any) => {
-      console.error("❌ Blog creation failed:");
-      console.error("  Error:", error);
-      console.error("  Response:", error?.response);
-      console.error("  Status:", error?.response?.status);
-      console.error("  Data:", error?.response?.data);
 
       let errorMessage = "Error creating blog";
 

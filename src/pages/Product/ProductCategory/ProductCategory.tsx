@@ -50,7 +50,9 @@ const ProductCategory: React.FC = () => {
             rawDescription: get(item, "description", ""),
             description: (
               <p className=" truncate max-w-xl">
-                {get(item, "description", "")}
+                {get(item, "description", "") !== ""
+                  ? get(item, "description")
+                  : "-"}
               </p>
             ),
             totalProducts: get(item, "totalProducts", 0),
@@ -69,9 +71,9 @@ const ProductCategory: React.FC = () => {
               editData: null,
             });
           }}
-          className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-sm text-white px-4 py-2 flex rounded-lg transition-colors duration-200"
+          className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-sm text-white px-4 gap-1 py-2 flex rounded-lg transition-colors duration-200"
         >
-          <Icon icon="ic:outline-add" fontSize={24} />
+          <Icon icon="ic:outline-add" fontSize={18} />
           New Category
         </button>
       </Header>

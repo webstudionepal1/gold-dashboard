@@ -29,12 +29,12 @@ const BlogList: React.FC = () => {
     sortOrder: "desc",
   });
 
-  // API hooks
+  // API hooks - now using search endpoint with parameters
   const { data: blogData, isLoading } = useGetAllBlogsQuery(searchParams);
   const { mutate: deleteBlog } = useDeleteBlogMutation();
   const { mutate: toggleFeatured } = useToggleFeaturedMutation();
 
-  // Filter and sort options
+  // Filter and sort options for advanced search
   const filterOptions = [
     { value: "", label: "All Status" },
     { value: "draft", label: "Draft" },
@@ -45,10 +45,14 @@ const BlogList: React.FC = () => {
   const sortOptions = [
     { value: "createdAt-desc", label: "Newest First" },
     { value: "createdAt-asc", label: "Oldest First" },
+    { value: "publishedAt-desc", label: "Recently Published" },
+    { value: "publishedAt-asc", label: "Oldest Published" },
     { value: "title-asc", label: "Title A-Z" },
     { value: "title-desc", label: "Title Z-A" },
     { value: "views-desc", label: "Most Viewed" },
+    { value: "views-asc", label: "Least Viewed" },
     { value: "likes-desc", label: "Most Liked" },
+    { value: "likes-asc", label: "Least Liked" },
   ];
 
   // Event handlers
@@ -63,7 +67,7 @@ const BlogList: React.FC = () => {
   const handleFilter = useCallback((filter: string) => {
     setSearchParams((prev) => ({
       ...prev,
-      status: filter as any,
+      status: filter ? (filter as "draft" | "published" | "archived") : undefined,
       page: 1,
     }));
   }, []);
@@ -290,11 +294,43 @@ const BlogList: React.FC = () => {
             onSort={handleSort}
             filterOptions={filterOptions}
             sortOptions={sortOptions}
-            placeholder="Search blogs..."
+            placeholder="Search blogs by title, content, tags, or categories..."
             showFilter={true}
             showSort={true}
             showView={false}
           />
+
+          {/* Additional Filters */}
+          <div className="flex items-center gap-4 mt-4">
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="featured-filter"
+                checked={searchParams.featured === true}
+                onChange={(e) => {
+                  setSearchParams((prev) => ({
+                    ...prev,
+                    featured: e.target.checked ? true : undefined,
+                    page: 1,
+                  }));
+                }}
+                className="w-4 h-4 text-customorange bg-gray-100 border-gray-300 rounded focus:ring-customorange focus:ring-2"
+              />
+              <label htmlFor="featured-filter" className="text-sm font-medium text-gray-700">
+                Featured Only
+              </label>
+            </div>
+
+            {/* Search Results Info */}
+            {blogData && (
+              <div className="text-sm text-gray-500 ml-auto">
+                {blogData.pagination.totalBlogs} blog{blogData.pagination.totalBlogs !== 1 ? 's' : ''} found
+                {searchParams.search && (
+                  <span> for "{searchParams.search}"</span>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Loading State */}
