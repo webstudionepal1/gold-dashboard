@@ -5,22 +5,26 @@ import { Modal } from "../../../../components/shared";
 import {
   useCreateProductCategoriesMutation,
   useUpdateProductCategoriesMutation,
+  IFetchCategory,
 } from "../../../../server/api/productHooks";
 import { z } from "zod";
 import { FieldError } from "../../../auth/LoginPage";
+import FileDropInput from "../../../../components/shared/form_components/FileDropInput";
 interface propTypes {
   modalRef: React.RefObject<HTMLDivElement | null>;
-  editData?: any;
+  editData?: IFetchCategory & { rawDescription?: string; image?: string };
   closeModal: () => void;
 }
 
 const schema = z.object({
   name: z.string().min(1, "**Name is required"),
   description: z.string().max(500, "**Description must be less than 500 characters").optional(),
+  image: z.instanceof(File).nullable().optional(),
 });
 interface ICategoryValue {
   name: string;
   description?: string;
+  image?: File | null;
 }
 const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
   const { mutate: createCategory, isSuccess: createSuccess } =
@@ -31,6 +35,7 @@ const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
     defaultValues: {
       name: editData ? get(editData, "name", "") : "",
       description: editData ? get(editData, "rawDescription", "") : "",
+      image: null,
     } as ICategoryValue,
     validators: {
       onChange: schema,
@@ -39,8 +44,26 @@ const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
     },
 
     onSubmit: async ({ value }) => {
-      if (editData) updateCategory({ id: editData._id, body: value });
-      else createCategory(value);
+      // Create FormData if there's an image, otherwise send regular JSON
+      if (value.image) {
+        const formData = new FormData();
+        formData.append("name", value.name);
+        if (value.description) {
+          formData.append("description", value.description);
+        }
+        formData.append("image", value.image);
+
+        if (editData) updateCategory({ id: editData._id, body: formData });
+        else createCategory(formData);
+      } else {
+        // Send regular JSON data when no image
+        const jsonData = {
+          name: value.name,
+          description: value.description,
+        };
+        if (editData) updateCategory({ id: editData._id, body: jsonData });
+        else createCategory(jsonData);
+      }
     },
   });
 
@@ -92,7 +115,7 @@ const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
               <div>
                 <div className="flex flex-col">
                   <label className="mb-1 text-sm font-medium text-gray-700">
-                    Description <span className="text-red">*</span>
+                    Description 
                   </label>
                   <textarea
                     placeholder="Enter short description"
@@ -103,12 +126,33 @@ const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
                     maxLength={500}
                   />
                   <div className="flex justify-between items-center mt-1">
-                    <div></div>
                     <span className={`text-xs ${(field.state.value?.length || 0) > 450 ? 'text-red-500' : 'text-gray-500'}`}>
                       {field.state.value?.length || 0}/500
                     </span>
                   </div>
                 </div>
+                <FieldError field={field} />
+              </div>
+            )}
+          </form.Field>
+
+          <form.Field name="image">
+            {(field) => (
+              <div>
+                <label className="block mb-1 text-sm font-medium text-gray-700">
+                  Category Image
+                </label>
+                <FileDropInput
+                  multiple={false}
+                  label=""
+                  value={field.state.value || null}
+                  onChange={(file: File | null) => field.handleChange(file)}
+                  existingImageUrl={editData?.image}
+                  accept={{
+                    "image/*": [".png", ".jpg", ".jpeg", ".svg", ".webp"],
+                  }}
+                  placeholder="Upload category image (optional)"
+                />
                 <FieldError field={field} />
               </div>
             )}
