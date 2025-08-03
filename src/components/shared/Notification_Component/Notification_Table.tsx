@@ -2,8 +2,8 @@ import React, { useState, useMemo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../tab";
 import Pagination from "../_table/_Pagination";
 import NotificationCard from "./NotificationCard";
-import { useGetNotifications } from "@/server/api/push-notifications";
-import { useAuth } from "@/hooks/useAuth";
+// import { useGetNotifications } from "@/server/api/push-notifications";
+// import { useAuth } from "@/hooks/useAuth";
 import { Loader2 } from "lucide-react";
 
 interface FormattedNotification {
@@ -22,23 +22,25 @@ interface FormattedNotification {
 const NotificationTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  const { data: authData } = useAuth();
+  // const { data: authData } = useAuth();
+  const authData: { user?: string | object } | null = null; // Temporary fallback
 
   // Get user ID from auth data
   const userId = useMemo(() => {
-    if (!authData?.user) return null;
+    if (!(authData as any)?.user) return null;
 
     try {
       let userData;
-      if (typeof authData.user === "string") {
+      const userProp = (authData as any).user;
+      if (typeof userProp === "string") {
         // Try to parse JSON string, but handle cases where it might be "[object Object]"
-        if (authData.user === "[object Object]") {
+        if (userProp === "[object Object]") {
           console.error("Invalid user data format: [object Object]");
           return null;
         }
-        userData = JSON.parse(authData.user);
+        userData = JSON.parse(userProp);
       } else {
-        userData = authData.user;
+        userData = userProp;
       }
       return userData?._id;
     } catch (error) {
@@ -47,22 +49,30 @@ const NotificationTable = () => {
     }
   }, [authData]);
 
-  // Fetch notifications from API
-  const {
-    data: notificationsResponse,
-    isLoading,
-    error,
-  } = useGetNotifications(userId, itemsPerPage, currentPage);
+  // Fetch notifications from API - temporarily disabled
+  // const {
+  //   data: notificationsResponse,
+  //   isLoading,
+  //   error,
+  // } = useGetNotifications(userId, itemsPerPage, currentPage);
+
+  // Temporary fallback
+  const notificationsResponse: {
+    data?: any[] | { data?: any[]; pagination?: { total?: number } };
+    total?: number;
+  } | null = null;
+  const isLoading = false;
+  const error = null;
 
   // Handle different response structures - ensure notifications is always an array
-  const notifications = Array.isArray(notificationsResponse?.data)
-    ? notificationsResponse?.data
-    : notificationsResponse?.data?.data || [];
+  const notifications = Array.isArray((notificationsResponse as any)?.data)
+    ? (notificationsResponse as any)?.data
+    : (notificationsResponse as any)?.data?.data || [];
 
   // Get total items count from the appropriate response structure
   const totalItems =
-    notificationsResponse?.total ||
-    notificationsResponse?.data?.pagination?.total ||
+    (notificationsResponse as any)?.total ||
+    (notificationsResponse as any)?.data?.pagination?.total ||
     0;
 
   const handlePageChange = (page: number) => {

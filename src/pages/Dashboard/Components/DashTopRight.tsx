@@ -6,6 +6,10 @@ import TopCustomer from "../../../assets/images/TopCustomers1.png";
 import Marquee from "react-fast-marquee";
 import { DashboardData } from "../../../server/api/dashboardHooks";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import {
+  convertGramToTola,
+  formatPrice,
+} from "../../../utils/priceConversions";
 
 interface DashTopRightProps {
   dashboardData: DashboardData;
@@ -87,54 +91,60 @@ const DashTopRight = ({ dashboardData }: DashTopRightProps) => {
   };
 
   // Map price list data from API and add metal prices if available
-  const metalPricesData =
-    dashboardData.metalPrices &&
-    dashboardData.metalPrices.goldPrice &&
-    dashboardData.metalPrices.silverPrice
-      ? [
-          {
-            img: PriceList1, // Gold icon
-            price: (
-              <div className="flex flex-col">
-                <div className="font-bold">
-                  ${dashboardData.metalPrices.goldPrice.pricePerGram.toFixed(3)}{" "}
-                  / g
-                </div>
-                <div>
-                  $
-                  {dashboardData.metalPrices.goldPrice.pricePerOunce.toFixed(3)}{" "}
-                  / oz
-                </div>
+  const metalPricesData = dashboardData.metalPrices
+    ? [
+        {
+          img: PriceList1, // Gold icon
+          price: (
+            <div className="flex flex-col">
+              <div className="font-bold text-lg">
+                {formatPrice(
+                  convertGramToTola(
+                    dashboardData.metalPrices.goldPrice.pricePerGram
+                  ),
+                  dashboardData.metalPrices.goldPrice.currency || "NPR"
+                )}{" "}
+                / tola
               </div>
-            ),
-            title: "Gold Price",
-            bgColor: "bg-[#FCF6EA]",
-          },
-          {
-            img: PriceList1, // Silver icon
-            price: (
-              <div className="flex flex-col">
-                <div className="font-bold">
-                  $
-                  {dashboardData.metalPrices.silverPrice.pricePerGram.toFixed(
-                    3
-                  )}{" "}
-                  / g
-                </div>
-                <div>
-                  $
-                  {dashboardData.metalPrices.silverPrice.pricePerOunce.toFixed(
-                    3
-                  )}{" "}
-                  / oz
-                </div>
+              <div className="text-sm text-gray-600">
+                {formatPrice(
+                  dashboardData.metalPrices.goldPrice.pricePerGram,
+                  dashboardData.metalPrices.goldPrice.currency || "NPR"
+                )}{" "}
+                / g
               </div>
-            ),
-            title: "Silver Price",
-            bgColor: "bg-[#ECEEF2]",
-          },
-        ]
-      : [];
+            </div>
+          ),
+          title: "Gold Price (24k)",
+          bgColor: "bg-[#FCF6EA]",
+        },
+        {
+          img: PriceList1, // Silver icon
+          price: (
+            <div className="flex flex-col">
+              <div className="font-bold text-lg">
+                {formatPrice(
+                  convertGramToTola(
+                    dashboardData.metalPrices.silverPrice.pricePerGram
+                  ),
+                  dashboardData.metalPrices.silverPrice.currency || "NPR"
+                )}{" "}
+                / tola
+              </div>
+              <div className="text-sm text-gray-600">
+                {formatPrice(
+                  dashboardData.metalPrices.silverPrice.pricePerGram,
+                  dashboardData.metalPrices.silverPrice.currency || "NPR"
+                )}{" "}
+                / g
+              </div>
+            </div>
+          ),
+          title: "Silver Price",
+          bgColor: "bg-[#ECEEF2]",
+        },
+      ]
+    : [];
 
   // Define the interface for price data items
   interface PriceDataItem {

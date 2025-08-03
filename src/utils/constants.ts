@@ -1,3 +1,4 @@
 export const Constants = {
-  currency: "RS",
+  currency: "NPR",
+  currencySymbol: "Rs",
 };

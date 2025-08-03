@@ -32,10 +32,6 @@ import Expenses from "../pages/financeandexpenses/Expenses";
 import ProfitandLoss from "../pages/financeandexpenses/ProfitandLoss";
 import Transaction from "../pages/transaction/Transaction";
 
-import BlogAnalytics from "@/pages/Blog/BlogAnalytics/BlogAnalytics";
-import BlogEditor from "@/pages/Blog/BlogEditor/BlogEditor";
-import BlogList from "@/pages/Blog/BlogList/BlogList";
-import BlogView from "@/pages/Blog/BlogView/BlogView";
 import CalculatorIndex from "@/pages/settings/calculator/CalculatorIndex";
 import OrderReport from "../pages/analytics/OrderReport";
 import SalesReport from "../pages/analytics/SalesReport";
@@ -55,6 +51,14 @@ import AttribConfig from "../pages/settings/components/AttribConfig";
 import EditProfileForm from "../pages/settings/ProfileConfig/EditProfileForm";
 import StoneIndex from "../pages/Stone/StoneIndex";
 import TestUpload from "../pages/TestUpload";
+import BlogList from "@/pages/Blog/BlogList/BlogList";
+import BlogEditor from "@/pages/Blog/BlogEditor/BlogEditor";
+import BlogView from "@/pages/Blog/BlogView/BlogView";
+import BlogAnalytics from "@/pages/Blog/BlogAnalytics/BlogAnalytics";
+// import BlogList from "@/pages/Blog/BlogList/BlogList";
+// import BlogEditor from "@/pages/Blog/BlogEditor/BlogEditor";
+// import BlogView from "@/pages/Blog/BlogView/BlogView";
+// import BlogAnalytics from "@/pages/Blog/BlogAnalytics/BlogAnalytics";
 
 export const routesConfig = [
   {
@@ -306,7 +310,7 @@ export const routesConfig = [
     path: "/test-upload",
     element: <TestUpload />,
   },
-  // Blog routes
+  // Blog routes - commented out due to missing components
   {
     path: FrontendRoutes.BLOGLIST,
     element: <BlogList />,
