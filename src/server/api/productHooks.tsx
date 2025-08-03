@@ -23,6 +23,7 @@ export interface IProductCategory {
   _id?: string;
   name?: string;
   description?: string;
+  image?: string;
   totalProducts?: number;
   isActive?: boolean;
   subCategory?: IProductCategory[];
@@ -260,8 +261,11 @@ export const useCreateProductCategoriesMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ["category"],
-    mutationFn: async (body: IProductCategory) => {
-      const res = await apiClient.post("category", body);
+    mutationFn: async (body: IProductCategory | FormData) => {
+      const isFormData = body instanceof FormData;
+      const res = await apiClient.post("category", body, {
+        headers: isFormData ? { "Content-Type": "multipart/form-data" } : {},
+      });
       return res?.data?.data;
     },
     onSuccess() {
@@ -282,9 +286,12 @@ export const useUpdateProductCategoriesMutation = () => {
       body,
     }: {
       id: string | undefined;
-      body: IProductCategory;
+      body: IProductCategory | FormData;
     }) => {
-      const res = await apiClient.patch(`category/${id}`, body);
+      const isFormData = body instanceof FormData;
+      const res = await apiClient.patch(`category/${id}`, body, {
+        headers: isFormData ? { "Content-Type": "multipart/form-data" } : {},
+      });
       return res?.data?.data;
     },
     onSuccess() {

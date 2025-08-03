@@ -16,7 +16,7 @@ import ViewProductCategory from "./components/ViewProductCategory";
 
 interface IEditModal {
   state: boolean;
-  editData?: IFetchCategory | null;
+  editData?: (IFetchCategory & { rawDescription?: string; image?: string }) | null;
 }
 const ProductCategory: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<IEditModal>({
@@ -94,7 +94,7 @@ const ProductCategory: React.FC = () => {
         <AddProductCategory
           modalRef={modalRef}
           closeModal={() => setIsModalOpen({ state: false, editData: null })}
-          editData={isModalOpen.editData}
+          editData={isModalOpen.editData ?? undefined}
         />
       )}
       {isViewModalOpen.state && (
