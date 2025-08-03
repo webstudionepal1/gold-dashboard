@@ -206,6 +206,11 @@ export const SidebarConfig = {
               path: "/settings/attribute-config",
               title: "Attribute config",
             },
+            {
+              id:109,
+              path: "/settings/calculator",
+              title: "Calculator",
+            }
           ],
         },
         {

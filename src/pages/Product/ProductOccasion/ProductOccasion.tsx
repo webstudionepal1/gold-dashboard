@@ -42,7 +42,7 @@ const ProductOccasion: React.FC = () => {
             <img
               src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${item.image.length > 0 ? item.image[0] : '/no-image.png'}`}
               alt={item.name}
-              className="w-12 h-12 object-cover rounded"
+              className="w-12 h-12 mx-auto object-cover rounded"
             />
           ) : (
             <span className="text-gray-400">No image</span>

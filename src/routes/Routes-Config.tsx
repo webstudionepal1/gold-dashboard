@@ -1,4 +1,3 @@
-import { LoginPage } from "../pages";
 
 import { DashboardPage } from "../pages/Dashboard/Dashboard";
 
@@ -8,57 +7,54 @@ import { NotFoundPage } from "../pages/NotFound/NotFound";
 import AssignedOrders from "../pages/OrderManagement/AssignedOrder/AssignedOrder";
 import CancelledOrder from "../pages/OrderManagement/CancelledOrder/CancelledOrder";
 import CompletedOrder from "../pages/OrderManagement/CompletedOrder/CompletedOrder";
-import { FrontendRoutes } from "./routes";
+import ProductCategory from "../pages/Product/ProductCategory/ProductCategory";
 import ProductDescription from "../pages/Product/ProductList/[id]/ProdectDescription";
 import ProductList from "../pages/Product/ProductList/ProductList";
-import ProductCategory from "../pages/Product/ProductCategory/ProductCategory";
 import Productsubcategory from "../pages/Product/ProductSubcategory/ProductSubCategory";
+import { FrontendRoutes } from "./routes";
 
-import BannerIndex from "../pages/Banner/BannerIndex";
-import NotificationIndex from "../pages/Notification/NotificationIndex";
-import NotificationTest from "../components/test/NotificationTest";
 import NotificationAdminPanel from "../components/admin/NotificationAdminPanel";
-import MyPostBusinessIndex from "../pages/MyPostBusiness/MyPostBusinessIndex";
-import ConfirmedOrder from "../pages/OrderManagement/ConfirmedOrder/ConfirmedOrder";
-import OrderIndex from "../pages/OrderManagement/Order/OrderIndex";
-import AddOrderForm from "../pages/OrderManagement/Order/components/AddOrderPage";
+import NotificationTest from "../components/test/NotificationTest";
+import BannerIndex from "../pages/Banner/BannerIndex";
 import AddBannerForm from "../pages/Banner/Components/AddBannerForm";
 import CollectionIndex from "../pages/Collection/CollectionIndex";
-import CollectionForm from "../pages/Collection/components/CollectionForm";
 import CollectionDetails from "../pages/Collection/components/CollectionDetails";
+import NotificationIndex from "../pages/Notification/NotificationIndex";
+import ConfirmedOrder from "../pages/OrderManagement/ConfirmedOrder/ConfirmedOrder";
+import AddOrderForm from "../pages/OrderManagement/Order/components/AddOrderPage";
+import OrderIndex from "../pages/OrderManagement/Order/OrderIndex";
 
 import NewCollectionForm from "../pages/Collection/components/NewCollectionForm";
 import CustomerIndex from "../pages/Customer/CustomerIndex";
 // import AddCustomerForm from "../pages/Customer/components/AddCustomerForm";
-import Transaction from "../pages/transaction/Transaction";
-import VerifyCashPayment from "../pages/transaction/VerifyCashPayment";
-import Expenses from "../pages/financeandexpenses/Expenses";
 import Cashflow from "../pages/financeandexpenses/Cashflow";
+import Expenses from "../pages/financeandexpenses/Expenses";
 import ProfitandLoss from "../pages/financeandexpenses/ProfitandLoss";
+import Transaction from "../pages/transaction/Transaction";
 
+import BlogAnalytics from "@/pages/Blog/BlogAnalytics/BlogAnalytics";
+import BlogEditor from "@/pages/Blog/BlogEditor/BlogEditor";
+import BlogList from "@/pages/Blog/BlogList/BlogList";
+import BlogView from "@/pages/Blog/BlogView/BlogView";
+import CalculatorIndex from "@/pages/settings/calculator/CalculatorIndex";
 import OrderReport from "../pages/analytics/OrderReport";
 import SalesReport from "../pages/analytics/SalesReport";
 import StoreReport from "../pages/analytics/StockReport";
-import ProductForm from "../pages/Product/ProductList/component/ProductForm";
-import NewProductForm from "../pages/Product/components/NewProductForm";
 import CustomerDetails from "../pages/Customer/components/CustomerDetails";
-import OrderDetails from "../pages/OrderManagement/Order/OrderDetails";
 import InventoryIndex from "../pages/Inventory/InventoryIndex";
-import PurchaseIndex from "../pages/PurchaseManagement/PurchaseIndex";
+import OrderDetails from "../pages/OrderManagement/Order/OrderDetails";
+import NewProductForm from "../pages/Product/components/NewProductForm";
+import ProductImageDemo from "../pages/Product/ProductImageDemo";
+import ProductForm from "../pages/Product/ProductList/component/ProductForm";
+import ProductOccasion from "../pages/Product/ProductOccasion/ProductOccasion";
 import AddSupplierForm from "../pages/PurchaseManagement/components/AddSupplierForm";
 import SupplierDetail from "../pages/PurchaseManagement/pages/SupplierDetail";
 import SupplierHistory from "../pages/PurchaseManagement/pages/SupplierHistory";
+import PurchaseIndex from "../pages/PurchaseManagement/PurchaseIndex";
 import AttribConfig from "../pages/settings/components/AttribConfig";
 import EditProfileForm from "../pages/settings/ProfileConfig/EditProfileForm";
-import ProductOccasion from "../pages/Product/ProductOccasion/ProductOccasion";
 import StoneIndex from "../pages/Stone/StoneIndex";
 import TestUpload from "../pages/TestUpload";
-import { ProductDetails } from "../pages/Product/ProductList/[id]/components/ProductDetails";
-import ProductImageDemo from "../pages/Product/ProductImageDemo";
-import BlogList from "@/pages/Blog/BlogList/BlogList";
-import BlogEditor from "@/pages/Blog/BlogEditor/BlogEditor";
-import BlogView from "@/pages/Blog/BlogView/BlogView";
-import BlogAnalytics from "@/pages/Blog/BlogAnalytics/BlogAnalytics";
 
 export const routesConfig = [
   {
@@ -288,6 +284,10 @@ export const routesConfig = [
   {
     path: "/settings/attribute-config",
     element: <AttribConfig />,
+  },
+  {
+    path: "/settings/calculator",
+    element: <CalculatorIndex />,
   },
   //Analytics
   {
