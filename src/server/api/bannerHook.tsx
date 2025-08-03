@@ -50,7 +50,8 @@ export const useCreateBannerMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["banner"] });
     },
     onError(err: string) {
-      toast.error(err || "Error creating banner");
+      // toast.error(err || "Error creating banner");
+      toast.error("Error creating banner");
     },
   });
 };
@@ -75,7 +76,8 @@ export const useUpdateBannerMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["banner"] });
     },
     onError(err: string) {
-      toast.error(err || "Error creating banners");
+      // toast.error(err || "Error creating banners");
+      toast.error("Error creating banners");
     },
   });
 };
@@ -93,7 +95,8 @@ export const useDeleteBannerMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["banner"] });
     },
     onError(err: string) {
-      toast.error(err || "Error deleting banner");
+      // toast.error(err || "Error deleting banner");
+      toast.error("Error deleting banner");
     },
   });
 };

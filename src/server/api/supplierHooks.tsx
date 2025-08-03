@@ -76,7 +76,8 @@ export const useCreateSupplierMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["supplier"] });
     },
     onError(err: string) {
-      toast.error(err || "Error adding supplier");
+      // toast.error(err || "Error adding supplier");
+      toast.error("Error adding supplier");
     },
   });
 };
@@ -98,7 +99,8 @@ export const useUpdateSupplierMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["supplier"] });
     },
     onError(err: string) {
-      toast.error(err || "Error updating supplier");
+      // toast.error(err || "Error updating supplier");
+      toast.error("Error updating supplier");
     },
   });
 };
@@ -116,7 +118,8 @@ export const useDeleteSupplierMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["supplier"] });
     },
     onError(err: string) {
-      toast.error(err || "Error deleting supplier");
+      // toast.error(err || "Error deleting supplier");
+      toast.error("Error deleting supplier");
     },
   });
 };
