@@ -34,7 +34,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       secondary: "bg-gray-600 hover:bg-gray-700 text-white focus:ring-gray-500/50 shadow-sm hover:shadow-md",
       outline: "border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 focus:ring-gray-500/50 shadow-sm",
       ghost: "bg-transparent hover:bg-gray-100 text-gray-700 focus:ring-gray-500/50",
-      danger: "bg-red-500 hover:bg-red-600 text-white focus:ring-red-500/50 shadow-sm hover:shadow-md",
+      danger: "bg-red hover:bg-red-600 text-white focus:ring-red-500/50 shadow-sm hover:shadow-md",
       success: "bg-green-500 hover:bg-green-600 text-white focus:ring-green-500/50 shadow-sm hover:shadow-md"
     };
     
