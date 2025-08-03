@@ -76,7 +76,8 @@ export const useCreatePurchaseMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["purchases"] });
     },
     onError(err: string) {
-      toast.error(err || "Error creating purchase");
+      // toast.error(err || "Error creating purchase");
+      toast.error("Error creating purchase");
     },
   });
 };
@@ -94,7 +95,8 @@ export const useUpdatePurchaseMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["purchases"] });
     },
     onError(err: string) {
-      toast.error(err || "Error updating purchase");
+      // toast.error(err || "Error updating purchase");
+      toast.error("Error updating purchase");
     },
   });
 };
@@ -112,7 +114,8 @@ export const useDeletePurchaseMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["purchases"] });
     },
     onError(err: string) {
-      toast.error(err || "Error deleting purchase");
+      // toast.error(err || "Error deleting purchase");
+      toast.error("Error deleting purchase");
     },
   });
 };
@@ -147,7 +150,8 @@ export const useCreateRawMaterialMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["rawitem"] });
     },
     onError(err: string) {
-      toast.error(err || "Error creating raw material");
+      // toast.error(err || "Error creating raw material");
+      toast.error("Error creating raw material");
     },
   });
 };
@@ -164,7 +168,8 @@ export const useUpdateRawItemsMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["rawitem"] });
     },
     onError(err: string) {
-      toast.error(err || "Error updating raw material");
+      // toast.error(err || "Error updating raw material");
+      toast.error("Error updating raw material");
     },
   });
 };
@@ -181,7 +186,8 @@ export const useDeleteRawMaterial = () => {
       queryClient.invalidateQueries({ queryKey: ["rawitem"] });
     },
     onError(err: string) {
-      toast.error(err || "Error deleting raw material");
+      // toast.error(err || "Error deleting raw material");
+      toast.error("Error deleting raw material");
     },
   });
 };
@@ -250,7 +256,8 @@ export const useCreatePurchaseReturnMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["purchase/return"] });
     },
     onError(err: string) {
-      toast.error(err || "Error creating purchase return");
+      // toast.error(err || "Error creating purchase return");
+      toast.error("Error creating purchase return");
     },
   });
 };
@@ -268,7 +275,8 @@ export const useUpdatePurchaseReturnMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["purchase-return"] });
     },
     onError(err: string) {
-      toast.error(err || "Error updating purchase return");
+      // toast.error(err || "Error updating purchase return");
+      toast.error("Error updating purchase return");
     },
   });
 };
@@ -286,7 +294,8 @@ export const useDeletePurchasReturnMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["purchase-return"] });
     },
     onError(err: string) {
-      toast.error(err || "Error deleting purchase return");
+      // toast.error(err || "Error deleting purchase return");
+      toast.error("Error deleting purchase return");
     },
   });
 };
