@@ -289,7 +289,8 @@ export const useCreateCollectionMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["collections"] });
     },
     onError(err: any) {
-      toast.error(err?.response?.data?.message || "Error creating collection");
+      // toast.error(err?.response?.data?.message || "Error creating collection");
+      toast.error("Error creating collection");
     },
   });
 };
@@ -312,7 +313,8 @@ export const useUpdateCollectionMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["collections"] });
     },
     onError(err: any) {
-      toast.error(err?.response?.data?.message || "Error updating collection");
+      // toast.error(err?.response?.data?.message || "Error updating collection");
+      toast.error("Error updating collection");
     },
   });
 };
@@ -333,9 +335,10 @@ export const useCalculateCollectionPriceRangeMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["collections"] });
     },
     onError(err: any) {
-      toast.error(
-        err?.response?.data?.message || "Error calculating price range"
-      );
+      // toast.error(
+      //   err?.response?.data?.message || "Error calculating price range"
+      // );
+      toast.error("Error calculating price range");
     },
   });
 };
@@ -354,9 +357,10 @@ export const useCalculateAllCollectionsPriceRangesMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["collections"] });
     },
     onError(err: any) {
-      toast.error(
-        err?.response?.data?.message || "Error calculating price ranges"
-      );
+      // toast.error(
+      //   err?.response?.data?.message || "Error calculating price ranges"
+      // );
+      toast.error("Error calculating price ranges");
     },
   });
 };
@@ -375,7 +379,8 @@ export const useDeleteCollectionMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["collections"] });
     },
     onError(err: any) {
-      toast.error(err?.response?.data?.message || "Error deleting collection");
+      // toast.error(err?.response?.data?.message || "Error deleting collection");
+      toast.error("Error deleting collection");
     },
   });
 };
@@ -394,9 +399,10 @@ export const useUpdateCollectionProductsMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["collections"] });
     },
     onError(err: any) {
-      toast.error(
-        err?.response?.data?.message || "Error updating collection products"
-      );
+      // toast.error(
+      //   err?.response?.data?.message || "Error updating collection products"
+      // );
+      toast.error("Error updating collection products");
     },
   });
 };

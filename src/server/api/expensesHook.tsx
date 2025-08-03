@@ -84,7 +84,8 @@ export const useCreateExpenseMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["expense"] });
     },
     onError(err: string) {
-      toast.error(err || "Error creating expense");
+      // toast.error(err || "Error creating expense");
+      toast.error("Error creating expense");
     },
   });
 };
@@ -102,7 +103,8 @@ export const useCreateExpenseCategoryMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["expense/category"] });
     },
     onError(err: string) {
-      toast.error(err || "Error creating expense category");
+      // toast.error(err || "Error creating expense category");
+      toast.error("Error creating expense category");
     },
   });
 };
@@ -122,7 +124,8 @@ export const useUpdateExpenseMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["expense"] });
     },
     onError(err: string) {
-      toast.error(err || "Error updating Expense");
+      // toast.error(err || "Error updating Expense");
+      toast.error("Error updating Expense");
     },
   });
 };
@@ -140,7 +143,8 @@ export const useUpdateExpenseCategoryMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["expense/category"] });
     },
     onError(err: string) {
-      toast.error(err || "Error updating Expense Category");
+      // toast.error(err || "Error updating Expense Category");
+      toast.error("Error updating Expense Category");
     },
   });
 };
@@ -158,7 +162,8 @@ export const useDeleteExpenseMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["expense"] });
     },
     onError(err: string) {
-      toast.error(err || "Error deleting expense");
+      // toast.error(err || "Error deleting expense");
+      toast.error("Error deleting expense");
     },
   });
 };
@@ -176,7 +181,8 @@ export const useDeleteExpenseCategoryMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["expense/category"] });
     },
     onError(err: string) {
-      toast.error(err || "Error deleting expense category");
+      // toast.error(err || "Error deleting expense category");
+      toast.error("Error deleting expense category");
     },
   });
 };
