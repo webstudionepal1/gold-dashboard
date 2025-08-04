@@ -13,6 +13,7 @@ import {
 import { BasicInformationPage } from "./collection-form-pages/BasicInformationPage";
 import { CollectionPropertiesPage } from "./collection-form-pages/CollectionPropertiesPage";
 import { SmartCollectionRulesPage } from "./collection-form-pages/SmartCollectionRulesPage";
+import { ProductSelectionPage } from "./collection-form-pages/ProductSelectionPage";
 import { MediaAssetsPage } from "./collection-form-pages/MediaAssetsPage";
 
 import { AvailabilityTimingPage } from "./collection-form-pages/AvailabilityTimingPage";
@@ -71,6 +72,36 @@ const MultiPageFormContent: React.FC<{
     markStepIncomplete,
   } = useMultiPageForm();
 
+  // Determine if we should show the product selection step
+  const shouldShowProductSelection = formData.collectionMode === "manual";
+
+  // Dynamic steps based on collection mode
+  const dynamicSteps = useMemo(() => {
+    const baseSteps = [...FORM_STEPS];
+
+    if (shouldShowProductSelection) {
+      // Insert product selection step after collection rules
+      const productSelectionStep: StepperStep = {
+        id: 3.5,
+        title: "Select Products",
+        description: "Choose Products",
+        icon: "material-symbols:inventory-2",
+      };
+
+      // Insert at index 3 (after collection rules)
+      baseSteps.splice(3, 0, productSelectionStep);
+
+      // Update subsequent step IDs
+      baseSteps.forEach((step, index) => {
+        if (index > 3) {
+          step.id = index + 1;
+        }
+      });
+    }
+
+    return baseSteps;
+  }, [shouldShowProductSelection]);
+
   // Update step completion status based on validation
   useEffect(() => {
     const stepValid = isStepValid(currentStep);
@@ -89,13 +120,13 @@ const MultiPageFormContent: React.FC<{
 
   // Enhanced steps with completion and error status
   const enhancedSteps = useMemo(() => {
-    return FORM_STEPS.map((step) => ({
+    return dynamicSteps.map((step) => ({
       ...step,
       isCompleted: completedSteps.has(step.id),
       isActive: currentStep === step.id,
       hasError: !isStepValid(step.id) && step.id < currentStep,
     }));
-  }, [currentStep, completedSteps, isStepValid]);
+  }, [dynamicSteps, currentStep, completedSteps, isStepValid]);
 
   // Handle step navigation
   const handleStepClick = (stepId: number) => {
@@ -129,19 +160,40 @@ const MultiPageFormContent: React.FC<{
 
   // Render current page content
   const renderCurrentPage = () => {
-    switch (currentStep) {
-      case 1:
-        return <BasicInformationPage />;
-      case 2:
-        return <CollectionPropertiesPage />;
-      case 3:
-        return <SmartCollectionRulesPage />;
-      case 4:
-        return <MediaAssetsPage />;
-      case 5:
-        return <AvailabilityTimingPage />;
-      default:
-        return <BasicInformationPage />;
+    if (shouldShowProductSelection) {
+      // With product selection step
+      switch (currentStep) {
+        case 1:
+          return <BasicInformationPage />;
+        case 2:
+          return <CollectionPropertiesPage />;
+        case 3:
+          return <SmartCollectionRulesPage />;
+        case 4:
+          return <ProductSelectionPage />;
+        case 5:
+          return <MediaAssetsPage />;
+        case 6:
+          return <AvailabilityTimingPage />;
+        default:
+          return <BasicInformationPage />;
+      }
+    } else {
+      // Without product selection step
+      switch (currentStep) {
+        case 1:
+          return <BasicInformationPage />;
+        case 2:
+          return <CollectionPropertiesPage />;
+        case 3:
+          return <SmartCollectionRulesPage />;
+        case 4:
+          return <MediaAssetsPage />;
+        case 5:
+          return <AvailabilityTimingPage />;
+        default:
+          return <BasicInformationPage />;
+      }
     }
   };
 
@@ -180,7 +232,7 @@ const MultiPageFormContent: React.FC<{
         <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <ProgressBar
             currentStep={currentStep}
-            totalSteps={FORM_STEPS.length}
+            totalSteps={dynamicSteps.length}
           />
           <div className="mt-3">
             <FormStepper
@@ -206,7 +258,7 @@ const MultiPageFormContent: React.FC<{
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <StepperNavigation
             currentStep={currentStep}
-            totalSteps={FORM_STEPS.length}
+            totalSteps={dynamicSteps.length}
             onPrevious={previousStep}
             onNext={handleNext}
             onSubmit={handleSubmit}
@@ -233,7 +285,7 @@ export const MultiPageCollectionForm: React.FC<
   return (
     <MultiPageFormProvider
       initialData={initialData}
-      totalSteps={FORM_STEPS.length}
+      totalSteps={6} // Max possible steps (with product selection)
     >
       <MultiPageFormContent
         onSubmit={onSubmit}
@@ -249,6 +301,7 @@ export {
   BasicInformationPage,
   CollectionPropertiesPage,
   SmartCollectionRulesPage,
+  ProductSelectionPage,
   MediaAssetsPage,
   AvailabilityTimingPage,
   FORM_STEPS,

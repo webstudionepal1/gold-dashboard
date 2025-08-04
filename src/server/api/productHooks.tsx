@@ -218,12 +218,12 @@ export const useUpdateProductsMutation = () => {
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Product created successfully");
+      toast.success("Product updated successfully");
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
-    onError(err: string) {
-      // toast.error(err || "Error creating products");
-      toast.error("Error creating products");
+    onError(err: any) {
+      console.error("Product update error:", err);
+      toast.error(err?.response?.data?.message || err?.message || "Error updating product");
     },
   });
 };

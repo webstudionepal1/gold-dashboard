@@ -22,6 +22,9 @@ export interface CollectionFormData {
   collectionMode: "manual" | "automatic" | "hybrid";
   conditions: ISmartCollectionConditions;
 
+  // Page 3.5: Product Selection (for manual collections)
+  selectedProducts: string[];
+
   // Page 4: Media and Assets
   images: (File | string)[];
   bannerImage: File | string | null;
@@ -115,6 +118,9 @@ const defaultFormData: CollectionFormData = {
     manualProductIds: [],
     excludedProductIds: [],
   },
+
+  // Page 3.5: Product Selection (for manual collections)
+  selectedProducts: [],
 
   // Page 4: Media and Assets
   images: [],
