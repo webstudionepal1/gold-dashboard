@@ -218,7 +218,7 @@ export const useUpdateBlogMutation = () => {
       formData: FormData;
     }) => {
       console.log("🌐 Making API call to update blog...");
-      const res = await apiClient.put(`blog/${id}`, formData, {
+      const res = await apiClient.patch(`blog/${id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

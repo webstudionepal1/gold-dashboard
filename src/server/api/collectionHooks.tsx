@@ -301,7 +301,7 @@ export const useUpdateCollectionMutation = () => {
   return useMutation({
     mutationKey: ["collections"],
     mutationFn: async ({ id, body }: { id: string; body: FormData }) => {
-      const res = await apiClient.put(`collection/${id}`, body, {
+      const res = await apiClient.patch(`collection/${id}`, body, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
