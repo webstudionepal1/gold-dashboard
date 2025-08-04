@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Header from "../../components/shared/table_heading/Header";
 import { SearchFilterSort } from "../../components/global/SearchFilterSort";
-import MasterTable from "../../components/shared/MasterTable";
+import { ExpandableInventoryTable } from "../../components/inventory/ExpandableInventoryTable";
 import {
   useGetAllProductsQuery,
   IFetchProduct,
@@ -284,19 +284,19 @@ const InventoryIndex = () => {
 
       <div className="bg-white border-[#dcdddf] pb-4 border rounded-xl">
         <div className="mx-2">
-          <MasterTable
+          <div className="p-4">
+            <SearchFilterSort
+              onSearch={handleSearch}
+              onFilter={handleFilter}
+              onSort={handleSort}
+              filterOptions={filterOptions}
+              sortOptions={SORT_OPTIONS}
+              placeholder="Search here..."
+            />
+          </div>
+          <ExpandableInventoryTable
+            data={processedItems}
             columns={columns}
-            filterSection={
-              <SearchFilterSort
-                onSearch={handleSearch}
-                onFilter={handleFilter}
-                onSort={handleSort}
-                filterOptions={filterOptions}
-                sortOptions={SORT_OPTIONS}
-                placeholder="Search here..."
-              />
-            }
-            rows={processedItems}
             loading={isLoading}
           />
         </div>
