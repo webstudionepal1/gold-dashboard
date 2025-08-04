@@ -537,7 +537,7 @@ export const useUpdateStoneMutation = () => {
   return useMutation({
     mutationKey: ["stone"],
     mutationFn: async ({ id, body }: { id: string; body: FormData }) => {
-      const res = await apiClient.put(`stone/${id}`, body);
+      const res = await apiClient.patch(`stone/${id}`, body);
       return res?.data?.data;
     },
     onSuccess() {
