@@ -179,7 +179,7 @@ const AddBannerForm = () => {
     if (bannerSuccess || bannerUpdateSuccess) {
       form.reset();
       // router.replace("/banner");
-      router("/banner", {replace:true});
+      router("/banner", { replace: true });
     }
   }, [bannerSuccess, bannerUpdateSuccess]);
 
@@ -315,7 +315,7 @@ const AddBannerForm = () => {
                   </div>
                 )}
               </form.Field>
-            </div>
+            </div>pnpm 
 
             <button
               type="submit"
