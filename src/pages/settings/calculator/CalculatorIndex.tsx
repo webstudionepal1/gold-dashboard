@@ -15,7 +15,6 @@ interface CalculationRow {
   name: string;
   type: "flat" | "percent";
   value: number;
-  stonePrice?: number;
 }
 
 interface FormValues {
@@ -27,6 +26,7 @@ interface FormValues {
     | "diamond+stone"
     | "";
   transactionType: "buy" | "sell" | "";
+  stonePrice?: number; // Moved outside of individual calculations
   incrementCalculations: CalculationRow[];
   decrementCalculations: CalculationRow[];
 }
@@ -35,24 +35,28 @@ interface StoredConfiguration {
   _id: string;
   type: string;
   for: string;
+  stonePrice?: number; // Add this to the stored configuration interface
   incrementalCalculations: Array<{
     name: string;
     type: "percentage" | "flat";
     value: number;
-    stonePrice?: number;
   }>;
   decrementalCalculations: Array<{
     name: string;
     type: "percentage" | "flat";
     value: number;
-    stonePrice?: number;
   }>;
 }
 
-// Validation schema
+// Updated validation schema
 const validationSchema = Yup.object({
   selectedMaterial: Yup.string().required("Material type is required"),
   transactionType: Yup.string().required("Transaction type is required"),
+  stonePrice: Yup.number().when("selectedMaterial", {
+    is: (val: string) => val && val.includes("stone"),
+    then: (schema) => schema.min(0, "Stone price must be positive").required("Stone price is required when stone material is selected"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
   incrementCalculations: Yup.array().of(
     Yup.object({
       name: Yup.string().required("Name is required"),
@@ -62,7 +66,6 @@ const validationSchema = Yup.object({
       value: Yup.number()
         .min(0, "Value must be positive")
         .required("Value is required"),
-      stonePrice: Yup.number().min(0, "Stone price must be positive"),
     })
   ),
   decrementCalculations: Yup.array().of(
@@ -74,16 +77,9 @@ const validationSchema = Yup.object({
       value: Yup.number()
         .min(0, "Value must be positive")
         .required("Value is required"),
-      stonePrice: Yup.number().min(0, "Stone price must be positive"),
     })
   ),
 });
-
-interface IConfig {
-  type: string;
-  value: number;
-  stonePrice?: number;
-}
 
 const CalculatorIndex = () => {
   const { mutate, isPending: isCreating } = useCreatePriceConfiguration();
@@ -117,13 +113,13 @@ const CalculatorIndex = () => {
         name: calc.name,
         type: (calc.type.toLowerCase() === "percentage" ? "percent" : "flat") as "flat" | "percent",
         value: calc.value,
-        stonePrice: calc.stonePrice || 0,
       }));
     };
 
     return {
       selectedMaterial: materialMapping[config.type] || "",
       transactionType: config.for.toLowerCase() as "buy" | "sell",
+      stonePrice: config.stonePrice || 0,
       incrementCalculations: transformCalculations(
         config.incrementalCalculations || []
       ),
@@ -161,6 +157,7 @@ const CalculatorIndex = () => {
     return {
       selectedMaterial: "",
       transactionType: "",
+      stonePrice: 0,
       incrementCalculations: [],
       decrementCalculations: [],
     };
@@ -203,13 +200,13 @@ const CalculatorIndex = () => {
           name: calc.name,
           value: calc.value,
           type: calc.type === "percent" ? "percentage" : "flat", // Convert "percent" to "percentage"
-          ...(calc.stonePrice && { stonePrice: calc.stonePrice })
         }));
       };
 
       const formattedData = {
         type: values.selectedMaterial,
         for: values.transactionType,
+        ...(hasStone(values.selectedMaterial) && values.stonePrice && { stonePrice: values.stonePrice }),
         incrementalCalculations: transformCalculations(values.incrementCalculations),
         decrementalCalculations: transformCalculations(values.decrementCalculations),
       };
@@ -254,6 +251,9 @@ const CalculatorIndex = () => {
   const handleResetAll = () => {
     formik.setFieldValue("incrementCalculations", []);
     formik.setFieldValue("decrementCalculations", []);
+    if (hasStone(formik.values.selectedMaterial)) {
+      formik.setFieldValue("stonePrice", 0);
+    }
   };
 
   const renderCalculationSection = (sectionType: "increment" | "decrement") => {
@@ -292,9 +292,6 @@ const CalculatorIndex = () => {
                     name: "",
                     type: "flat",
                     value: 0,
-                    ...(hasStone(formik.values.selectedMaterial) && {
-                      stonePrice: 0,
-                    }),
                   })
                 }
                 variant="primary"
@@ -319,12 +316,6 @@ const CalculatorIndex = () => {
                   <p className="text-sm">No calculations added yet</p>
                   <p className="text-xs">
                     Click "Add Row" to start adding calculations
-                    {formik.values.selectedMaterial.includes("stone") && (
-                      <span className="block mt-1 text-purple-600">
-                        💡 For stone materials, you can add stone price as a
-                        calculation
-                      </span>
-                    )}
                   </p>
                 </div>
               ) : (
@@ -332,30 +323,20 @@ const CalculatorIndex = () => {
                   {calculations.map((row, index) => (
                     <div
                       key={index}
-                      className={`grid grid-cols-1 gap-3 p-3 bg-gray-50 rounded-sm ${
-                        hasStone(formik.values.selectedMaterial)
-                          ? "md:grid-cols-5"
-                          : "md:grid-cols-4"
-                      }`}
+                      className="grid grid-cols-1 gap-3 p-3 bg-gray-50 rounded-sm md:grid-cols-4"
                     >
                       <div className="md:col-span-1">
                         <InputField
                           label={index === 0 ? "Name" : ""}
                           name={`${fieldName}.${index}.name`}
-                          placeholder={
-                            formik.values.selectedMaterial.includes("stone")
-                              ? "e.g., Stone Price, Labor, etc."
-                              : "Enter calculation name"
-                          }
+                          placeholder="Enter calculation name"
                           value={formik.values[fieldName][index]?.name || ""}
                           onChange={formik.handleChange}
                           onBlur={formik.handleBlur}
                           icon="material-symbols:edit"
                           helperText={
                             index === 0
-                              ? formik.values.selectedMaterial.includes("stone")
-                                ? "Add stone price or other stone-related calculations"
-                                : "Descriptive name for this calculation"
+                              ? "Descriptive name for this calculation"
                               : undefined
                           }
                           error={
@@ -451,46 +432,6 @@ const CalculatorIndex = () => {
                         />
                       </div>
 
-                      {/* Stone Price Field - Only show when stone material is selected */}
-                      {hasStone(formik.values.selectedMaterial) && (
-                        <div className="md:col-span-1">
-                          <InputField
-                            label={index === 0 ? "Stone Price" : ""}
-                            name={`${fieldName}.${index}.stonePrice`}
-                            type="number"
-                            step="0.01"
-                            placeholder="0.00"
-                            value={
-                              formik.values[fieldName][
-                                index
-                              ]?.stonePrice?.toString() || "0"
-                            }
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            icon="material-symbols:diamond"
-                            helperText={
-                              index === 0
-                                ? "Stone price for this calculation"
-                                : undefined
-                            }
-                            error={
-                              formik.touched[fieldName]?.[index]?.stonePrice &&
-                              (
-                                formik.errors[fieldName]?.[
-                                  index
-                                ] as FormikErrors<CalculationRow>
-                              )?.stonePrice
-                                ? (
-                                    formik.errors[fieldName]?.[
-                                      index
-                                    ] as FormikErrors<CalculationRow>
-                                  )?.stonePrice
-                                : undefined
-                            }
-                          />
-                        </div>
-                      )}
-
                       <div className="md:col-span-1 flex items-end">
                         <Button
                           type="button"
@@ -572,7 +513,7 @@ const CalculatorIndex = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl">
             <DropdownField
               label="Material Type"
               name="selectedMaterial"
@@ -612,6 +553,28 @@ const CalculatorIndex = () => {
                   : undefined
               }
             />
+            
+            {/* Stone Price Field - Only show when stone material is selected */}
+            {hasStone(formik.values.selectedMaterial) && (
+              <InputField
+                label="Stone Price"
+                name="stonePrice"
+                type="number"
+                step="0.01"
+                placeholder="0.00"
+                value={formik.values.stonePrice?.toString() || "0"}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                required
+                icon="material-symbols:diamond"
+                helperText="Base stone price for all calculations"
+                error={
+                  formik.touched.stonePrice && formik.errors.stonePrice
+                    ? formik.errors.stonePrice
+                    : undefined
+                }
+              />
+            )}
           </div>
         </div>
 
@@ -636,10 +599,9 @@ const CalculatorIndex = () => {
                     {formik.values.incrementCalculations.length} | Total
                     decrement rules:{" "}
                     {formik.values.decrementCalculations.length}
-                    {formik.values.selectedMaterial.includes("stone") && (
+                    {hasStone(formik.values.selectedMaterial) && (
                       <span className="block mt-1 text-purple-600">
-                        💡 Remember to add stone price in increment/decrement
-                        calculations
+                        💎 Stone price: ${formik.values.stonePrice || 0} (applies to all calculations)
                       </span>
                     )}
                   </p>
@@ -671,26 +633,6 @@ const CalculatorIndex = () => {
             </div>
           </>
         )}
-
-        {/* Debug: Show form values (remove in production) */}
-        {/* {import.meta.env?.DEV && (
-          <div className="bg-gray-100 p-4 rounded-sm">
-            <h4 className="font-medium mb-2">Form Values (Debug):</h4>
-            <pre className="text-xs overflow-auto">
-              {JSON.stringify(formik.values, null, 2)}
-            </pre>
-            {Object.keys(formik.errors).length > 0 && (
-              <>
-                <h4 className="font-medium mb-2 mt-4 text-red-600">
-                  Form Errors:
-                </h4>
-                <pre className="text-xs overflow-auto text-red-600">
-                  {JSON.stringify(formik.errors, null, 2)}
-                </pre>
-              </>
-            )}
-          </div>
-        )} */}
       </form>
     </FormikProvider>
   );
