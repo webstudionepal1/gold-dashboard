@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { useForm, useStore } from "@tanstack/react-form";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import * as z from "zod";
 
 import { InputField } from "../../../components/shared/form_components/InputField";
@@ -18,34 +18,38 @@ import {
   useGetAllProductSubCategoriesQuery,
 } from "../../../server/api/productHooks";
 import { bannerStore } from "./bannerStore";
-import {
-  generateBannerFormDefaultValue,
-} from "./bannerobj";
+import { generateBannerFormDefaultValue } from "./bannerobj";
 import MultiImageUploader from "../../../components/shared/form_components/FileDropInput";
 import { cleanObject } from "../../../utils/cleanObject";
 
-const AddBannerSchema = z.object({
-  title: z.string().min(1, "Banner Title is required"),
-  description: z.string().min(1, "Description is required"),
-  category: z.string().min(1, "Category is required"),
-  subCategory: z.string().min(1, "Sub Category is required"),
-  priority: z.number().min(0, "Price must be a positive number"),
-  locations: z.array(z.string()).min(1, "Location is required"),
-  image: z
-    .instanceof(File)
-    .nullable()
-    .refine((val) => val !== null, {
+const AddBannerSchema = z
+  .object({
+    title: z.string().min(1, "Banner Title is required"),
+    description: z.string().min(1, "Description is required"),
+    category: z.string().min(1, "Category is required"),
+    subCategory: z.string().min(1, "Sub Category is required"),
+    priority: z.number().min(0, "Price must be a positive number"),
+    locations: z.array(z.string()).min(1, "Location is required"),
+    image: z.instanceof(File).nullable(),
+    mobImage: z.instanceof(File).nullable(), // Mobile image is optional
+    existingImage: z.string().optional(), // Track existing image
+    existingMobImage: z.string().optional(), // Track existing mobile image
+  })
+  .refine(
+    (data) => {
+      // Custom validation: require either a new image file or an existing image
+      return data.image !== null || data.existingImage;
+    },
+    {
       message: "Web image is required",
-    }),
-  mobImage: z
-    .instanceof(File)
-    .nullable(), // Mobile image is optional
-});
+      path: ["image"], // Show error on the image field
+    }
+  );
 
 const AddBannerForm = () => {
   const { id } = useParams();
   const bannerData = useStore(bannerStore, (state) => state);
-
+  const router = useNavigate();
   const {
     mutate: createBanner,
     isPending: bannerPending,
@@ -58,7 +62,11 @@ const AddBannerForm = () => {
     isSuccess: bannerUpdateSuccess,
   } = useUpdateBannerMutation();
 
-  const { data: _banners = [], isLoading: _isLoading, error: _error } = useGetAllBannerQuery();
+  const {
+    data: _banners = [],
+    isLoading: _isLoading,
+    error: _error,
+  } = useGetAllBannerQuery();
 
   const {
     data: categories,
@@ -126,6 +134,16 @@ const AddBannerForm = () => {
           formData.append("mobImage", value.mobImage);
         }
 
+        // Handle existing images for edit mode
+        if (id !== "add") {
+          if (value.existingImage) {
+            formData.append("existingImage", value.existingImage);
+          }
+          if (value.existingMobImage) {
+            formData.append("existingMobImage", value.existingMobImage);
+          }
+        }
+
         if (id === "add") createBanner(formData);
         else updateBanner({ id: bannerData._id, body: formData });
       } catch (error) {
@@ -134,7 +152,11 @@ const AddBannerForm = () => {
     },
   });
 
-  const FieldError = ({ field }: { field: { state: { meta: { errors: unknown[] } } } }) => {
+  const FieldError = ({
+    field,
+  }: {
+    field: { state: { meta: { errors: unknown[] } } };
+  }) => {
     if (field.state.meta.errors.length > 0) {
       const error = field.state.meta.errors[0];
       const errorMessage =
@@ -144,7 +166,9 @@ const AddBannerForm = () => {
 
       return (
         <div className="min-h-[20px] mt-1">
-          <span className="text-xs font-medium" style={{ color: '#ef4444' }}>{errorMessage}</span>
+          <span className="text-xs font-medium" style={{ color: "#ef4444" }}>
+            {errorMessage}
+          </span>
         </div>
       );
     }
@@ -152,7 +176,11 @@ const AddBannerForm = () => {
   };
 
   useEffect(() => {
-    if (bannerSuccess || bannerUpdateSuccess) form.reset();
+    if (bannerSuccess || bannerUpdateSuccess) {
+      form.reset();
+      // router.replace("/banner");
+      router("/banner", {replace:true});
+    }
   }, [bannerSuccess, bannerUpdateSuccess]);
 
   return (
@@ -304,7 +332,7 @@ const AddBannerForm = () => {
             <div className="mx-6 my-4">
               <div>
                 <h1 className="text-xl font-semibold">
-                  Upload Web Image <span style={{ color: '#ef4444' }}>*</span>
+                  Upload Web Image <span style={{ color: "#ef4444" }}>*</span>
                 </h1>
                 <div className="border-b border-[#dedde2] w-full my-2"></div>
               </div>
@@ -335,7 +363,8 @@ const AddBannerForm = () => {
             <div className="mx-6 my-4">
               <div>
                 <h1 className="text-xl font-semibold">
-                  Upload Mobile Image <span className="text-gray-500 text-sm">(Optional)</span>
+                  Upload Mobile Image{" "}
+                  <span className="text-gray-500 text-sm">(Optional)</span>
                 </h1>
                 <div className="border-b border-[#dedde2] w-full my-2"></div>
               </div>
