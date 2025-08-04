@@ -48,9 +48,12 @@ export const useGetAllBlogsQuery = (params: IBlogSearchParams = {}) => {
         delete searchParams.status;
       }
 
-      const res = await apiClient.get<{ data: IBlogListResponse }>("blog/search", {
-        params: searchParams,
-      });
+      const res = await apiClient.get<{ data: IBlogListResponse }>(
+        "blog/search",
+        {
+          params: searchParams,
+        }
+      );
       return res?.data?.data;
     },
   });
@@ -162,13 +165,11 @@ export const useCreateBlogMutation = () => {
   return useMutation({
     mutationKey: ["create-blog"],
     mutationFn: async (blogData: FormData) => {
-
       const res = await apiClient.post("blog", blogData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-
 
       if (!res.data?.success) {
         throw new Error(res.data?.message || "Failed to create blog");
@@ -183,23 +184,22 @@ export const useCreateBlogMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["blog-analytics"] });
     },
     onError: (error: any) => {
+      // const errorMessage = "Error creating blog";
 
-      let errorMessage = "Error creating blog";
+      // if (error?.response?.data?.message) {
+      //   errorMessage = error.response.data.message;
+      // } else if (error?.response?.data?.error) {
+      //   // Handle validation errors
+      //   if (Array.isArray(error.response.data.error)) {
+      //     errorMessage = error.response.data.error[0]?.message || errorMessage;
+      //   } else {
+      //     errorMessage = error.response.data.error;
+      //   }
+      // } else if (error?.message) {
+      //   errorMessage = error.message;
+      // }
 
-      if (error?.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      } else if (error?.response?.data?.error) {
-        // Handle validation errors
-        if (Array.isArray(error.response.data.error)) {
-          errorMessage = error.response.data.error[0]?.message || errorMessage;
-        } else {
-          errorMessage = error.response.data.error;
-        }
-      } else if (error?.message) {
-        errorMessage = error.message;
-      }
-
-      toast.error(errorMessage);
+      toast.error("Error creating blog");
     },
   });
 };
@@ -218,7 +218,7 @@ export const useUpdateBlogMutation = () => {
       formData: FormData;
     }) => {
       console.log("🌐 Making API call to update blog...");
-      const res = await apiClient.put(`blog/${id}`, formData, {
+      const res = await apiClient.patch(`blog/${id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -234,11 +234,12 @@ export const useUpdateBlogMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["blog-analytics"] });
     },
     onError: (error: any) => {
-      toast.error(
-        error?.response?.data?.message ||
-          error?.message ||
-          "Error updating blog"
-      );
+      // toast.error(
+      //   error?.response?.data?.message ||
+      //     error?.message ||
+      //     "Error updating blog"
+      // );
+      toast.error("Error updating blog");
     },
   });
 };
@@ -260,7 +261,8 @@ export const useDeleteBlogMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["blog-analytics"] });
     },
     onError: (error: string) => {
-      toast.error(error || "Error deleting blog");
+      // toast.error(error || "Error deleting blog");
+      toast.error("Error deleting blog");
     },
   });
 };
@@ -282,7 +284,8 @@ export const useLikeBlogMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["published-blogs"] });
     },
     onError: (error: string) => {
-      toast.error(error || "Error liking blog");
+      // toast.error(error || "Error liking blog");
+      toast.error("Error liking blog");
     },
   });
 };
@@ -305,7 +308,8 @@ export const useToggleFeaturedMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["blog-analytics"] });
     },
     onError: (error: string) => {
-      toast.error(error || "Error updating featured status");
+      // toast.error(error || "Error updating featured status");
+      toast.error("Error updating featured status");
     },
   });
 };
@@ -327,7 +331,8 @@ export const useBulkUpdateStatusMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["blog-analytics"] });
     },
     onError: (error: string) => {
-      toast.error(error || "Error updating blog statuses");
+      // toast.error(error || "Error updating blog statuses");
+      toast.error("Error updating blog statuses");
     },
   });
 };

@@ -184,69 +184,100 @@ const DashTopRight = ({ dashboardData }: DashTopRightProps) => {
   }));
 
   return (
-    <div className="flex flex-col gap-5">
-      {/* Price List Section */}
-      <div className="flex flex-col w-full h-full gap-5">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold lg:text-2xl md:text-xl">
-            Today's Price List
-          </h2>
-          {dashboardData.metalPrices && dashboardData.metalPrices.goldPrice && (
-            <div className="flex items-center text-sm text-gray-500">
-              <Icon icon="mdi:clock-outline" className="mr-1" />
-              <span>
-                Updated:{" "}
-                {new Date(
-                  dashboardData.metalPrices.goldPrice.timestamp
-                ).toLocaleString()}
-              </span>
-            </div>
-          )}
-        </div>
-        <div
-          className={`${bgColor} rounded-xl px-4 py-4 shadow-md transition-all duration-300 ease-linear`}>
-          <div className="flex items-center w-full">
-            <div className="overflow-hidden rounded-lg w-14 h-14">
-              <img
-                src={img}
-                alt="Product Icon"
-                className="object-cover w-full h-full"
-              />
-            </div>
-
-            <div className="ml-4 w-full">
-              <div className="lg:text-xl md:text-lg text-base text-[#333]">
-                {price}
+    <div className="space-y-6">
+      {/* Enhanced Price List Section */}
+      <div className="bg-white rounded-2xl shadow-lg border border-slate-200/60 overflow-hidden">
+        <div className="px-6 py-4 bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center justify-center w-8 h-8 bg-amber-100 rounded-lg">
+                <Icon icon="material-symbols:price-check" className="w-4 h-4 text-amber-600" />
               </div>
-              <div className="text-xs text-gray-500 lg:text-base md:text-sm">
-                {title}
+              <div>
+                <h2 className="text-lg font-semibold text-slate-800">Today's Prices</h2>
+                <p className="text-sm text-slate-500">Live metal prices</p>
               </div>
             </div>
-          </div>
-        </div>
-        <div className="flex flex-col w-full h-full p-4 bg-white shadow-md rounded-xl">
-          <h2 className="mb-4 text-base font-semibold text-left text-black lg:text-xl md:text-lg">
-            Total Sales
-          </h2>
-          <div className="flex items-center justify-center">
-            {dashboardData.salesMetrics?.totalSalesByCategory?.length ? (
-              <DonutChart data={totalSalesData} options={totalSalesOptions} />
-            ) : (
-              <div className="flex items-center justify-center h-40 text-gray-400">
-                <p>No sales data available</p>
+            {dashboardData.metalPrices && dashboardData.metalPrices.goldPrice && (
+              <div className="flex items-center text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-lg">
+                <Icon icon="material-symbols:schedule" className="mr-1 w-3 h-3" />
+                <span>
+                  {new Date(dashboardData.metalPrices.goldPrice.timestamp).toLocaleTimeString()}
+                </span>
               </div>
             )}
           </div>
-          <div className="flex justify-center gap-4 mt-4 text-sm font-medium text-gray-600">
+        </div>
+        <div className="p-6">
+          <div className={`${bgColor} rounded-xl p-4 transition-all duration-300 ease-in-out hover:shadow-md border border-amber-200/50`}>
+            <div className="flex items-center space-x-4">
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 bg-white rounded-lg shadow-sm flex items-center justify-center">
+                  <img
+                    src={img}
+                    alt="Product Icon"
+                    className="w-8 h-8 object-cover"
+                  />
+                </div>
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <div className="text-lg font-bold text-slate-800">
+                  {price}
+                </div>
+                <div className="text-sm text-slate-600 truncate">
+                  {title}
+                </div>
+              </div>
+
+              <div className="flex-shrink-0">
+                <Icon icon="material-symbols:trending-up" className="w-5 h-5 text-green-500" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* Enhanced Total Sales Chart */}
+      <div className="bg-white rounded-2xl shadow-lg border border-slate-200/60 overflow-hidden">
+        <div className="px-6 py-4 bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200">
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center justify-center w-8 h-8 bg-purple-100 rounded-lg">
+              <Icon icon="material-symbols:pie-chart" className="w-4 h-4 text-purple-600" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-slate-800">Total Sales</h2>
+              <p className="text-sm text-slate-500">Sales by category</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-6">
+          <div className="flex items-center justify-center mb-6">
+            {dashboardData.salesMetrics?.totalSalesByCategory?.length ? (
+              <div className="w-48 h-48">
+                <DonutChart data={totalSalesData} options={totalSalesOptions} />
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-40 space-y-3">
+                <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center">
+                  <Icon icon="material-symbols:pie-chart-outline" className="w-6 h-6 text-slate-400" />
+                </div>
+                <p className="text-sm text-slate-500">No sales data available</p>
+              </div>
+            )}
+          </div>
+
+          {/* Legend */}
+          <div className="flex flex-wrap justify-center gap-3">
             {(dashboardData.salesMetrics?.totalSalesByCategory || []).map(
               (category, index) => (
-                <div key={index} className="flex items-center gap-1">
+                <div key={index} className="flex items-center space-x-2 px-3 py-1 bg-slate-50 rounded-lg">
                   <span
                     className="w-3 h-3 rounded-full"
                     style={{
                       backgroundColor: chartColors[index % chartColors.length],
                     }}></span>
-                  {category.category}
+                  <span className="text-sm font-medium text-slate-700">{category.category}</span>
                 </div>
               )
             )}
@@ -254,57 +285,83 @@ const DashTopRight = ({ dashboardData }: DashTopRightProps) => {
         </div>
       </div>
 
-      {/* Total Order Chart */}
-      <div className="bg-white p-4 rounded-xl shadow-md w-full h-[300px]">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-semibold text-black lg:text-xl md:text-lg">
-            Total Order
-          </h2>
-        </div>
-        <div className="h-[200px]">
-          {dashboardData.orderMetrics?.dailyOrders?.labels?.length ? (
-            <BarChart data={totalOrderData} options={totalOrderOptions} />
-          ) : (
-            <div className="flex items-center justify-center h-full text-gray-400">
-              <p>No order data available</p>
+      {/* Enhanced Total Order Chart */}
+      <div className="bg-white rounded-2xl shadow-lg border border-slate-200/60 overflow-hidden">
+        <div className="px-6 py-4 bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200">
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-lg">
+              <Icon icon="material-symbols:bar-chart" className="w-4 h-4 text-blue-600" />
             </div>
-          )}
+            <div>
+              <h2 className="text-lg font-semibold text-slate-800">Total Orders</h2>
+              <p className="text-sm text-slate-500">Daily order volume</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-6">
+          <div className="h-48">
+            {dashboardData.orderMetrics?.dailyOrders?.labels?.length ? (
+              <BarChart data={totalOrderData} options={totalOrderOptions} />
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full space-y-3">
+                <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center">
+                  <Icon icon="material-symbols:bar-chart" className="w-6 h-6 text-slate-400" />
+                </div>
+                <p className="text-sm text-slate-500">No order data available</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Top Customers Section */}
-      <div className="flex flex-col w-full gap-2 p-4 overflow-hidden bg-white shadow-md rounded-xl">
-        <h2 className="mb-3 text-base font-semibold lg:text-xl md:text-lg">
-          Top Customer
-        </h2>
-        <div className="xl:w-[22rem] lg:w-[18rem] md:w-[18rem] w-[16rem] rounded-sm flex items-center justify-center overflow-hidden">
-          {topCustomers.length > 0 ? (
-            <Marquee pauseOnHover gradient={false} speed={50}>
-              {topCustomers.map((customer, index) => (
-                <div
-                  key={index}
-                  className="w-auto mx-[10px] bg-[#FCF6EA] rounded-xl shadow-md flex flex-col items-center lg:px-8 lg:py-5 md:px-7 md:py-4 px-6 py-3 text-center">
-                  <div className="w-12 h-12 mb-3 overflow-hidden rounded-full lg:w-20 lg:h-20 md:w-16 md:h-16">
-                    <img
-                      src={customer.img}
-                      alt={customer.name}
-                      className="object-cover w-full h-full"
-                    />
-                  </div>
-                  <div className="text-sm font-normal text-gray-800 lg:text-lg md:text-base">
-                    {customer.name}
-                  </div>
-                  <div className="lg:text-sm md:text-[13px] text-sm text-gray-500">
-                    {customer.price} Purchase
-                  </div>
-                </div>
-              ))}
-            </Marquee>
-          ) : (
-            <div className="flex items-center justify-center h-20 w-full text-gray-400">
-              <p>No customer data available</p>
+      {/* Enhanced Top Customers Section */}
+      <div className="bg-white rounded-2xl shadow-lg border border-slate-200/60 overflow-hidden">
+        <div className="px-6 py-4 bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200">
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center justify-center w-8 h-8 bg-indigo-100 rounded-lg">
+              <Icon icon="material-symbols:person-star" className="w-4 h-4 text-indigo-600" />
             </div>
-          )}
+            <div>
+              <h2 className="text-lg font-semibold text-slate-800">Top Customers</h2>
+              <p className="text-sm text-slate-500">Most valued customers</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-6">
+          <div className="overflow-hidden">
+            {topCustomers.length > 0 ? (
+              <Marquee pauseOnHover gradient={false} speed={40}>
+                {topCustomers.map((customer, index) => (
+                  <div
+                    key={index}
+                    className="mx-3 bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4 flex flex-col items-center text-center min-w-[140px] hover:shadow-md transition-shadow duration-200">
+                    <div className="w-12 h-12 mb-3 overflow-hidden rounded-full ring-2 ring-amber-200">
+                      <img
+                        src={customer.img}
+                        alt={customer.name}
+                        className="object-cover w-full h-full"
+                      />
+                    </div>
+                    <div className="text-sm font-semibold text-slate-800 mb-1">
+                      {customer.name}
+                    </div>
+                    <div className="text-xs text-amber-700 bg-amber-100 px-2 py-1 rounded-full">
+                      {customer.price} Orders
+                    </div>
+                  </div>
+                ))}
+              </Marquee>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-24 space-y-3">
+                <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center">
+                  <Icon icon="material-symbols:person-off" className="w-6 h-6 text-slate-400" />
+                </div>
+                <p className="text-sm text-slate-500">No customer data available</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

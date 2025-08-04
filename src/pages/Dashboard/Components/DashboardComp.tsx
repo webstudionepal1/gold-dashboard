@@ -64,15 +64,21 @@ const DashboardComp = () => {
     : emptyData;
 
   return (
-    <div className="flex flex-col gap-5 bg-[#F4F4F5]">
-      <div className="flex flex-col gap-5 md:flex-row">
-        <div className="w-full md:w-2/3">
+    <div className="space-y-6">
+      {/* Top Section - Main Content Grid */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        {/* Left Column - Takes 2/3 on xl screens */}
+        <div className="xl:col-span-2 space-y-6">
           <DashTopLeft dashboardData={combinedData} />
         </div>
-        <div className="w-full md:w-1/3">
+
+        {/* Right Column - Takes 1/3 on xl screens */}
+        <div className="xl:col-span-1 space-y-6">
           <DashTopRight dashboardData={combinedData} />
         </div>
       </div>
+
+      {/* Bottom Section */}
       <DashBottom dashboardData={combinedData} />
     </div>
   );

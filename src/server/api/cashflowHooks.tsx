@@ -63,7 +63,8 @@ export const useDeleteCashflowMutation = () => {
       toast.success("Cashflow deleted successfully");
     },
     onError(err: string) {
-      toast.error(err || "Error Deleting cashflow");
+      // toast.error(err || "Error Deleting cashflow");
+      toast.error("Error Deleting cashflow");
     },
   });
 };

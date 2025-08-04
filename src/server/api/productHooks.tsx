@@ -194,7 +194,8 @@ export const useCreateProductsMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
     onError(err: string) {
-      toast.error(err || "Error creating products");
+      // toast.error(err || "Error creating products");
+      toast.error("Error creating products");
     },
   });
 };
@@ -221,7 +222,8 @@ export const useUpdateProductsMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
     onError(err: string) {
-      toast.error(err || "Error creating products");
+      // toast.error(err || "Error creating products");
+      toast.error("Error creating products");
     },
   });
 };
@@ -239,7 +241,8 @@ export const useDeleteProductsMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
     onError(err: string) {
-      toast.error(err || "Error deleting products");
+      // toast.error(err || "Error deleting products");
+      toast.error("Error deleting products");
     },
   });
 };
@@ -273,7 +276,8 @@ export const useCreateProductCategoriesMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["category"] });
     },
     onError(err: string) {
-      toast.error(err || "Error creating product category");
+      // toast.error(err || "Error creating product category");
+      toast.error("Error creating product category");
     },
   });
 };
@@ -299,7 +303,8 @@ export const useUpdateProductCategoriesMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["category"] });
     },
     onError(err: string) {
-      toast.error(err || "Error updating product category");
+      // toast.error(err || "Error updating product category");
+      toast.error("Error updating product category");
     },
   });
 };
@@ -317,7 +322,8 @@ export const useDeleteProductCategoriesMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["category"] });
     },
     onError(err: string) {
-      toast.error(err || "Error deleting product category");
+      // toast.error(err || "Error deleting product category");
+      toast.error("Error deleting product category");
     },
   });
 };
@@ -349,7 +355,8 @@ export const useCreateProductSubCategoryMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["subcategory"] });
     },
     onError(err: string) {
-      toast.error(err || "Error creating product subcategory");
+      // toast.error(err || "Error creating product subcategory");
+      toast.error("Error creating product subcategory");
     },
   });
 };
@@ -373,7 +380,8 @@ export const useUpdateProductSubCategoryMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["subcategory"] });
     },
     onError(err: string) {
-      toast.error(err || "Error updating product subcategory");
+      // toast.error(err || "Error updating product subcategory");
+      toast.error("Error updating product subcategory");
     },
   });
 };
@@ -391,7 +399,8 @@ export const useDeleteProductSubCategoryMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["subcategory"] });
     },
     onError(err: string) {
-      toast.error(err || "Error deleting product subcategory");
+      // toast.error(err || "Error deleting product subcategory");
+      toast.error("Error deleting product subcategory");
     },
   });
 };
@@ -423,7 +432,8 @@ export const useCreateProductClaspsMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["clasptype"] });
     },
     onError(err: string) {
-      toast.error(err || "Error creating product clasp");
+      // toast.error(err || "Error creating product clasp");
+      toast.error("Error creating product clasp");
     },
   });
 };
@@ -443,7 +453,8 @@ export const useUpdateProductClaspsMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["clasptype"] });
     },
     onError(err: string) {
-      toast.error(err || "Error updating product clasp");
+      // toast.error(err || "Error updating product clasp");
+      toast.error("Error updating product clasp");
     },
   });
 };
@@ -461,7 +472,8 @@ export const useDeleteProductClaspsMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["clasptype"] });
     },
     onError(err: string) {
-      toast.error(err || "Error deleting product clasp");
+      // toast.error(err || "Error deleting product clasp");
+      toast.error("Error deleting product clasp");
     },
   });
 };
@@ -514,7 +526,8 @@ export const useCreateStoneMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["stone"] });
     },
     onError(err: string) {
-      toast.error(err || "Error creating stone");
+      // toast.error(err || "Error creating stone");
+      toast.error("Error creating stone");
     },
   });
 };
@@ -524,7 +537,7 @@ export const useUpdateStoneMutation = () => {
   return useMutation({
     mutationKey: ["stone"],
     mutationFn: async ({ id, body }: { id: string; body: FormData }) => {
-      const res = await apiClient.put(`stone/${id}`, body);
+      const res = await apiClient.patch(`stone/${id}`, body);
       return res?.data?.data;
     },
     onSuccess() {
@@ -532,7 +545,8 @@ export const useUpdateStoneMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["stone"] });
     },
     onError(err: string) {
-      toast.error(err || "Error updating stone");
+      // toast.error(err || "Error updating stone");
+      toast.error("Error updating stone");
     },
   });
 };
@@ -550,7 +564,8 @@ export const useDeleteStoneMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["stones"] });
     },
     onError(err: string) {
-      toast.error(err || "Error deleting stone");
+      // toast.error(err || "Error deleting stone");
+      toast.error("Error deleting stone");
     },
   });
 };
@@ -585,7 +600,8 @@ export const useCreateProductOccasionMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["occasions"] });
     },
     onError(err: string) {
-      toast.error(err || "Error creating product occasion");
+      // toast.error(err || "Error creating product occasion");
+      toast.error("Error creating product occasion");
     },
   });
 };
@@ -607,7 +623,8 @@ export const useUpdateProductOccasionMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["occasions"] });
     },
     onError(err: string) {
-      toast.error(err || "Error updating product occasion");
+      // toast.error(err || "Error updating product occasion");
+      toast.error("Error updating product occasion");
     },
   });
 };
@@ -625,7 +642,8 @@ export const useDeleteProductOccasionMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["occasions"] });
     },
     onError(err: string) {
-      toast.error(err || "Error deleting product occasion");
+      // toast.error(err || "Error deleting product occasion");
+      toast.error("Error deleting product occasion");
     },
   });
 };

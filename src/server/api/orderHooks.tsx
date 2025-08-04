@@ -137,7 +137,8 @@ export const useCreateOrderMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
     },
     onError(error: string) {
-      toast.error(error || "Error creating order");
+      // toast.error(error || "Error creating order");
+      toast.error("Error creating order");
     },
   });
 };
@@ -156,7 +157,8 @@ export const useUpdateOrderMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
     },
     onError(error: string) {
-      toast.error(error || "Error updating order");
+      // toast.error(error || "Error updating order");
+      toast.error("Error updating order");
     },
   });
 };
@@ -175,7 +177,8 @@ export const useDeleteOrderMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
     },
     onError(error: string) {
-      toast.error(error || "Error deleting order");
+      // toast.error(error || "Error deleting order");
+      toast.error("Error deleting order");
     },
   });
 };

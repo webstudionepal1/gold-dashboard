@@ -55,6 +55,7 @@ import BlogList from "@/pages/Blog/BlogList/BlogList";
 import BlogEditor from "@/pages/Blog/BlogEditor/BlogEditor";
 import BlogView from "@/pages/Blog/BlogView/BlogView";
 import BlogAnalytics from "@/pages/Blog/BlogAnalytics/BlogAnalytics";
+import Calculator from "@/pages/settings/calculator/Calculator";
 // import BlogList from "@/pages/Blog/BlogList/BlogList";
 // import BlogEditor from "@/pages/Blog/BlogEditor/BlogEditor";
 // import BlogView from "@/pages/Blog/BlogView/BlogView";
@@ -291,7 +292,11 @@ export const routesConfig = [
   },
   {
     path: "/settings/calculator",
-    element: <CalculatorIndex />,
+    element: <Calculator />,
+  },
+  {
+    path:'/settings/calculator/:status',
+    element:<CalculatorIndex />,
   },
   //Analytics
   {

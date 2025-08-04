@@ -49,7 +49,7 @@ const ProductCategory: React.FC = () => {
             sn: index + 1,
             rawDescription: get(item, "description", ""),
             description: (
-              <p className=" truncate max-w-xl">
+              <p className=" truncate max-w-xl text-center">
                 {get(item, "description", "") !== ""
                   ? get(item, "description")
                   : "-"}
