@@ -564,7 +564,7 @@ const NewProductForm = ({
                                 required
                                 firstInput="Select Weight"
                                 options={weightOptions}
-                                value={field.state.value.toString()}
+                                value={field.state.value?.toString()}
                                 onChange={(e) =>
                                   field.handleChange(Number(e.target.value))
                                 }
