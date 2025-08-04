@@ -24,7 +24,21 @@ interface InventoryItem {
   category?: string;
   subCategory?: string;
   price?: number;
-  wt?: number;
+  variants?: ProductVariant[];
+  variantCount?: number;
+}
+
+interface ProductVariant {
+  _id?: string;
+  sku?: string;
+  price: number;
+  wt: number;
+  unit: string;
+  totalStock: number;
+  usedStock: number;
+  remainingStock: number;
+  reorderPoint: number;
+  isActive?: boolean;
 }
 
 type SortOption =
@@ -32,8 +46,6 @@ type SortOption =
   | "name-desc"
   | "price-high"
   | "price-low"
-  | "weight-high"
-  | "weight-low"
   | "stock-high"
   | "stock-low";
 
@@ -51,8 +63,6 @@ const SORT_OPTIONS = [
   { value: "name-desc", label: "Name (Z-A)" },
   { value: "price-high", label: "Price (High-Low)" },
   { value: "price-low", label: "Price (Low-High)" },
-  { value: "weight-high", label: "Weight (High-Low)" },
-  { value: "weight-low", label: "Weight (Low-High)" },
   { value: "stock-high", label: "Stock (High-Low)" },
   { value: "stock-low", label: "Stock (Low-High)" },
 ];
@@ -97,33 +107,65 @@ const transformProductToInventoryItems = (
         category: categoryName,
         subCategory: subCategoryName,
         price: 0,
-        wt: 0,
+        variants: [],
+        variantCount: 0,
       },
     ];
   }
 
-  // Transform each variant to inventory item
-  return product.variants.map((variant, index) => {
-    const totalStock = variant.totalStock || 0;
-    const remainingStock = variant.remainingStock || 0;
-    const reorderPoint = variant.reorderPoint || Math.floor(totalStock * 0.2);
+  // Calculate combined totals for all variants
+  const combinedTotalStock = product.variants.reduce(
+    (sum, variant) => sum + (variant.totalStock || 0),
+    0
+  );
+  const combinedRemainingStock = product.variants.reduce(
+    (sum, variant) => sum + (variant.remainingStock || 0),
+    0
+  );
+  const combinedUsedStock = product.variants.reduce(
+    (sum, variant) => sum + (variant.usedStock || 0),
+    0
+  );
+  const combinedReorderPoint = product.variants.reduce(
+    (sum, variant) =>
+      sum +
+      (variant.reorderPoint || Math.floor((variant.totalStock || 0) * 0.2)),
+    0
+  );
 
-    return {
-      _id: `${product._id}-${index}`,
+  // Get price range for display
+  const prices = product.variants.map((v) => v.price || 0).filter((p) => p > 0);
+  const minPrice = prices.length > 0 ? Math.min(...prices) : 0;
+  const maxPrice = prices.length > 0 ? Math.max(...prices) : 0;
+  const displayPrice = minPrice === maxPrice ? minPrice : minPrice; // Show min price, could be enhanced to show range
+
+  // Get most common unit
+  const units = product.variants.map((v) => v.unit).filter(Boolean);
+  const mostCommonUnit = units.length > 0 ? units[0] : "";
+
+  // Return single grouped item
+  return [
+    {
+      _id: product._id || "",
       name: product.name || "",
-      totalStock,
-      remainingStock,
-      usedStock: variant.usedStock || 0,
-      unit: variant.unit || "",
-      reorder_point: reorderPoint,
-      status: getStockStatus(remainingStock, totalStock, reorderPoint),
+      totalStock: combinedTotalStock,
+      remainingStock: combinedRemainingStock,
+      usedStock: combinedUsedStock,
+      unit: mostCommonUnit,
+      reorder_point: combinedReorderPoint,
+      status: getStockStatus(
+        combinedRemainingStock,
+        combinedTotalStock,
+        combinedReorderPoint
+      ),
       image: productImage,
       category: categoryName,
       subCategory: subCategoryName,
-      price: variant.price || 0,
-      wt: variant.wt || 0,
-    };
-  });
+      price: displayPrice,
+      variants: product.variants,
+      variantCount: product.variants.length,
+    },
+  ];
 };
 
 const sortItems = (
@@ -141,10 +183,6 @@ const sortItems = (
       return sortedItems.sort((a, b) => (b.price || 0) - (a.price || 0));
     case "price-low":
       return sortedItems.sort((a, b) => (a.price || 0) - (b.price || 0));
-    case "weight-high":
-      return sortedItems.sort((a, b) => (b.wt || 0) - (a.wt || 0));
-    case "weight-low":
-      return sortedItems.sort((a, b) => (a.wt || 0) - (b.wt || 0));
     case "stock-high":
       return sortedItems.sort((a, b) => b.remainingStock - a.remainingStock);
     case "stock-low":
