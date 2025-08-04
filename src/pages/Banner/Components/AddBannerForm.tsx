@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useForm, useStore } from "@tanstack/react-form";
 import { useParams } from "react-router-dom";
 import * as z from "zod";
@@ -45,7 +45,6 @@ const AddBannerSchema = z.object({
 const AddBannerForm = () => {
   const { id } = useParams();
   const bannerData = useStore(bannerStore, (state) => state);
-  const [selectedTagItems, setSelectedTagItems] = useState<string[]>([]);
 
   const {
     mutate: createBanner,
@@ -272,9 +271,8 @@ const AddBannerForm = () => {
                     <DropdownTagField
                       required
                       label="Locations"
-                      values={selectedTagItems}
+                      values={field.state.value || []}
                       onChange={(newValues) => {
-                        setSelectedTagItems(newValues);
                         field.handleChange(newValues);
                       }}
                       options={[
