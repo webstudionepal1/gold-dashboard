@@ -75,22 +75,22 @@ export const ExpandableInventoryTable: React.FC<
   const renderCell = (column: Column, item: InventoryItem): React.ReactNode => {
     if (column.key === "name") {
       return (
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <span className="font-medium">{item.name}</span>
-            {item.variantCount && item.variantCount > 1 && (
+        <div className="flex items-center gap-2">
+          <span className="font-medium">{item.name}</span>
+          {item.variantCount && item.variantCount > 1 && (
+            <>
               <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
                 {item.variantCount} variants
               </span>
-            )}
-          </div>
-          {item.variants && item.variants.length > 1 && (
-            <ExpandableRowToggle
-              variants={item.variants}
-              productName={item.name}
-              isExpanded={expandedRows.has(item._id)}
-              onToggle={() => toggleRow(item._id)}
-            />
+              <Icon
+                icon={
+                  expandedRows.has(item._id)
+                    ? "material-symbols:expand-less"
+                    : "material-symbols:expand-more"
+                }
+                className="w-4 h-4 text-gray-500 ml-auto"
+              />
+            </>
           )}
         </div>
       );
@@ -161,7 +161,17 @@ export const ExpandableInventoryTable: React.FC<
             data.map((item) => (
               <React.Fragment key={item._id}>
                 {/* Main product row */}
-                <tr className="hover:bg-gray-50">
+                <tr
+                  className={`hover:bg-gray-50 transition-colors ${
+                    item.variants && item.variants.length > 1
+                      ? "cursor-pointer select-none"
+                      : ""
+                  }`}
+                  onClick={() => {
+                    if (item.variants && item.variants.length > 1) {
+                      toggleRow(item._id);
+                    }
+                  }}>
                   {columns.map((column) => (
                     <td
                       key={column.key}
