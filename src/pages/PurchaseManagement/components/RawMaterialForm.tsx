@@ -366,8 +366,9 @@ const NewProductForm = ({
   const { mutate: createPurchase } = useCreatePurchaseMutation();
   const { mutate: updatePurchase } = useUpdatePurchaseMutation();
   const { data: suppliers, isSuccess } = useGetSupplierQuery();
-  const { data: products, isSuccess: productSuccess } =
-    useGetAllProductsQuery();
+  const { data: products, isSuccess: productSuccess } = useGetAllProductsQuery({
+    includeAll: true,
+  });
   const { data: rawMaterials, isSuccess: rawMaterialSuccess } =
     useGetRawMaterialsQuery();
 

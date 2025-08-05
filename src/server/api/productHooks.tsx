@@ -612,6 +612,18 @@ export interface IFetchClasps {
 //   });
 // };
 
+export const useGetAllProducts = (params: IParams = {}) => {
+  return useQuery({
+    queryKey: ["products"],
+    queryFn: async () => {
+      const res = await apiClient.get<{ data: IFetchProduct[] }>("product", {
+        params,
+      });
+      return res?.data?.data;
+    },
+  });
+};
+
 export const useGetAllProductsQuery = (
   params: IParams = {},
   endpoint: string = "product"

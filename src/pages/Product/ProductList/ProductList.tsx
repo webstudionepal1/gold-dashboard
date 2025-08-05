@@ -7,7 +7,7 @@ import Header from "../../../components/shared/table_heading/Header";
 import {
   IFetchProduct,
   useDeleteProductsMutation,
-  useGetAllProductsQuery,
+  useGetAllProducts,
   useUpdateProductsMutation,
 } from "../../../server/api/productHooks";
 import { updateProductState } from "../../../store/productStore";
@@ -21,7 +21,8 @@ const ProductList: React.FC = () => {
     isLoading,
     isError,
     error,
-  } = useGetAllProductsQuery();
+  } = useGetAllProducts();
+  console.log("productsList", productsList);
   const productsData = useMemo(
     () => (isSuccess && Array.isArray(productsList) ? productsList : []),
     [isSuccess, productsList]

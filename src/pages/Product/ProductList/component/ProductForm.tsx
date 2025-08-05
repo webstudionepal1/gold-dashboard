@@ -1761,7 +1761,6 @@ const ProductForm = () => {
     }
   }, [productCreateSuccess, productUpdateSuccess, form, navigate]);
 
-  // Helper function to get field errors
   const getFieldError = (_fieldPath: string) => {
     return [];
   };
