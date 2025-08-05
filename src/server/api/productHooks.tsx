@@ -699,6 +699,7 @@ export const useCreateProductsMutation = () => {
     onSuccess() {
       handleMutationSuccess("Product created successfully");
       queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["product"] });
     },
     onError(err: any) {
       handleMutationError(err, "Error creating products");
@@ -727,6 +728,7 @@ export const useUpdateProductsMutation = () => {
     onSuccess() {
       handleMutationSuccess("Product updated successfully");
       queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["product"] });
     },
     onError(err: any) {
       handleMutationError(err, "Error updating products");
@@ -745,6 +747,7 @@ export const useDeleteProductsMutation = () => {
     onSuccess() {
       toast.success("Product deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["product"] });
     },
     onError(err: string) {
       toast.error(err || "Error deleting products");
@@ -832,6 +835,11 @@ export const useGetAllProductSubCategoriesQuery = (params: IParams = {}) => {
   return useQuery({
     queryKey: ["subcategory", params],
     queryFn: async () => {
+      // Debug logging for parameters
+      console.log("=== SUBCATEGORY API CALL ===");
+      console.log("Params being sent:", params);
+      console.log("CategoryId:", params?.categoryId);
+
       const res = await apiClient.get<{
         data: {
           subcategories: IFetchSubCategory[];
@@ -839,12 +847,39 @@ export const useGetAllProductSubCategoriesQuery = (params: IParams = {}) => {
         };
       }>("subcategory", { params });
 
-      // Debug logging
+      // Debug logging for response
       console.log("API Response:", res?.data);
+      console.log(
+        "Subcategories count:",
+        res?.data?.data?.subcategories?.length
+      );
       console.log("Subcategories:", res?.data?.data?.subcategories);
+      console.log("============================");
 
       // Handle the new API response structure
       const subcategories = res?.data?.data?.subcategories;
+
+      // If backend doesn't filter, filter on frontend
+      if (Array.isArray(subcategories) && params?.categoryId) {
+        console.log(
+          "Filtering subcategories for categoryId:",
+          params.categoryId
+        );
+        const filtered = subcategories.filter((sub) => {
+          const subCategoryId =
+            sub.category?._id || sub.category?.id || sub.categoryId;
+          console.log(
+            "Subcategory:",
+            sub.name,
+            "belongs to category:",
+            subCategoryId
+          );
+          return subCategoryId === params.categoryId;
+        });
+        console.log("Filtered subcategories:", filtered);
+        return filtered;
+      }
+
       return Array.isArray(subcategories) ? subcategories : [];
     },
   });

@@ -14,7 +14,6 @@ import { categoryColumns } from "../productObj";
 import AddProductCategory from "./components/AddProductCategory";
 import { StatusSwitch } from "../../../components/shared/StatusSwitch";
 import ViewProductCategory from "./components/ViewProductCategory";
-
 interface IEditModal {
   state: boolean;
   editData?: IFetchCategory | null;
@@ -59,7 +58,6 @@ const ProductCategory: React.FC = () => {
   };
 
   const categoriesData = useMemo(() => {
-    // Ensure we have valid data and it's an array
     if (!isSuccess || !categories || !Array.isArray(categories)) {
       return [];
     }
