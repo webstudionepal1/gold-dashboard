@@ -188,8 +188,38 @@ const ConfirmedOrder = () => {
   // };
 
   return (
-    <div>
-      <Header text="Orders"></Header>
+    <div className="container mx-auto px-4 py-3">
+      <Header text="Confirmed Orders" />
+
+      {/* Status Indicator */}
+      <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+            <div>
+              <h3 className="text-lg font-semibold text-blue-800">
+                Confirmed Orders
+              </h3>
+              <p className="text-sm text-blue-600">
+                Orders confirmed and ready for delivery assignment
+              </p>
+            </div>
+          </div>
+          <div className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+            {orderList.length} orders
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Navigation */}
+      <div className="mb-4 flex gap-2 text-sm">
+        <button
+          onClick={() => navigate("/order/orders")}
+          className="px-3 py-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors">
+          ← Back to Order Management
+        </button>
+      </div>
+
       <div className="p-4 bg-white border-2 rounded-lg">
         <MasterTable
           showAction

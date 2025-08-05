@@ -199,6 +199,28 @@ const PurchaseReturnForm: React.FC<IPurchaseReturnForm> = ({
     return acc + price * item.quantity;
   }, 0);
 
+  // Calculate total quantities for summary - MUST be before any conditional returns
+  const totalOriginalQuantity = useMemo(() => {
+    const items = data.items?.length > 0 ? data.items : data.products || [];
+    return items.reduce((sum, item) => sum + get(item, "quantity", 0), 0);
+  }, [data]);
+
+  const totalReturnableQuantity = useMemo(() => {
+    return (
+      returnSummary?.returnSummary?.reduce(
+        (sum, item) => sum + (item.remainingQuantity || 0),
+        0
+      ) || 0
+    );
+  }, [returnSummary]);
+
+  const currentReturnQuantity = useMemo(() => {
+    return form.state.values.products.reduce(
+      (sum, item) => sum + (item.quantity || 0),
+      0
+    );
+  }, [form.state.values.products]);
+
   // Show loading state while fetching return summary
   if (isLoadingReturnSummary) {
     return (
@@ -214,6 +236,31 @@ const PurchaseReturnForm: React.FC<IPurchaseReturnForm> = ({
   return (
     <div className="py-4 space-y-4">
       <h1 className="text-2xl font-semibold text-center">Purchase Return</h1>
+
+      {/* Quantity Summary */}
+      <div className="mx-4 p-4 bg-gray-50 rounded-lg border">
+        <h3 className="text-lg font-medium mb-3">Quantity Summary</h3>
+        <div className="grid grid-cols-3 gap-4 text-sm">
+          <div className="text-center">
+            <div className="text-2xl font-bold text-blue-600">
+              {totalOriginalQuantity}
+            </div>
+            <div className="text-gray-600">Total Purchased</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-green-600">
+              {totalReturnableQuantity}
+            </div>
+            <div className="text-gray-600">Available to Return</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-orange-600">
+              {currentReturnQuantity}
+            </div>
+            <div className="text-gray-600">Currently Returning</div>
+          </div>
+        </div>
+      </div>
 
       <form
         className="flex flex-col mx-4 mt-6 space-y-4"
@@ -260,9 +307,11 @@ const PurchaseReturnForm: React.FC<IPurchaseReturnForm> = ({
                   label="Refund Amount"
                   required
                   type="number"
-                  placeholder="Enter Refund Amount"
-                  value={field.state.value}
-                  onChange={(e) => field.handleChange(Number(e.target.value))}
+                  placeholder="0"
+                  value={field.state.value === 0 ? "" : field.state.value}
+                  onChange={(e) =>
+                    field.handleChange(Number(e.target.value) || 0)
+                  }
                 />
                 <FieldError field={field} />
               </div>
@@ -309,8 +358,10 @@ const PurchaseReturnForm: React.FC<IPurchaseReturnForm> = ({
                 <InputField
                   label="Available for Return"
                   type="number"
-                  placeholder="Available Quantity"
-                  value={dynamicForm.maxQuantity}
+                  placeholder="0"
+                  value={
+                    dynamicForm.maxQuantity === 0 ? "" : dynamicForm.maxQuantity
+                  }
                   disabled
                 />
               </div>
@@ -319,10 +370,10 @@ const PurchaseReturnForm: React.FC<IPurchaseReturnForm> = ({
                   label="Quantity"
                   required
                   type="number"
-                  placeholder="Enter Quantity"
-                  value={dynamicForm.quantity}
+                  placeholder="0"
+                  value={dynamicForm.quantity === 0 ? "" : dynamicForm.quantity}
                   onChange={(e) => {
-                    const value = Number(e.target.value);
+                    const value = Number(e.target.value) || 0;
                     console.log(
                       "Quantity input:",
                       value,
@@ -345,10 +396,10 @@ const PurchaseReturnForm: React.FC<IPurchaseReturnForm> = ({
                   required
                   type="number"
                   step="0.01"
-                  placeholder="Enter Weight"
-                  value={dynamicForm.wt}
+                  placeholder="0"
+                  value={dynamicForm.wt === 0 ? "" : dynamicForm.wt}
                   onChange={(e) => {
-                    const value = Number(e.target.value);
+                    const value = Number(e.target.value) || 0;
                     if (value >= 0) {
                       setDynamicForm({
                         ...dynamicForm,

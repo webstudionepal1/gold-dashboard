@@ -93,7 +93,6 @@ interface LowStockWiseData {
     status: string;
   };
   category: string;
-  subCategory: string;
   images: string;
 }
 

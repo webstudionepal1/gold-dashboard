@@ -350,7 +350,6 @@ export const RawMaterialSchema = z.object({
       })
     )
     .min(1, "**At least one item is required**"),
-  description: z.string().optional(),
 });
 
 interface NewProductProps {
@@ -367,8 +366,9 @@ const NewProductForm = ({
   const { mutate: createPurchase } = useCreatePurchaseMutation();
   const { mutate: updatePurchase } = useUpdatePurchaseMutation();
   const { data: suppliers, isSuccess } = useGetSupplierQuery();
-  const { data: products, isSuccess: productSuccess } =
-    useGetAllProductsQuery();
+  const { data: products, isSuccess: productSuccess } = useGetAllProductsQuery({
+    includeAll: true,
+  });
   const { data: rawMaterials, isSuccess: rawMaterialSuccess } =
     useGetRawMaterialsQuery();
 
@@ -405,7 +405,6 @@ const NewProductForm = ({
               wt: 0,
             },
           ],
-      description: edit ? get(data, "description") : "",
     } as IRawMaterialForm,
     validators: {
       onSubmit: RawMaterialSchema,
@@ -527,9 +526,12 @@ const NewProductForm = ({
                             label="Quantity"
                             type="number"
                             min={0} // Prevent negative input
-                            value={field.state.value}
+                            placeholder="0"
+                            value={
+                              field.state.value === 0 ? "" : field.state.value
+                            }
                             onChange={(e) =>
-                              field.handleChange(Number(e.target.value))
+                              field.handleChange(Number(e.target.value) || 0)
                             }
                           />
                           <FieldError field={field} />
@@ -578,10 +580,12 @@ const NewProductForm = ({
                           <InputField
                             label="Weight"
                             type="number"
-                            placeholder="Enter weight"
-                            value={field.state.value}
+                            placeholder="0"
+                            value={
+                              field.state.value === 0 ? "" : field.state.value
+                            }
                             onChange={(e) =>
-                              field.handleChange(Number(e.target.value))
+                              field.handleChange(Number(e.target.value) || 0)
                             }
                           />
                           <FieldError field={field} />
@@ -603,22 +607,6 @@ const NewProductForm = ({
                   )}
                 </div>
               ))}
-            </div>
-          )}
-        </form.Field>
-
-        <form.Field name="description">
-          {(field) => (
-            <div className="flex flex-col">
-              <label className="text-[#98999e] font-semibold mb-2">
-                Description
-              </label>
-              <textarea
-                value={field.state.value}
-                onChange={(e) => field.handleChange(e.target.value)}
-                className="resize-none bg-[#f6f7f9] border-2 border-[#d3dae4] focus:outline-none rounded-xl px-3 py-1 placeholder:text-[#858492]"
-                placeholder="Enter Short Description"
-              ></textarea>
             </div>
           )}
         </form.Field>

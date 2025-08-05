@@ -8,4 +8,14 @@ export default defineConfig({
     host: true,
     port: 5173,
   },
+  define: {
+    global: "globalThis",
+  },
+
+  build: {
+    target: "esnext",
+    rollupOptions: {
+      external: [],
+    },
+  }
 });

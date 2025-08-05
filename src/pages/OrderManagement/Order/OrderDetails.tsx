@@ -2,7 +2,7 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import clsx from "clsx";
 import { get, map } from "lodash";
 import { CheckIcon, Download, PackageIcon, TruckIcon } from "lucide-react";
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import MasterTable from "../../../components/shared/MasterTable";
@@ -15,6 +15,8 @@ import InfoSection from "./components/InfoSection";
 import OrderTracker from "./components/OrderTracker";
 import { order_details_columns, Ordertitle, StepperObj } from "./orderObj";
 import { Constants } from "../../../utils/constants";
+import { CancelOrderModal } from "../../../components/shared/modals/CancelOrderModal";
+import { CompleteOrderModal } from "../../../components/shared/modals/CompleteOrderModal";
 
 // Define proper TypeScript interfaces
 interface OrderedProduct {
@@ -74,6 +76,10 @@ const OrderDetails: React.FC = () => {
   const pagePath = pathname.split("/");
   const page = pagePath[pagePath.length - 2];
 
+  // Modal states
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
+
   // API hooks with proper error handling
   const {
     mutate: updateOrder,
@@ -86,19 +92,77 @@ const OrderDetails: React.FC = () => {
   // Handle navigation after successful order update
   useEffect(() => {
     if (isSuccess) {
-      if (page === "order-details") {
-        navigate("/order/confirmed-order");
-      } else if (page === "confirmed-order-details") {
-        navigate("/order/assigned-order");
-      }
+      // Navigate back to main order management page
+      navigate("/order/orders");
     }
-  }, [isSuccess, navigate, page]);
+  }, [isSuccess, navigate]);
+
+  // Handle order completion
+  const handleCompleteOrder = (notes?: string) => {
+    if (!order?._id) return;
+
+    updateOrder({
+      id: order._id,
+      body: {
+        orderStatus: "delivered",
+        deliveryCompletion: {
+          date: new Date().toISOString(),
+          notes: notes || undefined,
+        },
+      },
+    });
+    setShowCompleteModal(false);
+    // Navigate back to main order management page after successful completion
+    setTimeout(() => navigate("/order/orders"), 1000);
+  };
+
+  // Handle order cancellation
+  const handleCancelOrder = (reason: string) => {
+    if (!order?._id) return;
+
+    updateOrder({
+      id: order._id,
+      body: {
+        orderStatus: "cancelled",
+        cancellation: {
+          reason,
+          date: new Date().toISOString(),
+        },
+      },
+    });
+    setShowCancelModal(false);
+    // Navigate to cancelled orders page after successful cancellation
+    setTimeout(() => navigate("/order/cancelled-order"), 1000);
+  };
 
   // Transform order products data
   const orderMenu = useMemo(() => {
     if (!order?.orderedProducts) return [];
 
     return map(order.orderedProducts, (item) => ({
+      image: (
+        <div className="flex items-center justify-center">
+          <div className="w-10 h-10">
+            {get(item, "product.images", []).length > 0 ? (
+              <img
+                src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${get(
+                  item,
+                  "product.images[0]",
+                  ""
+                )}`}
+                alt={get(item, "product.name", "Product")}
+                className="w-full h-full rounded-md object-cover aspect-square"
+              />
+            ) : (
+              <img
+                src="/no-image.png"
+                alt="No image"
+                className="w-full h-full rounded-md object-cover aspect-square"
+              />
+            )}
+          </div>
+        </div>
+      ),
       name: get(item, "product.name", ""),
       qty: get(item, "selectedVariant.quantity", 0),
       price: `${get(item, "selectedVariant.price", 0).toFixed(2)}`,
@@ -185,8 +249,7 @@ const OrderDetails: React.FC = () => {
               order?.paymentStatus === "paid"
                 ? "text-white bg-green text-sm rounded-full py-1 px-4"
                 : "text-white bg-red text-sm rounded-full py-1 px-4"
-            }
-          >
+            }>
             {get(order, "paymentStatus", "pending")}
           </div>
         ),
@@ -281,8 +344,7 @@ const OrderDetails: React.FC = () => {
         </p>
         <button
           onClick={() => window.location.reload()}
-          className="px-4 py-2 mt-4 text-white rounded-lg bg-primary"
-        >
+          className="px-4 py-2 mt-4 text-white rounded-lg bg-primary">
           Retry
         </button>
       </div>
@@ -298,7 +360,17 @@ const OrderDetails: React.FC = () => {
       <Header text={Ordertitle[page] || "Order Details"} />
 
       {/* Order Progress Tracker */}
-      <OrderTracker steps={STEPS} currentStep={StepperObj[orderStatus] || 0} />
+      <OrderTracker
+        steps={STEPS}
+        currentStep={StepperObj[orderStatus] || 0}
+        cancelledBg={orderStatus === "cancelled" ? "bg-red-600" : undefined}
+        cancelledBorder={
+          orderStatus === "cancelled" ? "border-red-600" : undefined
+        }
+        cancelledText={
+          orderStatus === "cancelled" ? "text-red-600 font-medium" : undefined
+        }
+      />
 
       <div className="py-4rounded-md grid grid-cols-1 md:grid-cols-3 mt-4 gap-4 lg:grid-cols-12">
         {/* Order Header */}
@@ -391,8 +463,7 @@ const OrderDetails: React.FC = () => {
                     ([key, { label, value }]) => (
                       <div
                         key={key}
-                        className="flex items-center justify-between text-sm"
-                      >
+                        className="flex items-center justify-between text-sm">
                         <p>{label}</p>
                         <p>
                           {Constants.currency}{" "}
@@ -446,15 +517,14 @@ const OrderDetails: React.FC = () => {
                     isPending
                       ? "opacity-70 cursor-not-allowed"
                       : "hover:bg-[#c97d24]"
-                  )}
-                >
+                  )}>
                   {isPending ? "Processing..." : "Accept Order"}
                 </button>
                 <button
-                  className="bg-[#d1d1d1] px-4 py-2 text-[#878787] rounded-xl font-semibold hover:bg-[#c1c1c1] transition-all"
-                  onClick={() => handleOrderStatusUpdate("cancelled")}
-                  disabled={isPending}
-                >
+                  className="bg-red-600 px-4 py-2 text-white rounded-xl font-medium hover:bg-red-700 transition-all flex items-center gap-2"
+                  onClick={() => setShowCancelModal(true)}
+                  disabled={isPending}>
+                  <Icon icon="mdi:cancel" className="w-4 h-4" />
                   Cancel Order
                 </button>
               </>
@@ -469,14 +539,47 @@ const OrderDetails: React.FC = () => {
                   isPending
                     ? "opacity-70 cursor-not-allowed"
                     : "hover:bg-[#c97d24]"
-                )}
-              >
+                )}>
                 {isPending ? "Processing..." : "Assign Delivery"}
+              </button>
+            )}
+
+            {page === "assigned-order-details" && (
+              <button
+                onClick={() => setShowCompleteModal(true)}
+                disabled={isPending}
+                className={clsx(
+                  "bg-[#de8d29] hover:bg-[#c97d24] px-4 py-2 text-white rounded-xl font-medium transition-all flex items-center gap-2 text-nowrap",
+                  isPending
+                    ? "opacity-70 cursor-not-allowed"
+                    : "hover:bg-green-700"
+                )}>
+                <Icon icon="mdi:check-circle" className="w-4 h-4" />
+                Complete Order
               </button>
             )}
           </div>
         </div>
       </div>
+
+      {/* Modals */}
+      <CompleteOrderModal
+        isOpen={showCompleteModal}
+        onClose={() => setShowCompleteModal(false)}
+        onConfirm={handleCompleteOrder}
+        isLoading={isPending}
+        orderNumber={get(order, "orderNumber", "")}
+        customerName={get(order, "customer.name", "")}
+        totalAmount={get(order, "totalAmount", 0)}
+      />
+
+      <CancelOrderModal
+        isOpen={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        onConfirm={handleCancelOrder}
+        isLoading={isPending}
+        orderNumber={get(order, "orderNumber", "")}
+      />
     </div>
   );
 };

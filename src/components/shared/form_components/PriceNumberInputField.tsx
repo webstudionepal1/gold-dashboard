@@ -1,9 +1,15 @@
 import React from "react";
 import { twMerge } from "tailwind-merge";
-import { formatNumberInputValue, parseNumberInputValue } from "../../../utils/numberInputHelpers";
+import {
+  formatNumberInputValue,
+  parseNumberInputValue,
+} from "../../../utils/numberInputHelpers";
 
 interface PriceNumberInputFieldProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'onChange' | 'value'> {
+  extends Omit<
+    React.InputHTMLAttributes<HTMLInputElement>,
+    "type" | "onChange" | "value"
+  > {
   label: string;
   variant?: string;
   inputClassName?: string;
@@ -44,12 +50,12 @@ export const PriceNumberInputField = React.forwardRef<
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
       // Prevent typing negative sign if negative values are not allowed
-      if (!allowNegative && e.key === '-') {
+      if (!allowNegative && e.key === "-") {
         e.preventDefault();
       }
-      
+
       // Prevent typing 'e', 'E', '+' which are valid in number inputs but not desired
-      if (['e', 'E', '+'].includes(e.key)) {
+      if (["e", "E", "+"].includes(e.key)) {
         e.preventDefault();
       }
     };
@@ -68,8 +74,8 @@ export const PriceNumberInputField = React.forwardRef<
           <input
             ref={ref}
             type="number"
-            placeholder={placeholder}
-            value={formatNumberInputValue(value)}
+            placeholder={placeholder || "0"}
+            value={formatNumberInputValue(value, false)}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             min={min}

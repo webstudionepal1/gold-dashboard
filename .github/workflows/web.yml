@@ -3,23 +3,40 @@ on:
   push:
     branches:
       - main
-
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Clear npm cache
+        run: npm cache clean --force
+        
+      - name: Install dependencies
+        run: npm ci  # Use npm ci instead of npm install for CI
+        
       - name: Build Web Application
+        env:
+          NODE_OPTIONS: "--max_old_space_size=4096"
+          GENERATE_SOURCEMAP: false
+          NODE_ENV: production
         run: |
-          npm install
+          # Node.js 20 specific fixes
+          unset NODE_OPTIONS
+          export NODE_OPTIONS="--max_old_space_size=4096"
           npm run build
-
+          
       - name: Create Web Production Bundle
         run: |
           tar -czf dist-web.tar.gz dist
-
+          
       - name: Setup SSH Key
         if: github.ref == 'refs/heads/main'
         run: |
@@ -27,7 +44,7 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -p 72 -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
-
+          
       - name: Deploy Web to VPS
         if: github.ref == 'refs/heads/main'
         env:
@@ -44,7 +61,7 @@ jobs:
             tar -xzf /tmp/dist-web.tar.gz -C "/home/nabin/gold"
             rm /tmp/dist-web.tar.gz
           EOF
-
+          
       - name: Cleanup SSH Key
         if: always()
         run: rm -f ~/.ssh/id_rsa

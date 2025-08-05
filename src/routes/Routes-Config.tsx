@@ -5,9 +5,7 @@ import { DashboardPage } from "../pages/Dashboard/Dashboard";
 // import PurchaseReturn from "../pages/Inventory/PurchaseManagement/PurchaseReturn";
 // import Suppliers from "../pages/Inventory/PurchaseManagement/Suppliers";
 import { NotFoundPage } from "../pages/NotFound/NotFound";
-import AssignedOrders from "../pages/OrderManagement/AssignedOrder/AssignedOrder";
-import CancelledOrder from "../pages/OrderManagement/CancelledOrder/CancelledOrder";
-import CompletedOrder from "../pages/OrderManagement/CompletedOrder/CompletedOrder";
+
 import { FrontendRoutes } from "./routes";
 import ProductDescription from "../pages/Product/ProductList/[id]/ProdectDescription";
 import ProductList from "../pages/Product/ProductList/ProductList";
@@ -17,7 +15,9 @@ import Productsubcategory from "../pages/Product/ProductSubcategory/ProductSubCa
 import BannerIndex from "../pages/Banner/BannerIndex";
 import NotificationIndex from "../pages/Notification/NotificationIndex";
 import MyPostBusinessIndex from "../pages/MyPostBusiness/MyPostBusinessIndex";
-import ConfirmedOrder from "../pages/OrderManagement/ConfirmedOrder/ConfirmedOrder";
+import NotificationAdminPanel from "../components/admin/NotificationAdminPanel";
+import NotificationTest from "../components/test/NotificationTest";
+
 import OrderIndex from "../pages/OrderManagement/Order/OrderIndex";
 import AddOrderForm from "../pages/OrderManagement/Order/components/AddOrderPage";
 import AddBannerForm from "../pages/Banner/Components/AddBannerForm";
@@ -67,45 +67,14 @@ export const routesConfig = [
     element: <OrderDetails />,
   },
   {
-    path: "/order/confirmed-order-details/:id",
-    element: <OrderDetails />,
-  },
-  {
     path: "/attribs",
     element: <AttribConfig />,
-  },
-  {
-    path: "/order/assigned-order-details/:id",
-    element: <OrderDetails />,
-  },
-  {
-    path: "/order/completed-order-details/:id",
-    element: <OrderDetails />,
-  },
-  {
-    path: "/order/cancelled-order-details/:id",
-    element: <OrderDetails />,
   },
   {
     path: FrontendRoutes.ADDORDER,
     element: <AddOrderForm />,
   },
-  {
-    path: FrontendRoutes.ASSIGNEDORDER,
-    element: <AssignedOrders />,
-  },
-  {
-    path: FrontendRoutes.CONFIRMEDORDER,
-    element: <ConfirmedOrder />,
-  },
-  {
-    path: FrontendRoutes.CANCELLEDORDER,
-    element: <CancelledOrder />,
-  },
-  {
-    path: FrontendRoutes.COMPLETEDORDER,
-    element: <CompletedOrder />,
-  },
+
   {
     path: FrontendRoutes.PRODUCTLIST,
     element: <ProductList />,
@@ -191,6 +160,14 @@ export const routesConfig = [
   {
     path: FrontendRoutes.NOTIFICATION,
     element: <NotificationIndex />,
+  },
+  {
+    path: "/notification-admin",
+    element: <NotificationAdminPanel />,
+  },
+  {
+    path: "/notification-test",
+    element: <NotificationTest />,
   },
   // MyPostBusiness route commented out - will be integrated later
   // {

@@ -6,6 +6,7 @@ import { useAuth, useLogout } from "../../hooks/useAuth";
 import { useOutsideClick } from "../../hooks/UseOutsideClick";
 import { Text } from "./Text";
 import { useSidebar } from "./sidebar/SidebarHooks";
+import NotificationBell from "./NotificationBell";
 
 /*eslint-disable @typescript-eslint/no-explicit-any*/
 export const Navbar = () => {
@@ -13,10 +14,7 @@ export const Navbar = () => {
   const userInfo = useAuth() as any;
   const logout = useLogout();
   const [showLogout, setShowLogout] = useState(false);
-  const [toggleNotification, setToggleNotification] = useState(false);
   const navigate = useNavigate();
-  const { data } = useAuth();
-  const [_, setRefresh] = useState(false);
 
   //   const {
   //     data: notificationData,
@@ -29,7 +27,6 @@ export const Navbar = () => {
 
   const modalRef = useOutsideClick(() => {
     setShowLogout(false);
-    setToggleNotification(false);
   });
 
   //   useEffect(() => {
@@ -54,8 +51,6 @@ export const Navbar = () => {
 
   const handleViewAllClick = () => {
     navigate("/notification");
-    setToggleNotification(false);
-    // refetch();
   };
 
   //   const handleNotificationClick = (type: string, _id: string) => {
@@ -134,110 +129,7 @@ export const Navbar = () => {
       </div>
       <div className="flex items-center gap-5">
         <section className="flex place-items-center">
-          <div className="relative">
-            <Icon
-              icon="tdesign:notification"
-              fontSize={24}
-              onClick={() => setToggleNotification((prev) => !prev)}
-              className="text-gray-700 cursor-pointer hover:text-gray-900"
-            />
-
-            {/* {mappedNotifications?.length > 0 && (
-            <span className="absolute flex items-center justify-center w-4 h-4 text-xs text-white bg-red-500 rounded-full -top-2 -right-1 bg-red">
-              {mappedNotifications?.length}
-            </span>
-          )} */}
-
-            {/* {toggleNotification && (
-            <div className="absolute right-0 p-4 px-3 mt-3 bg-white border rounded-lg shadow-lg">
-              {error ? (
-                <div className="text-center">
-                  <h2 className="mb-2 text-lg font-semibold">
-                    Latest Notifications
-                  </h2>
-                  <p className="text-red-500">Error loading notifications</p>
-                </div>
-              ) : isLoading ? (
-                <div className="text-center">
-                  <h2 className="mb-2 text-lg font-semibold">Notifications</h2>
-                  <p className="text-gray-500">Loading notifications...</p>
-                </div>
-              ) : mappedNotifications.length > 0 ? (
-                <>
-                  <div className="flex items-center justify-between mb-2">
-                    <h2 className="text-lg font-semibold">
-                      Latest Notifications
-                    </h2>
-                    <span className="px-2 py-1 text-sm text-purple-700 bg-purple-200 rounded-full">
-                      {mappedNotifications.length} Unread
-                    </span>
-                  </div>
-                  <div className="divide-y h-[280px] overflow-scroll divide-gray-200">
-                    {mappedNotifications.map(
-                      ({
-                        _id,
-                        icon,
-                        title,
-                        text,
-                        color,
-                        type,
-                        createdAt,
-                      }: {
-                        _id: string;
-                        icon: string;
-                        title: string;
-                        text: string;
-                        color: string;
-                        type: string;
-                        createdAt: string;
-                      }) => (
-                        <div
-                          key={_id}
-                          className="flex items-center justify-between gap-8 py-2 cursor-pointer hover:bg-gray-100"
-                          onClick={() => {
-                            handleNotificationClick(type, _id);
-                          }}
-                        >
-                          <div className="flex">
-                            <div
-                              className={`w-10 h-10 ${color} text-white flex items-center justify-center rounded-full`}
-                            >
-                              <Icon icon={icon} fontSize={20} />
-                            </div>
-                            <div className="flex-1 ml-3">
-                              <h3 className="font-semibold capitalize">
-                                {type === 'order' ? 'New' + text : text}
-                              </h3>
-                              <p className="text-sm text-gray-600 whitespace-nowrap">
-                                {title}
-                              </p>
-                            </div>
-                          </div>
-                          <p className="text-sm whitespace-nowrap">
-                            {timeAgo(createdAt)}
-                          </p>
-                        </div>
-                      )
-                    )}
-                  </div>
-                  <button
-                    className="w-full py-2 mt-3 font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-700"
-                    onClick={handleViewAllClick}
-                  >
-                    View All
-                  </button>
-                </>
-              ) : (
-                <div className="w-full text-center">
-                  <h2 className="mb-2 text-lg font-semibold">Notifications</h2>
-                  <p className="w-full text-gray-500">
-                    No notifications available
-                  </p>
-                </div>
-              )}
-            </div>
-          )} */}
-          </div>
+          <NotificationBell />
         </section>
 
         <section

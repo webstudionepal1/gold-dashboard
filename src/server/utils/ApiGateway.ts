@@ -1,8 +1,8 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 // Configure base URL from environment variables
-// export const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}api/v1/en/`;
 export const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}`;
+// export const API_BASE_URL = `${import.meta.env.VITE_API_LOCAL_URL}`;
 
 // Create an axios instance
 export const apiClient = axios.create({
@@ -66,13 +66,9 @@ apiClient.interceptors.response.use(
       return Promise.resolve({ canceled: true });
     }
 
-    // Format error message
-    const errorMessage =
-      error.response?.data?.message ||
-      error.message ||
-      "An unexpected error occurred";
-
-    return Promise.reject(errorMessage);
+    // Return the full error object so error handlers can extract detailed messages
+    // Don't format here - let individual error handlers decide what to show
+    return Promise.reject(error);
   }
 );
 

@@ -40,13 +40,14 @@ export const AddProductSubCategory = ({
   const { mutate: updateSubCategory, isSuccess: isUpdateSuccess } =
     useUpdateProductSubCategoryMutation();
 
-  const categoriesList = useMemo(
-    () =>
-      categorySuccess
-        ? categories?.map((item) => ({ label: item.name, value: item._id }))
-        : [],
-    [categorySuccess, categories]
-  );
+  const categoriesList = useMemo(() => {
+    // Ensure we have valid data and it's an array
+    if (!categorySuccess || !categories || !Array.isArray(categories)) {
+      return [];
+    }
+
+    return categories.map((item) => ({ label: item.name, value: item._id }));
+  }, [categorySuccess, categories]);
   const form = useForm({
     defaultValues: {
       name: editData ? get(editData, "name", "") : "",
@@ -75,8 +76,7 @@ export const AddProductSubCategory = ({
         onSubmit={(e) => {
           e.preventDefault();
           form.handleSubmit();
-        }}
-      >
+        }}>
         <h2 className="mb-6 text-xl font-semibold">
           {editData ? "Edit Subcategory" : "Add New Subcategory"}
         </h2>
@@ -163,14 +163,12 @@ export const AddProductSubCategory = ({
           <button
             type="submit"
             onClick={closeModal}
-            className="px-4 py-2 text-sm font-medium text-gray-700 transition-colors duration-200 border border-gray-300 rounded-md hover:bg-gray-50"
-          >
+            className="px-4 py-2 text-sm font-medium text-gray-700 transition-colors duration-200 border border-gray-300 rounded-md hover:bg-gray-50">
             Cancel
           </button>
           <button
             type="submit"
-            className="px-7 py-2 bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-white rounded-md text-sm font-medium transition-colors duration-200"
-          >
+            className="px-7 py-2 bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-white rounded-md text-sm font-medium transition-colors duration-200">
             {editData ? "Update" : "Add"}
           </button>
         </div>

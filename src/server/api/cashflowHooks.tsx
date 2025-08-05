@@ -1,6 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../utils/ApiGateway";
 import { toast } from "react-toastify";
+import {
+  handleMutationError,
+  handleMutationSuccess,
+} from "../../utils/errorHandler";
 
 export enum CashFlowType {
   SALE = "sale", // Revenue from product sales
@@ -60,10 +64,10 @@ export const useDeleteCashflowMutation = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cashflow"] });
-      toast.success("Cashflow deleted successfully");
+      handleMutationSuccess("Cashflow deleted successfully");
     },
-    onError(err: string) {
-      toast.error(err || "Error Deleting cashflow");
+    onError(err: any) {
+      handleMutationError(err, "Error Deleting cashflow");
     },
   });
 };

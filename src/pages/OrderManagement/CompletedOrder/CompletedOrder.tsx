@@ -21,7 +21,7 @@ const CompletedOrder = () => {
     isSuccess,
     isLoading,
   } = useGetAllOrdersQuery({
-    orderStatus: "completed",
+    orderStatus: "delivered",
   });
   const navigate = useNavigate();
 
@@ -42,7 +42,7 @@ const CompletedOrder = () => {
         orderedProducts: size(item.orderedProducts),
         orderStatus: (
           <div className="px-2 py-1 text-xs text-white rounded-full bg-green">
-            {item.orderStatus}
+            Completed
           </div>
         ),
         customer: get(item, "customer.name", "-"),
@@ -72,7 +72,7 @@ const CompletedOrder = () => {
             <SearchFilterSort onSort={handleSort} sortOptions={sortOptions} />
           }
           viewAction={(row) =>
-            navigate(`/order/assigned-order-details/${row._id}`)
+            navigate(`/order/completed-order-details/${row._id}`)
           }
           columns={confirmedColumns}
           rows={filteredItems}

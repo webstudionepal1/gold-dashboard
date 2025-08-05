@@ -51,6 +51,7 @@ interface dropDownFieldPropTypes
   extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
   firstInput?: string;
+  placeholder?: string;
   options?: { value: string; label: string }[];
   required?: boolean;
   inputClassname?: string;
@@ -61,7 +62,15 @@ export const DropdownField = React.forwardRef<
   dropDownFieldPropTypes
 >(
   (
-    { label, options, required = false, firstInput, inputClassname, ...other },
+    {
+      label,
+      options,
+      required = false,
+      firstInput,
+      placeholder,
+      inputClassname,
+      ...other
+    },
     ref
   ) => (
     <div className="flex flex-col gap-2">
@@ -77,10 +86,9 @@ export const DropdownField = React.forwardRef<
         className={twMerge(
           `border border-grey-200 py-3 px-4 rounded-xl text-gray-800 bg-[#f6f8f8] outline-none ${inputClassname}`
         )}
-        {...other}
-      >
+        {...other}>
         <option value="" disabled>
-          {firstInput ?? label}
+          {firstInput ?? placeholder ?? label}
         </option>
         {options?.map((option) => (
           <option key={option.value} value={option.value}>

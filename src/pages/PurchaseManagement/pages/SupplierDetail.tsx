@@ -1,8 +1,10 @@
+import React, { useMemo } from "react";
 import { get } from "lodash";
 import { useNavigate, useParams } from "react-router-dom";
 import Header from "../../../components/shared/table_heading/Header";
 import { FrontendRoutes } from "../../../routes/routes";
 import { useGetSupplierByIdQuery } from "../../../server/api/supplierHooks";
+import { useGetSupplierPurchaseHistoryQuery } from "../../../server/api/purchaseHooks";
 import ContactCard from "../components/ContactCard";
 import SupplierCard from "../components/SupplierDetailCard";
 
@@ -10,7 +12,39 @@ const SupplierDetail = () => {
   let { id } = useParams();
   id ??= "";
   const { data: supplierData } = useGetSupplierByIdQuery(id);
+  const { data: purchaseHistory } = useGetSupplierPurchaseHistoryQuery(id);
   const navigate = useNavigate();
+
+  // Extract unique products from purchase history
+  const itemsSupplied = useMemo(() => {
+    if (!purchaseHistory) return [];
+
+    const uniqueItems = new Set<string>();
+    const uniqueProducts = new Set<string>();
+
+    purchaseHistory.forEach((purchase: any) => {
+      // Add items (raw materials) - these are populated objects
+      purchase.items?.forEach((item: any) => {
+        if (item.item && typeof item.item === "object" && item.item.name) {
+          uniqueItems.add(item.item.name);
+        }
+      });
+
+      // Add products - these are populated objects
+      purchase.products?.forEach((product: any) => {
+        if (
+          product.product &&
+          typeof product.product === "object" &&
+          product.product.name
+        ) {
+          uniqueProducts.add(product.product.name);
+        }
+      });
+    });
+
+    // Combine both items and products
+    return [...Array.from(uniqueItems), ...Array.from(uniqueProducts)];
+  }, [purchaseHistory]);
   const contactDataList = [
     {
       title: "Contact Information",
@@ -56,7 +90,7 @@ const SupplierDetail = () => {
     },
   ];
   const handleButtonClick = () => {
-    navigate(`${FrontendRoutes.SUPPLIERHISTORY}`);
+    navigate(FrontendRoutes.SUPPLIERHISTORY.replace(":id", id));
   };
   return (
     <>
@@ -73,11 +107,13 @@ const SupplierDetail = () => {
                 : "https://via.placeholder.com/150"
             }
             title={get(supplierData, "name", "-")}
-            supplierType={get(supplierData, "email", "-")}
-            location={get(supplierData, "addresses.district", "-")}
-            itemsSupplied={get(supplierData, "products", []).map(
-              (item) => item.name
-            )}
+            supplierType={get(supplierData, "businessType", "-")}
+            location={`${get(supplierData, "addresses.city", "-")}, ${get(
+              supplierData,
+              "addresses.state",
+              "-"
+            )}`}
+            itemsSupplied={itemsSupplied}
             buttonText="Purchase History"
             buttonClick={handleButtonClick}
           />
