@@ -867,7 +867,9 @@ export const useGetAllProductSubCategoriesQuery = (params: IParams = {}) => {
         );
         const filtered = subcategories.filter((sub) => {
           const subCategoryId =
-            sub.category?._id || sub.category?.id || sub.categoryId;
+            (sub as any).category?._id ||
+            (sub as any).category?.id ||
+            (sub as any).categoryId;
           console.log(
             "Subcategory:",
             sub.name,
