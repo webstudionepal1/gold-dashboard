@@ -330,7 +330,7 @@ import Header from "../../components/shared/table_heading/Header";
 import { SearchFilterSort } from "../../components/global/SearchFilterSort";
 import MasterTable from "../../components/shared/MasterTable";
 import {
-  useGetAllProductsQuery,
+  useGetAllProducts,
   IFetchProduct,
 } from "../../server/api/productHooks";
 import { columns } from "./inventoryObj";
@@ -409,7 +409,6 @@ const transformProductToInventoryItems = (
   const categoryName = extractCategoryName(product.category);
   const subCategoryName = extractCategoryName(product.subCategory);
   const productImage = product.images?.[0];
-
   // Handle products without variants
   if (!product.variant?.length) {
     return [
@@ -467,7 +466,6 @@ const transformProductToInventoryItems = (
     }
   );
 
-  // Calculate combined reorder point (average of all variant reorder points)
   const avgReorderPoint =
     combinedData.reorderPoints.length > 0
       ? Math.round(
@@ -476,7 +474,6 @@ const transformProductToInventoryItems = (
         )
       : Math.floor(combinedData.totalStock * 0.2);
 
-  // Create display strings for combined data
   const unitDisplay =
     combinedData.units.length > 1
       ? `${combinedData.units.join(", ")}`
@@ -485,7 +482,7 @@ const transformProductToInventoryItems = (
   const priceDisplay =
     combinedData.minPrice === combinedData.maxPrice
       ? combinedData.minPrice
-      : combinedData.minPrice; // Show minimum price for sorting
+      : combinedData.minPrice;
 
   return [
     {
@@ -573,8 +570,8 @@ const InventoryIndex = () => {
   const [selectedFilter, setSelectedFilter] = useState("");
   const [selectedSort, setSelectedSort] = useState("");
 
-  const { data, isLoading, error } = useGetAllProductsQuery({});
-  const products = (data?.products || []) as IFetchProduct[];
+  const { data, isLoading, error } = useGetAllProducts({});
+  const products = (data || []) as IFetchProduct[];
 
   // Transform products to inventory items
   const inventoryItems = useMemo(
