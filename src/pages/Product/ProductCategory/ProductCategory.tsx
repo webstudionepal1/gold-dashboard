@@ -13,7 +13,7 @@ import {
 import { categoryColumns } from "../productObj";
 import AddProductCategory from "./components/AddProductCategory";
 import { StatusSwitch } from "../../../components/shared/StatusSwitch";
-// import { AddProductCategory } from "./components/AddProductCategory";
+import ViewProductCategory from "./components/ViewProductCategory";
 
 interface IEditModal {
   state: boolean;
@@ -24,6 +24,15 @@ const ProductCategory: React.FC = () => {
     state: false,
     editData: null,
   });
+
+  const [isViewModalOpen, setIsViewModalOpen] = useState<{
+    state: boolean;
+    viewData: IFetchCategory | null;
+  }>({
+    state: false,
+    viewData: null,
+  });
+
   const modalRef = useOutsideClick(() =>
     setIsModalOpen({ state: false, editData: null })
   );
@@ -57,14 +66,12 @@ const ProductCategory: React.FC = () => {
 
     return categories.map((item, index) => ({
       ...item,
-      // subCategory: get(item, "subCategory", [])
-      //   .map((subItem) => get(subItem, "name", ""))
-      //   .join(", "),
       sn: index + 1,
       description:
         get(item, "description", "").length > 50
           ? `${get(item, "description", "").slice(0, 50)}...`
           : get(item, "description", ""),
+      rawDescription: get(item, "description", ""),
       totalProducts: get(item, "totalProducts", 0),
       status: (
         <StatusSwitch
@@ -85,7 +92,8 @@ const ProductCategory: React.FC = () => {
               editData: null,
             });
           }}
-          className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-sm text-white px-4 py-2 flex rounded-lg transition-colors duration-200">
+          className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-sm text-white px-4 py-2 flex rounded-lg transition-colors duration-200"
+        >
           <Icon icon="ic:outline-add" fontSize={24} />
           New Category
         </button>
@@ -97,6 +105,9 @@ const ProductCategory: React.FC = () => {
           loading={isLoading}
           onDelete={(id) => deleteCategory(id)}
           editAction={(row) => setIsModalOpen({ state: true, editData: row })}
+          viewAction={(row) =>
+            setIsViewModalOpen({ state: true, viewData: row })
+          }
           showAction
         />
       </div>
@@ -105,6 +116,17 @@ const ProductCategory: React.FC = () => {
           modalRef={modalRef}
           closeModal={() => setIsModalOpen({ state: false, editData: null })}
           editData={isModalOpen.editData}
+        />
+      )}
+
+      {isViewModalOpen.state && (
+        <ViewProductCategory
+          modalRef={modalRef}
+          closeModal={() =>
+            setIsViewModalOpen({ state: false, viewData: null })
+          }
+          viewData={isViewModalOpen.viewData}
+          isOpen={isViewModalOpen.state}
         />
       )}
     </div>
