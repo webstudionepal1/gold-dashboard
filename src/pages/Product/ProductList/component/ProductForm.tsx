@@ -101,7 +101,6 @@ const ProductForm = () => {
       try {
         const formData = new FormData();
         const formattedData = cleanObject(value);
-        // delete formattedData["image"];
         delete formattedData["existingImage"];
         formData.append("name", value.name);
         formData.append("description", value.description);
@@ -166,12 +165,9 @@ const ProductForm = () => {
     }
   }, [productCreateSuccess, productUpdateSuccess]);
 
-  // Helper function to get field errors
   const getFieldError = (_fieldPath: string) => {
     return [];
   };
-
-  // Debug: Log form state
 
   return (
     <div className="p-2">
