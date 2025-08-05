@@ -44,7 +44,6 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
   //   const inventory = {
   //  "Stock QTY":get(product, ''), "Reorder Level":""
   //   }
-  console.log("variants", product.variant);
   const inventories = product.variant.map((item) => ({
     Weight: `${get(item, "wt", 0)} ${get(item, "unit", "")}`,
     "Stock Qty": get(item, "remainingStock", 0),

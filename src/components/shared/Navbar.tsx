@@ -29,20 +29,6 @@ export const Navbar = () => {
     setShowLogout(false);
   });
 
-  //   useEffect(() => {
-  //     const unsubscribe = onMessageListener()
-  //       .then((payload: any) => {
-  //         toast.info(payload?.data?.notification?.title || 'New Notification');
-  //         refetch();
-  //         // setRefresh(true);
-  //       })
-  //       .catch((err) => console.log('FCM Error:', err));
-
-  //     return () => {
-  //       unsubscribe; // Cleanup when component unmounts
-  //     };
-  //   }, []);
-
   const handleLogout = () => {
     logout();
     toast.success("Logged out successfully");
