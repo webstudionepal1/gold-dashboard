@@ -773,6 +773,7 @@ export interface IPurchaseForm {
     price: number;
     paidAmount: number;
     wt?: number;
+    unit?: string;
   }[];
   description?: string;
 }
@@ -788,6 +789,7 @@ export const PurchaseSchema = z.object({
         price: z.coerce.number().min(1, "**Price is required**"),
         paidAmount: z.coerce.number().min(1, "**Paid Amount is required**"),
         wt: z.coerce.number().optional(),
+        unit: z.string().min(1, "**Unit is required**"),
       })
     )
     .min(1, "**At least one item is required**"),
