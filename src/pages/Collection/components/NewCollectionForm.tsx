@@ -90,6 +90,11 @@ const NewCollectionForm: React.FC = () => {
       if (formData.collectionMode)
         formDataObj.append("collectionMode", formData.collectionMode);
 
+      // Handle selected products for manual collections
+      if (formData.selectedProducts && Array.isArray(formData.selectedProducts)) {
+        formDataObj.append("selectedProducts", JSON.stringify(formData.selectedProducts));
+      }
+
       // Handle conditions array
       if (formData.conditions && Array.isArray(formData.conditions)) {
         formData.conditions.forEach((condition: string, index: number) => {
