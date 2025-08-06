@@ -54,6 +54,7 @@ const NewProductForm: React.FC = () => {
       color: product.color || "",
       clarity: product.clarity || "",
       dimension: product.dimension || 0,
+      gender: product.gender as "male" | "female" | "unisex" | undefined,
       makingCharges: product.makingCharges || 0,
 
       // Variants
@@ -146,6 +147,7 @@ const NewProductForm: React.FC = () => {
     if (formData.color) formDataObj.append("color", formData.color);
     formDataObj.append("clarity", formData.clarity);
     formDataObj.append("dimension", formData.dimension.toString());
+    if (formData.gender) formDataObj.append("gender", formData.gender);
     formDataObj.append("makingCharges", formData.makingCharges.toString());
 
     // Variants

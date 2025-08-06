@@ -56,6 +56,13 @@ const colorOptions = [
   { value: "other", label: "Other" },
 ];
 
+const genderOptions = [
+  { value: "", label: "Select Target Gender" },
+  { value: "male", label: "Male" },
+  { value: "female", label: "Female" },
+  { value: "unisex", label: "Unisex" },
+];
+
 export const ProductSpecificationsPage: React.FC = () => {
   const { formData, updateFormData, updateValidation, validationState } =
     useProductForm();
@@ -136,6 +143,12 @@ export const ProductSpecificationsPage: React.FC = () => {
     updateValidation("totalCarat", errors.length === 0, errors);
   };
 
+  const validateGender = (value: string) => {
+    const errors: string[] = [];
+    // Gender is optional, so no validation errors for empty values
+    updateValidation("gender", errors.length === 0, errors);
+  };
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -186,8 +199,7 @@ export const ProductSpecificationsPage: React.FC = () => {
               {validationState.length?.errors.map((error, index) => (
                 <p
                   key={index}
-                  className="text-red-500 text-sm flex items-center gap-1"
-                >
+                  className="text-red-500 text-sm flex items-center gap-1">
                   <Icon icon="material-symbols:error" className="w-4 h-4" />
                   {error}
                 </p>
@@ -213,8 +225,7 @@ export const ProductSpecificationsPage: React.FC = () => {
               {validationState.dimension?.errors.map((error, index) => (
                 <p
                   key={index}
-                  className="text-red-500 text-sm flex items-center gap-1"
-                >
+                  className="text-red-500 text-sm flex items-center gap-1">
                   <Icon icon="material-symbols:error" className="w-4 h-4" />
                   {error}
                 </p>
@@ -242,8 +253,7 @@ export const ProductSpecificationsPage: React.FC = () => {
               {validationState.quantity?.errors.map((error, index) => (
                 <p
                   key={index}
-                  className="text-red-500 text-sm flex items-center gap-1"
-                >
+                  className="text-red-500 text-sm flex items-center gap-1">
                   <Icon icon="material-symbols:error" className="w-4 h-4" />
                   {error}
                 </p>
@@ -281,8 +291,7 @@ export const ProductSpecificationsPage: React.FC = () => {
               {validationState.shape?.errors.map((error, index) => (
                 <p
                   key={index}
-                  className="text-red-500 text-sm flex items-center gap-1"
-                >
+                  className="text-red-500 text-sm flex items-center gap-1">
                   <Icon icon="material-symbols:error" className="w-4 h-4" />
                   {error}
                 </p>
@@ -307,8 +316,7 @@ export const ProductSpecificationsPage: React.FC = () => {
               {validationState.clarity?.errors.map((error, index) => (
                 <p
                   key={index}
-                  className="text-red-500 text-sm flex items-center gap-1"
-                >
+                  className="text-red-500 text-sm flex items-center gap-1">
                   <Icon icon="material-symbols:error" className="w-4 h-4" />
                   {error}
                 </p>
@@ -362,6 +370,35 @@ export const ProductSpecificationsPage: React.FC = () => {
               </p>
             </div>
 
+            {/* Gender */}
+            <div className="space-y-2">
+              <DropdownField
+                label="Target Gender"
+                firstInput="Select target gender"
+                options={genderOptions}
+                value={formData.gender || ""}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  updateFormData({
+                    gender: value as "male" | "female" | "unisex" | undefined,
+                  });
+                  validateGender(value);
+                }}
+                onBlur={(e) => validateGender(e.target.value)}
+              />
+              <p className="text-sm text-gray-500">
+                Target audience for this product
+              </p>
+              {validationState.gender?.errors.map((error, index) => (
+                <p
+                  key={index}
+                  className="text-red-500 text-sm flex items-center gap-1">
+                  <Icon icon="material-symbols:error" className="w-4 h-4" />
+                  {error}
+                </p>
+              ))}
+            </div>
+
             {/* Total Carat */}
             <div className="space-y-2">
               <InputField
@@ -384,8 +421,7 @@ export const ProductSpecificationsPage: React.FC = () => {
               {validationState.totalCarat?.errors.map((error, index) => (
                 <p
                   key={index}
-                  className="text-red-500 text-sm flex items-center gap-1"
-                >
+                  className="text-red-500 text-sm flex items-center gap-1">
                   <Icon icon="material-symbols:error" className="w-4 h-4" />
                   {error}
                 </p>
@@ -416,8 +452,7 @@ export const ProductSpecificationsPage: React.FC = () => {
               {validationState.makingCharges?.errors.map((error, index) => (
                 <p
                   key={index}
-                  className="text-red-500 text-sm flex items-center gap-1"
-                >
+                  className="text-red-500 text-sm flex items-center gap-1">
                   <Icon icon="material-symbols:error" className="w-4 h-4" />
                   {error}
                 </p>
