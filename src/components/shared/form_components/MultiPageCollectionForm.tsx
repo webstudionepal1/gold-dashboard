@@ -73,7 +73,7 @@ const MultiPageFormContent: React.FC<{
   } = useMultiPageForm();
 
   // Determine if we should show the product selection step
-  const shouldShowProductSelection = formData.collectionMode === "manual";
+  const shouldShowProductSelection = formData.collectionMode === "manual" || formData.collectionMode === "hybrid";
 
   // Dynamic steps based on collection mode
   const dynamicSteps = useMemo(() => {
