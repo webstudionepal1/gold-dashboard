@@ -1,6 +1,6 @@
-import { get } from "lodash";
-import { IFetchProduct } from "../../../../../server/api/productHooks";
-import { DropdownSection } from "./DropDownSection";
+import { get } from 'lodash';
+import { IFetchProduct } from '../../../../../server/api/productHooks';
+import { DropdownSection } from './DropDownSection';
 
 // Type for product variant
 interface ProductVariant {
@@ -27,19 +27,17 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
     );
   }
 
-
   const specifications = {
-    Length: get(product, "length", 0),
-    "Clasp Type": get(product, "claspType.name", "-"),
-    "Rhodoum Finishes": get(product, "rhodoumFinishes", "false"),
+    Length: get(product, 'length', 0),
+    'Clasp Type': get(product, 'claspType.name', '-'),
+    'Rhodoum Finishes': get(product, 'rhodoumFinishes', 'false'),
   };
   const natural = {
-    Shape: get(product, "shape", "-"),
-    Color: get(product, "color", "-"),
-    Quantity: get(product, "quantity", "-"),
-    Clarity: get(product, "clarity", "-"),
+    Shape: get(product, 'shape', '-'),
+    Color: get(product, 'color', '-'),
+    Quantity: get(product, 'quantity', '-'),
+    Clarity: get(product, 'clarity', '-'),
   };
-
 
   return (
     <div className="space-y-3">
@@ -49,21 +47,21 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
               <h1 className="text-xl font-bold text-gray-800 leading-tight">
-                {get(product, "name", "-")}
+                {get(product, 'name', '-')}
               </h1>
               <span className="px-2 py-0.5 text-xs text-white rounded bg-amber-500 flex-shrink-0">
-                {get(product, "status", "-")}
+                {get(product, 'status', '-')}
               </span>
             </div>
             <p className="text-sm font-medium text-amber-600">
-              {get(product, "category.name", "-")}
+              {get(product, 'category.name', '-')}
             </p>
           </div>
         </div>
 
         {/* Description */}
         <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-          {get(product, "description", "-")}
+          {get(product, 'description', '-')}
         </p>
 
         {/* Tags */}
@@ -72,8 +70,9 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
             {product.tags.slice(0, 4).map((tag, index) => (
               <span
                 key={index}
-                className="px-2 py-0.5 text-xs text-gray-600 bg-gray-100 rounded-full">
-                #{tag.replace(/\s+/g, "")}
+                className="px-2 py-0.5 text-xs text-gray-600 bg-gray-100 rounded-full"
+              >
+                #{tag.replace(/\s+/g, '')}
               </span>
             ))}
             {product.tags.length > 4 && (
@@ -103,10 +102,13 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-3">
                     <div className="bg-amber-100 text-amber-800 px-2 py-1 rounded text-sm font-semibold">
-                      ${item?.price?.toLocaleString() || 0}
+                      RS. {item?.price?.toLocaleString() || 0}
                     </div>
                     <div className="text-sm font-medium text-gray-900">
-                      {item?.wt || 0} <span className="text-xs text-gray-500">{item?.unit || 'units'}</span>
+                      {item?.wt || 0}{' '}
+                      <span className="text-xs text-gray-500">
+                        {item?.unit || 'units'}
+                      </span>
                     </div>
                   </div>
                   {(item?.remainingStock || 0) <= (item?.reorderPoint || 0) && (
@@ -119,11 +121,31 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
                 {/* Single Row Stock Info */}
                 <div className="flex items-center justify-between text-xs text-gray-600 mb-2">
                   <div className="flex items-center gap-3">
-                    <span>Total: <span className="font-semibold text-gray-900">{item?.totalStock || 0}</span></span>
-                    <span>Used: <span className="font-semibold text-red-600">{item?.usedStock || 0}</span></span>
-                    <span>Left: <span className={`font-semibold ${
-                      (item?.remainingStock || 0) <= (item?.reorderPoint || 0) ? 'text-red-600' : 'text-green-600'
-                    }`}>{item?.remainingStock || 0}</span></span>
+                    <span>
+                      Total:{' '}
+                      <span className="font-semibold text-gray-900">
+                        {item?.totalStock || 0}
+                      </span>
+                    </span>
+                    <span>
+                      Used:{' '}
+                      <span className="font-semibold text-red-600">
+                        {item?.usedStock || 0}
+                      </span>
+                    </span>
+                    <span>
+                      Left:{' '}
+                      <span
+                        className={`font-semibold ${
+                          (item?.remainingStock || 0) <=
+                          (item?.reorderPoint || 0)
+                            ? 'text-red-600'
+                            : 'text-green-600'
+                        }`}
+                      >
+                        {item?.remainingStock || 0}
+                      </span>
+                    </span>
                   </div>
                   <span>Reorder: {item?.reorderPoint || 0}</span>
                 </div>
@@ -135,17 +157,27 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
                       className={`h-1 rounded-full transition-all duration-300 ${
                         (item?.remainingStock || 0) <= (item?.reorderPoint || 0)
                           ? 'bg-red-500'
-                          : (item?.remainingStock || 0) <= (item?.totalStock || 1) * 0.3
+                          : (item?.remainingStock || 0) <=
+                            (item?.totalStock || 1) * 0.3
                           ? 'bg-yellow-500'
                           : 'bg-green-500'
                       }`}
                       style={{
-                        width: `${Math.min(((item?.remainingStock || 0) / (item?.totalStock || 1)) * 100, 100)}%`
+                        width: `${Math.min(
+                          ((item?.remainingStock || 0) /
+                            (item?.totalStock || 1)) *
+                            100,
+                          100
+                        )}%`,
                       }}
                     ></div>
                   </div>
                   <span className="text-xs text-gray-500 min-w-[30px]">
-                    {Math.round(((item?.remainingStock || 0) / (item?.totalStock || 1)) * 100)}%
+                    {Math.round(
+                      ((item?.remainingStock || 0) / (item?.totalStock || 1)) *
+                        100
+                    )}
+                    %
                   </span>
                 </div>
               </div>

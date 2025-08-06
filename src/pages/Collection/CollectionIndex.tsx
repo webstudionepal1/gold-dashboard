@@ -1,44 +1,44 @@
-import { Icon } from "@iconify/react/dist/iconify.js";
-import React, { useCallback, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { SearchFilterSort } from "../../components/global/SearchFilterSort";
+import { Icon } from '@iconify/react/dist/iconify.js';
+import React, { useCallback, useMemo, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { SearchFilterSort } from '../../components/global/SearchFilterSort';
 import {
   IFetchCollection,
   useDeleteCollectionMutation,
   useGetAllCollectionsQuery,
-} from "../../server/api/collectionHooks";
-import MasterTable from "../../components/shared/MasterTable";
-import Header from "../../components/shared/table_heading/Header";
-import { get } from "lodash";
-import SafeImage from "../../components/ui/SafeImage";
+} from '../../server/api/collectionHooks';
+import MasterTable from '../../components/shared/MasterTable';
+import Header from '../../components/shared/table_heading/Header';
+import { get } from 'lodash';
+import SafeImage from '../../components/ui/SafeImage';
 
 // Filter and sort options for collections
 const filterOptions = [
-  { label: "All Collections", value: "" },
-  { label: "Active", value: "active" },
-  { label: "Inactive", value: "inactive" },
-  { label: "Featured", value: "featured" },
-  { label: "Limited Edition", value: "limited" },
-  { label: "Material", value: "material" },
-  { label: "Gemstone", value: "gemstone" },
-  { label: "Style", value: "style" },
-  { label: "Occasion", value: "occasion" },
+  { label: 'All Collections', value: '' },
+  { label: 'Active', value: 'active' },
+  { label: 'Inactive', value: 'inactive' },
+  { label: 'Featured', value: 'featured' },
+  { label: 'Limited Edition', value: 'limited' },
+  { label: 'Material', value: 'material' },
+  { label: 'Gemstone', value: 'gemstone' },
+  { label: 'Style', value: 'style' },
+  { label: 'Occasion', value: 'occasion' },
 ];
 
 const sortOptions = [
-  { label: "Name (A-Z)", value: "name_asc" },
-  { label: "Name (Z-A)", value: "name_desc" },
-  { label: "Created Date (Newest)", value: "created_desc" },
-  { label: "Created Date (Oldest)", value: "created_asc" },
-  { label: "Sort Order", value: "sort_order" },
-  { label: "Total Products", value: "products_desc" },
+  { label: 'Name (A-Z)', value: 'name_asc' },
+  { label: 'Name (Z-A)', value: 'name_desc' },
+  { label: 'Created Date (Newest)', value: 'created_desc' },
+  { label: 'Created Date (Oldest)', value: 'created_asc' },
+  { label: 'Sort Order', value: 'sort_order' },
+  { label: 'Total Products', value: 'products_desc' },
 ];
 
 const CollectionIndex: React.FC = () => {
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterValue, setFilterValue] = useState("");
-  const [sortValue, setSortValue] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterValue, setFilterValue] = useState('');
+  const [sortValue, setSortValue] = useState('');
 
   // Fetch collections
   const { data: collections = [], isLoading } = useGetAllCollectionsQuery();
@@ -48,14 +48,16 @@ const CollectionIndex: React.FC = () => {
   const columns = useMemo(
     () => [
       {
-        key: "name",
-        title: "Collection Name",
-        width: "20%",
+        key: 'name',
+        title: 'Collection Name',
+        width: '20%',
         render: (value: string, row: IFetchCollection) => (
           <div className="flex items-center gap-3">
             {row.images && row.images.length > 0 && (
               <SafeImage
-                src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${row.bannerImage}`}
+                src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${
+                  row.bannerImage
+                }`}
                 alt={row.name}
                 className="w-10 h-10 rounded-lg object-cover"
               />
@@ -68,27 +70,27 @@ const CollectionIndex: React.FC = () => {
         ),
       },
       {
-        key: "collectionType",
-        title: "Type",
-        width: "12%",
+        key: 'collectionType',
+        title: 'Type',
+        width: '12%',
         render: (value: string) => (
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 capitalize">
-            {value?.replace("_", " ") || "Custom"}
+            {value?.replace('_', ' ') || 'Custom'}
           </span>
         ),
       },
       {
-        key: "collectionMode",
-        title: "Mode",
-        width: "10%",
+        key: 'collectionMode',
+        title: 'Mode',
+        width: '10%',
         render: (value: string) => (
           <span
             className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${
-              value === "automatic"
-                ? "bg-green-100 text-green-800"
-                : value === "hybrid"
-                ? "bg-yellow-100 text-yellow-800"
-                : "bg-gray-100 text-gray-800"
+              value === 'automatic'
+                ? 'bg-green-100 text-green-800'
+                : value === 'hybrid'
+                ? 'bg-yellow-100 text-yellow-800'
+                : 'bg-gray-100 text-gray-800'
             }`}
           >
             {value}
@@ -96,55 +98,55 @@ const CollectionIndex: React.FC = () => {
         ),
       },
       {
-        key: "totalProducts",
-        title: "Products",
-        width: "8%",
+        key: 'totalProducts',
+        title: 'Products',
+        width: '8%',
         render: (value: number) => (
           <span className="text-sm font-medium">{value || 0}</span>
         ),
       },
       {
-        key: "materialType",
-        title: "Material",
-        width: "10%",
+        key: 'materialType',
+        title: 'Material',
+        width: '10%',
         render: (value: string) =>
           value ? (
             <span className="text-sm capitalize">
-              {value?.replace("_", " ") || value}
+              {value?.replace('_', ' ') || value}
             </span>
           ) : (
             <span className="text-gray-400">-</span>
           ),
       },
       {
-        key: "gemstoneType",
-        title: "Gemstone",
-        width: "10%",
+        key: 'gemstoneType',
+        title: 'Gemstone',
+        width: '10%',
         render: (value: string) =>
-          value && value !== "none" ? (
+          value && value !== 'none' ? (
             <span className="text-sm capitalize">{value}</span>
           ) : (
             <span className="text-gray-400">-</span>
           ),
       },
       {
-        key: "isActive",
-        title: "Status",
-        width: "8%",
+        key: 'isActive',
+        title: 'Status',
+        width: '8%',
         render: (value: boolean) => (
           <span
             className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-              value ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+              value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
             }`}
           >
-            {value ? "Active" : "Inactive"}
+            {value ? 'Active' : 'Inactive'}
           </span>
         ),
       },
       {
-        key: "isFeatured",
-        title: "Featured",
-        width: "8%",
+        key: 'isFeatured',
+        title: 'Featured',
+        width: '8%',
         render: (value: boolean) => (
           <div className="flex justify-center">
             {value ? (
@@ -162,9 +164,9 @@ const CollectionIndex: React.FC = () => {
         ),
       },
       {
-        key: "isLimitedEdition",
-        title: "Limited",
-        width: "8%",
+        key: 'isLimitedEdition',
+        title: 'Limited',
+        width: '8%',
         render: (value: boolean) => (
           <div className="flex justify-center">
             {value ? (
@@ -179,9 +181,9 @@ const CollectionIndex: React.FC = () => {
         ),
       },
       {
-        key: "sortOrder",
-        title: "Order",
-        width: "6%",
+        key: 'sortOrder',
+        title: 'Order',
+        width: '6%',
         render: (value: number) => (
           <span className="text-sm">{value || 0}</span>
         ),
@@ -210,13 +212,13 @@ const CollectionIndex: React.FC = () => {
     if (filterValue) {
       filtered = filtered.filter((collection) => {
         switch (filterValue) {
-          case "active":
+          case 'active':
             return collection.isActive;
-          case "inactive":
+          case 'inactive':
             return !collection.isActive;
-          case "featured":
+          case 'featured':
             return collection.isFeatured;
-          case "limited":
+          case 'limited':
             return collection.isLimitedEdition;
           default:
             return collection.collectionType === filterValue;
@@ -228,23 +230,23 @@ const CollectionIndex: React.FC = () => {
     if (sortValue) {
       filtered = [...filtered].sort((a, b) => {
         switch (sortValue) {
-          case "name_asc":
+          case 'name_asc':
             return a.name.localeCompare(b.name);
-          case "name_desc":
+          case 'name_desc':
             return b.name.localeCompare(a.name);
-          case "created_desc":
+          case 'created_desc':
             return (
               new Date(b.createdAt || 0).getTime() -
               new Date(a.createdAt || 0).getTime()
             );
-          case "created_asc":
+          case 'created_asc':
             return (
               new Date(a.createdAt || 0).getTime() -
               new Date(b.createdAt || 0).getTime()
             );
-          case "sort_order":
+          case 'sort_order':
             return (a.sortOrder || 0) - (b.sortOrder || 0);
-          case "products_desc":
+          case 'products_desc':
             return (b.totalProducts || 0) - (a.totalProducts || 0);
           default:
             return 0;
@@ -285,14 +287,14 @@ const CollectionIndex: React.FC = () => {
 
   const handleView = useCallback(
     (collection: IFetchCollection) => {
-      navigate(`/collection/details/${collection._id}`);
+      navigate(`/collection/${collection._id}`);
     },
     [navigate]
   );
 
   const handleDelete = useCallback(
     (id: string) => {
-      if (window.confirm("Are you sure you want to delete this collection?")) {
+      if (window.confirm('Are you sure you want to delete this collection?')) {
         deleteCollectionMutation.mutate(id);
       }
     },

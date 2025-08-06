@@ -1,11 +1,11 @@
-import { Icon } from "@iconify/react/dist/iconify.js";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import { useAuth, useLogout } from "../../hooks/useAuth";
-import { useOutsideClick } from "../../hooks/UseOutsideClick";
-import { Text } from "./Text";
-import { useSidebar } from "./sidebar/SidebarHooks";
+import { Icon } from '@iconify/react/dist/iconify.js';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { useAuth, useLogout } from '../../hooks/useAuth';
+import { useOutsideClick } from '../../hooks/UseOutsideClick';
+import { Text } from './Text';
+import { useSidebar } from './sidebar/SidebarHooks';
 
 /*eslint-disable @typescript-eslint/no-explicit-any*/
 export const Navbar = () => {
@@ -45,12 +45,12 @@ export const Navbar = () => {
 
   const handleLogout = () => {
     logout();
-    toast.success("Logged out successfully");
+    toast.success('Logged out successfully');
     setShowLogout(false);
   };
 
   const handleViewAllClick = () => {
-    navigate("/notification");
+    navigate('/notification');
   };
 
   //   const handleNotificationClick = (type: string, _id: string) => {
@@ -118,7 +118,8 @@ export const Navbar = () => {
   return (
     <div
       className="flex justify-end w-full gap-6 px-6 py-3 bg-white shadow-md md:justify-between place-items-center"
-      ref={modalRef}>
+      ref={modalRef}
+    >
       <div className="hidden md:block">
         <Icon
           icon="iconamoon:menu-burger-horizontal-light"
@@ -142,7 +143,8 @@ export const Navbar = () => {
 
         <section
           className="z-50 flex gap-3 cursor-pointer place-items-center"
-          onClick={() => setShowLogout((prev) => !prev)}>
+          onClick={() => setShowLogout((prev) => !prev)}
+        >
           <div className="flex gap-3 place-items-center">
             {/* <div className="rounded-full bg-gray- p-3"> */}
             <img src="/avatar.webp" alt="profile" className="w-8" />
@@ -159,7 +161,7 @@ export const Navbar = () => {
           <section className="relative">
             <Icon icon="oui:arrow-down" fontSize={16} />
             {showLogout && (
-              <div className="absolute -left-32 top-8 w-[15rem] h-fit bg-white shadow-sm border rounded-lg">
+              <div className="absolute -right-6  top-8 w-[15rem] h-fit bg-white shadow-sm border rounded-lg">
                 <div className="flex flex-col items-center justify-center gap-2 p-4">
                   <div className="w-16 h-16 rounded-full">
                     <img
@@ -180,7 +182,8 @@ export const Navbar = () => {
                     </h1>
                     <button
                       className="bg-red w-32 py-2.5 px-2 rounded flex justify-center items-center text-white font-semibold gap-2 mt-2"
-                      onClick={handleLogout}>
+                      onClick={handleLogout}
+                    >
                       Logout
                     </button>
                   </div>
@@ -197,8 +200,8 @@ export const Navbar = () => {
           <Icon
             icon={
               isSidebarOpen
-                ? "oui:cross"
-                : "iconamoon:menu-burger-horizontal-light"
+                ? 'oui:cross'
+                : 'iconamoon:menu-burger-horizontal-light'
             }
             onClick={toggleSidebar}
             fontSize={24}

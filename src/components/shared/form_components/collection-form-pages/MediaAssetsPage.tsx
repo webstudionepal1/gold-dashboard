@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { Icon } from "@iconify/react/dist/iconify.js";
-import FileDropInput from "../FileDropInput";
-import VideoUploadField from "../VideoUploadField";
-import { useMultiPageForm } from "../MultiPageFormContext";
+import React, { useState } from 'react';
+import { Icon } from '@iconify/react/dist/iconify.js';
+import FileDropInput from '../FileDropInput';
+import VideoUploadField from '../VideoUploadField';
+import { useMultiPageForm } from '../MultiPageFormContext';
 
 export const MediaAssetsPage: React.FC = () => {
   const { formData, updateFormData, updateValidation, validationState } =
@@ -19,18 +19,18 @@ export const MediaAssetsPage: React.FC = () => {
     // Validate images first
     const errors: string[] = [];
     if (files && files.length > 10) {
-      errors.push("Maximum 10 images allowed");
-      updateValidation("images", false, errors);
+      errors.push('Maximum 10 images allowed');
+      updateValidation('images', false, errors);
       return;
     }
 
     if (files && files.length > 0) {
       // Store actual File objects instead of uploading immediately
       updateFormData({ images: files });
-      updateValidation("images", true, []);
+      updateValidation('images', true, []);
     } else {
       updateFormData({ images: [] });
-      updateValidation("images", true, []);
+      updateValidation('images', true, []);
     }
   };
 
@@ -41,10 +41,10 @@ export const MediaAssetsPage: React.FC = () => {
     if (file) {
       // Store actual File object instead of uploading immediately
       updateFormData({ bannerImage: file });
-      updateValidation("bannerImage", true, []);
+      updateValidation('bannerImage', true, []);
     } else {
       updateFormData({ bannerImage: null });
-      updateValidation("bannerImage", true, []);
+      updateValidation('bannerImage', true, []);
     }
   };
 
@@ -55,16 +55,16 @@ export const MediaAssetsPage: React.FC = () => {
     if (file) {
       // Store actual File object instead of uploading immediately
       updateFormData({ video: file });
-      updateValidation("video", true, []);
+      updateValidation('video', true, []);
     } else {
       updateFormData({ video: null });
-      updateValidation("video", true, []);
+      updateValidation('video', true, []);
     }
   };
 
   // Handle video upload error
   const handleVideoUploadError = (error: string) => {
-    updateValidation("video", false, [error]);
+    updateValidation('video', false, [error]);
   };
 
   return (
@@ -115,7 +115,7 @@ export const MediaAssetsPage: React.FC = () => {
                 />
 
                 {/* Image Preview Grid */}
-                {selectedImages.length > 0 && (
+                {/* {selectedImages.length > 0 && (
                   <div className="w-full min-w-0">
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
                       {selectedImages.map((file, index) => (
@@ -147,7 +147,7 @@ export const MediaAssetsPage: React.FC = () => {
                       ))}
                     </div>
                   </div>
-                )}
+                )} */}
 
                 {/* Validation Errors */}
                 {validationState.images?.errors.map((error, index) => (
@@ -186,7 +186,7 @@ export const MediaAssetsPage: React.FC = () => {
                 value={bannerImage}
                 onChange={handleBannerImageUpload}
                 existingImageUrl={
-                  typeof formData.bannerImage === "string"
+                  typeof formData.bannerImage === 'string'
                     ? formData.bannerImage
                     : undefined
                 }
@@ -232,7 +232,7 @@ export const MediaAssetsPage: React.FC = () => {
                 onUploadError={handleVideoUploadError}
                 maxFileSize={200}
                 existingVideoUrl={
-                  typeof formData.video === "string"
+                  typeof formData.video === 'string'
                     ? formData.video
                     : undefined
                 }
@@ -289,7 +289,7 @@ export const MediaAssetsPage: React.FC = () => {
                       Banner Image
                     </p>
                     <p className="text-gray-600 truncate">
-                      {bannerImage ? "✓ Uploaded" : "Not uploaded"}
+                      {bannerImage ? '✓ Uploaded' : 'Not uploaded'}
                     </p>
                   </div>
                   <div className="bg-white rounded-lg p-3 border border-gray-200 min-w-0">
@@ -297,7 +297,7 @@ export const MediaAssetsPage: React.FC = () => {
                       Collection Video
                     </p>
                     <p className="text-gray-600 truncate">
-                      {videoFile ? "✓ Uploaded" : "Not uploaded"}
+                      {videoFile ? '✓ Uploaded' : 'Not uploaded'}
                     </p>
                   </div>
                 </div>
