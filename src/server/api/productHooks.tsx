@@ -102,6 +102,7 @@ export interface IFetchProduct {
   rhodoumFinishes: boolean;
   shape: string;
   quantity: number;
+  gender:string;
   totalCarat: number;
   color: string;
   clarity: string;
