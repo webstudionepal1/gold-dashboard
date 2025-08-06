@@ -836,7 +836,7 @@ const AddSupplierForm = () => {
                         field.handleChange(file);
                         // When a new image is selected, clear the existing image
                         if (file) {
-                          form.setFieldValue("existingLogo", null);
+                          form.setFieldValue("existingLogo", undefined);
                         }
                       }}
                       value={field.state.value}

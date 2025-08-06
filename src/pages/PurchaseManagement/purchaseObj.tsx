@@ -416,11 +416,7 @@ interface IButtonObj {
   };
 }
 
-interface IContactPerson {
-  name: string;
-  phone: string;
-  email: string;
-}
+// Removed unused interface IContactPerson
 
 export interface SupplierFormValues {
   name: string;
@@ -591,7 +587,7 @@ export function appendFormData(
   parentKey: string = ""
 ) {
   for (const key in data) {
-    if (data.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(data, key)) {
       const value = data[key];
       const fullKey = parentKey ? `${parentKey}.${key}` : key;
 
@@ -611,7 +607,7 @@ export function appendFormData(
 export interface ITable {
   [key: string]: {
     columns: { key: string; title: string }[];
-    rows: any;
+    rows: any[];
     [key: string]: any;
   };
 }

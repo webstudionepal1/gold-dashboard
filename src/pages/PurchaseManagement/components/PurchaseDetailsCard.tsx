@@ -9,27 +9,7 @@ import {
 } from "../../../server/api/purchaseHooks";
 import { viewPurchaseColumns } from "../purchaseObj";
 
-type Item = {
-  name: string;
-  unit: string;
-  costPerUnit: number;
-  quantity: number;
-  total: number;
-};
-
-type SummaryType = "purchase" | "refund";
-type PurchaseDetailsProps = {
-  billNo: string;
-  date: string;
-  purchaseId: string;
-  supplier: string;
-  items: Item[];
-  totalCost?: number;
-  discount?: number;
-  netTotal?: number;
-  refundAmount?: number;
-  summaryType?: SummaryType;
-};
+// Removed unused types to fix ESLint warnings
 
 interface PropDetails {
   data: IFetchPurchase | IFetchPurchaseReturn;
@@ -41,7 +21,7 @@ export const PurchaseDetailsCard: React.FC<PropDetails> = ({
 }) => {
   const rows =
     data?.items && data.items.length > 0
-      ? data.items.map((item: any) => ({
+      ? data.items.map((item) => ({
           name: get(item, "product.name", "N/A"),
           costPerUnit: get(item, "price", 0),
           quantity: get(item, "quantity", 0),
@@ -49,7 +29,7 @@ export const PurchaseDetailsCard: React.FC<PropDetails> = ({
           total: get(item, "totalCost", 0),
         }))
       : data?.products && data.products.length > 0
-      ? data.products.map((item: any) => ({
+      ? data.products.map((item) => ({
           name: get(item, "product.name", "N/A"),
           costPerUnit: get(item, "price", 0),
           quantity: get(item, "quantity", 0),
@@ -89,37 +69,36 @@ export const PurchaseDetailsCard: React.FC<PropDetails> = ({
       />
 
       {/* Summary */}
-      {summary === "refund" &&
-        (data as any).totalQuantityPurchased !== undefined && (
-          <div className="pt-4 border-t border-gray-200">
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Total Qty Purchased:</span>
-                <span className="font-semibold">
-                  {(data as any).totalQuantityPurchased || 0}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Qty Returned:</span>
-                <span className="font-semibold">
-                  {(data as any).totalQuantityReturned || 0}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Total Return Amount:</span>
-                <span className="font-semibold">
-                  ₹{(data as any).totalReturnAmount || 0}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Refund Amount:</span>
-                <span className="font-semibold">
-                  ₹{(data as any).refundAmount || 0}
-                </span>
-              </div>
+      {summary === "refund" && "totalQuantityPurchased" in data && (
+        <div className="pt-4 border-t border-gray-200">
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="flex justify-between">
+              <span className="text-gray-600">Total Qty Purchased:</span>
+              <span className="font-semibold">
+                {(data as IFetchPurchaseReturn).totalQuantityPurchased || 0}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Qty Returned:</span>
+              <span className="font-semibold">
+                {(data as IFetchPurchaseReturn).totalQuantityReturned || 0}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Total Return Amount:</span>
+              <span className="font-semibold">
+                ₹{(data as IFetchPurchaseReturn).totalReturnAmount || 0}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Refund Amount:</span>
+              <span className="font-semibold">
+                ₹{(data as IFetchPurchaseReturn).refundAmount || 0}
+              </span>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
       {/* Purchase Summary */}
       {summary === "Purchase" && (

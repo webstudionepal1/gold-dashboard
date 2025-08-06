@@ -349,7 +349,7 @@ const AddBannerForm = () => {
                         field.handleChange(file);
                         // When a new image is selected, clear the existing image
                         if (file) {
-                          form.setFieldValue("existingImage", null);
+                          form.setFieldValue("existingImage", undefined);
                         }
                       }}
                     />
@@ -387,7 +387,7 @@ const AddBannerForm = () => {
                         field.handleChange(file);
                         // When a new image is selected, clear the existing image
                         if (file) {
-                          form.setFieldValue("existingMobImage", null);
+                          form.setFieldValue("existingMobImage", undefined);
                         }
                       }}
                     />

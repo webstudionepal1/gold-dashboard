@@ -179,7 +179,7 @@ const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
                     field.handleChange(file);
                     // When a new image is selected, clear the existing image
                     if (file) {
-                      form.setFieldValue("existingImage", null);
+                      form.setFieldValue("existingImage", undefined);
                     }
                   }}
                   existingFile={form.getFieldValue("existingImage")}
