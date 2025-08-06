@@ -198,8 +198,7 @@ const AddBannerForm = () => {
               e.preventDefault();
               e.stopPropagation();
               form.handleSubmit();
-            }}
-          >
+            }}>
             <div>
               <h1 className="text-xl font-semibold">General Information</h1>
               <div className="border-b border-[#dedde2] w-full my-2"></div>
@@ -236,7 +235,6 @@ const AddBannerForm = () => {
                 )}
               </form.Field>
             </div>
-
             <div className="flex items-center gap-4 w-full">
               <form.Field name="category">
                 {(field) => (
@@ -268,12 +266,10 @@ const AddBannerForm = () => {
                 )}
               </form.Field>
             </div>
-
             <div>
               <h1 className="text-xl font-semibold">Priority</h1>
               <div className="border-b border-[#dedde2] w-full my-2"></div>
             </div>
-
             <div className="flex items-center gap-4 w-full">
               <form.Field name="priority">
                 {(field) => (
@@ -315,13 +311,12 @@ const AddBannerForm = () => {
                   </div>
                 )}
               </form.Field>
-            </div>pnpm 
-
+            </div>
+            pnpm
             <button
               type="submit"
               disabled={bannerPending || bannerUpdatePending}
-              className="self-end bg-[#df8d29] text-white px-7 py-2 rounded-xl disabled:opacity-50"
-            >
+              className="self-end bg-[#df8d29] text-white px-7 py-2 rounded-xl disabled:opacity-50">
               {bannerPending || bannerUpdatePending ? "Saving..." : "Save"}
             </button>
           </form>
@@ -350,7 +345,13 @@ const AddBannerForm = () => {
                         "image/*": [".png", ".jpg", ".jpeg", ".svg"],
                       }}
                       existingFile={form.getFieldValue("existingImage")}
-                      onChange={(file) => field.handleChange(file)}
+                      onChange={(file) => {
+                        field.handleChange(file);
+                        // When a new image is selected, clear the existing image
+                        if (file) {
+                          form.setFieldValue("existingImage", null);
+                        }
+                      }}
                     />
                     <FieldError field={field} />
                   </div>
@@ -382,7 +383,13 @@ const AddBannerForm = () => {
                         "image/*": [".png", ".jpg", ".jpeg", ".svg", ".webp"],
                       }}
                       existingFile={form.getFieldValue("existingMobImage")}
-                      onChange={(file) => field.handleChange(file)}
+                      onChange={(file) => {
+                        field.handleChange(file);
+                        // When a new image is selected, clear the existing image
+                        if (file) {
+                          form.setFieldValue("existingMobImage", null);
+                        }
+                      }}
                     />
                     <FieldError field={field} />
                   </div>
