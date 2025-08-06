@@ -650,6 +650,10 @@ export const purchaseColumns = [
     key: "supplier",
   },
   {
+    title: "Total Quantity",
+    key: "totalQuantity",
+  },
+  {
     title: "Total Amount",
     key: "totalCost",
   },

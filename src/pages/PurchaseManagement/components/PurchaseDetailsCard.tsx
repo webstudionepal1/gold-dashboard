@@ -82,7 +82,7 @@ export const PurchaseDetailsCard: React.FC<PropDetails> = ({
 
       {/* Reused Table Component */}
       <MasterTable
-      mainClassName="p-0"
+        mainClassName="p-0"
         canSearch={false}
         columns={viewPurchaseColumns}
         rows={rows}
@@ -120,6 +120,26 @@ export const PurchaseDetailsCard: React.FC<PropDetails> = ({
             </div>
           </div>
         )}
+
+      {/* Purchase Summary */}
+      {summary === "Purchase" && (
+        <div className="pt-4 border-t border-gray-200">
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="flex justify-between">
+              <span className="text-gray-600">Total Quantity:</span>
+              <span className="font-semibold">
+                {rows.reduce((acc, item) => acc + (item.quantity || 0), 0)}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Total Amount:</span>
+              <span className="font-semibold">
+                ₹{rows.reduce((acc, item) => acc + (item.total || 0), 0)}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
