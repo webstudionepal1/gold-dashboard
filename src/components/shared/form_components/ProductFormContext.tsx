@@ -42,6 +42,7 @@ export interface ProductFormData {
   color?: string;
   clarity: string;
   dimension: number;
+  gender?: "male" | "female" | "unisex";
   makingCharges: number;
 
   // Page 3: Product Variants
@@ -136,6 +137,7 @@ const defaultFormData: ProductFormData = {
   color: "",
   clarity: "",
   dimension: 0,
+  gender: undefined,
   makingCharges: 0,
 
   // Page 3: Product Variants
@@ -321,7 +323,7 @@ const getStepFields = (step: number): string[] => {
     case 1:
       return ["name", "description", "category", "subCategory"];
     case 2:
-      return ["length", "shape", "clarity", "dimension"];
+      return ["length", "shape", "clarity", "dimension", "gender"];
     case 3:
       return ["variants"];
     case 4:

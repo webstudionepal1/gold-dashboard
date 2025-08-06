@@ -416,11 +416,7 @@ interface IButtonObj {
   };
 }
 
-interface IContactPerson {
-  name: string;
-  phone: string;
-  email: string;
-}
+// Removed unused interface IContactPerson
 
 export interface SupplierFormValues {
   name: string;
@@ -591,7 +587,7 @@ export function appendFormData(
   parentKey: string = ""
 ) {
   for (const key in data) {
-    if (data.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(data, key)) {
       const value = data[key];
       const fullKey = parentKey ? `${parentKey}.${key}` : key;
 
@@ -611,7 +607,7 @@ export function appendFormData(
 export interface ITable {
   [key: string]: {
     columns: { key: string; title: string }[];
-    rows: any;
+    rows: any[];
     [key: string]: any;
   };
 }
@@ -648,6 +644,10 @@ export const purchaseColumns = [
   {
     title: "Supplier Name",
     key: "supplier",
+  },
+  {
+    title: "Total Quantity",
+    key: "totalQuantity",
   },
   {
     title: "Total Amount",
@@ -773,6 +773,7 @@ export interface IPurchaseForm {
     price: number;
     paidAmount: number;
     wt?: number;
+    unit?: string;
   }[];
   description?: string;
 }
@@ -788,6 +789,7 @@ export const PurchaseSchema = z.object({
         price: z.coerce.number().min(1, "**Price is required**"),
         paidAmount: z.coerce.number().min(1, "**Paid Amount is required**"),
         wt: z.coerce.number().optional(),
+        unit: z.string().min(1, "**Unit is required**"),
       })
     )
     .min(1, "**At least one item is required**"),

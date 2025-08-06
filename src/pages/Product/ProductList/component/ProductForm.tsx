@@ -144,9 +144,10 @@ const ProductForm = () => {
 
         // Handle image upload - Fix the field name mismatch
         if (value.images) {
+          // New image selected - this replaces any existing image
           formData.append("images", value.images);
         } else if (formstate !== "add" && value.existingImage) {
-          // For updates without new image, include existing image info
+          // For updates without new image, keep existing image
           formData.append("existingImage", value.existingImage);
         }
 
@@ -880,12 +881,18 @@ const ProductForm = () => {
                     form={form}
                     label=""
                     value={field.state.value}
-                    // existingFileField="existingImage"
+                    existingFileField="existingImage"
                     accept={{
                       "image/*": [".png", ".jpg", ".jpeg", ".svg", ".webp"],
                     }}
                     existingFile={form.getFieldValue("existingImage")}
-                    onChange={(file) => field.handleChange(file)}
+                    onChange={(file) => {
+                      field.handleChange(file);
+                      // When a new image is selected, clear the existing image
+                      if (file) {
+                        form.setFieldValue("existingImage", undefined);
+                      }
+                    }}
                   />
                 )}
               </form.Field>

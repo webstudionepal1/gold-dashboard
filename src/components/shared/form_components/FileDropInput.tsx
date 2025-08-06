@@ -54,13 +54,17 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
         const limitedFiles = newFiles.slice(0, maxFiles);
         props.onChange(limitedFiles);
       } else {
-        // Single file mode
+        // Single file mode - replace existing file
         if (acceptedFiles.length > 0) {
           props.onChange(acceptedFiles[0]);
+          // Clear existing file when new file is selected
+          if (form && props.existingFileField && !props.multiple) {
+            form.setFieldValue(props.existingFileField, null);
+          }
         }
       }
     },
-    [props, maxFiles]
+    [props, maxFiles, form]
   );
 
   const removeFile = () => {
@@ -202,13 +206,13 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
 
       return (
         <div>
-          {/* Existing file preview */}
+          {/* Show existing file preview only if no new file is selected */}
           {existingImage && !singleProps.value && (
             <div className="mb-4">
               {renderFilePreview(existingImage, 0, true)}
             </div>
           )}
-          {/* Selected file preview */}
+          {/* Show selected file preview - this replaces existing file */}
           {singleProps.value && (
             <div className="mb-4">
               {renderFilePreview(singleProps.value, 0, false)}

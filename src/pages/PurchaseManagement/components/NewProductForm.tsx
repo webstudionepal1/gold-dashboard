@@ -362,6 +362,7 @@ const NewProductForm = ({
               price: 0,
               paidAmount: 0,
               wt: 0,
+              unit: "gm",
             },
           ])
         : [
@@ -371,6 +372,7 @@ const NewProductForm = ({
               price: 0,
               paidAmount: 0,
               wt: 0,
+              unit: "gm",
             },
           ],
       description: edit ? get(data, "description", "") : "",
@@ -389,12 +391,6 @@ const NewProductForm = ({
       onClose();
     }
   }, [createSuccess, updateSuccess, onClose]);
-
-  // Function to get product weight by ID
-  const getProductWeight = (productId: string) => {
-    const product = products?.find((p) => p._id === productId);
-    return product?.variants?.[0]?.wt ?? 0;
-  };
 
   // Function to get available weights for a product
   const getProductWeightOptions = (productId: string) => {
@@ -462,6 +458,7 @@ const NewProductForm = ({
                       price: 0,
                       paidAmount: 0,
                       wt: 0,
+                      unit: "gm",
                     })
                   }
                   className="px-3 py-2 text-sm flex items-center text-white bg-[#d49327] transition-transform duration-200 ease-in-out hover:scale-105 rounded-lg">
@@ -488,8 +485,12 @@ const NewProductForm = ({
                             value={field.state.value}
                             onChange={(e) => {
                               field.handleChange(e.target.value);
-                              // Reset weight field when product changes so user must select from dropdown
+                              // Reset weight and unit fields when product changes so user must select from dropdown
                               form.setFieldValue(`products[${index}].wt`, 0);
+                              form.setFieldValue(
+                                `products[${index}].unit`,
+                                "gm"
+                              );
                             }}
                             options={productList}
                           />
@@ -548,42 +549,67 @@ const NewProductForm = ({
                         </div>
                       )}
                     </form.Field>
-                    <form.Field name={`products[${index}].wt`}>
-                      {(field) => {
-                        const selectedProductId = form.getFieldValue(
-                          `products[${index}].product`
-                        );
-                        const weightOptions =
-                          getProductWeightOptions(selectedProductId);
+                    <div className="grid grid-cols-2 gap-2">
+                      <form.Field name={`products[${index}].wt`}>
+                        {(field) => {
+                          const selectedProductId = form.getFieldValue(
+                            `products[${index}].product`
+                          );
+                          const weightOptions =
+                            getProductWeightOptions(selectedProductId);
 
-                        return (
+                          return (
+                            <div className="w-full">
+                              {weightOptions.length > 0 ? (
+                                <DropdownField
+                                  label="Weight"
+                                  required
+                                  firstInput="Select Weight"
+                                  options={weightOptions}
+                                  value={field.state.value?.toString()}
+                                  onChange={(e) =>
+                                    field.handleChange(Number(e.target.value))
+                                  }
+                                />
+                              ) : (
+                                <InputField
+                                  label="Weight"
+                                  placeholder="Weight"
+                                  value={field.state.value}
+                                  onChange={(e) =>
+                                    field.handleChange(Number(e.target.value))
+                                  }
+                                />
+                              )}
+                              <FieldError field={field} />
+                            </div>
+                          );
+                        }}
+                      </form.Field>
+
+                      <form.Field name={`products[${index}].unit`}>
+                        {(field) => (
                           <div className="w-full">
-                            {weightOptions.length > 0 ? (
-                              <DropdownField
-                                label="Weight"
-                                required
-                                firstInput="Select Weight"
-                                options={weightOptions}
-                                value={field.state.value?.toString()}
-                                onChange={(e) =>
-                                  field.handleChange(Number(e.target.value))
-                                }
-                              />
-                            ) : (
-                              <InputField
-                                label="Weight"
-                                placeholder="Weight"
-                                value={field.state.value}
-                                onChange={(e) =>
-                                  field.handleChange(Number(e.target.value))
-                                }
-                              />
-                            )}
+                            <DropdownField
+                              label="Unit"
+                              required
+                              firstInput="Select Unit"
+                              options={[
+                                { label: "Gm", value: "gm" },
+                                { label: "Carat", value: "carat" },
+                                { label: "Tola", value: "tola" },
+                                { label: "Kg", value: "kg" },
+                              ]}
+                              value={field.state.value}
+                              onChange={(e) =>
+                                field.handleChange(e.target.value)
+                              }
+                            />
                             <FieldError field={field} />
                           </div>
-                        );
-                      }}
-                    </form.Field>
+                        )}
+                      </form.Field>
+                    </div>
                   </div>
 
                   {index > 0 && (

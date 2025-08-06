@@ -542,8 +542,7 @@ const AddSupplierForm = () => {
             e.preventDefault();
             e.stopPropagation();
             form.handleSubmit();
-          }}
-        >
+          }}>
           <div className="col-span-4 p-6 space-y-4 bg-white border rounded-xl">
             <div>
               <h1 className="text-xl font-semibold">General Information</h1>
@@ -674,8 +673,9 @@ const AddSupplierForm = () => {
                       className="resize-none bg-[#f6f7f9] border-2 border-[#d3dae4] focus:outline-none rounded-xl px-4 py-3 placeholder:text-[#858492]"
                       placeholder="Enter Short Description"
                       value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                    ></textarea>
+                      onChange={(e) =>
+                        field.handleChange(e.target.value)
+                      }></textarea>
                     <FieldError field={field} />
                   </div>
                 )}
@@ -832,7 +832,13 @@ const AddSupplierForm = () => {
                   <div>
                     <MultiImageUploader
                       multiple={false}
-                      onChange={(file) => field.handleChange(file)}
+                      onChange={(file) => {
+                        field.handleChange(file);
+                        // When a new image is selected, clear the existing image
+                        if (file) {
+                          form.setFieldValue("existingLogo", undefined);
+                        }
+                      }}
                       value={field.state.value}
                       existingFile={form.getFieldValue("existingLogo")}
                       existingFileField="existingLogo"
@@ -914,8 +920,7 @@ const AddSupplierForm = () => {
                 className={clsx(
                   "self-end bg-[#df8d29] text-white px-7 my-2 py-2 rounded-xl disabled:bg-[#966830]",
                   (updatePending || isPending) && "cursor-progress"
-                )}
-              >
+                )}>
                 {page === "Edit" ? "Update" : "Save"}
               </button>
             </div>

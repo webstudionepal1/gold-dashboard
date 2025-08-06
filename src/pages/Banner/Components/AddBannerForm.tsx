@@ -199,8 +199,7 @@ const AddBannerForm = () => {
               e.preventDefault();
               e.stopPropagation();
               form.handleSubmit();
-            }}
-          >
+            }}>
             <div>
               <h1 className="text-xl font-semibold">General Information</h1>
               <div className="border-b border-[#dedde2] w-full my-2"></div>
@@ -237,7 +236,6 @@ const AddBannerForm = () => {
                 )}
               </form.Field>
             </div>
-
             <div className="flex items-center gap-4 w-full">
               <form.Field name="category">
                 {(field) => (
@@ -269,12 +267,10 @@ const AddBannerForm = () => {
                 )}
               </form.Field>
             </div>
-
             <div>
               <h1 className="text-xl font-semibold">Priority</h1>
               <div className="border-b border-[#dedde2] w-full my-2"></div>
             </div>
-
             <div className="flex items-center gap-4 w-full">
               <form.Field name="priority">
                 {(field) => (
@@ -350,8 +346,14 @@ const AddBannerForm = () => {
                       accept={{
                         'image/*': ['.png', '.jpg', '.jpeg', '.svg'],
                       }}
-                      existingFile={form.getFieldValue('existingImage')}
-                      onChange={(file) => field.handleChange(file)}
+                      existingFile={form.getFieldValue("existingImage")}
+                      onChange={(file) => {
+                        field.handleChange(file);
+                        // When a new image is selected, clear the existing image
+                        if (file) {
+                          form.setFieldValue("existingImage", undefined);
+                        }
+                      }}
                     />
                     <FieldError field={field} />
                   </div>
@@ -382,8 +384,14 @@ const AddBannerForm = () => {
                       accept={{
                         'image/*': ['.png', '.jpg', '.jpeg', '.svg', '.webp'],
                       }}
-                      existingFile={form.getFieldValue('existingMobImage')}
-                      onChange={(file) => field.handleChange(file)}
+                      existingFile={form.getFieldValue("existingMobImage")}
+                      onChange={(file) => {
+                        field.handleChange(file);
+                        // When a new image is selected, clear the existing image
+                        if (file) {
+                          form.setFieldValue("existingMobImage", undefined);
+                        }
+                      }}
                     />
                     <FieldError field={field} />
                   </div>

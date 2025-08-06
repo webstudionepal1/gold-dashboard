@@ -257,6 +257,7 @@ import {
   supplierColumns,
 } from "./purchaseObj";
 import {
+  IFetchPurchase,
   IFetchPurchaseReturn,
   useDeletePurchaseMutation,
   useGetPurchaseReturnQuery,
@@ -276,7 +277,12 @@ import { Constants } from "../../utils/constants";
 interface IModalState {
   of: string;
   edit: boolean;
-  data: any;
+  data:
+    | IFetchProduct
+    | IFetchSupplier
+    | IFetchPurchase
+    | IFetchPurchaseReturn
+    | null;
 }
 
 export interface IFetchSupplier {
@@ -335,19 +341,32 @@ const PurchaseIndex = () => {
   const purchaseTableData = useMemo(
     () => ({
       columns: purchaseColumns,
-      rows: map(purchaseList, (item) => ({
-        ...item,
-        date: dayjs(item.createdAt).format("MMM-DD-YYYY"),
-        supplier: get(item, "supplier.name", "-"),
-        billNo: get(item, "billNo", "-"),
-        totalCost: `${Constants.currency} ${
+      rows: map(purchaseList, (item) => {
+        // Calculate total quantity
+        const totalQuantity =
+          item?.items && item.items.length > 0
+            ? item.items.reduce((acc, item) => acc + (item.quantity || 0), 0)
+            : item?.products && item.products.length > 0
+            ? item.products.reduce((acc, item) => acc + (item.quantity || 0), 0)
+            : 0;
+
+        // Calculate total cost
+        const totalCost =
           item?.items && item.items.length > 0
             ? item.items.reduce((acc, item) => acc + (item.price || 0), 0)
             : item?.products && item.products.length > 0
             ? item.products.reduce((acc, item) => acc + (item.price || 0), 0)
-            : 0
-        }`,
-      })),
+            : 0;
+
+        return {
+          ...item,
+          date: dayjs(item.createdAt).format("MMM-DD-YYYY"),
+          supplier: get(item, "supplier.name", "-"),
+          billNo: get(item, "billNo", "-"),
+          totalQuantity: totalQuantity,
+          totalCost: `${Constants.currency} ${totalCost}`,
+        };
+      }),
       viewAction(row: IFetchProduct) {
         setModal({
           of: "purchase-view",
@@ -457,8 +476,7 @@ const PurchaseIndex = () => {
                 navigate("/inventory/suppliers/add");
               }
             }}
-            className="px-3 py-2 flex items-center text-white bg-[#d49327] rounded-lg"
-          >
+            className="px-3 py-2 flex items-center text-white bg-[#d49327] rounded-lg">
             <Icon
               icon="material-symbols-light:add-rounded"
               width="24"
@@ -489,23 +507,31 @@ const PurchaseIndex = () => {
           <PurchaseForm
             onClose={closeModal}
             edit={modal.edit}
-            data={modal.data}
+            data={modal.data as IFetchPurchase | null}
           />
         </ScrollableModal>
       )}
       {modal.of === "purchase-view" && modal.data && (
         <ScrollableModal classname="w-full max-w-2xl" onClose={closeModal}>
-          <PurchaseDetailsCard data={modal.data} />
+          <PurchaseDetailsCard
+            data={modal.data as IFetchPurchase | IFetchPurchaseReturn}
+          />
         </ScrollableModal>
       )}
       {modal.of === "purchase-return" && modal.data && (
         <ScrollableModal classname="w-full max-w-2xl" onClose={closeModal}>
-          <PurchaseDetailsCard summary="refund" data={modal.data} />
+          <PurchaseDetailsCard
+            summary="refund"
+            data={modal.data as IFetchPurchase | IFetchPurchaseReturn}
+          />
         </ScrollableModal>
       )}
-      {modal.of === "purchase-return-form" && (
+      {modal.of === "purchase-return-form" && modal.data && (
         <ScrollableModal classname="w-full max-w-2xl" onClose={closeModal}>
-          <PurchaseReturnForm data={modal.data} onClose={closeModal} />
+          <PurchaseReturnForm
+            data={modal.data as IFetchPurchase}
+            onClose={closeModal}
+          />
         </ScrollableModal>
       )}
     </div>
