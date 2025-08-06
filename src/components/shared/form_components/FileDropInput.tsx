@@ -1,6 +1,6 @@
-import type React from "react";
-import { useCallback } from "react";
-import { useDropzone } from "react-dropzone";
+import type React from 'react';
+import { useCallback } from 'react';
+import { useDropzone } from 'react-dropzone';
 
 interface SingleFileProps {
   multiple: false;
@@ -35,7 +35,7 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
     label,
     form,
     accept = {
-      "image/*": [".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp", ".svg"],
+      'image/*': ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp', '.svg'],
     },
     placeholder,
     maxFiles = 10,
@@ -80,8 +80,9 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
   });
 
   const handleRemoveFile = (index?: number) => {
+    console.log(index, 'object');
     if (props.multiple) {
-      if (typeof index === "number") {
+      if (typeof index === 'number') {
         const newFiles = [...props.value];
         newFiles.splice(index, 1);
         props.onChange(newFiles);
@@ -93,9 +94,8 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
 
   const handleRemoveExistingFile = (index?: number) => {
     if (!form) return;
-
-    if (props.multiple && "existingFiles" in props && props.existingFiles) {
-      if (typeof index === "number" && props.existingFileField) {
+    if (props.multiple && 'existingFiles' in props && props.existingFiles) {
+      if (typeof index === 'number' && props.existingFileField) {
         const newFiles = [
           ...props.existingFiles.slice(0, index),
           ...props.existingFiles.slice(index + 1),
@@ -106,7 +106,7 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
       }
     } else if (
       !props.multiple &&
-      "existingFile" in props &&
+      'existingFile' in props &&
       props.existingFileField
     ) {
       form.setFieldValue(props.existingFileField, null);
@@ -115,17 +115,17 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
 
   const isImageFile = (file: File | string) => {
     if (file instanceof File) {
-      return file.type.startsWith("image/");
+      return file.type.startsWith('image/');
     }
-    if (typeof file === "string") {
+    if (typeof file === 'string') {
       const imageExtensions = [
-        ".png",
-        ".jpg",
-        ".jpeg",
-        ".gif",
-        ".webp",
-        ".bmp",
-        ".svg",
+        '.png',
+        '.jpg',
+        '.jpeg',
+        '.gif',
+        '.webp',
+        '.bmp',
+        '.svg',
       ];
       return imageExtensions.some((ext) => file.toLowerCase().endsWith(ext));
     }
@@ -133,7 +133,7 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
   };
 
   const getFileUrl = (file: string) => {
-    return `${import.meta.env.VITE_API_IMAGE_BASE_URL}/${file}`;
+    return `${import.meta.env.VITE_API_IMAGE_BASE_URL}${file}`;
   };
 
   const renderFilePreview = (
@@ -141,34 +141,38 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
     index: number,
     isExisting: boolean
   ) => {
+    console.log(file, 'file');
     const isImage = isImageFile(file);
-    let previewUrl = "/placeholder.svg";
-    let fileName = "";
+    let previewUrl = '/placeholder.svg';
+    let fileName = '';
+
+    console.log(isImage, 'isma');
 
     if (file instanceof File) {
-      previewUrl = isImage ? URL.createObjectURL(file) : "/placeholder.svg";
+      previewUrl = isImage ? URL.createObjectURL(file) : '/placeholder.svg';
       fileName = file.name;
-    } else if (typeof file === "string") {
-      previewUrl = `${import.meta.env.VITE_API_IMAGE_BASE_URL}${file}`;
+      console.log(previewUrl, 'fiole');
+    } else if (typeof file === 'string') {
+      if (file.includes('http')) {
+        previewUrl = file;
+      } else {
+        previewUrl = `${import.meta.env.VITE_API_IMAGE_BASE_URL}${file}`;
+      }
     }
+
+    console.log(previewUrl, 'url');
 
     return (
       <div
-        key={`${isExisting ? "existing" : "new"}-${index}`}
-        className="relative group">
-        {isImage ? (
-          <img
-            src={previewUrl}
-            alt={`preview-${index}`}
-            className="w-full h-24 object-cover rounded-md border"
-          />
-        ) : (
-          <img
-            src={previewUrl}
-            alt={`preview-${index}`}
-            className="w-full h-24 object-cover rounded-md border"
-          />
-        )}
+        key={`${isExisting ? 'existing' : 'new'}-${index}`}
+        className="relative group"
+      >
+        <img
+          src={previewUrl}
+          alt={`preview-${index}`}
+          className="w-full h-24  rounded-md border"
+        />
+
         <button
           onClick={() =>
             isExisting
@@ -176,7 +180,8 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
               : handleRemoveFile(index)
           }
           type="button"
-          className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 text-xs opacity-0 group-hover:opacity-100 transition">
+          className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 text-xs opacity-0 group-hover:opacity-100 transition"
+        >
           ✕
         </button>
       </div>
@@ -186,8 +191,18 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
   const renderSingleFileMode = () => {
     if (!props.multiple) {
       const singleProps = props as SingleFileProps & BaseProps;
-      const existingImage =
+      let existingImage =
         singleProps.existingFile || singleProps.existingImageUrl;
+
+      console.log(singleProps.value, 'exis');
+      if (
+        existingImage &&
+        typeof existingImage === 'object' &&
+        (existingImage as any)?.props &&
+        (existingImage as any)?.props.src
+      ) {
+        existingImage = (existingImage as any).props.src;
+      }
 
       return (
         <div>
@@ -215,6 +230,9 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
       const existingFiles = multiProps.existingFiles || [];
       const selectedFiles = multiProps.value || [];
 
+      console.log(selectedFiles, 'selected');
+      console.log(existingFiles.length, 'existing');
+
       if (existingFiles.length === 0 && selectedFiles.length === 0) {
         return null;
       }
@@ -222,14 +240,16 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
       return (
         <div className="grid grid-cols-3 gap-4 mt-4">
           {/* Existing files */}
-          {existingFiles.map((file, index) =>
-            renderFilePreview(file, index, true)
-          )}
+          {existingFiles.length > 0 &&
+            existingFiles.map((file, index) =>
+              renderFilePreview(file, index, true)
+            )}
 
           {/* Selected files */}
-          {selectedFiles.map((file, index) =>
-            renderFilePreview(file, index, false)
-          )}
+          {selectedFiles.length > 0 &&
+            selectedFiles.map((file, index) =>
+              renderFilePreview(file, index, false)
+            )}
         </div>
       );
     }
@@ -257,14 +277,16 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
       )}
 
       {/* Single file previews */}
-      {renderSingleFileMode()}
+
+      {!props.multiple && renderSingleFileMode()}
 
       {/* Drop zone */}
       <div
         {...getRootProps()}
         className={`flex justify-center items-center w-full h-32 border-2 border-gray-300 border-dashed rounded-md cursor-pointer ${
-          isDragActive ? "bg-gray-100" : "bg-white"
-        } ${isMaxFilesReached ? "opacity-50 cursor-not-allowed" : ""}`}>
+          isDragActive ? 'bg-gray-100' : 'bg-white'
+        } ${isMaxFilesReached ? 'opacity-50 cursor-not-allowed' : ''}`}
+      >
         <input {...getInputProps()} disabled={isMaxFilesReached} />
         <div className="text-center px-4">
           {isMaxFilesReached ? (
@@ -283,7 +305,7 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
       </div>
 
       {/* Multi file previews */}
-      {renderMultiFileMode()}
+      {props.multiple && renderMultiFileMode()}
     </div>
   );
 };

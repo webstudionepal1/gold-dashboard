@@ -1,11 +1,11 @@
-import React from "react";
-import { Icon } from "@iconify/react/dist/iconify.js";
-import { Table, ColumnConfig, TableData } from "../shared/Table";
+import React from 'react';
+import { Icon } from '@iconify/react/dist/iconify.js';
+import { Table, ColumnConfig, TableData } from '../shared/Table';
 import {
   IFetchStone,
   IStonePagination,
   STONE_TYPES,
-} from "../../types/Stone.interface";
+} from '../../types/Stone.interface';
 
 interface StoneListProps {
   stones: IFetchStone[];
@@ -28,19 +28,19 @@ const StoneList: React.FC<StoneListProps> = ({
 }) => {
   const getStoneTypeLabel = (type: string) => {
     const stoneType = STONE_TYPES.find((t) => t.value === type);
-    return stoneType?.label || type;
+    return stoneType?.label?.toUpperCase() || type;
   };
 
   const getStoneTypeColor = (type: string) => {
     const colors: Record<string, string> = {
-      diamond: "bg-blue-100 text-blue-800",
-      ruby: "bg-red-100 text-red-800",
-      emerald: "bg-green-100 text-green-800",
-      sapphire: "bg-indigo-100 text-indigo-800",
-      pearl: "bg-gray-100 text-gray-800",
-      other: "bg-purple-100 text-purple-800",
+      diamond: 'bg-blue-100 text-blue-800',
+      ruby: 'bg-red-100 text-red-800',
+      emerald: 'bg-green-100 text-green-800',
+      sapphire: 'bg-indigo-100 text-indigo-800',
+      pearl: 'bg-gray-100 text-gray-800',
+      other: 'bg-purple-100 text-purple-800',
     };
-    return colors[type] || "bg-gray-100 text-gray-800";
+    return colors[type] || 'bg-gray-100 text-gray-800';
   };
 
   // Transform stones data for the Table component
@@ -52,8 +52,8 @@ const StoneList: React.FC<StoneListProps> = ({
   // Define table columns
   const columns: ColumnConfig<IFetchStone>[] = [
     {
-      key: "name",
-      header: "Name",
+      key: 'name',
+      header: 'Name',
       render: (value, row) => (
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -65,7 +65,7 @@ const StoneList: React.FC<StoneListProps> = ({
           <div>
             <div className="font-medium text-gray-900">{value}</div>
             <div className="text-sm text-gray-500">
-              {row.description || "No description"}
+              {row.description || 'No description'}
             </div>
           </div>
         </div>
@@ -73,34 +73,35 @@ const StoneList: React.FC<StoneListProps> = ({
     },
 
     {
-      key: "type",
-      header: "Type",
+      key: 'type',
+      header: 'Type',
       render: (value) => (
         <span
-          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStoneTypeColor(
+          className={`inline-flex items-center px-2.5 py-0.5 rounded-full capitalize text-xs font-medium ${getStoneTypeColor(
             value
-          )}`}>
+          )}`}
+        >
           {getStoneTypeLabel(value)}
         </span>
       ),
     },
     {
-      key: "color",
-      header: "Color",
+      key: 'color',
+      header: 'Color',
       render: (value) => (
         <span className="text-gray-900 capitalize">{value}</span>
       ),
     },
     {
-      key: "carat",
-      header: "Carat",
+      key: 'carat',
+      header: 'Carat',
       render: (value) => (
         <span className="text-gray-900 font-medium">{value} ct</span>
       ),
     },
     {
-      key: "pricePerCarat",
-      header: "Price/Carat",
+      key: 'pricePerCarat',
+      header: 'Price/Carat',
       render: (value) => (
         <span className="text-gray-900 font-medium">
           NPR {value.toLocaleString()}
@@ -108,8 +109,8 @@ const StoneList: React.FC<StoneListProps> = ({
       ),
     },
     {
-      key: "totalPrice",
-      header: "Total Price",
+      key: 'totalPrice',
+      header: 'Total Price',
       render: (value) => (
         <span className="text-green-600 font-semibold">
           NPR {value.toLocaleString()}
@@ -117,14 +118,15 @@ const StoneList: React.FC<StoneListProps> = ({
       ),
     },
     {
-      key: "isActive",
-      header: "Status",
+      key: 'isActive',
+      header: 'Status',
       render: (value) => (
         <span
           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-            value ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-          }`}>
-          {value ? "Active" : "Inactive"}
+            value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+          }`}
+        >
+          {value ? 'Active' : 'Inactive'}
         </span>
       ),
     },

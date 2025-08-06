@@ -1,16 +1,16 @@
-import { Icon } from "@iconify/react/dist/iconify.js";
-import { get } from "lodash";
-import React, { useMemo, useState } from "react";
-import MasterTable from "../../components/shared/MasterTable";
-import Header from "../../components/shared/table_heading/Header";
-import { useOutsideClick } from "../../hooks/UseOutsideClick";
+import { Icon } from '@iconify/react/dist/iconify.js';
+import { get } from 'lodash';
+import React, { useMemo, useState } from 'react';
+import MasterTable from '../../components/shared/MasterTable';
+import Header from '../../components/shared/table_heading/Header';
+import { useOutsideClick } from '../../hooks/UseOutsideClick';
 import {
   IFetchStone,
   useDeleteStoneMutation,
   useGetAllStonesQuery,
-} from "../../server/api/productHooks";
-import { stoneColumns } from "./stoneObj";
-import AddStone from "./components/AddStone";
+} from '../../server/api/productHooks';
+import { stoneColumns } from './stoneObj';
+import AddStone from './components/AddStone';
 
 interface IEditModal {
   state: boolean;
@@ -28,7 +28,7 @@ const StoneIndex: React.FC = () => {
 
   const { data: stones, isSuccess } = useGetAllStonesQuery({});
 
-  console.log("Stone data", stones);
+  console.log('Stone data', stones);
   const { mutate: deleteStone } = useDeleteStoneMutation();
 
   const stonesData = useMemo(
@@ -36,12 +36,12 @@ const StoneIndex: React.FC = () => {
       isSuccess
         ? stones?.map((item) => ({
             ...item,
-            type: get(item, "type", ""),
-            color: get(item, "color", ""),
-            carat: get(item, "carat", 0),
-            pricePerCarat: get(item, "pricePerCarat", 0),
-            totalPrice: get(item, "totalPrice", 0),
-            shape: get(item, "shape", ""),
+            type: <div className="capitalize">{get(item, 'type', '')}</div>,
+            color: get(item, 'color', ''),
+            carat: get(item, 'carat', 0),
+            pricePerCarat: get(item, 'pricePerCarat', 0),
+            totalPrice: get(item, 'totalPrice', 0),
+            shape: get(item, 'shape', ''),
           }))
         : [],
     [isSuccess, stones]
