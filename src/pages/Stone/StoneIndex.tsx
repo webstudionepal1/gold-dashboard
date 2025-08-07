@@ -69,7 +69,19 @@ const StoneIndex: React.FC = () => {
           columns={stoneColumns}
           rows={stonesData}
           onDelete={(id) => deleteStone(id)}
-          editAction={(row) => setIsModalOpen({ state: true, editData: row })}
+          editAction={(row) => {
+            console.log(row, 'row');
+            setIsModalOpen({
+              state: true,
+              editData: {
+                ...row,
+                type:
+                  typeof row.type === 'object'
+                    ? row?.type?.props?.children
+                    : (row.type as any),
+              },
+            });
+          }}
           showAction
         />
       </div>

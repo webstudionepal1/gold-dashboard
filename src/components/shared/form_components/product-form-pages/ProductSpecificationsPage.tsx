@@ -1,66 +1,66 @@
-import React from "react";
-import { Icon } from "@iconify/react/dist/iconify.js";
-import { InputField } from "../InputField";
-import { DropdownField } from "../Dropdown";
-import { useProductForm } from "../ProductFormContext";
-import { useGetAllProductClaspsQuery } from "../../../../server/api/productHooks";
+import React from 'react';
+import { Icon } from '@iconify/react/dist/iconify.js';
+import { InputField } from '../InputField';
+import { DropdownField } from '../Dropdown';
+import { useProductForm } from '../ProductFormContext';
+import { useGetAllProductClaspsQuery } from '../../../../server/api/productHooks';
 
 // Options for dropdowns
 const shapeOptions = [
-  { value: "", label: "Select Shape" },
-  { value: "round", label: "Round" },
-  { value: "oval", label: "Oval" },
-  { value: "square", label: "Square" },
-  { value: "rectangular", label: "Rectangular" },
-  { value: "heart", label: "Heart" },
-  { value: "pear", label: "Pear" },
-  { value: "marquise", label: "Marquise" },
-  { value: "emerald", label: "Emerald Cut" },
-  { value: "princess", label: "Princess" },
-  { value: "cushion", label: "Cushion" },
-  { value: "other", label: "Other" },
+  { value: '', label: 'Select Shape' },
+  { value: 'round', label: 'Round' },
+  { value: 'oval', label: 'Oval' },
+  { value: 'square', label: 'Square' },
+  { value: 'rectangular', label: 'Rectangular' },
+  { value: 'heart', label: 'Heart' },
+  { value: 'pear', label: 'Pear' },
+  { value: 'marquise', label: 'Marquise' },
+  { value: 'emerald', label: 'Emerald Cut' },
+  { value: 'princess', label: 'Princess' },
+  { value: 'cushion', label: 'Cushion' },
+  { value: 'other', label: 'Other' },
 ];
 
 const clarityOptions = [
-  { value: "", label: "Select Clarity" },
-  { value: "FL", label: "Flawless (FL)" },
-  { value: "IF", label: "Internally Flawless (IF)" },
-  { value: "VVS1", label: "Very Very Slightly Included 1 (VVS1)" },
-  { value: "VVS2", label: "Very Very Slightly Included 2 (VVS2)" },
-  { value: "VS1", label: "Very Slightly Included 1 (VS1)" },
-  { value: "VS2", label: "Very Slightly Included 2 (VS2)" },
-  { value: "SI1", label: "Slightly Included 1 (SI1)" },
-  { value: "SI2", label: "Slightly Included 2 (SI2)" },
-  { value: "I1", label: "Included 1 (I1)" },
-  { value: "I2", label: "Included 2 (I2)" },
-  { value: "I3", label: "Included 3 (I3)" },
-  { value: "N/A", label: "Not Applicable" },
+  { value: '', label: 'Select Clarity' },
+  { value: 'FL', label: 'Flawless (FL)' },
+  { value: 'IF', label: 'Internally Flawless (IF)' },
+  { value: 'VVS1', label: 'Very Very Slightly Included 1 (VVS1)' },
+  { value: 'VVS2', label: 'Very Very Slightly Included 2 (VVS2)' },
+  { value: 'VS1', label: 'Very Slightly Included 1 (VS1)' },
+  { value: 'VS2', label: 'Very Slightly Included 2 (VS2)' },
+  { value: 'SI1', label: 'Slightly Included 1 (SI1)' },
+  { value: 'SI2', label: 'Slightly Included 2 (SI2)' },
+  { value: 'I1', label: 'Included 1 (I1)' },
+  { value: 'I2', label: 'Included 2 (I2)' },
+  { value: 'I3', label: 'Included 3 (I3)' },
+  { value: 'N/A', label: 'Not Applicable' },
 ];
 
 const colorOptions = [
-  { value: "", label: "Select Color" },
-  { value: "D", label: "D (Colorless)" },
-  { value: "E", label: "E (Colorless)" },
-  { value: "F", label: "F (Colorless)" },
-  { value: "G", label: "G (Near Colorless)" },
-  { value: "H", label: "H (Near Colorless)" },
-  { value: "I", label: "I (Near Colorless)" },
-  { value: "J", label: "J (Near Colorless)" },
-  { value: "K", label: "K (Faint Yellow)" },
-  { value: "L", label: "L (Faint Yellow)" },
-  { value: "M", label: "M (Faint Yellow)" },
-  { value: "yellow", label: "Yellow" },
-  { value: "white", label: "White" },
-  { value: "rose", label: "Rose" },
-  { value: "mixed", label: "Mixed" },
-  { value: "other", label: "Other" },
+  { value: '', label: 'Select Color' },
+  { value: 'D', label: 'D (Colorless)' },
+  { value: 'E', label: 'E (Colorless)' },
+  { value: 'F', label: 'F (Colorless)' },
+  { value: 'G', label: 'G (Near Colorless)' },
+  { value: 'H', label: 'H (Near Colorless)' },
+  { value: 'I', label: 'I (Near Colorless)' },
+  { value: 'J', label: 'J (Near Colorless)' },
+  { value: 'K', label: 'K (Faint Yellow)' },
+  { value: 'L', label: 'L (Faint Yellow)' },
+  { value: 'M', label: 'M (Faint Yellow)' },
+  { value: 'yellow', label: 'Yellow' },
+  { value: 'white', label: 'White' },
+  { value: 'rose', label: 'Rose' },
+  { value: 'mixed', label: 'Mixed' },
+  { value: 'other', label: 'Other' },
 ];
 
 const genderOptions = [
-  { value: "", label: "Select Target Gender" },
-  { value: "male", label: "Male" },
-  { value: "female", label: "Female" },
-  { value: "unisex", label: "Unisex" },
+  { value: '', label: 'Select Target Gender' },
+  { value: 'male', label: 'Male' },
+  { value: 'female', label: 'Female' },
+  { value: 'unisex', label: 'Unisex' },
 ];
 
 export const ProductSpecificationsPage: React.FC = () => {
@@ -81,8 +81,8 @@ export const ProductSpecificationsPage: React.FC = () => {
 
   // Add "No Clasp" option at the beginning
   const claspOptions = [
-    { value: "", label: "Select Clasp Type" },
-    { value: "", label: "No Clasp" },
+    { value: '', label: 'Select Clasp Type' },
+    { value: '', label: 'No Clasp' },
     ...claspsList,
   ];
 
@@ -90,63 +90,63 @@ export const ProductSpecificationsPage: React.FC = () => {
   const validateLength = (value: number) => {
     const errors: string[] = [];
     if (value < 0) {
-      errors.push("Length cannot be negative");
+      errors.push('Length cannot be negative');
     }
-    updateValidation("length", errors.length === 0, errors);
+    updateValidation('length', errors.length === 0, errors);
   };
 
   const validateShape = (value: string) => {
     const errors: string[] = [];
     if (!value) {
-      errors.push("Shape is required");
+      errors.push('Shape is required');
     }
-    updateValidation("shape", errors.length === 0, errors);
+    updateValidation('shape', errors.length === 0, errors);
   };
 
   const validateClarity = (value: string) => {
     const errors: string[] = [];
     if (!value) {
-      errors.push("Clarity is required");
+      errors.push('Clarity is required');
     }
-    updateValidation("clarity", errors.length === 0, errors);
+    updateValidation('clarity', errors.length === 0, errors);
   };
 
   const validateDimension = (value: number) => {
     const errors: string[] = [];
     if (value < 0) {
-      errors.push("Dimension cannot be negative");
+      errors.push('Dimension cannot be negative');
     }
-    updateValidation("dimension", errors.length === 0, errors);
+    updateValidation('dimension', errors.length === 0, errors);
   };
 
   const validateQuantity = (value: number) => {
     const errors: string[] = [];
     if (value < 0) {
-      errors.push("Quantity cannot be negative");
+      errors.push('Quantity cannot be negative');
     }
-    updateValidation("quantity", errors.length === 0, errors);
+    updateValidation('quantity', errors.length === 0, errors);
   };
 
   const validateMakingCharges = (value: number) => {
     const errors: string[] = [];
     if (value < 0) {
-      errors.push("Making charges cannot be negative");
+      errors.push('Making charges cannot be negative');
     }
-    updateValidation("makingCharges", errors.length === 0, errors);
+    updateValidation('makingCharges', errors.length === 0, errors);
   };
 
   const validateTotalCarat = (value: number) => {
     const errors: string[] = [];
     if (value < 0) {
-      errors.push("Total carat cannot be negative");
+      errors.push('Total carat cannot be negative');
     }
-    updateValidation("totalCarat", errors.length === 0, errors);
+    updateValidation('totalCarat', errors.length === 0, errors);
   };
 
   const validateGender = (value: string) => {
     const errors: string[] = [];
     // Gender is optional, so no validation errors for empty values
-    updateValidation("gender", errors.length === 0, errors);
+    updateValidation('gender', errors.length === 0, errors);
   };
 
   return (
@@ -185,21 +185,21 @@ export const ProductSpecificationsPage: React.FC = () => {
               <InputField
                 label="Length (mm)"
                 type="number"
-                min="0"
                 step="0.1"
                 placeholder="0.0"
-                value={formData.length || ""}
-                onChange={(e) => {
-                  const value = Number(e.target.value) || 0;
+                numberValue={formData.length || 0}
+                onNumberChange={(value) => {
                   updateFormData({ length: value });
                   validateLength(value);
                 }}
-                onBlur={(e) => validateLength(Number(e.target.value) || 0)}
+                allowNegative={false}
+                clearZeroOnFocus={true}
               />
               {validationState.length?.errors.map((error, index) => (
                 <p
                   key={index}
-                  className="text-red-500 text-sm flex items-center gap-1">
+                  className="text-red-500 text-sm flex items-center gap-1"
+                >
                   <Icon icon="material-symbols:error" className="w-4 h-4" />
                   {error}
                 </p>
@@ -211,21 +211,21 @@ export const ProductSpecificationsPage: React.FC = () => {
               <InputField
                 label="Width/Diameter (mm)"
                 type="number"
-                min="0"
                 step="0.1"
                 placeholder="0.0"
-                value={formData.dimension || ""}
-                onChange={(e) => {
-                  const value = Number(e.target.value) || 0;
+                numberValue={formData.dimension || 0}
+                onNumberChange={(value) => {
                   updateFormData({ dimension: value });
                   validateDimension(value);
                 }}
-                onBlur={(e) => validateDimension(Number(e.target.value) || 0)}
+                allowNegative={false}
+                clearZeroOnFocus={true}
               />
               {validationState.dimension?.errors.map((error, index) => (
                 <p
                   key={index}
-                  className="text-red-500 text-sm flex items-center gap-1">
+                  className="text-red-500 text-sm flex items-center gap-1"
+                >
                   <Icon icon="material-symbols:error" className="w-4 h-4" />
                   {error}
                 </p>
@@ -237,15 +237,14 @@ export const ProductSpecificationsPage: React.FC = () => {
               <InputField
                 label="Base Quantity"
                 type="number"
-                min="0"
                 placeholder="1"
-                value={formData.quantity || ""}
-                onChange={(e) => {
-                  const value = Number(e.target.value) || 0;
+                numberValue={formData.quantity || 0}
+                onNumberChange={(value) => {
                   updateFormData({ quantity: value });
                   validateQuantity(value);
                 }}
-                onBlur={(e) => validateQuantity(Number(e.target.value) || 0)}
+                allowNegative={false}
+                clearZeroOnFocus={true}
               />
               <p className="text-sm text-gray-500">
                 Base quantity for this product
@@ -253,7 +252,8 @@ export const ProductSpecificationsPage: React.FC = () => {
               {validationState.quantity?.errors.map((error, index) => (
                 <p
                   key={index}
-                  className="text-red-500 text-sm flex items-center gap-1">
+                  className="text-red-500 text-sm flex items-center gap-1"
+                >
                   <Icon icon="material-symbols:error" className="w-4 h-4" />
                   {error}
                 </p>
@@ -291,7 +291,8 @@ export const ProductSpecificationsPage: React.FC = () => {
               {validationState.shape?.errors.map((error, index) => (
                 <p
                   key={index}
-                  className="text-red-500 text-sm flex items-center gap-1">
+                  className="text-red-500 text-sm flex items-center gap-1"
+                >
                   <Icon icon="material-symbols:error" className="w-4 h-4" />
                   {error}
                 </p>
@@ -316,7 +317,8 @@ export const ProductSpecificationsPage: React.FC = () => {
               {validationState.clarity?.errors.map((error, index) => (
                 <p
                   key={index}
-                  className="text-red-500 text-sm flex items-center gap-1">
+                  className="text-red-500 text-sm flex items-center gap-1"
+                >
                   <Icon icon="material-symbols:error" className="w-4 h-4" />
                   {error}
                 </p>
@@ -342,7 +344,7 @@ export const ProductSpecificationsPage: React.FC = () => {
                 label="Color"
                 firstInput="Select color"
                 options={colorOptions}
-                value={formData.color || ""}
+                value={formData.color || ''}
                 onChange={(e) => {
                   const value = e.target.value;
                   updateFormData({ color: value });
@@ -359,7 +361,7 @@ export const ProductSpecificationsPage: React.FC = () => {
                 label="Clasp Type"
                 firstInput="Select clasp type"
                 options={claspOptions}
-                value={formData.claspType || ""}
+                value={formData.claspType || ''}
                 onChange={(e) => {
                   const value = e.target.value;
                   updateFormData({ claspType: value });
@@ -376,11 +378,11 @@ export const ProductSpecificationsPage: React.FC = () => {
                 label="Target Gender"
                 firstInput="Select target gender"
                 options={genderOptions}
-                value={formData.gender || ""}
+                value={formData.gender || ''}
                 onChange={(e) => {
                   const value = e.target.value;
                   updateFormData({
-                    gender: value as "male" | "female" | "unisex" | undefined,
+                    gender: value as 'male' | 'female' | 'unisex' | undefined,
                   });
                   validateGender(value);
                 }}
@@ -392,7 +394,8 @@ export const ProductSpecificationsPage: React.FC = () => {
               {validationState.gender?.errors.map((error, index) => (
                 <p
                   key={index}
-                  className="text-red-500 text-sm flex items-center gap-1">
+                  className="text-red-500 text-sm flex items-center gap-1"
+                >
                   <Icon icon="material-symbols:error" className="w-4 h-4" />
                   {error}
                 </p>
@@ -402,18 +405,17 @@ export const ProductSpecificationsPage: React.FC = () => {
             {/* Total Carat */}
             <div className="space-y-2">
               <InputField
-                label="Total Carat Weight"
+                label="Total Carat"
                 type="number"
-                min="0"
                 step="0.01"
                 placeholder="0.00"
-                value={formData.totalCarat || ""}
-                onChange={(e) => {
-                  const value = Number(e.target.value) || 0;
+                numberValue={formData.totalCarat || 0}
+                onNumberChange={(value) => {
                   updateFormData({ totalCarat: value });
                   validateTotalCarat(value);
                 }}
-                onBlur={(e) => validateTotalCarat(Number(e.target.value) || 0)}
+                allowNegative={false}
+                clearZeroOnFocus={true}
               />
               <p className="text-sm text-gray-500">
                 Total weight of all gemstones in carats
@@ -421,7 +423,8 @@ export const ProductSpecificationsPage: React.FC = () => {
               {validationState.totalCarat?.errors.map((error, index) => (
                 <p
                   key={index}
-                  className="text-red-500 text-sm flex items-center gap-1">
+                  className="text-red-500 text-sm flex items-center gap-1"
+                >
                   <Icon icon="material-symbols:error" className="w-4 h-4" />
                   {error}
                 </p>
@@ -433,18 +436,15 @@ export const ProductSpecificationsPage: React.FC = () => {
               <InputField
                 label="Making Charges"
                 type="number"
-                min="0"
                 step="0.01"
                 placeholder="0.00"
-                value={formData.makingCharges || ""}
-                onChange={(e) => {
-                  const value = Number(e.target.value) || 0;
+                numberValue={formData.makingCharges || 0}
+                onNumberChange={(value) => {
                   updateFormData({ makingCharges: value });
                   validateMakingCharges(value);
                 }}
-                onBlur={(e) =>
-                  validateMakingCharges(Number(e.target.value) || 0)
-                }
+                allowNegative={false}
+                clearZeroOnFocus={true}
               />
               <p className="text-sm text-gray-500">
                 Additional charges for craftsmanship
@@ -452,7 +452,8 @@ export const ProductSpecificationsPage: React.FC = () => {
               {validationState.makingCharges?.errors.map((error, index) => (
                 <p
                   key={index}
-                  className="text-red-500 text-sm flex items-center gap-1">
+                  className="text-red-500 text-sm flex items-center gap-1"
+                >
                   <Icon icon="material-symbols:error" className="w-4 h-4" />
                   {error}
                 </p>

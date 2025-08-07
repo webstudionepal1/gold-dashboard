@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 
 interface SingleFileProps {
@@ -79,6 +79,15 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
     multiple: props.multiple,
   });
 
+  const [localExistingFiles, setLocalExistingFiles] = useState<string[]>([]);
+
+  // Update local state when existingFiles prop changes
+  useEffect(() => {
+    if (props.multiple && 'existingFiles' in props) {
+      setLocalExistingFiles(props.existingFiles || []);
+    }
+  }, [props.multiple, 'existingFiles' in props ? props.existingFiles : []]);
+
   const handleRemoveFile = (index?: number) => {
     console.log(index, 'object');
     if (props.multiple) {
@@ -94,6 +103,7 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
 
   const handleRemoveExistingFile = (index?: number) => {
     if (!form) return;
+
     if (props.multiple && 'existingFiles' in props && props.existingFiles) {
       if (typeof index === 'number' && props.existingFileField) {
         const newFiles = [
@@ -102,7 +112,7 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
         ];
 
         form.setFieldValue(props.existingFileField, newFiles);
-        // console.log(form.getFieldValue(props.existingFileField));
+        setLocalExistingFiles(newFiles);
       }
     } else if (
       !props.multiple &&
@@ -141,17 +151,11 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
     index: number,
     isExisting: boolean
   ) => {
-    console.log(file, 'file');
     const isImage = isImageFile(file);
     let previewUrl = '/placeholder.svg';
-    let fileName = '';
-
-    console.log(isImage, 'isma');
 
     if (file instanceof File) {
       previewUrl = isImage ? URL.createObjectURL(file) : '/placeholder.svg';
-      fileName = file.name;
-      console.log(previewUrl, 'fiole');
     } else if (typeof file === 'string') {
       if (file.includes('http')) {
         previewUrl = file;
@@ -159,8 +163,6 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
         previewUrl = `${import.meta.env.VITE_API_IMAGE_BASE_URL}${file}`;
       }
     }
-
-    console.log(previewUrl, 'url');
 
     return (
       <div
@@ -227,11 +229,9 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
   const renderMultiFileMode = () => {
     if (props.multiple) {
       const multiProps = props as MultiFileProps & BaseProps;
-      const existingFiles = multiProps.existingFiles || [];
+      // Use local state instead of props for existing files
+      const existingFiles = localExistingFiles;
       const selectedFiles = multiProps.value || [];
-
-      console.log(selectedFiles, 'selected');
-      console.log(existingFiles.length, 'existing');
 
       if (existingFiles.length === 0 && selectedFiles.length === 0) {
         return null;
@@ -259,7 +259,8 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
   const getCurrentFileCount = () => {
     if (props.multiple) {
       const multiProps = props as MultiFileProps & BaseProps;
-      const existingCount = multiProps.existingFiles?.length || 0;
+      // Use local state for existing files count
+      const existingCount = localExistingFiles.length;
       const selectedCount = multiProps.value?.length || 0;
       return existingCount + selectedCount;
     }
