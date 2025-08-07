@@ -19,6 +19,7 @@ export interface IProductFormValues {
   description: string;
   category: string;
   subCategory?: string;
+  material: string;
   variant: ProductVariant[];
   length: number;
   claspType?: string;
@@ -45,6 +46,7 @@ export const productFormSchema = z
     description: z.string().min(1, "Description is required"),
     category: z.string().min(1, "Category is required"),
     subCategory: z.string().optional(),
+    material: z.string().min(1, "Material is required"),
 
     // Price - Fixed validation
     variant: z
@@ -119,6 +121,7 @@ export const generateProductDefaultValue = (state: string, editData?: any) => {
       description: "",
       category: "",
       subCategory: "",
+      material: "",
       variant: [{ price: 0, wt: 0, unit: "gm" }],
       length: 0,
       claspType: "",
@@ -136,6 +139,7 @@ export const generateProductDefaultValue = (state: string, editData?: any) => {
       description: get(editData, "description", ""),
       category: get(editData, "category._id", ""),
       subCategory: get(editData, "subCategory._id", ""),
+      material: get(editData, "material", ""),
       variant: get(editData, "variant", [{ price: 0, wt: 0, unit: "gm" }]),
       length: get(editData, "length", 0),
       claspType: (() => {
@@ -168,6 +172,7 @@ export const productListColumns = [
   { title: "Product", key: "product" },
   { title: "Category", key: "categ" },
   { title: "Sub Category", key: "subCate" },
+  { title: "Material", key: "material" },
   { title: "Stock", key: "stock" },
   { title: "Sold", key: "sold" },
   { title: "Status", key: "status" },

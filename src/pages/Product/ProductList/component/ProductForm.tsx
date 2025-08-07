@@ -141,6 +141,18 @@ const ProductForm = () => {
     [claspsSuccess, clasps]
   );
 
+  // Material options based on backend constants
+  const materialOptions = [
+    { value: "gold", label: "Gold" },
+    { value: "silver", label: "Silver" },
+    { value: "platinum", label: "Platinum" },
+    { value: "diamond", label: "Diamond" },
+    { value: "ruby", label: "Ruby" },
+    { value: "emerald", label: "Emerald" },
+    { value: "sapphire", label: "Sapphire" },
+    { value: "other", label: "Other" },
+  ];
+
   const visibilityOptions = [
     { value: "featured", label: "Featured" },
     { value: "bestsellers", label: "Best Sellers" },
@@ -180,6 +192,8 @@ const ProductForm = () => {
         if (value.subCategory && value.subCategory.trim() !== "") {
           formData.append("subCategory", value.subCategory);
         }
+
+        formData.append("material", value.material);
 
         value.variant.forEach((v, index: number) => {
           formData.append(`variant[${index}][price]`, String(v.price));
@@ -266,8 +280,7 @@ const ProductForm = () => {
           e.stopPropagation();
           form.handleSubmit();
         }}
-        className="grid grid-cols-1 gap-4 lg:grid-cols-3"
-      >
+        className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         {/* Left Column */}
         <div className="col-span-2 bg-white border rounded-md">
           <div className="col-span-2">
@@ -322,7 +335,7 @@ const ProductForm = () => {
                   )}
                 </form.Field>
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                   <form.Field name="category">
                     {(field) => (
                       <div>
@@ -383,6 +396,30 @@ const ProductForm = () => {
                       </div>
                     )}
                   </form.Field>
+
+                  <form.Field name="material">
+                    {(field) => (
+                      <div>
+                        <DropdownField
+                          label="Material"
+                          required
+                          firstInput="Select Material"
+                          options={materialOptions}
+                          value={field.state.value}
+                          onChange={(e) => {
+                            console.log("Material selected:", e.target.value);
+                            field.handleChange(e.target.value);
+                          }}
+                        />
+                        <FieldError field={field} />
+                        {getFieldError("material").length > 0 && (
+                          <div className="text-red-500 text-sm mt-1">
+                            {getFieldError("material").join(", ")}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </form.Field>
                 </div>
               </div>
             </div>
@@ -401,8 +438,7 @@ const ProductForm = () => {
                           field.pushValue({ price: 0, wt: 0, unit: "gm" })
                         }
                         type="button"
-                        className="flex bg-[#DF8D28] rounded-md text-white items-center gap-2 px-3 py-2"
-                      >
+                        className="flex bg-[#DF8D28] rounded-md text-white items-center gap-2 px-3 py-2">
                         <Icon icon="ep:plus" width="18" height="18" />
                         Product Variant
                       </button>
@@ -415,8 +451,7 @@ const ProductForm = () => {
                     {field.state.value.map((_, i: number) => (
                       <div
                         key={i.toString()}
-                        className="border rounded-md p-3 mb-2"
-                      >
+                        className="border rounded-md p-3 mb-2">
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                           <form.Field name={`variant[${i}].price`}>
                             {(subField) => {
@@ -517,8 +552,7 @@ const ProductForm = () => {
                             <button
                               type="button"
                               onClick={() => field.removeValue(i)}
-                              className="flex items-center gap-2 px-3 py-1 text-sm text-red-600 border border-red-600 rounded-md"
-                            >
+                              className="flex items-center gap-2 px-3 py-1 text-sm text-red-600 border border-red-600 rounded-md">
                               <Icon
                                 icon="mdi:delete"
                                 className="text-red"
@@ -778,8 +812,7 @@ const ProductForm = () => {
             <button
               type="submit"
               disabled={pendingAddition || pendingUpdate}
-              className="px-6 py-2 text-white rounded-md min-w-32 bg-orange hover:bg-orange-600 disabled:opacity-50"
-            >
+              className="px-6 py-2 text-white rounded-md min-w-32 bg-orange hover:bg-orange-600 disabled:opacity-50">
               {pendingAddition || pendingUpdate ? (
                 <Icon icon="nrk:spinner" width={18} height={18} />
               ) : (
