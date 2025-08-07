@@ -1,16 +1,16 @@
-import { useForm } from "@tanstack/react-form";
-import { useEffect } from "react";
-import { Modal } from "../../../../components/shared";
+import { useForm } from '@tanstack/react-form';
+import { useEffect } from 'react';
+import { Modal } from '../../../../components/shared';
 import {
   IFetchOccasion,
   useCreateProductOccasionMutation,
   useUpdateProductOccasionMutation,
-} from "../../../../server/api/productHooks";
-import { InputField } from "../../../../components/shared/form_components/InputField";
-import { DropdownField } from "../../../../components/shared/form_components/Dropdown";
-import { FieldError } from "../../../auth/LoginPage";
-import FileDropInput from "../../../../components/shared/form_components/FileDropInput";
-import VideoUploadField from "../../../../components/shared/form_components/VideoUploadField";
+} from '../../../../server/api/productHooks';
+import { InputField } from '../../../../components/shared/form_components/InputField';
+import { DropdownField } from '../../../../components/shared/form_components/Dropdown';
+import { FieldError } from '../../../auth/LoginPage';
+import FileDropInput from '../../../../components/shared/form_components/FileDropInput';
+import VideoUploadField from '../../../../components/shared/form_components/VideoUploadField';
 
 interface PropTypes {
   modalRef: React.RefObject<HTMLDivElement | null>;
@@ -21,15 +21,15 @@ interface PropTypes {
 // Helper function to generate SEO data and slug automatically
 const generateSEOData = (
   name: string,
-  description: string = "",
-  seasonality: string = "year-round"
+  description: string = '',
+  seasonality: string = 'year-round'
 ) => {
   // Generate slug from name
   const slug = name
     .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, "") // Remove special characters
-    .replace(/\s+/g, "-") // Replace spaces with hyphens
-    .replace(/-+/g, "-") // Replace multiple hyphens with single
+    .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .replace(/-+/g, '-') // Replace multiple hyphens with single
     .trim();
 
   const seoTitle = `${name} Jewelry Collection | Premium ${name} Designs`;
@@ -41,12 +41,12 @@ const generateSEOData = (
     name.toLowerCase(),
     `${name.toLowerCase()} jewelry`,
     `${name.toLowerCase()} collection`,
-    "jewelry",
-    "premium jewelry",
-    "elegant designs",
+    'jewelry',
+    'premium jewelry',
+    'elegant designs',
   ];
 
-  if (seasonality !== "year-round") {
+  if (seasonality !== 'year-round') {
     baseKeywords.push(`${seasonality} jewelry`, `${seasonality} collection`);
   }
 
@@ -59,16 +59,16 @@ const generateSEOData = (
 };
 
 const seasonalityOptions = [
-  { label: "Spring", value: "spring" },
-  { label: "Summer", value: "summer" },
-  { label: "Autumn", value: "autumn" },
-  { label: "Winter", value: "winter" },
-  { label: "Year Round", value: "year-round" },
+  { label: 'Spring', value: 'spring' },
+  { label: 'Summer', value: 'summer' },
+  { label: 'Autumn', value: 'autumn' },
+  { label: 'Winter', value: 'winter' },
+  { label: 'Year Round', value: 'year-round' },
 ];
 
 const statusOptions = [
-  { label: "Active", value: "true" },
-  { label: "Inactive", value: "false" },
+  { label: 'Active', value: 'true' },
+  { label: 'Inactive', value: 'false' },
 ];
 
 const AddProductOccasion = ({ modalRef, closeModal, editData }: PropTypes) => {
@@ -79,51 +79,51 @@ const AddProductOccasion = ({ modalRef, closeModal, editData }: PropTypes) => {
 
   const form = useForm({
     defaultValues: {
-      name: editData?.name ?? "",
-      description: editData?.description ?? "",
+      name: editData?.name ?? '',
+      description: editData?.description ?? '',
       isActive: editData?.isActive ?? true,
       image: null as File | null, // Will be handled by FileDropInput
       video: null as File | null, // Will be handled by VideoUploadField
-      seasonality: editData?.metadata?.seasonality ?? "year-round",
+      seasonality: editData?.metadata?.seasonality ?? 'year-round',
     },
 
     onSubmit: async ({ value }) => {
       // Generate SEO data and slug automatically
       const seoData = generateSEOData(
         value.name,
-        value.description || "",
-        value.seasonality || "year-round"
+        value.description || '',
+        value.seasonality || 'year-round'
       );
 
       const formData = new FormData();
 
       // Append basic fields
-      formData.append("name", value.name);
-      formData.append("slug", editData?.slug || seoData.slug);
-      formData.append("description", value.description || "");
-      formData.append("isActive", String(value.isActive));
+      formData.append('name', value.name);
+      formData.append('slug', editData?.slug || seoData.slug);
+      formData.append('description', value.description || '');
+      formData.append('isActive', String(value.isActive));
 
       // Handle metadata as JSON string
       const metadata = {
-        seasonality: value.seasonality || "year-round",
+        seasonality: value.seasonality || 'year-round',
         seoTitle: seoData.seoTitle,
         seoDescription: seoData.seoDescription,
         keywords: seoData.keywords,
       };
-      formData.append("metadata", JSON.stringify(metadata));
+      formData.append('metadata', JSON.stringify(metadata));
 
       // Handle image file
       if (value.image instanceof File) {
-        formData.append("image", value.image);
+        formData.append('image', value.image);
       } else if (editData?.image) {
-        formData.append("existingImage", editData.image);
+        formData.append('existingImage', editData.image);
       }
 
       // Handle video file
       if (value.video instanceof File) {
-        formData.append("video", value.video);
+        formData.append('video', value.video);
       } else if (editData?.video) {
-        formData.append("existingVideo", editData.video);
+        formData.append('existingVideo', editData.video);
       }
 
       if (editData) {
@@ -144,15 +144,17 @@ const AddProductOccasion = ({ modalRef, closeModal, editData }: PropTypes) => {
   return (
     <Modal
       classname="max-w-3xl w-full h-auto max-h-[90vh] overflow-y-auto"
-      ref={modalRef}>
+      ref={modalRef}
+    >
       <form
         className="p-6"
         onSubmit={(e) => {
           e.preventDefault();
           form.handleSubmit();
-        }}>
+        }}
+      >
         <h2 className="text-xl font-semibold mb-4">
-          {editData ? "Edit Occasion" : "Add New Occasion"}
+          {editData ? 'Edit Occasion' : 'Add New Occasion'}
         </h2>
 
         <div className="space-y-4">
@@ -185,24 +187,23 @@ const AddProductOccasion = ({ modalRef, closeModal, editData }: PropTypes) => {
                 </div>
               )}
             </form.Field>
-          {/* Status Setting */}
-          <form.Field name="isActive">
-            {(field) => (
-              <div>
-                <DropdownField
-                  label="Status"
-                  options={statusOptions}
-                  value={field.state.value ? "true" : "false"}
-                  onChange={(e) =>
-                    field.handleChange(e.target.value === "true")
-                  }
-                />
-                <FieldError field={field} />
-              </div>
-            )}
-          </form.Field>
+            {/* Status Setting */}
+            <form.Field name="isActive">
+              {(field) => (
+                <div>
+                  <DropdownField
+                    label="Status"
+                    options={statusOptions}
+                    value={field.state.value ? 'true' : 'false'}
+                    onChange={(e) =>
+                      field.handleChange(e.target.value === 'true')
+                    }
+                  />
+                  <FieldError field={field} />
+                </div>
+              )}
+            </form.Field>
           </div>
-
 
           {/* Media Settings */}
           <div className="gap-4 grid  grid-cols-1">
@@ -239,7 +240,7 @@ const AddProductOccasion = ({ modalRef, closeModal, editData }: PropTypes) => {
           </div>
 
           {/* Metadata */}
-          <form.Field name="seasonality">
+          {/* <form.Field name="seasonality">
             {(field) => (
               <div>
                 <DropdownField
@@ -249,26 +250,25 @@ const AddProductOccasion = ({ modalRef, closeModal, editData }: PropTypes) => {
                   onChange={(e) =>
                     field.handleChange(
                       e.target.value as
-                        | "spring"
-                        | "summer"
-                        | "autumn"
-                        | "winter"
-                        | "year-round"
+                        | 'spring'
+                        | 'summer'
+                        | 'autumn'
+                        | 'winter'
+                        | 'year-round'
                     )
                   }
                 />
                 <FieldError field={field} />
               </div>
             )}
-          </form.Field>
+          </form.Field> */}
 
           {/* Information about automatic features */}
           <div className="space-y-2">
             <div className="p-3 bg-blue-50 rounded-lg">
               <p className="text-sm text-blue-700">
                 <strong>SEO:</strong> Title, description, and keywords are
-                automatically generated based on the occasion name, description,
-                and seasonality.
+                automatically generated based on the occasion name & description
               </p>
             </div>
             <div className="p-3 bg-green-50 rounded-lg">
@@ -285,13 +285,15 @@ const AddProductOccasion = ({ modalRef, closeModal, editData }: PropTypes) => {
           <button
             type="button"
             onClick={closeModal}
-            className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50">
+            className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+          >
             Cancel
           </button>
           <button
             type="submit"
-            className="px-4 py-2 bg-[#DF8D28] text-white rounded-lg hover:bg-[#DF8D28]/90">
-            {editData ? "Update" : "Create"} Occasion
+            className="px-4 py-2 bg-[#DF8D28] text-white rounded-lg hover:bg-[#DF8D28]/90"
+          >
+            {editData ? 'Update' : 'Create'} Occasion
           </button>
         </div>
       </form>

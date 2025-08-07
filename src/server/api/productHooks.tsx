@@ -1,6 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiClient } from "../utils/ApiGateway";
-import { toast } from "react-toastify";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { apiClient } from '../utils/ApiGateway';
+import { toast } from 'react-toastify';
 export interface IParams {
   [key: string]: string;
 }
@@ -102,7 +102,7 @@ export interface IFetchProduct {
   rhodoumFinishes: boolean;
   shape: string;
   quantity: number;
-  gender:string;
+  gender: string;
   totalCarat: number;
   color: string;
   clarity: string;
@@ -135,7 +135,7 @@ export interface IFetchOccasion {
     seoTitle?: string;
     seoDescription?: string;
     keywords?: string[];
-    seasonality?: "spring" | "summer" | "autumn" | "winter" | "year-round";
+    seasonality?: 'spring' | 'summer' | 'autumn' | 'winter' | 'year-round';
     popularity?: number;
   };
   createdAt?: Date;
@@ -145,9 +145,9 @@ export interface IFetchOccasion {
 //Products routes
 export const useGetAllProductsQuery = (params: IParams = {}) => {
   return useQuery({
-    queryKey: ["products"],
+    queryKey: ['products'],
     queryFn: async () => {
-      const res = await apiClient.get<{ data: IFetchProduct[] }>("product", {
+      const res = await apiClient.get<{ data: IFetchProduct[] }>('product', {
         params,
       });
       return res?.data?.data;
@@ -156,7 +156,7 @@ export const useGetAllProductsQuery = (params: IParams = {}) => {
 };
 export const useGetProductById = (id: string) => {
   return useQuery({
-    queryKey: ["products", id],
+    queryKey: ['products', id],
     queryFn: async () => {
       const res = await apiClient.get<{ data: IFetchProduct }>(`product/${id}`);
       return res?.data?.data;
@@ -169,7 +169,7 @@ export const useGetProductByIdQuery = (
   options?: { enabled?: boolean }
 ) => {
   return useQuery({
-    queryKey: ["product", id],
+    queryKey: ['product', id],
     queryFn: async () => {
       const res = await apiClient.get<{ data: IFetchProduct }>(`product/${id}`);
       return res?.data;
@@ -181,29 +181,29 @@ export const useGetProductByIdQuery = (
 export const useCreateProductsMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["products"],
+    mutationKey: ['products'],
     mutationFn: async (body: FormData) => {
-      const res = await apiClient.post("product", body, {
+      const res = await apiClient.post('product', body, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          'Content-Type': 'multipart/form-data',
         },
       });
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Product created successfully");
-      queryClient.invalidateQueries({ queryKey: ["products"] });
+      toast.success('Product created successfully');
+      queryClient.invalidateQueries({ queryKey: ['products'] });
     },
     onError(err: string) {
       // toast.error(err || "Error creating products");
-      toast.error("Error creating products");
+      toast.error('Error creating products');
     },
   });
 };
 export const useUpdateProductsMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["products"],
+    mutationKey: ['products'],
     mutationFn: async ({
       id,
       body,
@@ -213,18 +213,20 @@ export const useUpdateProductsMutation = () => {
     }) => {
       const res = await apiClient.patch(`product/${id}`, body, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          'Content-Type': 'multipart/form-data',
         },
       });
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Product updated successfully");
-      queryClient.invalidateQueries({ queryKey: ["products"] });
+      toast.success('Product updated successfully');
+      queryClient.invalidateQueries({ queryKey: ['products'] });
     },
     onError(err: any) {
-      console.error("Product update error:", err);
-      toast.error(err?.response?.data?.message || err?.message || "Error updating product");
+      console.error('Product update error:', err);
+      toast.error(
+        err?.response?.data?.message || err?.message || 'Error updating product'
+      );
     },
   });
 };
@@ -232,18 +234,18 @@ export const useUpdateProductsMutation = () => {
 export const useDeleteProductsMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["products"],
+    mutationKey: ['products'],
     mutationFn: async (id: string) => {
       const res = await apiClient.delete(`product/${id}`);
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Product deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["products"] });
+      toast.success('Product deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ['products'] });
     },
     onError(err: string) {
       // toast.error(err || "Error deleting products");
-      toast.error("Error deleting products");
+      toast.error('Error deleting products');
     },
   });
 };
@@ -251,9 +253,9 @@ export const useDeleteProductsMutation = () => {
 //Product category
 export const useGetAllProductCategoriesQuery = (params: IParams = {}) => {
   return useQuery({
-    queryKey: ["category"],
+    queryKey: ['category'],
     queryFn: async () => {
-      const res = await apiClient.get<{ data: IFetchCategory[] }>("category", {
+      const res = await apiClient.get<{ data: IFetchCategory[] }>('category', {
         params,
       });
       return res?.data?.data;
@@ -264,28 +266,28 @@ export const useGetAllProductCategoriesQuery = (params: IParams = {}) => {
 export const useCreateProductCategoriesMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["category"],
+    mutationKey: ['category'],
     mutationFn: async (body: IProductCategory | FormData) => {
       const isFormData = body instanceof FormData;
-      const res = await apiClient.post("category", body, {
-        headers: isFormData ? { "Content-Type": "multipart/form-data" } : {},
+      const res = await apiClient.post('category', body, {
+        headers: isFormData ? { 'Content-Type': 'multipart/form-data' } : {},
       });
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Product category created successfully");
-      queryClient.invalidateQueries({ queryKey: ["category"] });
+      toast.success('Product category created successfully');
+      queryClient.invalidateQueries({ queryKey: ['category'] });
     },
     onError(err: string) {
       // toast.error(err || "Error creating product category");
-      toast.error("Error creating product category");
+      toast.error('Error creating product category');
     },
   });
 };
 export const useUpdateProductCategoriesMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["category"],
+    mutationKey: ['category'],
     mutationFn: async ({
       id,
       body,
@@ -295,17 +297,17 @@ export const useUpdateProductCategoriesMutation = () => {
     }) => {
       const isFormData = body instanceof FormData;
       const res = await apiClient.patch(`category/${id}`, body, {
-        headers: isFormData ? { "Content-Type": "multipart/form-data" } : {},
+        headers: isFormData ? { 'Content-Type': 'multipart/form-data' } : {},
       });
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Product category updated successfully");
-      queryClient.invalidateQueries({ queryKey: ["category"] });
+      toast.success('Product category updated successfully');
+      queryClient.invalidateQueries({ queryKey: ['category'] });
     },
     onError(err: string) {
       // toast.error(err || "Error updating product category");
-      toast.error("Error updating product category");
+      toast.error('Error updating product category');
     },
   });
 };
@@ -313,18 +315,18 @@ export const useUpdateProductCategoriesMutation = () => {
 export const useDeleteProductCategoriesMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["category"],
+    mutationKey: ['category'],
     mutationFn: async (id: string) => {
       const res = await apiClient.delete(`category/${id}`);
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Product category deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["category"] });
+      toast.success('Product category deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ['category'] });
     },
     onError(err: string) {
       // toast.error(err || "Error deleting product category");
-      toast.error("Error deleting product category");
+      toast.error('Error deleting product category');
     },
   });
 };
@@ -332,10 +334,10 @@ export const useDeleteProductCategoriesMutation = () => {
 // Product sub category
 export const useGetAllProductSubCategoriesQuery = (params: IParams = {}) => {
   return useQuery({
-    queryKey: ["subcategory"],
+    queryKey: ['subcategory'],
     queryFn: async () => {
       const res = await apiClient.get<{ data: IFetchSubCategory[] }>(
-        "subcategory",
+        'subcategory',
         { params }
       );
       return res?.data?.data;
@@ -346,18 +348,18 @@ export const useGetAllProductSubCategoriesQuery = (params: IParams = {}) => {
 export const useCreateProductSubCategoryMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["subcategory"],
+    mutationKey: ['subcategory'],
     mutationFn: async (body: IBaseProductSubCategory) => {
-      const res = await apiClient.post("subcategory", body);
+      const res = await apiClient.post('subcategory', body);
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Product subcategory created successfully");
-      queryClient.invalidateQueries({ queryKey: ["subcategory"] });
+      toast.success('Product subcategory created successfully');
+      queryClient.invalidateQueries({ queryKey: ['subcategory'] });
     },
     onError(err: string) {
       // toast.error(err || "Error creating product subcategory");
-      toast.error("Error creating product subcategory");
+      toast.error('Error creating product subcategory');
     },
   });
 };
@@ -365,7 +367,7 @@ export const useCreateProductSubCategoryMutation = () => {
 export const useUpdateProductSubCategoryMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["subcategory"],
+    mutationKey: ['subcategory'],
     mutationFn: async ({
       id,
       body,
@@ -377,12 +379,12 @@ export const useUpdateProductSubCategoryMutation = () => {
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Product subcategory updated successfully");
-      queryClient.invalidateQueries({ queryKey: ["subcategory"] });
+      toast.success('Product subcategory updated successfully');
+      queryClient.invalidateQueries({ queryKey: ['subcategory'] });
     },
     onError(err: string) {
       // toast.error(err || "Error updating product subcategory");
-      toast.error("Error updating product subcategory");
+      toast.error('Error updating product subcategory');
     },
   });
 };
@@ -390,27 +392,27 @@ export const useUpdateProductSubCategoryMutation = () => {
 export const useDeleteProductSubCategoryMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["subcategory"],
+    mutationKey: ['subcategory'],
     mutationFn: async (id: string) => {
       const res = await apiClient.delete(`subcategory/${id}`);
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Product subcategory deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["subcategory"] });
+      toast.success('Product subcategory deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ['subcategory'] });
     },
     onError(err: string) {
       // toast.error(err || "Error deleting product subcategory");
-      toast.error("Error deleting product subcategory");
+      toast.error('Error deleting product subcategory');
     },
   });
 };
 // Product clasp
 export const useGetAllProductClaspsQuery = (params: IParams = {}) => {
   return useQuery({
-    queryKey: ["clasptype"],
+    queryKey: ['clasptype'],
     queryFn: async () => {
-      const res = await apiClient.get<{ data: IFetchClasps[] }>("clasptype", {
+      const res = await apiClient.get<{ data: IFetchClasps[] }>('clasptype', {
         params,
       });
       return res?.data?.data;
@@ -421,20 +423,20 @@ export const useGetAllProductClaspsQuery = (params: IParams = {}) => {
 export const useCreateProductClaspsMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["clasptype"],
+    mutationKey: ['clasptype'],
     mutationFn: async (body: FormData) => {
-      const res = await apiClient.post("clasptype", body, {
-        headers: { "Content-Type": "multipart/form-data" },
+      const res = await apiClient.post('clasptype', body, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Product clasp created successfully");
-      queryClient.invalidateQueries({ queryKey: ["clasptype"] });
+      toast.success('Product clasp created successfully');
+      queryClient.invalidateQueries({ queryKey: ['clasptype'] });
     },
     onError(err: string) {
       // toast.error(err || "Error creating product clasp");
-      toast.error("Error creating product clasp");
+      toast.error('Error creating product clasp');
     },
   });
 };
@@ -442,20 +444,20 @@ export const useCreateProductClaspsMutation = () => {
 export const useUpdateProductClaspsMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["clasptype"],
+    mutationKey: ['clasptype'],
     mutationFn: async ({ id, body }: { id: string; body: FormData }) => {
       const res = await apiClient.patch(`clasptype/${id}`, body, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Product clasp updated successfully");
-      queryClient.invalidateQueries({ queryKey: ["clasptype"] });
+      toast.success('Product clasp updated successfully');
+      queryClient.invalidateQueries({ queryKey: ['clasptype'] });
     },
     onError(err: string) {
       // toast.error(err || "Error updating product clasp");
-      toast.error("Error updating product clasp");
+      toast.error('Error updating product clasp');
     },
   });
 };
@@ -463,18 +465,18 @@ export const useUpdateProductClaspsMutation = () => {
 export const useDeleteProductClaspsMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["clasptype"],
+    mutationKey: ['clasptype'],
     mutationFn: async (id: string) => {
       const res = await apiClient.delete(`clasptype/${id}`);
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Product clasp deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["clasptype"] });
+      toast.success('Product clasp deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ['clasptype'] });
     },
     onError(err: string) {
       // toast.error(err || "Error deleting product clasp");
-      toast.error("Error deleting product clasp");
+      toast.error('Error deleting product clasp');
     },
   });
 };
@@ -483,7 +485,7 @@ export const useDeleteProductClaspsMutation = () => {
 export interface IFetchStone {
   _id: string;
   name: string;
-  type: "diamond" | "ruby" | "emerald" | "sapphire" | "pearl" | "other";
+  type: 'diamond' | 'ruby' | 'emerald' | 'sapphire' | 'pearl' | 'other';
   color: string;
   clarity: string;
   cut: string;
@@ -501,10 +503,10 @@ export interface IFetchStone {
 
 export const useGetAllStonesQuery = (params: IParams = {}) => {
   return useQuery({
-    queryKey: ["stone", params],
+    queryKey: ['stone', params],
     queryFn: async () => {
       const res = await apiClient.get<{ data: { stones: IFetchStone[] } }>(
-        "stone",
+        'stone',
         {
           params,
         }
@@ -517,18 +519,18 @@ export const useGetAllStonesQuery = (params: IParams = {}) => {
 export const useCreateStoneMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["stone"],
+    mutationKey: ['stone'],
     mutationFn: async (body: FormData) => {
-      const res = await apiClient.post("stone", body);
+      const res = await apiClient.post('stone', body);
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Stone created successfully");
-      queryClient.invalidateQueries({ queryKey: ["stone"] });
+      toast.success('Stone created successfully');
+      queryClient.invalidateQueries({ queryKey: ['stone'] });
     },
     onError(err: string) {
       // toast.error(err || "Error creating stone");
-      toast.error("Error creating stone");
+      toast.error('Error creating stone');
     },
   });
 };
@@ -536,18 +538,18 @@ export const useCreateStoneMutation = () => {
 export const useUpdateStoneMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["stone"],
+    mutationKey: ['stone'],
     mutationFn: async ({ id, body }: { id: string; body: FormData }) => {
-      const res = await apiClient.patch(`stone/${id}`, body);
+      const res = await apiClient.put(`stone/${id}`, body);
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Stone updated successfully");
-      queryClient.invalidateQueries({ queryKey: ["stone"] });
+      toast.success('Stone updated successfully');
+      queryClient.invalidateQueries({ queryKey: ['stone'] });
     },
     onError(err: string) {
       // toast.error(err || "Error updating stone");
-      toast.error("Error updating stone");
+      toast.error('Error updating stone');
     },
   });
 };
@@ -555,18 +557,18 @@ export const useUpdateStoneMutation = () => {
 export const useDeleteStoneMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["stones"],
+    mutationKey: ['stones'],
     mutationFn: async (id: string) => {
       const res = await apiClient.delete(`stone/${id}`);
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Stone deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["stones"] });
+      toast.success('Stone deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ['stones'] });
     },
     onError(err: string) {
       // toast.error(err || "Error deleting stone");
-      toast.error("Error deleting stone");
+      toast.error('Error deleting stone');
     },
   });
 };
@@ -574,9 +576,9 @@ export const useDeleteStoneMutation = () => {
 // Product Occasions exports
 export const useGetAllProductOccasionsQuery = (params: IParams = {}) => {
   return useQuery({
-    queryKey: ["occasions", params],
+    queryKey: ['occasions', params],
     queryFn: async () => {
-      const res = await apiClient.get<{ data: IFetchOccasion[] }>("occasion", {
+      const res = await apiClient.get<{ data: IFetchOccasion[] }>('occasion', {
         params,
       });
       return res?.data?.data;
@@ -587,22 +589,22 @@ export const useGetAllProductOccasionsQuery = (params: IParams = {}) => {
 export const useCreateProductOccasionMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["occasions"],
+    mutationKey: ['occasions'],
     mutationFn: async (body: FormData) => {
-      const res = await apiClient.post("occasion", body, {
+      const res = await apiClient.post('occasion', body, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          'Content-Type': 'multipart/form-data',
         },
       });
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Product occasion created successfully");
-      queryClient.invalidateQueries({ queryKey: ["occasions"] });
+      toast.success('Product occasion created successfully');
+      queryClient.invalidateQueries({ queryKey: ['occasions'] });
     },
     onError(err: string) {
       // toast.error(err || "Error creating product occasion");
-      toast.error("Error creating product occasion");
+      toast.error('Error creating product occasion');
     },
   });
 };
@@ -610,22 +612,22 @@ export const useCreateProductOccasionMutation = () => {
 export const useUpdateProductOccasionMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["occasions"],
+    mutationKey: ['occasions'],
     mutationFn: async ({ id, body }: { id: string; body: FormData }) => {
       const res = await apiClient.patch(`occasion/${id}`, body, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          'Content-Type': 'multipart/form-data',
         },
       });
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Product occasion updated successfully");
-      queryClient.invalidateQueries({ queryKey: ["occasions"] });
+      toast.success('Product occasion updated successfully');
+      queryClient.invalidateQueries({ queryKey: ['occasions'] });
     },
     onError(err: string) {
       // toast.error(err || "Error updating product occasion");
-      toast.error("Error updating product occasion");
+      toast.error('Error updating product occasion');
     },
   });
 };
@@ -633,18 +635,18 @@ export const useUpdateProductOccasionMutation = () => {
 export const useDeleteProductOccasionMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["occasions"],
+    mutationKey: ['occasions'],
     mutationFn: async (id: string) => {
       const res = await apiClient.delete(`occasion/${id}`);
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Product occasion deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["occasions"] });
+      toast.success('Product occasion deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ['occasions'] });
     },
     onError(err: string) {
       // toast.error(err || "Error deleting product occasion");
-      toast.error("Error deleting product occasion");
+      toast.error('Error deleting product occasion');
     },
   });
 };
@@ -652,7 +654,7 @@ export const useDeleteProductOccasionMutation = () => {
 // SKU validation export
 export const useValidateSKUQuery = (sku: string) => {
   return useQuery({
-    queryKey: ["validate-sku", sku],
+    queryKey: ['validate-sku', sku],
     queryFn: async () => {
       const res = await apiClient.get(`product/validate-sku/${sku}`);
       return res?.data;

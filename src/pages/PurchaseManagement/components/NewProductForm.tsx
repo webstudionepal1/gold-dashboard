@@ -303,23 +303,23 @@
 
 // Second
 
-import { Icon } from "@iconify/react/dist/iconify.js";
-import { useForm } from "@tanstack/react-form";
-import { get } from "lodash";
-import { DropdownField } from "../../../components/shared/form_components/Dropdown";
-import { InputField } from "../../../components/shared/form_components/InputField";
+import { Icon } from '@iconify/react/dist/iconify.js';
+import { useForm } from '@tanstack/react-form';
+import { get } from 'lodash';
+import { DropdownField } from '../../../components/shared/form_components/Dropdown';
+import { InputField } from '../../../components/shared/form_components/InputField';
 import {
   IBaseProduct,
   useGetAllProductsQuery,
-} from "../../../server/api/productHooks";
+} from '../../../server/api/productHooks';
 import {
   useCreatePurchaseMutation,
   useUpdatePurchaseMutation,
-} from "../../../server/api/purchaseHooks";
-import { useGetSupplierQuery } from "../../../server/api/supplierHooks";
-import { FieldError } from "../../auth/LoginPage";
-import { IPurchaseForm, PurchaseSchema } from "../purchaseObj";
-import { useEffect } from "react";
+} from '../../../server/api/purchaseHooks';
+import { useGetSupplierQuery } from '../../../server/api/supplierHooks';
+import { FieldError } from '../../auth/LoginPage';
+import { IPurchaseForm, PurchaseSchema } from '../purchaseObj';
+import { useEffect } from 'react';
 
 interface NewProductProps {
   onClose: () => void;
@@ -351,37 +351,37 @@ const NewProductForm = ({
 
   const form = useForm({
     defaultValues: {
-      billNo: edit ? get(data, "billNo") : "",
-      supplier: edit ? get(data, "supplier._id") : "",
-      phone_no: edit ? get(data, "phone", "") : "",
+      billNo: edit ? get(data, 'billNo') : '',
+      supplier: edit ? get(data, 'supplier._id') : '',
+      phone_no: edit ? get(data, 'phone', '') : '',
       products: edit
-        ? get(data, "products", [
+        ? get(data, 'products', [
             {
-              product: "",
+              product: '',
               quantity: 1,
               price: 0,
               paidAmount: 0,
               wt: 0,
-              unit: "gm",
+              unit: 'gm',
             },
           ])
         : [
             {
-              product: "",
+              product: '',
               quantity: 1,
               price: 0,
               paidAmount: 0,
               wt: 0,
-              unit: "gm",
+              unit: 'gm',
             },
           ],
-      description: edit ? get(data, "description", "") : "",
+      description: edit ? get(data, 'description', '') : '',
     } as IPurchaseForm,
     validators: {
       onSubmit: PurchaseSchema,
     },
     onSubmit: async ({ value }) => {
-      if (edit) updatePurchase({ id: data?._id ?? "", body: value });
+      if (edit) updatePurchase({ id: data?._id ?? '', body: value });
       else createPurchase(value);
     },
   });
@@ -398,7 +398,7 @@ const NewProductForm = ({
     if (!product?.variants) return [];
 
     return product.variants.map((variant) => ({
-      label: `${variant.wt} ${variant.unit || "gm"}`,
+      label: `${variant.wt} ${variant.unit || 'gm'}`,
       value: variant.wt.toString(),
     }));
   };
@@ -410,7 +410,8 @@ const NewProductForm = ({
         onSubmit={(e) => {
           e.preventDefault();
           form.handleSubmit();
-        }}>
+        }}
+      >
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <form.Field name="billNo">
             {(field) => (
@@ -453,15 +454,16 @@ const NewProductForm = ({
                   type="button"
                   onClick={() =>
                     field.pushValue({
-                      product: "",
+                      product: '',
                       quantity: 1,
                       price: 0,
                       paidAmount: 0,
                       wt: 0,
-                      unit: "gm",
+                      unit: 'gm',
                     })
                   }
-                  className="px-3 py-2 text-sm flex items-center text-white bg-[#d49327] transition-transform duration-200 ease-in-out hover:scale-105 rounded-lg">
+                  className="px-3 py-2 text-sm flex items-center text-white bg-[#d49327] transition-transform duration-200 ease-in-out hover:scale-105 rounded-lg"
+                >
                   <Icon
                     icon="material-symbols-light:add-rounded"
                     width="18"
@@ -474,7 +476,8 @@ const NewProductForm = ({
               {field.state.value.map((_, index: number) => (
                 <div
                   key={index.toString()}
-                  className="bg-[#ffffff] border-[#e7e7e7] border-2 rounded-xl px-3 py-2">
+                  className="bg-[#ffffff] border-[#e7e7e7] border-2 rounded-xl px-3 py-2"
+                >
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <form.Field name={`products[${index}].product`}>
                       {(field) => (
@@ -489,7 +492,7 @@ const NewProductForm = ({
                               form.setFieldValue(`products[${index}].wt`, 0);
                               form.setFieldValue(
                                 `products[${index}].unit`,
-                                "gm"
+                                'gm'
                               );
                             }}
                             options={productList}
@@ -505,10 +508,10 @@ const NewProductForm = ({
                           <InputField
                             label="Quantity"
                             type="number"
-                            value={field.state.value}
-                            onChange={(e) =>
-                              field.handleChange(Number(e.target.value))
-                            }
+                            numberValue={field.state.value || 0}
+                            onNumberChange={field.handleChange}
+                            allowNegative={false}
+                            clearZeroOnFocus={true}
                           />
                           <FieldError field={field} />
                         </div>
@@ -524,10 +527,11 @@ const NewProductForm = ({
                             label="Price (Rs.)"
                             placeholder="Tola"
                             required
-                            value={field.state.value}
-                            onChange={(e) =>
-                              field.handleChange(Number(e.target.value))
-                            }
+                            type="number"
+                            numberValue={field.state.value || 0}
+                            onNumberChange={field.handleChange}
+                            allowNegative={false}
+                            clearZeroOnFocus={true}
                           />
                           <FieldError field={field} />
                         </div>
@@ -540,10 +544,11 @@ const NewProductForm = ({
                             label="Paid Price (Rs.)"
                             required
                             placeholder="176,000"
-                            value={field.state.value}
-                            onChange={(e) =>
-                              field.handleChange(Number(e.target.value))
-                            }
+                            type="number"
+                            numberValue={field.state.value || 0}
+                            onNumberChange={field.handleChange}
+                            allowNegative={false}
+                            clearZeroOnFocus={true}
                           />
                           <FieldError field={field} />
                         </div>
@@ -575,10 +580,11 @@ const NewProductForm = ({
                                 <InputField
                                   label="Weight"
                                   placeholder="Weight"
-                                  value={field.state.value}
-                                  onChange={(e) =>
-                                    field.handleChange(Number(e.target.value))
-                                  }
+                                  type="number"
+                                  numberValue={field.state.value || 0}
+                                  onNumberChange={field.handleChange}
+                                  allowNegative={false}
+                                  clearZeroOnFocus={true}
                                 />
                               )}
                               <FieldError field={field} />
@@ -595,10 +601,10 @@ const NewProductForm = ({
                               required
                               firstInput="Select Unit"
                               options={[
-                                { label: "Gm", value: "gm" },
-                                { label: "Carat", value: "carat" },
-                                { label: "Tola", value: "tola" },
-                                { label: "Kg", value: "kg" },
+                                { label: 'Gm', value: 'gm' },
+                                { label: 'Carat', value: 'carat' },
+                                { label: 'Tola', value: 'tola' },
+                                { label: 'Kg', value: 'kg' },
                               ]}
                               value={field.state.value}
                               onChange={(e) =>
@@ -617,7 +623,8 @@ const NewProductForm = ({
                       <button
                         type="button"
                         onClick={() => field.removeValue(index)}
-                        className="px-3 py-1 border-[#de8d28] border-2 text-[#de8d28] rounded-xl">
+                        className="px-3 py-1 border-[#de8d28] border-2 text-[#de8d28] rounded-xl"
+                      >
                         Remove
                       </button>
                     </div>
@@ -638,7 +645,8 @@ const NewProductForm = ({
                 value={field.state.value}
                 onChange={(e) => field.handleChange(e.target.value)}
                 className="resize-none bg-[#f6f7f9] border-2 border-[#d3dae4] focus:outline-none rounded-xl px-3 py-1 placeholder:text-[#858492]"
-                placeholder="Enter Short Description"></textarea>
+                placeholder="Enter Short Description"
+              ></textarea>
             </div>
           )}
         </form.Field>
@@ -648,12 +656,14 @@ const NewProductForm = ({
         <div className="flex items-center gap-3">
           <button
             onClick={onClose}
-            className="flex-1 bg-[#c9c9c9] px-7 py-2 rounded-xl">
+            className="flex-1 bg-[#c9c9c9] px-7 py-2 rounded-xl"
+          >
             Cancel
           </button>
           <button
             type="submit"
-            className="flex-1 bg-[#df8d29] text-white px-7 py-2 rounded-xl">
+            className="flex-1 bg-[#df8d29] text-white px-7 py-2 rounded-xl"
+          >
             Create
           </button>
         </div>

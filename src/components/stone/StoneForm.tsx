@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { Icon } from "@iconify/react/dist/iconify.js";
-import { InputField } from "../shared/form_components/InputField";
-import { DropdownField } from "../shared/form_components/Dropdown";
+import React, { useEffect, useState } from 'react';
+import { Icon } from '@iconify/react/dist/iconify.js';
+import { InputField } from '../shared/form_components/InputField';
+import { DropdownField } from '../shared/form_components/Dropdown';
 import {
   IFetchStone,
   IStoneFormData,
@@ -10,7 +10,7 @@ import {
   STONE_SHAPES,
   DIAMOND_CLARITY_GRADES,
   STONE_COLORS,
-} from "../../types/Stone.interface";
+} from '../../types/Stone.interface';
 
 interface StoneFormProps {
   stone?: IFetchStone;
@@ -26,16 +26,16 @@ const StoneForm: React.FC<StoneFormProps> = ({
   isLoading = false,
 }) => {
   const [formData, setFormData] = useState<IStoneFormData>({
-    name: "",
-    type: "diamond",
-    color: "",
-    clarity: "",
-    cut: "",
+    name: '',
+    type: 'diamond',
+    color: '',
+    clarity: '',
+    cut: '',
     carat: 0,
     pricePerCarat: 0,
-    shape: "",
-    certification: "",
-    description: "",
+    shape: '',
+    certification: '',
+    description: '',
     images: [],
   });
 
@@ -67,8 +67,8 @@ const StoneForm: React.FC<StoneFormProps> = ({
         carat: stone.carat,
         pricePerCarat: stone.pricePerCarat,
         shape: stone.shape,
-        certification: stone.certification || "",
-        description: stone.description || "",
+        certification: stone.certification || '',
+        description: stone.description || '',
         images: stone.images || [],
       });
     }
@@ -93,35 +93,35 @@ const StoneForm: React.FC<StoneFormProps> = ({
     const newErrors: StoneFormErrors = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
+      newErrors.name = 'Name is required';
     }
 
     if (!formData.type) {
-      newErrors.type = "Type is required";
+      newErrors.type = 'Type is required';
     }
 
     if (!formData.color.trim()) {
-      newErrors.color = "Color is required";
+      newErrors.color = 'Color is required';
     }
 
     if (!formData.clarity.trim()) {
-      newErrors.clarity = "Clarity is required";
+      newErrors.clarity = 'Clarity is required';
     }
 
     if (!formData.cut.trim()) {
-      newErrors.cut = "Cut is required";
+      newErrors.cut = 'Cut is required';
     }
 
     if (!formData.shape.trim()) {
-      newErrors.shape = "Shape is required";
+      newErrors.shape = 'Shape is required';
     }
 
     if (formData.carat <= 0) {
-      newErrors.carat = "Carat must be greater than 0";
+      newErrors.carat = 'Carat must be greater than 0';
     }
 
     if (formData.pricePerCarat <= 0) {
-      newErrors.pricePerCarat = "Price per carat must be greater than 0";
+      newErrors.pricePerCarat = 'Price per carat must be greater than 0';
     }
 
     setErrors(newErrors);
@@ -150,10 +150,10 @@ const StoneForm: React.FC<StoneFormProps> = ({
           </div>
           <div>
             <h2 className="text-xl font-semibold text-gray-900">
-              {stone ? "Edit Stone" : "Add New Stone"}
+              {stone ? 'Edit Stone' : 'Add New Stone'}
             </h2>
             <p className="text-sm text-gray-500">
-              {stone ? "Update stone information" : "Create a new stone entry"}
+              {stone ? 'Update stone information' : 'Create a new stone entry'}
             </p>
           </div>
         </div>
@@ -172,7 +172,7 @@ const StoneForm: React.FC<StoneFormProps> = ({
               label="Stone Name"
               placeholder="Enter stone name"
               value={formData.name}
-              onChange={(e) => handleInputChange("name", e.target.value)}
+              onChange={(e) => handleInputChange('name', e.target.value)}
               required
             />
             {errors.name && (
@@ -187,7 +187,7 @@ const StoneForm: React.FC<StoneFormProps> = ({
                 label: type.label,
               }))}
               value={formData.type}
-              onChange={(e) => handleInputChange("type", e.target.value)}
+              onChange={(e) => handleInputChange('type', e.target.value)}
               required
             />
 
@@ -199,7 +199,7 @@ const StoneForm: React.FC<StoneFormProps> = ({
                 label: color.label,
               }))}
               value={formData.color}
-              onChange={(e) => handleInputChange("color", e.target.value)}
+              onChange={(e) => handleInputChange('color', e.target.value)}
               required
             />
 
@@ -211,7 +211,7 @@ const StoneForm: React.FC<StoneFormProps> = ({
                 label: clarity.label,
               }))}
               value={formData.clarity}
-              onChange={(e) => handleInputChange("clarity", e.target.value)}
+              onChange={(e) => handleInputChange('clarity', e.target.value)}
               required
             />
             {errors.clarity && (
@@ -234,7 +234,7 @@ const StoneForm: React.FC<StoneFormProps> = ({
                 label: cut.label,
               }))}
               value={formData.cut}
-              onChange={(e) => handleInputChange("cut", e.target.value)}
+              onChange={(e) => handleInputChange('cut', e.target.value)}
               required
             />
             {errors.cut && (
@@ -249,7 +249,7 @@ const StoneForm: React.FC<StoneFormProps> = ({
                 label: shape.label,
               }))}
               value={formData.shape}
-              onChange={(e) => handleInputChange("shape", e.target.value)}
+              onChange={(e) => handleInputChange('shape', e.target.value)}
               required
             />
             {errors.shape && (
@@ -260,12 +260,11 @@ const StoneForm: React.FC<StoneFormProps> = ({
               label="Carat Weight"
               type="number"
               step="0.01"
-              min="0"
               placeholder="0.00"
-              value={formData.carat || ""}
-              onChange={(e) =>
-                handleInputChange("carat", parseFloat(e.target.value) || 0)
-              }
+              numberValue={formData.carat || 0}
+              onNumberChange={(value) => handleInputChange('carat', value)}
+              allowNegative={false}
+              clearZeroOnFocus={true}
               required
             />
             {errors.carat && (
@@ -276,15 +275,13 @@ const StoneForm: React.FC<StoneFormProps> = ({
               label="Price per Carat (NPR)"
               type="number"
               step="0.01"
-              min="0"
               placeholder="0.00"
-              value={formData.pricePerCarat || ""}
-              onChange={(e) =>
-                handleInputChange(
-                  "pricePerCarat",
-                  parseFloat(e.target.value) || 0
-                )
+              numberValue={formData.pricePerCarat || 0}
+              onNumberChange={(value) =>
+                handleInputChange('pricePerCarat', value)
               }
+              allowNegative={false}
+              clearZeroOnFocus={true}
               required
             />
             {errors.pricePerCarat && (
@@ -302,7 +299,7 @@ const StoneForm: React.FC<StoneFormProps> = ({
                 NPR {totalPrice.toLocaleString()}
               </div>
               <div className="text-xs text-gray-500">
-                {formData.carat} ct × NPR{" "}
+                {formData.carat} ct × NPR{' '}
                 {formData.pricePerCarat.toLocaleString()}
               </div>
             </div>
@@ -322,7 +319,7 @@ const StoneForm: React.FC<StoneFormProps> = ({
               placeholder="e.g., GIA, AGS, EGL"
               value={formData.certification}
               onChange={(e) =>
-                handleInputChange("certification", e.target.value)
+                handleInputChange('certification', e.target.value)
               }
             />
             {errors.certification && (
@@ -341,7 +338,7 @@ const StoneForm: React.FC<StoneFormProps> = ({
               rows={4}
               placeholder="Enter stone description..."
               value={formData.description}
-              onChange={(e) => handleInputChange("description", e.target.value)}
+              onChange={(e) => handleInputChange('description', e.target.value)}
             />
           </div>
         </div>
@@ -367,12 +364,12 @@ const StoneForm: React.FC<StoneFormProps> = ({
                   icon="material-symbols:hourglass-empty"
                   className="w-4 h-4 animate-spin"
                 />
-                {stone ? "Updating..." : "Creating..."}
+                {stone ? 'Updating...' : 'Creating...'}
               </>
             ) : (
               <>
                 <Icon icon="material-symbols:save" className="w-4 h-4" />
-                {stone ? "Update Stone" : "Create Stone"}
+                {stone ? 'Update Stone' : 'Create Stone'}
               </>
             )}
           </button>
