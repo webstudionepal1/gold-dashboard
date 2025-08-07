@@ -5,7 +5,11 @@ import { useNavigate } from "react-router-dom";
 import MasterTable from "../../../components/shared/MasterTable";
 import Header from "../../../components/shared/table_heading/Header";
 import { useGetAllOrdersQuery } from "../../../server/api/orderHooks";
-import { confirmedColumns } from "../Order/orderObj";
+import {
+  confirmedColumns,
+  getStatusColor,
+  getStatusIcon,
+} from "../Order/orderObj";
 
 // Filter state interface
 interface FilterState {
@@ -33,8 +37,12 @@ const ConfirmedOrder = () => {
             ...item,
             orderedProducts: size(item.orderedProducts),
             orderStatus: (
-              <div className="px-2 py-1 text-xs text-white rounded-full bg-green">
-                {item.orderStatus}
+              <div
+                className={`px-3 py-1 text-xs font-medium rounded-full flex items-center gap-1 ${getStatusColor(
+                  item.orderStatus
+                )}`}>
+                <span>{getStatusIcon(item.orderStatus)}</span>
+                <span className="capitalize">{item.orderStatus}</span>
               </div>
             ),
             customer: get(item, "customer.name", "-"),

@@ -1,7 +1,14 @@
 import clsx from "clsx";
-import { debounce } from "lodash"; // Make sure this import is included
-import React, { ReactNode, useCallback, useEffect, useState } from "react";
+import { debounce } from "lodash";
+import React, {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useState,
+  useMemo,
+} from "react";
 import TableAction from "./_table/TableAction";
+import { TableLoading, EmptyState } from "./LoadingStates";
 
 // Define proper TypeScript interfaces
 interface Column {
@@ -103,13 +110,40 @@ const MasterTable: React.FC<MasterTableProps> = ({
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
-  // Initialize filtered rows when rows change
+  // Initialize filtered rows when rows change with better performance
   useEffect(() => {
-    // Only update the filteredRows if there's no search term or if using API pagination
     if (!globalFilter || apiPagination) {
       setFilteredRows(rows);
     }
   }, [rows, globalFilter, apiPagination]);
+
+  // Memoize filtered and paginated data for better performance
+  const processedData = useMemo(() => {
+    let filtered = filteredRows;
+
+    // Apply client-side filtering if not using API pagination
+    if (!apiPagination && globalFilter) {
+      const query = globalFilter.toLowerCase();
+      filtered = rows.filter((row) =>
+        Object.values(row).some((value) =>
+          String(value).toLowerCase().includes(query)
+        )
+      );
+    }
+
+    // Calculate pagination
+    const totalPages = Math.ceil(filtered.length / pageSize);
+    const startIndex = pageIndex * pageSize;
+    const endIndex = startIndex + pageSize;
+    const currentPageData = filtered.slice(startIndex, endIndex);
+
+    return {
+      filteredData: filtered,
+      currentPageData,
+      totalPages,
+      totalItems: filtered.length,
+    };
+  }, [filteredRows, rows, globalFilter, apiPagination, pageIndex, pageSize]);
 
   // Filter rows when search term changes (for client-side filtering)
   useEffect(() => {
@@ -163,10 +197,8 @@ const MasterTable: React.FC<MasterTableProps> = ({
     apiPagination ? totalItems : filteredRows.length
   );
 
-  // Get current page data (only for client-side pagination)
-  const currentPageRows = apiPagination
-    ? rows // For API pagination, we use the rows directly as they should already be the current page
-    : filteredRows.slice(start, end);
+  // Get current page data using processed data
+  const currentPageRows = apiPagination ? rows : processedData.currentPageData;
 
   // Reset page index when total pages change
   useEffect(() => {
@@ -373,40 +405,50 @@ const MasterTable: React.FC<MasterTableProps> = ({
               {loading ? (
                 <tr>
                   <td
-                    colSpan={canSelect ? columns.length + 1 : columns.length}
-                    className="px-6 py-4 text-sm text-center text-gray-500">
-                    Loading...
+                    colSpan={
+                      (canSelect ? 1 : 0) +
+                      columns.length +
+                      (showAction ? 1 : 0)
+                    }
+                    className="px-6 py-8">
+                    <TableLoading rows={3} columns={columns.length} />
                   </td>
                 </tr>
               ) : currentPageRows.length === 0 ? (
                 <tr>
                   <td
                     colSpan={
-                      canSelect
-                        ? columns.length + (showAction ? 2 : 1)
-                        : columns.length + (showAction ? 1 : 0)
+                      (canSelect ? 1 : 0) +
+                      columns.length +
+                      (showAction ? 1 : 0)
                     }
-                    className="px-6 py-2 text-sm text-center text-gray-500">
-                    {emptyStateMessage}
+                    className="px-6 py-8">
+                    <EmptyState
+                      title="No data available"
+                      description={emptyStateMessage}
+                      icon="mdi:database-outline"
+                    />
                   </td>
                 </tr>
               ) : (
                 currentPageRows.map((row, index: number) => (
                   <tr
-                    key={row.id ?? index}
-                    className={`hover:bg-gray-50 ${
+                    key={row.id ?? `row-${index}`}
+                    className={clsx(
+                      "hover:bg-gray-50 transition-colors duration-150",
                       row.id !== undefined && selectedRows.has(row.id)
                         ? "bg-blue-50"
                         : ""
-                    }`}>
+                    )}>
                     {canSelect && (
-                      <td className="px-3 py-2 text-sm whitespace-nowrap">
+                      <td className="px-3 py-3 text-sm">
                         {row.id !== undefined && (
                           <input
                             type="checkbox"
-                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                            checked={selectedRows.has(row.id ?? "")}
-                            onChange={() => toggleSelectRow(row.id ?? "")}
+                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                            checked={selectedRows.has(row.id)}
+                            onChange={() => toggleSelectRow(row.id)}
+                            aria-label={`Select row ${index + 1}`}
                           />
                         )}
                       </td>
@@ -415,19 +457,23 @@ const MasterTable: React.FC<MasterTableProps> = ({
                       <td
                         key={column.key}
                         className={clsx(
-                          "px-6 py-2 text-sm whitespace-nowrap",
+                          "px-6 py-3 text-sm",
                           column.key === "action" ? "text-center" : "text-start"
                         )}>
                         {column.key === "attachment" &&
                         row[column.key] === "Null" ? (
-                          <span className="text-gray-400">Null</span>
+                          <span className="text-gray-400 italic">
+                            No attachment
+                          </span>
                         ) : (
-                          row[column.key]
+                          row[column.key] || (
+                            <span className="text-gray-400">-</span>
+                          )
                         )}
                       </td>
                     ))}
                     {showAction && (
-                      <td className="px-0 py-2 text-sm whitespace-nowrap">
+                      <td className="px-3 py-3 text-sm">
                         <TableAction
                           row={row}
                           viewAction={viewAction}

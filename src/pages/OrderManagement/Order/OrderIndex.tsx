@@ -1,17 +1,30 @@
 import dayjs from "dayjs";
-import { get } from "lodash";
-import { useMemo, useState } from "react";
+import { groupBy, size } from "lodash";
+import { useMemo, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { SearchFilterSort } from "../../../components/global/SearchFilterSort";
 import MasterTable from "../../../components/shared/MasterTable";
 import Header from "../../../components/shared/table_heading/Header";
+import ErrorBoundary from "../../../components/shared/ErrorBoundary";
+import {
+  TableLoading,
+  EmptyState,
+} from "../../../components/shared/LoadingStates";
 import { useGetAllOrdersQuery } from "../../../server/api/orderHooks";
 import {
   filterItems,
   FilterState,
   orderIndexColumns,
   sortOptions,
+  getStatusColor,
+  getStatusIcon,
 } from "./orderObj";
+import {
+  extractOrderData,
+  formatCurrency,
+  safeGet,
+  validateOrderData,
+} from "../../../utils/dataHelpers";
 
 // Tab configuration
 const orderTabs = [
@@ -46,55 +59,34 @@ const OrderIndex = () => {
   // State for active tab
   const [activeTab, setActiveTab] = useState<string>("pending");
 
+  // Fetch all orders at once for better performance
   const {
-    data: orders,
+    data: allOrders,
     isSuccess,
     isLoading,
-  } = useGetAllOrdersQuery({
-    orderStatus: activeTab,
-  });
+    isError,
+    error,
+  } = useGetAllOrdersQuery({});
 
-  // Get counts for each tab (optional - for better UX)
-  const { data: pendingOrders } = useGetAllOrdersQuery({
-    orderStatus: "pending",
-  });
-  const { data: confirmedOrders } = useGetAllOrdersQuery({
-    orderStatus: "confirmed",
-  });
-  const { data: assignedOrders } = useGetAllOrdersQuery({
-    orderStatus: "assigned",
-  });
-  const { data: deliveredOrders } = useGetAllOrdersQuery({
-    orderStatus: "delivered",
-  });
-  const { data: cancelledOrders } = useGetAllOrdersQuery({
-    orderStatus: "cancelled",
-  });
+  // Group orders by status for efficient counting and filtering
+  const ordersByStatus = useMemo(() => {
+    if (!allOrders) return {};
+    return groupBy(allOrders, "orderStatus");
+  }, [allOrders]);
 
-  // Create tabs with counts
-  const tabsWithCounts = orderTabs.map((tab) => ({
-    ...tab,
-    count: (() => {
-      switch (tab.key) {
-        case "pending":
-          return pendingOrders?.length || 0;
-        case "confirmed":
-          return confirmedOrders?.length || 0;
-        case "assigned":
-          return assignedOrders?.length || 0;
-        case "delivered":
-          return deliveredOrders?.length || 0;
-        case "cancelled":
-          return cancelledOrders?.length || 0;
-        default:
-          return 0;
-      }
-    })(),
-  }));
+  // Get orders for current tab
+  const currentTabOrders = useMemo(() => {
+    return ordersByStatus[activeTab] || [];
+  }, [ordersByStatus, activeTab]);
 
-  const orderList = useMemo(
-    () => (isSuccess ? orders : []),
-    [isSuccess, orders]
+  // Create tabs with counts using grouped data
+  const tabsWithCounts = useMemo(
+    () =>
+      orderTabs.map((tab) => ({
+        ...tab,
+        count: size(ordersByStatus[tab.key]) || 0,
+      })),
+    [ordersByStatus]
   );
 
   // Consolidated filter state (removed filter since we use tabs)
@@ -106,36 +98,52 @@ const OrderIndex = () => {
 
   const navigate = useNavigate();
 
-  // Handle search and sort
-  const handleSearch = (query: string) => {
+  // Handle search and sort with useCallback for performance
+  const handleSearch = useCallback((query: string) => {
     setFilterState((prev) => ({ ...prev, searchQuery: query }));
-  };
+  }, []);
 
-  const handleSort = (sort: string) => {
+  const handleSort = useCallback((sort: string) => {
     setFilterState((prev) => ({ ...prev, sort }));
-  };
+  }, []);
 
-  // Get filtered items
+  // Get filtered items with improved data safety and styling
   const filteredItems = useMemo(
     () =>
-      filterItems(orderList, filterState).map((item) => ({
-        ...item,
-        orderedProducts: get(item, "orderedProducts.length", 0),
-        orderStatus: (
-          <div className="px-2 py-1 text-xs text-white rounded-full bg-green dark-green">
-            {get(item, "orderStatus", "")}
-          </div>
-        ),
-        customer: get(item, "customer.name", "-"),
-        createdAt: (
-          <div className="text-center">
-            {dayjs(get(item, "createdAt", "")).format("MMMM D, YYYY")}
-            <br />
-            {dayjs(get(item, "createdAt", "")).format("h:mm A")}
-          </div>
-        ),
-      })),
-    [orderList, filterState]
+      filterItems(currentTabOrders, filterState)
+        .filter((item) => {
+          const validation = validateOrderData(item);
+          if (!validation.isValid) {
+            console.warn("Invalid order data:", validation.errors, item);
+          }
+          return validation.isValid;
+        })
+        .map((item) => {
+          const orderData = extractOrderData(item);
+          return {
+            ...item,
+            orderedProducts: orderData.orderedProducts.length,
+            orderStatus: (
+              <div
+                className={`px-3 py-1 text-xs font-medium rounded-full flex items-center gap-1 ${getStatusColor(
+                  orderData.orderStatus
+                )}`}>
+                <span>{getStatusIcon(orderData.orderStatus)}</span>
+                <span className="capitalize">{orderData.orderStatus}</span>
+              </div>
+            ),
+            customer: orderData.customerName,
+            totalAmount: formatCurrency(orderData.totalAmount),
+            createdAt: (
+              <div className="text-center">
+                {dayjs(orderData.createdAt).format("MMMM D, YYYY")}
+                <br />
+                {dayjs(orderData.createdAt).format("h:mm A")}
+              </div>
+            ),
+          };
+        }),
+    [currentTabOrders, filterState]
   );
 
   // Get the current tab configuration
@@ -145,12 +153,31 @@ const OrderIndex = () => {
     return `/order/order-details/${orderId}`;
   };
 
+  // Handle error state
+  if (isError) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen gap-4">
+        <div className="text-red-500 text-6xl">⚠️</div>
+        <h2 className="text-xl font-medium">Error loading orders</h2>
+        <p className="text-gray-600">
+          {error?.message || "Please check your connection and try again"}
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-4 py-2 mt-4 text-white rounded-lg bg-primary">
+          Retry
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col h-screen">
-      {/* Fixed Header and Tabs */}
-      <div className="flex-shrink-0 bg-white">
-        <div className="container mx-auto px-4 py-3">
-          <Header text="Order Management" />
+    <ErrorBoundary>
+      <div className="flex flex-col h-screen">
+        {/* Fixed Header and Tabs */}
+        <div className="flex-shrink-0 bg-white">
+          <div className="container mx-auto px-4 py-3">
+            <Header text="Order Management" />
           {/* Tab Navigation */}
           <div className="mb-6">
             <div className="border-b border-gray-200">
@@ -200,26 +227,51 @@ const OrderIndex = () => {
                 </div>
               </div>
 
-              <MasterTable
-                filterSection={
-                  <SearchFilterSort
-                    onSearch={handleSearch}
-                    onSort={handleSort}
-                    sortOptions={sortOptions}
-                    placeholder="Search orders..."
-                  />
-                }
-                showAction
-                viewAction={(row) => navigate(getDetailRoute(row._id))}
-                rows={filteredItems}
-                columns={orderIndexColumns}
-                loading={isLoading}
-              />
+              {isLoading ? (
+                <TableLoading rows={5} columns={5} />
+              ) : filteredItems.length === 0 ? (
+                <EmptyState
+                  icon="mdi:package-variant"
+                  title={`No ${activeTab} orders found`}
+                  description={
+                    filterState.searchQuery
+                      ? `No orders match your search "${filterState.searchQuery}"`
+                      : `There are no ${activeTab} orders at the moment.`
+                  }
+                  action={
+                    filterState.searchQuery ? (
+                      <button
+                        onClick={() => handleSearch("")}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                      >
+                        Clear Search
+                      </button>
+                    ) : null
+                  }
+                />
+              ) : (
+                <MasterTable
+                  filterSection={
+                    <SearchFilterSort
+                      onSearch={handleSearch}
+                      onSort={handleSort}
+                      sortOptions={sortOptions}
+                      placeholder="Search orders..."
+                    />
+                  }
+                  showAction
+                  viewAction={(row) => navigate(getDetailRoute(row._id))}
+                  rows={filteredItems}
+                  columns={orderIndexColumns}
+                  loading={isLoading}
+                  emptyStateMessage={`No ${activeTab} orders found`}
+                />
+              )}
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </ErrorBoundary>
   );
 };
 

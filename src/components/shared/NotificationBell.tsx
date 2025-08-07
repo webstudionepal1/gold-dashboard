@@ -1,6 +1,6 @@
 import React from "react";
 import { Bell, BellRing } from "lucide-react";
-import { motion } from "motion/react";
+import { motion, type Variants } from "motion/react";
 import { useNavigate } from "react-router-dom";
 import useCriticalNotifications from "../../hooks/useCriticalNotifications";
 import CriticalNotificationBanner from "./CriticalNotificationBanner";
@@ -19,7 +19,7 @@ const NotificationBell: React.FC = () => {
   const hasCriticalNotifications = stats.critical > 0;
   const hasHighPriorityNotifications = stats.high > 0;
 
-  const bellVariants = {
+  const bellVariants: Variants = {
     idle: { rotate: 0 },
     ring: {
       rotate: [0, -10, 10, -10, 10, 0],
@@ -31,7 +31,7 @@ const NotificationBell: React.FC = () => {
     },
   };
 
-  const pulseVariants = {
+  const pulseVariants: Variants = {
     idle: { scale: 1, opacity: 0 },
     pulse: {
       scale: [1, 1.2, 1],
@@ -39,18 +39,18 @@ const NotificationBell: React.FC = () => {
       transition: {
         duration: 1.5,
         repeat: Infinity,
-        ease: "easeInOut",
+        ease: [0.4, 0.0, 0.2, 1], // easeInOut as cubic bezier
       },
     },
   };
 
-  const badgeVariants = {
+  const badgeVariants: Variants = {
     hidden: { scale: 0, opacity: 0 },
     visible: {
       scale: 1,
       opacity: 1,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 500,
         damping: 30,
       },
@@ -72,8 +72,7 @@ const NotificationBell: React.FC = () => {
           onClick={() => navigate("/notification")}
           className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
+          whileTap={{ scale: 0.95 }}>
           {/* Pulsing background for critical notifications */}
           {hasCriticalNotifications && (
             <motion.div
@@ -88,8 +87,7 @@ const NotificationBell: React.FC = () => {
           <motion.div
             variants={bellVariants}
             animate={hasCriticalNotifications ? "ring" : "idle"}
-            initial="idle"
-          >
+            initial="idle">
             {hasCriticalNotifications || hasHighPriorityNotifications ? (
               <BellRing className="w-6 h-6 relative z-10" />
             ) : (
@@ -109,8 +107,7 @@ const NotificationBell: React.FC = () => {
               }`}
               variants={badgeVariants}
               initial="hidden"
-              animate="visible"
-            >
+              animate="visible">
               {unreadCount > 99 ? "99+" : unreadCount}
             </motion.span>
           )}

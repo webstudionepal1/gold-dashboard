@@ -10,6 +10,14 @@ import {
   handleMutationError,
   handleMutationSuccess,
 } from "../../utils/errorHandler";
+import type {
+  Order,
+  OrdersResponse,
+  OrderResponse,
+  OrderFilters,
+  UpdateOrderRequest,
+  CreateOrderRequest,
+} from "../../types/order";
 
 interface ShippingAddress {
   fullname: string;
@@ -106,23 +114,24 @@ export interface IParams {
   id: string;
   body: any;
 }
-export const useGetAllOrdersQuery = (params = {}) => {
+export const useGetAllOrdersQuery = (params: OrderFilters = {}) => {
   return useQuery({
     queryKey: ["orders", params],
-    queryFn: async () => {
-      const res = await apiClient.get<{ data: IFetchOrder[] }>("order", {
+    queryFn: async (): Promise<Order[]> => {
+      const res = await apiClient.get<OrdersResponse>("order", {
         params,
       });
-      return res?.data?.data;
+      return res?.data?.data || [];
     },
   });
 };
 export const useGetOrderById = (id: string | undefined) => {
   return useQuery({
     queryKey: ["orders", id],
-    queryFn: async () => {
-      const res = await apiClient.get<{ data: IFetchOrder }>(`order/${id}`);
-      return res?.data?.data;
+    queryFn: async (): Promise<Order | null> => {
+      if (!id) return null;
+      const res = await apiClient.get<OrderResponse>(`order/${id}`);
+      return res?.data?.data || null;
     },
     enabled: !!id,
   });

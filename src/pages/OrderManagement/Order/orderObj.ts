@@ -181,21 +181,47 @@ export const StepperObj: Record<string, number> = {
 };
 
 export const getStatusColor = (status: string) => {
-  switch (status.toLowerCase()) {
-    case "completed":
-      return "bg-[#e9fbef] text-[#6db289]";
+  const normalizedStatus = status.toLowerCase().trim();
+
+  switch (normalizedStatus) {
     case "pending":
-      return "bg-[#d1d1d1] text-[#8d8d8d]";
-    case "in progress":
-      return "bg-blue-100 text-blue-800";
+      return "bg-gray-100 text-gray-700 border border-gray-200";
+    case "confirmed":
+      return "bg-blue-100 text-blue-800 border border-blue-200";
+    case "assigned":
+      return "bg-yellow-100 text-yellow-800 border border-yellow-200";
     case "delivered":
-      return "bg-green-100 text-green-800";
+    case "completed":
+      return "bg-green-100 text-green-800 border border-green-200";
     case "cancelled":
-      return "bg-[#f9ebea] text-[#ce8b8e]";
+      return "bg-red-100 text-red-800 border border-red-200";
+    case "in progress":
+      return "bg-indigo-100 text-indigo-800 border border-indigo-200";
     case "not completed":
-      return "bg-[#f9ebea] text-[#ce8b8e]";
+      return "bg-orange-100 text-orange-800 border border-orange-200";
     default:
-      return "bg-gray-100 text-gray-800";
+      return "bg-gray-100 text-gray-700 border border-gray-200";
+  }
+};
+
+// Helper function to get status icon
+export const getStatusIcon = (status: string) => {
+  const normalizedStatus = status.toLowerCase().trim();
+
+  switch (normalizedStatus) {
+    case "pending":
+      return "⏳";
+    case "confirmed":
+      return "✅";
+    case "assigned":
+      return "📦";
+    case "delivered":
+    case "completed":
+      return "🚚";
+    case "cancelled":
+      return "❌";
+    default:
+      return "📋";
   }
 };
 

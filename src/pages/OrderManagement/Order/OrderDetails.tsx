@@ -1,6 +1,6 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import clsx from "clsx";
-import { get, map } from "lodash";
+import { map } from "lodash";
 import { CheckIcon, Download, PackageIcon, TruckIcon } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -14,9 +14,21 @@ import {
 import InfoSection from "./components/InfoSection";
 import OrderTracker from "./components/OrderTracker";
 import { order_details_columns, Ordertitle, StepperObj } from "./orderObj";
+import ErrorBoundary from "../../../components/shared/ErrorBoundary";
+import {
+  OrderDetailsSkeleton,
+  ButtonLoading,
+} from "../../../components/shared/LoadingStates";
 import { Constants } from "../../../utils/constants";
 import { CancelOrderModal } from "../../../components/shared/modals/CancelOrderModal";
 import { CompleteOrderModal } from "../../../components/shared/modals/CompleteOrderModal";
+import {
+  extractOrderData,
+  extractProductData,
+  formatCurrency,
+  safeGet,
+  validateOrderData,
+} from "../../../utils/dataHelpers";
 
 // Define proper TypeScript interfaces
 interface OrderedProduct {
@@ -89,12 +101,22 @@ const OrderDetails: React.FC = () => {
 
   const { data: order, isLoading, isError, error } = useGetOrderById(id);
 
-  // Handle navigation after successful order update
+  // Handle navigation after successful order update with cleanup
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
     if (isSuccess) {
-      // Navigate back to main order management page
-      navigate("/order/orders");
+      // Add a small delay to ensure the success message is shown
+      timeoutId = setTimeout(() => {
+        navigate("/order/orders");
+      }, 500);
     }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, [isSuccess, navigate]);
 
   // Handle order completion
@@ -135,70 +157,72 @@ const OrderDetails: React.FC = () => {
     setTimeout(() => navigate("/order/cancelled-order"), 1000);
   };
 
-  // Transform order products data
+  // Transform order products data with safe access and performance optimization
   const orderMenu = useMemo(() => {
     if (!order?.orderedProducts) return [];
 
-    return map(order.orderedProducts, (item) => ({
-      image: (
-        <div className="flex items-center justify-center">
-          <div className="w-10 h-10">
-            {get(item, "product.images", []).length > 0 ? (
+    return map(order.orderedProducts, (item) => {
+      const productData = extractProductData(item);
+      const imageUrl =
+        productData.images.length > 0
+          ? `${import.meta.env.VITE_API_IMAGE_BASE_URL}${productData.images[0]}`
+          : "/no-image.png";
+
+      return {
+        image: (
+          <div className="flex items-center justify-center">
+            <div className="w-10 h-10">
               <img
-                src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${get(
-                  item,
-                  "product.images[0]",
-                  ""
-                )}`}
-                alt={get(item, "product.name", "Product")}
+                src={imageUrl}
+                alt={productData.name}
                 className="w-full h-full rounded-md object-cover aspect-square"
+                loading="lazy"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = "/no-image.png";
+                }}
               />
-            ) : (
-              <img
-                src="/no-image.png"
-                alt="No image"
-                className="w-full h-full rounded-md object-cover aspect-square"
-              />
-            )}
+            </div>
           </div>
-        </div>
-      ),
-      name: get(item, "product.name", ""),
-      qty: get(item, "selectedVariant.quantity", 0),
-      price: `${get(item, "selectedVariant.price", 0).toFixed(2)}`,
-      total_price: `${(
-        Number(get(item, "selectedVariant.price", 0)) *
-        Number(get(item, "selectedVariant.quantity", 0))
-      ).toFixed(2)}`,
-    }));
+        ),
+        name: productData.name,
+        qty: productData.quantity,
+        price: formatCurrency(productData.price),
+        total_price: formatCurrency(productData.totalPrice),
+      };
+    });
   }, [order?.orderedProducts]);
 
-  // Calculate order details with memoization
+  // Calculate order details with safe data access
   const orderDetails = useMemo(() => {
-    if (!order)
+    if (!order) {
       return {
         subTotal: { label: "SubTotal", value: 0 },
         shippingCost: { label: "Shipping Cost", value: 0 },
         discounts: { label: "Discounts", value: 0 },
         taxes: { label: "Taxes", value: 0 },
       };
+    }
 
-    const itemCount = order.orderedProducts?.length || 0;
+    const orderData = extractOrderData(order);
+    const itemCount = orderData.orderedProducts.length;
 
     return {
       subTotal: {
         label: `SubTotal (${itemCount} items)`,
-        value: get(order, "totalAmount", 0),
+        value: orderData.totalAmount,
       },
       shippingCost: {
         label: "Shipping Cost",
-        value: get(order, "billDetails.shippingCost", 0),
+        value: orderData.billDetails.shippingCost,
       },
       discounts: {
         label: "Discounts",
-        value: get(order, "billDetails.discount", 0),
+        value: orderData.billDetails.discount,
       },
-      taxes: { label: "Taxes", value: 0 },
+      taxes: {
+        label: "Taxes",
+        value: orderData.billDetails.taxes,
+      },
     };
   }, [order]);
 
@@ -210,47 +234,49 @@ const OrderDetails: React.FC = () => {
     );
   }, [orderDetails]);
 
-  // Generate shipping information dynamically from order data
+  // Generate shipping information with safe data access
   const shippingInformation = useMemo(() => {
     if (!order) return [];
+
+    const orderData = extractOrderData(order);
 
     return [
       {
         id: 1,
-        title: "Customer ",
-        value: get(order, "shippingAddress.fullname", ""),
+        title: "Customer",
+        value: orderData.shippingAddress.fullname || "N/A",
       },
       {
         id: 2,
         title: "Phone Number",
-        value: get(order, "shippingAddress.phone", ""),
+        value: orderData.shippingAddress.phone || "N/A",
       },
       {
         id: 3,
         title: "Address",
-        value: get(order, "shippingAddress.address", ""),
+        value: orderData.shippingAddress.address || "N/A",
       },
       {
         id: 4,
         title: "Email",
-        value: get(order, "shippingAddress.email", ""),
+        value: orderData.shippingAddress.email || "N/A",
       },
       {
         id: 5,
         title: "Shipping Method",
-        value: get(order, "shippingMethod", "Normal"),
+        value: safeGet(order, "shippingMethod", "Standard"),
       },
       {
         id: 6,
         title: "Payment Status",
         value: (
           <div
-            className={
-              order?.paymentStatus === "paid"
-                ? "text-white bg-green text-sm rounded-full py-1 px-4"
-                : "text-white bg-red text-sm rounded-full py-1 px-4"
-            }>
-            {get(order, "paymentStatus", "pending")}
+            className={`text-sm rounded-full py-1 px-4 font-medium ${
+              orderData.paymentStatus === "paid"
+                ? "text-white bg-green-600"
+                : "text-white bg-red-600"
+            }`}>
+            <span className="capitalize">{orderData.paymentStatus}</span>
           </div>
         ),
       },
@@ -322,32 +348,34 @@ const OrderDetails: React.FC = () => {
     });
   };
 
-  // Handle loading and error states
+  // Handle loading state
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <Icon
-          icon="mdi:loading"
-          className="w-10 h-10 animate-spin text-primary"
-        />
+      <div className="container px-4 py-3 mx-auto">
+        <OrderDetailsSkeleton />
       </div>
     );
   }
 
+  // Handle error state
   if (isError) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen gap-4">
-        <Icon icon="mdi:alert-circle" className="w-16 h-16 text-red" />
-        <h2 className="text-xl font-medium">Error loading order details</h2>
-        <p className="text-gray-600">
-          Please check your connection and try again
-        </p>
-        <button
-          onClick={() => window.location.reload()}
-          className="px-4 py-2 mt-4 text-white rounded-lg bg-primary">
-          Retry
-        </button>
-      </div>
+      <ErrorBoundary
+        fallback={
+          <div className="flex flex-col items-center justify-center h-screen gap-4">
+            <Icon icon="mdi:alert-circle" className="w-16 h-16 text-red-500" />
+            <h2 className="text-xl font-medium">Error loading order details</h2>
+            <p className="text-gray-600">
+              {error?.message || "Please check your connection and try again"}
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 mt-4 text-white rounded-lg bg-blue-600 hover:bg-blue-700 transition-colors">
+              Retry
+            </button>
+          </div>
+        }
+      />
     );
   }
 
@@ -356,25 +384,26 @@ const OrderDetails: React.FC = () => {
   const orderNumber = get(order, "id", "").slice(-5);
 
   return (
-    <div className="container px-4 py-3 mx-auto ">
-      <Header text={Ordertitle[page] || "Order Details"} />
+    <ErrorBoundary>
+      <div className="container px-4 py-3 mx-auto">
+        <Header text={Ordertitle[page] || "Order Details"} />
 
-      {/* Order Progress Tracker */}
-      <OrderTracker
-        steps={STEPS}
-        currentStep={StepperObj[orderStatus] || 0}
-        cancelledBg={orderStatus === "cancelled" ? "bg-red-600" : undefined}
-        cancelledBorder={
-          orderStatus === "cancelled" ? "border-red-600" : undefined
-        }
-        cancelledText={
-          orderStatus === "cancelled" ? "text-red-600 font-medium" : undefined
-        }
-      />
+        {/* Order Progress Tracker */}
+        <OrderTracker
+          steps={STEPS}
+          currentStep={StepperObj[orderStatus] || 0}
+          cancelledBg={orderStatus === "cancelled" ? "bg-red-600" : undefined}
+          cancelledBorder={
+            orderStatus === "cancelled" ? "border-red-600" : undefined
+          }
+          cancelledText={
+            orderStatus === "cancelled" ? "text-red-600 font-medium" : undefined
+          }
+        />
 
-      <div className="py-4rounded-md grid grid-cols-1 md:grid-cols-3 mt-4 gap-4 lg:grid-cols-12">
-        {/* Order Header */}
-        {/* <div className="border-2 border-[#d6dbe4] mx-3 rounded-xl">
+        <div className="py-6 grid grid-cols-1 md:grid-cols-3 mt-6 gap-6 lg:grid-cols-12">
+          {/* Order Header */}
+          {/* <div className="border-2 border-[#d6dbe4] mx-3 rounded-xl">
           <div className="flex items-center justify-between px-3 py-3">
             <div className="flex flex-col">
               <h1
@@ -408,179 +437,163 @@ const OrderDetails: React.FC = () => {
           </div>
         </div> */}
 
-        {/* Main Content Grid */}
-        <div className="md:col-span-2 flex flex-col gap-4 lg:col-span-8">
-          {/* Order Items Table */}
-          <div className="col-span-12 bg-white border-2 rounded-xl h-auto border-[#d5d9e4] lg:col-span-8">
-            <MasterTable
-              rows={orderMenu}
-              columns={order_details_columns}
-              canSearch={false}
-            />
-          </div>
-          <div className="col-span-12 bg-white border-2 rounded-xl border-[#d5d9e4] lg:col-span-8">
-            <InfoSection
-              title="Shipping Information"
-              info={shippingInformation}
-              showEdit={false}
-              onEditClick={() => {
-                /* Implement edit functionality */
-              }}
-            />
-          </div>
-          {/* Side Panel */}
-        </div>
-
-        {/* Additional Information Section */}
-        <div className="lg:col-span-4 flex flex-col gap-4">
-          <div className="col-span-12 space-y-4 lg:col-span-4">
-            {/* Delivery Partner Card */}
-            <div className="border-2 rounded-xl border-[#d5d9e4] bg-white">
-              <div className="flex flex-col gap-4 px-3 py-2">
-                <h1 className="text-xl font-semibold">Delivery Partner</h1>
-                <div className="flex items-center justify-between gap-2">
-                  <img
-                    src="/testimg.jpg"
-                    alt="Delivery Partner"
-                    className="object-cover w-20 h-20 rounded-md"
-                  />
-                  <h1 className="text-nowrap">Australian Post</h1>
-                  <button className="bg-[#e08d26] px-3 py-1 rounded-xl text-nowrap text-white">
-                    Track Order
-                  </button>
-                </div>
+          {/* Main Content Grid */}
+          <div className="md:col-span-2 flex flex-col gap-6 lg:col-span-8">
+            {/* Order Items Table */}
+            <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h2 className="text-lg font-semibold text-gray-900">
+                  Order Items
+                </h2>
               </div>
+              <MasterTable
+                rows={orderMenu}
+                columns={order_details_columns}
+                canSearch={false}
+              />
             </div>
 
-            {/* Order Total Card */}
-            <div className="border-2 rounded-xl border-[#d5d9e4] bg-white">
-              <div className="px-3 py-2 space-y-3">
-                <h1 className="text-2xl font-semibold">Total Amount</h1>
-                <div className="border-b-2 border-[#d5d9e4] my-1"></div>
+            {/* Shipping Information */}
+            <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
+              <InfoSection
+                title="Shipping Information"
+                info={shippingInformation}
+                showEdit={false}
+                onEditClick={() => {
+                  /* Implement edit functionality */
+                }}
+              />
+            </div>
+          </div>
 
-                <div className="flex flex-col gap-3">
-                  {Object.entries(orderDetails).map(
-                    ([key, { label, value }]) => (
-                      <div
-                        key={key}
-                        className="flex items-center justify-between text-sm">
-                        <p>{label}</p>
-                        <p>
-                          {Constants.currency}{" "}
-                          {typeof value === "number" ? value.toFixed(2) : value}
-                        </p>
-                      </div>
-                    )
-                  )}
-                </div>
+          {/* Additional Information Section */}
+          <div className="lg:col-span-4 flex flex-col gap-6">
+            <div className="space-y-6">
+              {/* Order Total Card */}
+              <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
+                <div className="px-6 py-4 space-y-4">
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    Order Summary
+                  </h2>
+                  <div className="border-b border-gray-200"></div>
 
-                <div className="my-2 rounded-md border-2 border-[#d5d9e4]">
-                  <div className="flex items-center justify-between px-3 py-1 font-semibold">
-                    <h1>Total</h1>
-                    <p>
-                      {Constants.currency} {totalValue.toFixed(2)}
-                    </p>
+                  <div className="flex flex-col gap-3">
+                    {Object.entries(orderDetails).map(
+                      ([key, { label, value }]) => (
+                        <div
+                          key={key}
+                          className="flex items-center justify-between text-sm">
+                          <p>{label}</p>
+                          <p>
+                            {Constants.currency}{" "}
+                            {typeof value === "number"
+                              ? value.toFixed(2)
+                              : value}
+                          </p>
+                        </div>
+                      )
+                    )}
+                  </div>
+
+                  <div className="my-2 rounded-md border-2 border-[#d5d9e4]">
+                    <div className="flex items-center justify-between px-3 py-1 font-semibold">
+                      <h1>Total</h1>
+                      <p>
+                        {Constants.currency} {totalValue.toFixed(2)}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div className="col-span-12 bg-white border-2 rounded-xl border-[#d5d9e4] lg:col-span-4">
-            {page === "cancelled-order-details" ? (
-              <InfoSection
-                title="Order Cancelled"
-                info={orderCancelled}
-                showEdit={false}
-                onEditClick={() => {
-                  /* Implement edit functionality */
-                }}
-              />
-            ) : (
-              <InfoSection
-                title="Billing Address"
-                info={billingAddress}
-                showEdit={false}
-                onEditClick={() => {
-                  /* Implement edit functionality */
-                }}
-              />
-            )}
-          </div>
-          <div className="flex items-center justify-end gap-3">
-            {page === "order-details" && (
-              <>
-                <button
-                  onClick={() => handleOrderStatusUpdate("confirmed")}
-                  disabled={isPending}
-                  className={clsx(
-                    "bg-[#de8d29] px-4 py-2 text-white rounded-xl font-medium transition-all",
-                    isPending
-                      ? "opacity-70 cursor-not-allowed"
-                      : "hover:bg-[#c97d24]"
-                  )}>
-                  {isPending ? "Processing..." : "Accept Order"}
-                </button>
-                <button
-                  className="bg-red-600 px-4 py-2 text-white rounded-xl font-medium hover:bg-red-700 transition-all flex items-center gap-2"
-                  onClick={() => setShowCancelModal(true)}
-                  disabled={isPending}>
-                  <Icon icon="mdi:cancel" className="w-4 h-4" />
-                  Cancel Order
-                </button>
-              </>
-            )}
+            <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
+              {page === "cancelled-order-details" ? (
+                <InfoSection
+                  title="Order Cancelled"
+                  info={orderCancelled}
+                  showEdit={false}
+                  onEditClick={() => {
+                    /* Implement edit functionality */
+                  }}
+                />
+              ) : (
+                <InfoSection
+                  title="Billing Address"
+                  info={billingAddress}
+                  showEdit={false}
+                  onEditClick={() => {
+                    /* Implement edit functionality */
+                  }}
+                />
+              )}
+            </div>
+            <div className="flex items-center justify-end gap-3 mt-6">
+              {page === "order-details" && (
+                <>
+                  <ButtonLoading
+                    isLoading={isPending}
+                    loadingText="Accepting..."
+                    onClick={() => handleOrderStatusUpdate("confirmed")}
+                    className="bg-blue-600 hover:bg-blue-700 px-6 py-3 text-white rounded-lg font-medium transition-all shadow-sm flex items-center gap-2">
+                    <Icon icon="mdi:check" className="w-4 h-4" />
+                    Accept Order
+                  </ButtonLoading>
+                  <ButtonLoading
+                    isLoading={isPending}
+                    loadingText="Cancelling..."
+                    onClick={() => setShowCancelModal(true)}
+                    className="bg-red-600 hover:bg-red-700 px-6 py-3 text-white rounded-lg font-medium transition-all shadow-sm flex items-center gap-2">
+                    <Icon icon="mdi:cancel" className="w-4 h-4" />
+                    Cancel Order
+                  </ButtonLoading>
+                </>
+              )}
 
-            {page === "confirmed-order-details" && (
-              <button
-                onClick={() => handleOrderStatusUpdate("assigned")}
-                disabled={isPending}
-                className={clsx(
-                  "bg-[#de8d29] px-4 py-2 text-white rounded-xl font-medium transition-all",
-                  isPending
-                    ? "opacity-70 cursor-not-allowed"
-                    : "hover:bg-[#c97d24]"
-                )}>
-                {isPending ? "Processing..." : "Assign Delivery"}
-              </button>
-            )}
+              {page === "confirmed-order-details" && (
+                <ButtonLoading
+                  isLoading={isPending}
+                  loadingText="Assigning..."
+                  onClick={() => handleOrderStatusUpdate("assigned")}
+                  className="bg-orange-600 hover:bg-orange-700 px-6 py-3 text-white rounded-lg font-medium transition-all shadow-sm flex items-center gap-2">
+                  <Icon icon="mdi:truck-delivery" className="w-4 h-4" />
+                  Assign Delivery
+                </ButtonLoading>
+              )}
 
-            {page === "assigned-order-details" && (
-              <button
-                onClick={() => setShowCompleteModal(true)}
-                disabled={isPending}
-                className={clsx(
-                  "bg-[#de8d29] hover:bg-[#c97d24] px-4 py-2 text-white rounded-xl font-medium transition-all flex items-center gap-2 text-nowrap",
-                  isPending
-                    ? "opacity-70 cursor-not-allowed"
-                    : "hover:bg-green-700"
-                )}>
-                <Icon icon="mdi:check-circle" className="w-4 h-4" />
-                Complete Order
-              </button>
-            )}
+              {page === "assigned-order-details" && (
+                <ButtonLoading
+                  isLoading={isPending}
+                  loadingText="Completing..."
+                  onClick={() => setShowCompleteModal(true)}
+                  className="bg-green-600 hover:bg-green-700 px-6 py-3 text-white rounded-lg font-medium transition-all shadow-sm flex items-center gap-2">
+                  <Icon icon="mdi:check-circle" className="w-4 h-4" />
+                  Complete Order
+                </ButtonLoading>
+              )}
+            </div>
           </div>
         </div>
+
+        {/* Modals */}
+        <CompleteOrderModal
+          isOpen={showCompleteModal}
+          onClose={() => setShowCompleteModal(false)}
+          onConfirm={handleCompleteOrder}
+          isLoading={isPending}
+          orderNumber={get(order, "orderNumber", "")}
+          customerName={get(order, "customer.name", "")}
+          totalAmount={get(order, "totalAmount", 0)}
+        />
+
+        <CancelOrderModal
+          isOpen={showCancelModal}
+          onClose={() => setShowCancelModal(false)}
+          onConfirm={handleCancelOrder}
+          isLoading={isPending}
+          orderNumber={safeGet(order, "orderNumber", "")}
+        />
       </div>
-
-      {/* Modals */}
-      <CompleteOrderModal
-        isOpen={showCompleteModal}
-        onClose={() => setShowCompleteModal(false)}
-        onConfirm={handleCompleteOrder}
-        isLoading={isPending}
-        orderNumber={get(order, "orderNumber", "")}
-        customerName={get(order, "customer.name", "")}
-        totalAmount={get(order, "totalAmount", 0)}
-      />
-
-      <CancelOrderModal
-        isOpen={showCancelModal}
-        onClose={() => setShowCancelModal(false)}
-        onConfirm={handleCancelOrder}
-        isLoading={isPending}
-        orderNumber={get(order, "orderNumber", "")}
-      />
-    </div>
+    </ErrorBoundary>
   );
 };
 
