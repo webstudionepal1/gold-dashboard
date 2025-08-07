@@ -95,7 +95,7 @@ const CustomerDetails = () => {
     data: orders,
     isLoading: ordersLoading,
     // error: ordersError,
-  } = useGetAllOrdersQuery({ customer: id });
+  } = useGetAllOrdersQuery({ customerId: id });
 
   // const printRef = useRef<HTMLDivElement>(null);
 
@@ -179,8 +179,7 @@ const CustomerDetails = () => {
         <div
           className={` font-semibold  ${getShippingStatusColor(
             selectedOrder?.paymentStatus || ""
-          )}`}
-        >
+          )}`}>
           {selectedOrder?.paymentStatus}
         </div>
       ),
@@ -335,7 +334,7 @@ const CustomerDetails = () => {
             )}
             <SimpleTable
               title="Order History"
-              data={orders || []}
+              data={(orders as any) || []}
               titlePosition="justify-center"
               showSerialNumber={true}
               columns={[
@@ -368,8 +367,7 @@ const CustomerDetails = () => {
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
                           value
-                        )}`}
-                      >
+                        )}`}>
                         {value}
                       </span>
                     );
@@ -380,8 +378,7 @@ const CustomerDetails = () => {
               viewAllButton={
                 <Link
                   to={FrontendRoutes.ORDER}
-                  className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-amber-600 bg-amber-50 border border-amber-200 rounded-md hover:bg-amber-100 transition-colors"
-                >
+                  className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-amber-600 bg-amber-50 border border-amber-200 rounded-md hover:bg-amber-100 transition-colors">
                   <Icon icon="mdi:eye" className="w-4 h-4 mr-1" />
                   View All
                 </Link>
@@ -406,8 +403,7 @@ const CustomerDetails = () => {
       {showModal && selectedOrder && (
         <ScrollableModal
           onClose={handleCloseModal}
-          classname="w-[90%] max-w-4xl p-4"
-        >
+          classname="w-[90%] max-w-4xl p-4">
           <div className="space-y-4">
             {/* Order Header - Compact */}
             <div className="bg-white border border-gray-200 rounded-lg p-4">
@@ -430,8 +426,7 @@ const CustomerDetails = () => {
                   <span
                     className={`px-3 py-1 rounded-full text-sm font-medium ${getOrderStatusColor(
                       selectedOrder?.paymentStatus || ""
-                    )}`}
-                  >
+                    )}`}>
                     {selectedOrder?.paymentStatus}
                   </span>
                   <button
@@ -439,8 +434,7 @@ const CustomerDetails = () => {
                       setShowInvoiceModal(true);
                       setShowModal(false);
                     }}
-                    className="flex items-center gap-2 px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                  >
+                    className="flex items-center gap-2 px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
                     <Icon icon="mdi:file-document" className="w-4 h-4" />
                     View Invoice
                   </button>
@@ -644,7 +638,7 @@ const CustomerDetails = () => {
                 customerAddress: customer?.address,
                 items: selectedOrder.orderedProducts.map((orderedProduct) => ({
                   name: orderedProduct.product?.name,
-                  weight: orderedProduct.selectedVariant.wt,
+                  weight: orderedProduct.selectedVariant.wt || 0,
                   purity: "",
                   makingCharge: 0,
                   ratePerGram: orderedProduct.selectedVariant.price,
@@ -659,7 +653,8 @@ const CustomerDetails = () => {
                 shopAddress: "Your Shop Address",
                 shopPhone: "Your Shop Phone",
                 shopGSTNumber: "GST Number",
-                paymentMethod: selectedOrder.transactionDetails.paymentMethod,
+                paymentMethod:
+                  selectedOrder.transactionDetails?.paymentMethod || "N/A",
                 // notes: "Thank you for your purchase!",
               };
 

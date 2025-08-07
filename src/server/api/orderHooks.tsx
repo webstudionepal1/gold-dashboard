@@ -23,7 +23,7 @@ interface ShippingAddress {
   fullname: string;
   address: string;
   phone: string;
-  landmark: string;
+  landmark?: string; // Make optional for compatibility
   email: string;
 }
 
@@ -37,37 +37,37 @@ export interface IOrderSummary {
 interface BillingAddress {
   fullname: string;
   address: string;
-  landmark: string;
+  landmark?: string; // Make optional for compatibility
   phone: string;
   email: string;
 }
 
 interface BillDetails {
-  subTotalItemPrice: number;
+  subTotalItemPrice?: number; // Make optional for compatibility
   shippingCost: number;
   discount: number;
-  coupon: any[];
-  totalBill: number;
+  coupon?: any[]; // Make optional for compatibility
+  totalBill?: number; // Make optional for compatibility
 }
 
 interface OrderTimeline {
-  canceled: {
+  canceled?: {
     reason: string | null;
   };
-  orderCreated: string;
-  orderConfirmation: string | null;
-  pickUp: string | null;
-  deliveryAssignment: string | null;
-  outForDelivery: string | null;
-  orderHandOver: string | null;
-  deliveryCompletion: string | null;
+  orderCreated?: string;
+  orderConfirmation?: string | null;
+  pickUp?: string | null;
+  deliveryAssignment?: string | null;
+  outForDelivery?: string | null;
+  orderHandOver?: string | null;
+  deliveryCompletion?: string | null;
 }
 
 interface TransactionDetails {
-  image: string;
-  transactionId: string;
-  payment: number;
-  remainingPayment: number;
+  image?: string; // Make optional for compatibility
+  transactionId?: string; // Make optional for compatibility
+  payment?: number; // Make optional for compatibility
+  remainingPayment?: number; // Make optional for compatibility
   paymentMethod: string;
 }
 
@@ -98,14 +98,14 @@ export interface IFetchOrder {
   billingAddress: BillingAddress;
   billDetails: BillDetails;
   orderTimeline: OrderTimeline;
-  transactionDetails: TransactionDetails;
+  transactionDetails?: TransactionDetails; // Make optional for compatibility
   _id: string;
   customer: ICustomer;
   orderedProducts: OrderedProduct[];
   orderStatus: string;
   paymentStatus: string;
   totalAmount: number;
-  deliveryStatus: string;
+  deliveryStatus?: string; // Make optional for compatibility
   createdAt: string;
   updatedAt: string;
   __v: number;

@@ -33,7 +33,7 @@ const MyPostBusinessIndex = () => {
     isSuccess,
     isLoading,
   } = useGetAllOrdersQuery({
-    orderStatus: "pending",
+    status: "pending",
   });
 
   const orderList = useMemo(
@@ -144,8 +144,9 @@ const MyPostBusinessIndex = () => {
 
   const filteredItems = useMemo(
     () =>
-      filterItems(orderList).map((item) => ({
+      filterItems(orderList as any).map((item) => ({
         ...item,
+        id: get(item, "_id", ""), // Map _id to id for MasterTable compatibility
         orderedProducts: get(item, "orderedProducts.length", 0),
         orderStatus: (
           <div className="px-2 py-1 text-xs text-white rounded-full bg-green dark-green">
@@ -273,8 +274,7 @@ const MyPostBusinessIndex = () => {
               </button>
               <button
                 onClick={() => setIsActionButtonClicked(!isactionButtonClicked)}
-                className="flex items-center gap-2 w-[7rem]  bg-[#df8d29] px-3 py-2 text-white rounded-xl"
-              >
+                className="flex items-center gap-2 w-[7rem]  bg-[#df8d29] px-3 py-2 text-white rounded-xl">
                 Actions
                 <Icon
                   icon="solar:alt-arrow-down-outline"

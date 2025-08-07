@@ -1,6 +1,6 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import clsx from "clsx";
-import { map } from "lodash";
+import { map, get } from "lodash";
 import { CheckIcon, Download, PackageIcon, TruckIcon } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -374,8 +374,9 @@ const OrderDetails: React.FC = () => {
               Retry
             </button>
           </div>
-        }
-      />
+        }>
+        <div></div>
+      </ErrorBoundary>
     );
   }
 

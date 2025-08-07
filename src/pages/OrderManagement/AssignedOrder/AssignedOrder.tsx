@@ -19,7 +19,7 @@ const AssignedOrder = () => {
     isSuccess,
     isLoading,
   } = useGetAllOrdersQuery({
-    orderStatus: "assigned",
+    status: "assigned",
   });
   const navigate = useNavigate();
   const orderList = useMemo(
@@ -34,8 +34,9 @@ const AssignedOrder = () => {
 
   const filteredItems = useMemo(
     () =>
-      filterItems(orderList, filterState).map((item) => ({
+      filterItems(orderList as any, filterState).map((item) => ({
         ...item,
+        id: item._id, // Map _id to id for MasterTable compatibility
         orderedProducts: size(item.orderedProducts),
         orderStatus: (
           <div className="px-2 py-1 text-xs text-white rounded-full bg-green">

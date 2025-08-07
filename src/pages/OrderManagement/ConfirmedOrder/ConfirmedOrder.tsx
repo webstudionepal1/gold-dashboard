@@ -26,7 +26,7 @@ const ConfirmedOrder = () => {
     isSuccess,
     isLoading,
   } = useGetAllOrdersQuery({
-    orderStatus: "confirmed",
+    status: "confirmed",
   });
   const navigate = useNavigate();
 

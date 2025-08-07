@@ -447,7 +447,9 @@ const MasterTable: React.FC<MasterTableProps> = ({
                             type="checkbox"
                             className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                             checked={selectedRows.has(row.id)}
-                            onChange={() => toggleSelectRow(row.id)}
+                            onChange={() =>
+                              row.id !== undefined && toggleSelectRow(row.id)
+                            }
                             aria-label={`Select row ${index + 1}`}
                           />
                         )}

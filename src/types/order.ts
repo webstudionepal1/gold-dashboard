@@ -1,17 +1,13 @@
 // Comprehensive type definitions for order management
 
-export type OrderStatus = 
-  | "pending" 
-  | "confirmed" 
-  | "assigned" 
-  | "delivered" 
+export type OrderStatus =
+  | "pending"
+  | "confirmed"
+  | "assigned"
+  | "delivered"
   | "cancelled";
 
-export type PaymentStatus = 
-  | "pending" 
-  | "paid" 
-  | "failed" 
-  | "refunded";
+export type PaymentStatus = "pending" | "paid" | "failed" | "refunded";
 
 export interface Address {
   fullname: string;
@@ -19,6 +15,7 @@ export interface Address {
   email: string;
   address: string;
   landMark?: string;
+  landmark?: string; // Alternative casing for compatibility
   city?: string;
   state?: string;
   zipCode?: string;
@@ -36,6 +33,8 @@ export interface ProductVariant {
   _id: string;
   price: number;
   quantity: number;
+  wt?: number; // Weight property
+  unit?: string; // Unit property for compatibility
   sku?: string;
   attributes?: Record<string, any>;
 }
@@ -57,10 +56,13 @@ export interface OrderedProduct {
 
 export interface BillDetails {
   subTotal: number;
+  subTotalItemPrice?: number; // Alternative field name for compatibility
   shippingCost: number;
   discount: number;
   taxes: number;
   total: number;
+  totalBill?: number; // Alternative field name for compatibility
+  coupon?: any[]; // Additional field for compatibility
 }
 
 export interface OrderTimeline {
@@ -70,6 +72,17 @@ export interface OrderTimeline {
   shipped?: string;
   delivered?: string;
   cancelled?: string;
+  // Additional fields for compatibility with IFetchOrder
+  canceled?: {
+    reason: string | null;
+  };
+  orderCreated?: string;
+  orderConfirmation?: string | null;
+  pickUp?: string | null;
+  deliveryAssignment?: string | null;
+  outForDelivery?: string | null;
+  orderHandOver?: string | null;
+  deliveryCompletion?: string | null;
 }
 
 export interface TransactionDetails {
@@ -77,6 +90,10 @@ export interface TransactionDetails {
   transactionId?: string;
   paymentGateway?: string;
   paymentDate?: string;
+  // Additional fields for compatibility with IFetchOrder
+  image?: string;
+  payment?: number;
+  remainingPayment?: number;
 }
 
 export interface DeliveryDetails {
@@ -100,6 +117,7 @@ export interface Order {
   orderedProducts: OrderedProduct[];
   orderStatus: OrderStatus;
   paymentStatus: PaymentStatus;
+  deliveryStatus?: string;
   totalAmount: number;
   shippingAddress: Address;
   billingAddress: Address;
@@ -129,10 +147,12 @@ export interface OrderResponse {
 // Filter and search types
 export interface OrderFilters {
   status?: OrderStatus;
+  orderStatus?: OrderStatus; // Alternative field name for compatibility
   paymentStatus?: PaymentStatus;
   dateFrom?: string;
   dateTo?: string;
   customerId?: string;
+  customer?: string; // Alternative field name for compatibility
   searchQuery?: string;
 }
 
