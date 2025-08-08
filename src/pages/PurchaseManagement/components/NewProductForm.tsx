@@ -403,6 +403,8 @@ const NewProductForm = ({
     }));
   };
 
+  console.log(form.state.values, 'form stat');
+
   return (
     <div>
       <form
@@ -476,147 +478,144 @@ const NewProductForm = ({
               {field.state.value.map((_, index: number) => (
                 <div
                   key={index.toString()}
-                  className="bg-[#ffffff] border-[#e7e7e7] border-2 rounded-xl px-3 py-2"
+                  className="bg-[#ffffff] border-[#e7e7e7] grid grid-cols-2 gap-4 border-2 rounded-xl px-3 py-2"
                 >
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <form.Field name={`products[${index}].product`}>
-                      {(field) => (
-                        <div className="w-full">
-                          <DropdownField
-                            label="Product Name"
-                            required
-                            value={field.state.value}
-                            onChange={(e) => {
-                              field.handleChange(e.target.value);
-                              // Reset weight and unit fields when product changes so user must select from dropdown
-                              form.setFieldValue(`products[${index}].wt`, 0);
-                              form.setFieldValue(
-                                `products[${index}].unit`,
-                                'gm'
-                              );
-                            }}
-                            options={productList}
-                          />
-                          <FieldError field={field} />
-                        </div>
-                      )}
-                    </form.Field>
+                  {/* <div className="grid grid-cols-1 gap-4 sm:grid-cols-2"> */}
+                  <form.Field name={`products[${index}].product`}>
+                    {(field) => (
+                      <div className="w-full">
+                        <DropdownField
+                          label="Product Name"
+                          required
+                          value={field.state.value}
+                          onChange={(e) => {
+                            field.handleChange(e.target.value);
+                            // Reset weight and unit fields when product changes so user must select from dropdown
+                            form.setFieldValue(`products[${index}].wt`, 0);
+                            form.setFieldValue(`products[${index}].unit`, 'gm');
+                          }}
+                          options={productList}
+                        />
+                        <FieldError field={field} />
+                      </div>
+                    )}
+                  </form.Field>
 
-                    <form.Field name={`products[${index}].quantity`}>
-                      {(field) => (
-                        <div className="w-full">
-                          <InputField
-                            label="Quantity"
-                            type="number"
-                            numberValue={field.state.value || 0}
-                            onNumberChange={field.handleChange}
-                            allowNegative={false}
-                            clearZeroOnFocus={true}
-                          />
-                          <FieldError field={field} />
-                        </div>
-                      )}
-                    </form.Field>
-                  </div>
+                  <form.Field name={`products[${index}].quantity`}>
+                    {(field) => (
+                      <div className="w-full">
+                        <InputField
+                          label="Quantity"
+                          type="number"
+                          numberValue={field.state.value || 0}
+                          onNumberChange={field.handleChange}
+                          allowNegative={false}
+                          clearZeroOnFocus={true}
+                        />
+                        <FieldError field={field} />
+                      </div>
+                    )}
+                  </form.Field>
+                  {/* </div> */}
 
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                    <form.Field name={`products[${index}].price`}>
-                      {(field) => (
-                        <div className="w-full">
-                          <InputField
-                            label="Price (Rs.)"
-                            placeholder="Tola"
-                            required
-                            type="number"
-                            numberValue={field.state.value || 0}
-                            onNumberChange={field.handleChange}
-                            allowNegative={false}
-                            clearZeroOnFocus={true}
-                          />
-                          <FieldError field={field} />
-                        </div>
-                      )}
-                    </form.Field>
-                    <form.Field name={`products[${index}].paidAmount`}>
-                      {(field) => (
-                        <div className="w-full">
-                          <InputField
-                            label="Paid Price (Rs.)"
-                            required
-                            placeholder="176,000"
-                            type="number"
-                            numberValue={field.state.value || 0}
-                            onNumberChange={field.handleChange}
-                            allowNegative={false}
-                            clearZeroOnFocus={true}
-                          />
-                          <FieldError field={field} />
-                        </div>
-                      )}
-                    </form.Field>
-                    <div className="grid grid-cols-2 gap-2">
-                      <form.Field name={`products[${index}].wt`}>
-                        {(field) => {
-                          const selectedProductId = form.getFieldValue(
-                            `products[${index}].product`
-                          );
-                          const weightOptions =
-                            getProductWeightOptions(selectedProductId);
+                  {/* <div className="grid grid-cols-1 gap-4 md:grid-cols-3"> */}
 
-                          return (
-                            <div className="w-full">
-                              {weightOptions.length > 0 ? (
-                                <DropdownField
-                                  label="Weight"
-                                  required
-                                  firstInput="Select Weight"
-                                  options={weightOptions}
-                                  value={field.state.value?.toString()}
-                                  onChange={(e) =>
-                                    field.handleChange(Number(e.target.value))
-                                  }
-                                />
-                              ) : (
-                                <InputField
-                                  label="Weight"
-                                  placeholder="Weight"
-                                  type="number"
-                                  numberValue={field.state.value || 0}
-                                  onNumberChange={field.handleChange}
-                                  allowNegative={false}
-                                  clearZeroOnFocus={true}
-                                />
-                              )}
-                              <FieldError field={field} />
-                            </div>
-                          );
-                        }}
-                      </form.Field>
+                  <form.Field name={`products[${index}].price`}>
+                    {(field) => (
+                      <div className="w-full">
+                        <InputField
+                          label="Price (Rs.)"
+                          placeholder="Tola"
+                          required
+                          type="number"
+                          numberValue={field.state.value || 0}
+                          onNumberChange={field.handleChange}
+                          allowNegative={false}
+                          clearZeroOnFocus={true}
+                        />
+                        <FieldError field={field} />
+                      </div>
+                    )}
+                  </form.Field>
+                  <form.Field name={`products[${index}].paidAmount`}>
+                    {(field) => (
+                      <div className="w-full">
+                        <InputField
+                          label="Paid Price (Rs.)"
+                          required
+                          placeholder="176,000"
+                          type="number"
+                          numberValue={field.state.value || 0}
+                          onNumberChange={field.handleChange}
+                          allowNegative={false}
+                          clearZeroOnFocus={true}
+                        />
+                        <FieldError field={field} />
+                      </div>
+                    )}
+                  </form.Field>
 
-                      <form.Field name={`products[${index}].unit`}>
-                        {(field) => (
-                          <div className="w-full">
+                  {/* <div className="grid grid-cols-1 gap-2"> */}
+                  <form.Field name={`products[${index}].wt`}>
+                    {(field) => {
+                      const selectedProductId = form.getFieldValue(
+                        `products[${index}].product`
+                      );
+                      const weightOptions =
+                        getProductWeightOptions(selectedProductId);
+
+                      return (
+                        <div className="w-full">
+                          {weightOptions.length > 0 ? (
                             <DropdownField
-                              label="Unit"
+                              label="Weight"
                               required
-                              firstInput="Select Unit"
-                              options={[
-                                { label: 'Gm', value: 'gm' },
-                                { label: 'Carat', value: 'carat' },
-                                { label: 'Tola', value: 'tola' },
-                                { label: 'Kg', value: 'kg' },
-                              ]}
-                              value={field.state.value}
+                              firstInput="Select Weight"
+                              options={weightOptions}
+                              value={field.state.value?.toString()}
                               onChange={(e) =>
-                                field.handleChange(e.target.value)
+                                field.handleChange(Number(e.target.value))
                               }
                             />
-                            <FieldError field={field} />
-                          </div>
-                        )}
-                      </form.Field>
-                    </div>
-                  </div>
+                          ) : (
+                            <InputField
+                              label="Weight"
+                              placeholder="Weight"
+                              type="number"
+                              numberValue={field.state.value || 0}
+                              onNumberChange={field.handleChange}
+                              allowNegative={false}
+                              clearZeroOnFocus={true}
+                            />
+                          )}
+                          <FieldError field={field} />
+                        </div>
+                      );
+                    }}
+                  </form.Field>
+
+                  <form.Field name={`products[${index}].unit`}>
+                    {(field) => (
+                      <div>
+                        <DropdownField
+                          label="Unit"
+                          required
+                          firstInput="Select Unit"
+                          options={[
+                            { label: 'Gm', value: 'gm' },
+                            { label: 'Carat', value: 'carat' },
+                            { label: 'Tola', value: 'tola' },
+                            { label: 'Kg', value: 'kg' },
+                          ]}
+                          value={field.state.value}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                        />
+                        <FieldError field={field} />
+                      </div>
+                    )}
+                  </form.Field>
+                  {/* </div> */}
+                  {/* </div> */}
 
                   {index > 0 && (
                     <div className="flex items-center justify-end px-2 py-2">

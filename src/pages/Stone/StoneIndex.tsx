@@ -8,6 +8,7 @@ import {
   IFetchStone,
   useDeleteStoneMutation,
   useGetAllStonesQuery,
+  useUpdateStoneMutation,
 } from '../../server/api/productHooks';
 import { stoneColumns } from './stoneObj';
 import AddStone from './components/AddStone';
@@ -30,6 +31,21 @@ const StoneIndex: React.FC = () => {
 
   console.log('Stone data', stones);
   const { mutate: deleteStone } = useDeleteStoneMutation();
+  const { mutate: updateStone } = useUpdateStoneMutation();
+
+  const handleStatusToggle = async (stoneId: string, newStatus: boolean) => {
+    const formData = new FormData();
+    formData.append('isActive', newStatus.toString());
+    updateStone(
+      {
+        id: stoneId,
+        body: formData,
+      },
+      {
+        onError: (err) => console.error('Update failed:', err),
+      }
+    );
+  };
 
   const stonesData = useMemo(
     () =>
@@ -42,6 +58,17 @@ const StoneIndex: React.FC = () => {
             pricePerCarat: get(item, 'pricePerCarat', 0),
             totalPrice: get(item, 'totalPrice', 0),
             shape: get(item, 'shape', ''),
+            status: (
+              <span
+                className={`px-2 py-1 text-xs font-medium rounded-full ${
+                  get(item, 'isActive', true)
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-red-100 text-red-800'
+                }`}
+              >
+                {get(item, 'isActive', true) ? 'Active' : 'Inactive'}
+              </span>
+            ),
           }))
         : [],
     [isSuccess, stones]
@@ -83,6 +110,10 @@ const StoneIndex: React.FC = () => {
             });
           }}
           showAction
+          toggleAction={(row) => {
+            console.log(row, 'stone row');
+            handleStatusToggle(row._id, !row.isActive);
+          }}
         />
       </div>
       {isModalOpen.state && (

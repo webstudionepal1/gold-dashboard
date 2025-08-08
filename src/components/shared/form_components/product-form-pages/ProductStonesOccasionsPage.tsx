@@ -1,13 +1,13 @@
-import React, { useState } from "react";
-import { Icon } from "@iconify/react/dist/iconify.js";
-import { InputField } from "../InputField";
-import { DropdownField } from "../Dropdown";
-import { useProductForm } from "../ProductFormContext";
-import { ProductStone } from "../ProductFormContext";
+import React, { useState } from 'react';
+import { Icon } from '@iconify/react/dist/iconify.js';
+import { InputField } from '../InputField';
+import { DropdownField } from '../Dropdown';
+import { useProductForm } from '../ProductFormContext';
+import { ProductStone } from '../ProductFormContext';
 import {
   useGetAllStonesQuery,
   useGetAllProductOccasionsQuery,
-} from "../../../../server/api/productHooks";
+} from '../../../../server/api/productHooks';
 
 export const ProductStonesOccasionsPage: React.FC = () => {
   const { formData, updateFormData, updateValidation, validationState } =
@@ -37,7 +37,7 @@ export const ProductStonesOccasionsPage: React.FC = () => {
   // Add new stone
   const addStone = () => {
     const newStone: ProductStone = {
-      stone: "",
+      stone: '',
       quantity: 1,
       totalPrice: 0,
       isOptional: true,
@@ -164,7 +164,7 @@ export const ProductStonesOccasionsPage: React.FC = () => {
                         type="number"
                         min="1"
                         placeholder="1"
-                        value={stone.quantity || ""}
+                        value={stone.quantity || ''}
                         onChange={(e) => {
                           const value = Number(e.target.value) || 1;
                           updateStone(index, { quantity: value });
@@ -180,7 +180,7 @@ export const ProductStonesOccasionsPage: React.FC = () => {
                         min="0"
                         step="0.01"
                         placeholder="0.00"
-                        value={stone.totalPrice || ""}
+                        value={stone.totalPrice || ''}
                         onChange={(e) => {
                           const value = Number(e.target.value) || 0;
                           updateStone(index, { totalPrice: value });
@@ -283,26 +283,30 @@ export const ProductStonesOccasionsPage: React.FC = () => {
                     onClick={() => toggleOccasion(occasion.value)}
                     className={`p-3 rounded-lg border-2 transition-all duration-200 text-left ${
                       isSelected
-                        ? "border-green-500 bg-green-100 text-green-800"
-                        : "border-gray-200 bg-white text-gray-700 hover:border-green-300 hover:bg-green-50"
+                        ? 'border border-customorange bg-green-100 text-green-800'
+                        : 'border-gray-200 bg-white text-gray-700 hover:border-green-300 hover:bg-green-50'
                     }`}
                   >
                     <div className="flex items-center gap-2">
                       <div
                         className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
                           isSelected
-                            ? "border-green-500 bg-green-500"
-                            : "border-gray-300"
+                            ? 'border-green-500 bg-green-500'
+                            : 'border-gray-300'
                         }`}
                       >
                         {isSelected && (
                           <Icon
                             icon="material-symbols:check"
-                            className="w-3 h-3 text-white"
+                            className="w-3 h-3 text-customorange"
                           />
                         )}
                       </div>
-                      <span className="text-sm font-medium">
+                      <span
+                        className={`text-sm font-medium ${
+                          isSelected ? 'text-customorange' : 'text-gray-700'
+                        }`}
+                      >
                         {occasion.label}
                       </span>
                     </div>

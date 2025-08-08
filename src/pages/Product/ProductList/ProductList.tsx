@@ -1,18 +1,17 @@
-import { Icon } from "@iconify/react/dist/iconify.js";
-import { get } from "lodash";
-import React, { useCallback, useMemo, useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import MasterTable from "../../../components/shared/MasterTable";
-import Header from "../../../components/shared/table_heading/Header";
+import { Icon } from '@iconify/react/dist/iconify.js';
+import { get } from 'lodash';
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import MasterTable from '../../../components/shared/MasterTable';
+import Header from '../../../components/shared/table_heading/Header';
 import {
   IFetchProduct,
   useDeleteProductsMutation,
   useGetAllProductsQuery,
   useUpdateProductsMutation,
-} from "../../../server/api/productHooks";
-import { updateProductState } from "../../../store/productStore";
-import { productListColumns } from "../productObj";
-import { StatusSwitch } from "../../../components/shared/StatusSwitch";
+} from '../../../server/api/productHooks';
+import { updateProductState } from '../../../store/productStore';
+import { productListColumns } from '../productObj';
 
 // Filter state interface
 // interface FilterState {
@@ -117,21 +116,15 @@ const ProductList: React.FC = () => {
   // };
 
   const handleStatusToggle = async (productId: string, newStatus: boolean) => {
-    console.log(
-      "Toggling status for productId:",
-      productId,
-      "newStatus:",
-      newStatus
-    );
     const formData = new FormData();
-    formData.append("isActive", newStatus.toString());
+    formData.append('isActive', newStatus.toString());
     updateProduct(
       {
         id: productId,
         body: formData,
       },
       {
-        onError: (err) => console.error("Update failed:", err),
+        onError: (err) => console.error('Update failed:', err),
       }
     );
   };
@@ -242,29 +235,34 @@ const ProductList: React.FC = () => {
             src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${
               product.images[0]
             }`}
-            alt={"product image"}
+            alt={'product image'}
             className="w-full h-full rounded-sm object fite aspect-square"
           />
         ) : (
           <img
-            src={"/no-image.png"}
-            alt={"product image"}
+            src={'/no-image.png'}
+            alt={'product image'}
             className="w-full h-full rounded-sm object fite aspect-square"
           />
         )}
       </div>
     ),
-    product: get(product, "name", ""),
-    categ: get(product, "category.name", ""),
-    subCate: get(product, "subCategory.name", ""),
-    price: get(product, "price", 0),
-    stock: get(product, "variant[0].remainingStock", 0),
-    sold: get(product, "variant[0].usedStock", 0),
+    product: get(product, 'name', ''),
+    categ: get(product, 'category.name', ''),
+    subCate: get(product, 'subCategory.name', ''),
+    price: get(product, 'price', 0),
+    stock: get(product, 'variant[0].remainingStock', 0),
+    sold: get(product, 'variant[0].usedStock', 0),
     status: (
-      <StatusSwitch
-        isActive={get(product, "isActive", true)}
-        onToggle={(newStatus) => handleStatusToggle(product._id, newStatus)}
-      />
+      <span
+        className={`px-2 py-1 text-xs font-medium rounded-full ${
+          get(product, 'isActive', true)
+            ? 'bg-green-100 text-green-800'
+            : 'bg-red-100 text-red-800'
+        }`}
+      >
+        {get(product, 'isActive', true) ? 'Active' : 'Inactive'}
+      </span>
     ),
   }));
 
@@ -285,6 +283,10 @@ const ProductList: React.FC = () => {
           editAction={onEdit}
           viewAction={viewAction}
           loading={isLoading}
+          showAction={true}
+          toggleAction={(row) => {
+            handleStatusToggle(row._id, !row.isActive);
+          }}
           // filterSection={
           //   <SearchFilterSort
           //     onSearch={handleSearch}
@@ -300,7 +302,6 @@ const ProductList: React.FC = () => {
           //   />
           // }
           rows={tableData}
-          showAction
         />
       </div>
     </div>

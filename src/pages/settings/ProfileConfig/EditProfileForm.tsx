@@ -1,42 +1,42 @@
-import { useForm } from "@tanstack/react-form";
-import { AnyActionArg, useEffect, useMemo } from "react";
-import Breadcrumbs from "../../../components/shared/Breadcrumb";
-import { DropdownField } from "../../../components/shared/form_components/Dropdown";
-import MultiImageUploader from "../../../components/shared/form_components/FileDropInput";
-import { InputField } from "../../../components/shared/form_components/InputField";
-import Header from "../../../components/shared/table_heading/Header";
+import { useForm } from '@tanstack/react-form';
+import { AnyActionArg, useEffect, useMemo } from 'react';
+import Breadcrumbs from '../../../components/shared/Breadcrumb';
+import { DropdownField } from '../../../components/shared/form_components/Dropdown';
+import MultiImageUploader from '../../../components/shared/form_components/FileDropInput';
+import { InputField } from '../../../components/shared/form_components/InputField';
+import Header from '../../../components/shared/table_heading/Header';
 import {
   IFetchCompany,
   useGetCompanyDetailsQuery,
   useUpdateCompanyDetailsMutation,
-} from "../../../server/api/companyHooks";
-import { FieldError } from "../../auth/LoginPage";
-import { generateProfileValue, IProfileValue } from "../profileObj";
-import { get } from "lodash";
+} from '../../../server/api/companyHooks';
+import { FieldError } from '../../auth/LoginPage';
+import { generateProfileValue, IProfileValue } from '../profileObj';
+import { get } from 'lodash';
 
 const defaultValues = {
-  _id: "",
-  name: "",
-  ownerNo: "",
-  address: "",
-  email: "",
-  phone: "",
-  description: "",
-  registrationNo: "",
-  city: "",
-  zipCode: "",
-  openDay: "",
-  openTime: "",
-  closeTime: "",
-  paymentMode: "",
-  bankName: "",
-  accountNo: "",
-  accountHolder: "",
-  companyName: "",
-  branch: "",
+  _id: '',
+  name: '',
+  ownerNo: '',
+  address: '',
+  email: '',
+  phone: '',
+  description: '',
+  registrationNo: '',
+  city: '',
+  zipCode: '',
+  openDay: '',
+  openTime: '',
+  closeTime: '',
+  paymentMode: '',
+  bankName: '',
+  accountNo: '',
+  accountHolder: '',
+  companyName: '',
+  branch: '',
   logo: null,
   qr: [],
-  existingQr: "",
+  existingQr: '',
 };
 
 const EditProfileForm = () => {
@@ -54,30 +54,30 @@ const EditProfileForm = () => {
     defaultValues: generateProfileValue(companyData) as IProfileValue,
     onSubmit: async ({ value }: { value: any }) => {
       const obj = [
-        "name",
-        "ownerNo",
-        "address",
-        "email",
-        "phone",
-        "description",
-        "registrationNo",
-        "city",
-        "zipCode",
-        "openDay",
-        "openTime",
-        "closeTime",
-        "paymentMode",
-        "bankName",
-        "accountNo",
-        "accountHolder",
-        "branch",
+        'name',
+        'ownerNo',
+        'address',
+        'email',
+        'phone',
+        'description',
+        'registrationNo',
+        'city',
+        'zipCode',
+        'openDay',
+        'openTime',
+        'closeTime',
+        'paymentMode',
+        'bankName',
+        'accountNo',
+        'accountHolder',
+        'branch',
       ];
       const formdata = new FormData();
-      obj.forEach((item) => formdata.append(item, value[item] || ""));
-      if (value.logo) formdata.append("logo", value.logo);
+      obj.forEach((item) => formdata.append(item, value[item] || ''));
+      if (value.logo) formdata.append('logo', value.logo);
 
       if (Array.isArray(value.qr)) {
-        value.qr.forEach((item: File) => formdata.append("qr", item));
+        value.qr.forEach((item: File) => formdata.append('qr', item));
       }
       updateProfile({ id: companyData._id, body: formdata });
     },
@@ -95,7 +95,8 @@ const EditProfileForm = () => {
           e.preventDefault();
           e.stopPropagation();
           form.handleSubmit();
-        }}>
+        }}
+      >
         <div className="col-span-4 p-4 space-y-4 bg-white rounded-lg shadow-lg border-2 border-[#eeeeee]">
           <div>
             <div>
@@ -318,8 +319,8 @@ const EditProfileForm = () => {
                     <DropdownField
                       label="Payment Method"
                       options={[
-                        { value: "cash", label: "Cash" },
-                        { value: "online", label: "Online" },
+                        { value: 'cash', label: 'Cash' },
+                        { value: 'online', label: 'Online' },
                       ]}
                       required
                       value={field.state.value}
@@ -391,7 +392,7 @@ const EditProfileForm = () => {
                     <InputField
                       label="Account Name"
                       required
-                      placeholder="Barun Gems Modern & Ethic Jewelery"
+                      placeholder="Account holder name"
                       value={field.state.value}
                       onChange={(e) => field.handleChange(e.target.value)}
                     />
@@ -410,7 +411,7 @@ const EditProfileForm = () => {
               <form.Field name="logo">
                 {(field) => (
                   <MultiImageUploader
-                    existingFile={get(companyData, "logo[0]")}
+                    existingFile={get(companyData, 'logo[0]')}
                     multiple={false}
                     form={form}
                     label="Upload Receipts"
@@ -430,7 +431,7 @@ const EditProfileForm = () => {
                 {(field) => (
                   <MultiImageUploader
                     multiple
-                    existingFiles={form.getFieldValue("existingQr")}
+                    existingFiles={form.getFieldValue('existingQr')}
                     existingFileField="existingImages"
                     label="Upload Receipts"
                     value={field.state.value as File[]}
@@ -445,8 +446,9 @@ const EditProfileForm = () => {
             <button
               type="submit"
               className="self-end bg-[#df8d29] text-white px-7 py-2 rounded-xl disabled:bg-[#966830]"
-              disabled={isPending}>
-              {isPending ? "Saving..." : "Save"}
+              disabled={isPending}
+            >
+              {isPending ? 'Saving...' : 'Save'}
             </button>
           </div>
         </div>

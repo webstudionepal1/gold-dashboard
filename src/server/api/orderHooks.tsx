@@ -3,9 +3,9 @@ import {
   useQuery,
   useQueryClient,
   UseQueryOptions,
-} from "@tanstack/react-query";
-import { apiClient } from "../utils/ApiGateway";
-import { toast } from "react-toastify";
+} from '@tanstack/react-query';
+import { apiClient } from '../utils/ApiGateway';
+import { toast } from 'react-toastify';
 
 interface ShippingAddress {
   fullname: string;
@@ -97,6 +97,7 @@ export interface IFetchOrder {
   createdAt: string;
   updatedAt: string;
   __v: number;
+  orderNumber?: string;
 }
 export interface IParams {
   id: string;
@@ -104,9 +105,9 @@ export interface IParams {
 }
 export const useGetAllOrdersQuery = (params = {}) => {
   return useQuery({
-    queryKey: ["orders", params],
+    queryKey: ['orders', params],
     queryFn: async () => {
-      const res = await apiClient.get<{ data: IFetchOrder[] }>("order", {
+      const res = await apiClient.get<{ data: IFetchOrder[] }>('order', {
         params,
       });
       return res?.data?.data;
@@ -115,7 +116,7 @@ export const useGetAllOrdersQuery = (params = {}) => {
 };
 export const useGetOrderById = (id: string | undefined) => {
   return useQuery({
-    queryKey: ["orders", id],
+    queryKey: ['orders', id],
     queryFn: async () => {
       const res = await apiClient.get<{ data: IFetchOrder }>(`order/${id}`);
       return res?.data?.data;
@@ -127,18 +128,18 @@ export const useCreateOrderMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["orders"],
+    mutationKey: ['orders'],
     mutationFn: async (body: FormData) => {
-      const res = await apiClient.post("order", body);
+      const res = await apiClient.post('order', body);
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Order created successfully");
-      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      toast.success('Order created successfully');
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
     },
     onError(error: string) {
       // toast.error(error || "Error creating order");
-      toast.error("Error creating order");
+      toast.error('Error creating order');
     },
   });
 };
@@ -147,18 +148,18 @@ export const useUpdateOrderMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["orders"],
+    mutationKey: ['orders'],
     mutationFn: async ({ id, body }: IParams) => {
       const res = await apiClient.patch(`order/${id}`, body);
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Order updated successfully");
-      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      toast.success('Order updated successfully');
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
     },
     onError(error: string) {
       // toast.error(error || "Error updating order");
-      toast.error("Error updating order");
+      toast.error('Error updating order');
     },
   });
 };
@@ -167,18 +168,18 @@ export const useDeleteOrderMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["orders"],
+    mutationKey: ['orders'],
     mutationFn: async (id: string) => {
       const res = await apiClient.delete(`order/${id}`);
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Order deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      toast.success('Order deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
     },
     onError(error: string) {
       // toast.error(error || "Error deleting order");
-      toast.error("Error deleting order");
+      toast.error('Error deleting order');
     },
   });
 };

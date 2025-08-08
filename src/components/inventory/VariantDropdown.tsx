@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Icon } from "@iconify/react/dist/iconify.js";
+import React, { useState } from 'react';
+import { Icon } from '@iconify/react/dist/iconify.js';
 
 interface ProductVariant {
   _id?: string;
@@ -25,22 +25,22 @@ const getStockStatus = (
   remainingStock: number,
   totalStock: number,
   reorderPoint?: number
-): "On Stock" | "Low Stock" | "Out of Stock" => {
-  if (remainingStock <= 0) return "Out of Stock";
+): 'On Stock' | 'Low Stock' | 'Out of Stock' => {
+  if (remainingStock <= 0) return 'Out of Stock';
   const threshold = reorderPoint || Math.floor(totalStock * 0.2);
-  return remainingStock <= threshold ? "Low Stock" : "On Stock";
+  return remainingStock <= threshold ? 'Low Stock' : 'On Stock';
 };
 
 const getStatusColor = (status: string) => {
   switch (status) {
-    case "On Stock":
-      return "bg-green-100 text-green-800";
-    case "Low Stock":
-      return "bg-yellow-100 text-yellow-800";
-    case "Out of Stock":
-      return "bg-red-100 text-red-800";
+    case 'On Stock':
+      return 'bg-green text-white';
+    case 'Low Stock':
+      return 'bg-yellow text-white';
+    case 'Out of Stock':
+      return 'bg-red text-white';
     default:
-      return "bg-gray-100 text-gray-800";
+      return 'bg-gray-100 text-gray-800';
   }
 };
 
@@ -57,16 +57,17 @@ export const ExpandableRowToggle: React.FC<ExpandableRowProps> = ({
   return (
     <button
       onClick={onToggle}
-      className="flex items-center gap-1 px-2 py-1 text-xs bg-blue-50 text-blue-700 rounded-md hover:bg-blue-100 transition-colors">
+      className="flex items-center gap-1 px-2 py-1 text-xs bg-blue-50 text-blue-700 rounded-md hover:bg-blue-100 transition-colors"
+    >
       <Icon
         icon={
           isExpanded
-            ? "material-symbols:expand-less"
-            : "material-symbols:expand-more"
+            ? 'material-symbols:expand-less'
+            : 'material-symbols:expand-more'
         }
         className="w-4 h-4"
       />
-      {isExpanded ? "Hide" : "Show"} Variants ({variants.length})
+      {isExpanded ? 'Hide' : 'Show'} Variants ({variants.length})
     </button>
   );
 };
@@ -87,12 +88,13 @@ export const VariantRows: React.FC<{
         return (
           <tr
             key={variant._id || `variant-${index}`}
-            className="bg-blue-50/30 border-l-4 border-blue-200">
+            className="bg-blue-50/30 border-l-4 border-blue-200"
+          >
             {columns.map((column) => {
               let cellContent;
 
               switch (column.key) {
-                case "name":
+                case 'name':
                   cellContent = (
                     <div className="flex items-center gap-2 pl-8">
                       <Icon
@@ -112,47 +114,49 @@ export const VariantRows: React.FC<{
                     </div>
                   );
                   break;
-                case "category":
+                case 'category':
                   cellContent = (
                     <span className="text-gray-400 text-sm">—</span>
                   );
                   break;
-                case "price":
+                case 'price':
                   cellContent = `₹${variant.price}`;
                   break;
-                case "unit":
+                case 'unit':
                   cellContent = variant.unit;
                   break;
-                case "totalStock":
+                case 'totalStock':
                   cellContent = variant.totalStock;
                   break;
-                case "remainingStock":
+                case 'remainingStock':
                   cellContent = variant.remainingStock;
                   break;
-                case "usedStock":
+                case 'usedStock':
                   cellContent = variant.usedStock;
                   break;
-                case "reorder_point":
+                case 'reorder_point':
                   cellContent = variant.reorderPoint;
                   break;
-                case "status":
+                case 'status':
                   cellContent = (
                     <span
                       className={`px-2 py-1 text-xs rounded-full ${getStatusColor(
                         status
-                      )}`}>
+                      )}`}
+                    >
                       {status}
                     </span>
                   );
                   break;
                 default:
-                  cellContent = "—";
+                  cellContent = '—';
               }
 
               return (
                 <td
                   key={column.key}
-                  className="px-6 py-3 text-sm text-center whitespace-nowrap">
+                  className="px-6 py-3 text-sm text-center whitespace-nowrap"
+                >
                   {cellContent}
                 </td>
               );

@@ -1,16 +1,84 @@
-import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
 
 const Breadcrumbs: React.FC = () => {
   const location = useLocation();
+
+  // Define route mappings for mismatched URLs
+  const routeMapping: Record<string, { path: string; label?: string }> = {
+    // Map breadcrumb segments to actual routes
+    customer: { path: '/customer/customer-list', label: 'Customer' },
+    // Add more mappings as needed
+  };
+
+  // Define segments that should not be clickable (detail pages, etc.)
+  const nonClickableSegments = [
+    'customer-details',
+    'user-details',
+    'product-details',
+    'order-details',
+    'edit',
+    'create',
+    'view',
+  ];
+
+  // Function to check if a segment is a MongoDB ObjectId
+  const isMongoId = (segment: string): boolean => {
+    return /^[a-fA-F0-9]{24}$/.test(segment);
+  };
+
   const pathSegments = location.pathname
-    .split("/")
-    .filter((segment) => segment);
+    .split('/')
+    .filter((segment) => segment)
+    .filter((segment) => !isMongoId(segment));
 
   const formatSegment = (segment: string) => {
+    // Check if there's a custom label in route mapping
+    if (routeMapping[segment]?.label) {
+      return routeMapping[segment].label;
+    }
+
     return segment
-      .replace(/-/g, " ")
+      .replace(/-/g, ' ')
       .replace(/\b\w/g, (char) => char.toUpperCase());
+  };
+
+  // Get the correct navigation path for a segment
+  const getNavigationPath = (segment: string, index: number): string | null => {
+    // If it's the last segment, return null (not clickable)
+    if (index === pathSegments.length - 1) {
+      return null;
+    }
+
+    // If the segment is in non-clickable list, return null
+    if (nonClickableSegments.includes(segment)) {
+      return null;
+    }
+
+    // If there's a specific route mapping, use it
+    if (routeMapping[segment]) {
+      return routeMapping[segment].path;
+    }
+
+    // Default behavior: try to construct path normally
+    const originalSegments = location.pathname
+      .split('/')
+      .filter((segment) => segment);
+
+    let segmentCount = 0;
+    let pathParts = [];
+
+    for (const originalSegment of originalSegments) {
+      pathParts.push(originalSegment);
+      if (!isMongoId(originalSegment)) {
+        if (segmentCount === index) {
+          break;
+        }
+        segmentCount++;
+      }
+    }
+
+    return `/${pathParts.join('/')}`;
   };
 
   return (
@@ -21,7 +89,8 @@ const Breadcrumbs: React.FC = () => {
           height="20"
           viewBox="0 0 20 20"
           fill="none"
-          xmlns="http://www.w3.org/2000/svg">
+          xmlns="http://www.w3.org/2000/svg"
+        >
           <path
             fillRule="evenodd"
             clipRule="evenodd"
@@ -33,18 +102,23 @@ const Breadcrumbs: React.FC = () => {
       </Link>
 
       {pathSegments.map((segment, index) => {
-        const path = `/${pathSegments.slice(0, index + 1).join("/")}`;
+        const navigationPath = getNavigationPath(segment, index);
         const isLast = index === pathSegments.length - 1;
+        const isClickable = navigationPath !== null;
 
         return (
-          <React.Fragment key={path}>
-            <span>{">"}</span>
-            {isLast ? (
-              <span className="text-[#d2a05d] font-semibold">
+          <React.Fragment key={`${segment}-${index}`}>
+            <span>{'>'}</span>
+            {isLast || !isClickable ? (
+              <span
+                className={`${
+                  isLast ? 'text-[#d2a05d] font-semibold' : 'text-gray-400'
+                }`}
+              >
                 {formatSegment(segment)}
               </span>
             ) : (
-              <Link to={path} className="hover:text-gray-700">
+              <Link to={navigationPath} className="hover:text-gray-700">
                 {formatSegment(segment)}
               </Link>
             )}

@@ -1,17 +1,18 @@
-import { Icon } from "@iconify/react/dist/iconify.js";
-import { get } from "lodash";
-import React, { useMemo, useState } from "react";
-import MasterTable from "../../../components/shared/MasterTable";
-import Header from "../../../components/shared/table_heading/Header";
-import { useOutsideClick } from "../../../hooks/UseOutsideClick";
+import { Icon } from '@iconify/react/dist/iconify.js';
+import { get } from 'lodash';
+import React, { useMemo, useState } from 'react';
+import MasterTable from '../../../components/shared/MasterTable';
+import Header from '../../../components/shared/table_heading/Header';
+import { useOutsideClick } from '../../../hooks/UseOutsideClick';
 import {
   IFetchSubCategory,
   useDeleteProductSubCategoryMutation,
   useGetAllProductSubCategoriesQuery,
-} from "../../../server/api/productHooks";
-import { subCategoryColumns } from "../productObj";
-import { AddProductSubCategory } from "./components/AddProductSubCategory";
-import ViewProductSubCategory from "./components/ViewProductSubCategory";
+  useUpdateProductSubCategoryMutation,
+} from '../../../server/api/productHooks';
+import { subCategoryColumns } from '../productObj';
+import { AddProductSubCategory } from './components/AddProductSubCategory';
+import ViewProductSubCategory from './components/ViewProductSubCategory';
 // import { get } from "lodash";
 
 interface IEditModal {
@@ -41,6 +42,22 @@ const Productsubcategory: React.FC = () => {
   } = useGetAllProductSubCategoriesQuery();
 
   const { mutate: deleteSubCategory } = useDeleteProductSubCategoryMutation();
+  const { mutate: updateSubCategory } = useUpdateProductSubCategoryMutation();
+
+  const handleStatusToggle = async (
+    subCategoryId: string,
+    newStatus: boolean
+  ) => {
+    updateSubCategory(
+      {
+        id: subCategoryId,
+        body: { isActive: newStatus },
+      },
+      {
+        onError: (err) => console.error('Update failed:', err),
+      }
+    );
+  };
   const subCategoriesData = useMemo(
     () =>
       isSuccess
@@ -49,13 +66,24 @@ const Productsubcategory: React.FC = () => {
             sn: index + 1,
             description: (
               <p className="truncate max-w-xl">
-              { get(item, "description", "") !== ""
-                ? get(item, "description")
-                : "-"}
+                {get(item, 'description', '') !== ''
+                  ? get(item, 'description')
+                  : '-'}
               </p>
             ),
-            rawDescription: get(item, "description", ""),
-            totalProducts: get(item, "totalProducts", "N/A"),
+            rawDescription: get(item, 'description', ''),
+            totalProducts: get(item, 'totalProducts', 'N/A'),
+            status: (
+              <span
+                className={`px-2 py-1 text-xs font-medium rounded-full ${
+                  get(item, 'isActive', true)
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-red-100 text-red-800'
+                }`}
+              >
+                {get(item, 'isActive', true) ? 'Active' : 'Inactive'}
+              </span>
+            ),
             // category: get(item, "category._id", "-"),
           }))
         : [],
@@ -89,6 +117,10 @@ const Productsubcategory: React.FC = () => {
           viewAction={(row) =>
             setIsViewModalOpen({ state: true, viewData: row })
           }
+          toggleAction={(row) => {
+            console.log(row, 'subcategory row');
+            handleStatusToggle(row._id, !row.isActive);
+          }}
         />
       </div>
       {isModalOpen.state && (

@@ -1,9 +1,9 @@
-import dayjs from "dayjs";
-import React from "react";
-import html2pdf from "html2pdf.js";
-import { useRef } from "react";
-import { useReactToPrint } from "react-to-print";
-import CompanyLogo from "../../../components/shared/CompanyLogo";
+import dayjs from 'dayjs';
+import React from 'react';
+import html2pdf from 'html2pdf.js';
+import { useRef } from 'react';
+import { useReactToPrint } from 'react-to-print';
+import CompanyLogo from '../../../components/shared/CompanyLogo';
 
 export interface InvoiceItem {
   name: string;
@@ -43,21 +43,31 @@ const Invoice: React.FC<Props> = ({ data }) => {
   const handlePrint = useReactToPrint({
     contentRef: contentRef,
   });
+
   const subtotal = data.items.reduce((sum, item) => sum + item.total, 0);
   const discount = data.discount || 0;
   const taxRate = data.taxRate || 0;
   const taxAmount = ((subtotal - discount) * taxRate) / 100;
   const grandTotal = subtotal - discount + taxAmount;
 
+  const customizeInvoiceNumber =
+    data?.customerName?.slice(0, 3) +
+    data?.items?.length +
+    data?.customerPhone?.slice(0, 4);
+  const invoiceNumber =
+    data?.invoiceNumber !== '-'
+      ? data?.invoiceNumber
+      : `Inv-${customizeInvoiceNumber}`;
+
   const handleExportPDF = () => {
     if (contentRef.current) {
       html2pdf()
         .set({
           margin: 0.5,
-          filename: `${"invoice"}.pdf`,
-          image: { tyep: "jpeg", quality: 0.98 },
+          filename: `${'invoice'}.pdf`,
+          image: { tyep: 'jpeg', quality: 0.98 },
           html2canvas: { scale: 2 },
-          jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+          jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
         })
         .from(contentRef.current)
         .save();
@@ -66,16 +76,17 @@ const Invoice: React.FC<Props> = ({ data }) => {
   return (
     <div>
       <div
-        className="max-w-4xl mx-auto p-8 bg-white rounded-xl text-sm text-gray-800 font-sans"
-        ref={contentRef}>
+        className="max-w-4xl mx-auto p-2 bg-white rounded-xl text-sm text-gray-800 font-sans"
+        ref={contentRef}
+      >
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex justify-between  mb-4">
           <div>
-            <div>
+            <div className="">
               <CompanyLogo
                 size="xl"
-                className="h-[200px] w-[200px]"
-                fallbackSrc="/barun_gems_logo.png"
+                className="h-[120px] w-[120px] -mt-5 -ml-6"
+                fallbackSrc="/logo.png"
                 showLoadingState={false}
               />
               {/* <h1 className="text-2xl font-bold text-gray-900">
@@ -93,10 +104,10 @@ const Invoice: React.FC<Props> = ({ data }) => {
           <div className="text-right">
             <h2 className="text-xl font-semibold">Invoice</h2>
             <p>
-              Invoice #: <strong>{data.invoiceNumber}</strong>
+              Invoice #: <strong>{invoiceNumber}</strong>
             </p>
             <p>
-              Date: <strong>{dayjs(data.date).format("YYYY-MM-DD")}</strong>
+              Date: <strong>{dayjs(data.date).format('YYYY-MM-DD')}</strong>
             </p>
             {/* <p>
             Due Date: <strong>{data.dueDate}</strong>
@@ -203,12 +214,14 @@ const Invoice: React.FC<Props> = ({ data }) => {
       <div className="flex justify-end mt-6 gap-4">
         <button
           onClick={() => handlePrint()}
-          className="px-5 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-600 transition">
+          className="px-5 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-600 transition"
+        >
           Print
         </button>
         <button
           onClick={() => handleExportPDF()}
-          className="px-4 py-2 bg-[#df8d29] text-white rounded-lg hover:bg-[#c6893f] transition">
+          className="px-4 py-2 bg-[#df8d29] text-white rounded-lg hover:bg-[#c6893f] transition"
+        >
           Export
         </button>
       </div>

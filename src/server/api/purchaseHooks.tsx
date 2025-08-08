@@ -1,8 +1,8 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { toast } from "react-toastify";
-import { apiClient } from "../utils/ApiGateway";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'react-toastify';
+import { apiClient } from '../utils/ApiGateway';
 // import { IFetchSupplier } from "./supplierHooks";
-import { IFetchProduct } from "./productHooks";
+import { IFetchProduct } from './productHooks';
 
 export interface IItem {
   item: string;
@@ -53,9 +53,9 @@ interface IUpdateProps {
 }
 export const useGetPurchasesQuery = (params = {}) => {
   return useQuery({
-    queryKey: ["purchases", params],
+    queryKey: ['purchases', params],
     queryFn: async () => {
-      const res = await apiClient.get<{ data: IFetchPurchase[] }>("purchase", {
+      const res = await apiClient.get<{ data: IFetchPurchase[] }>('purchase', {
         params,
       });
       return res?.data?.data;
@@ -66,18 +66,18 @@ export const useGetPurchasesQuery = (params = {}) => {
 export const useCreatePurchaseMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["purchases"],
+    mutationKey: ['purchases'],
     mutationFn: async (body: IPurchase) => {
-      const res = await apiClient.post("purchase", body);
+      const res = await apiClient.post('purchase', body);
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Purchase created successfully");
-      queryClient.invalidateQueries({ queryKey: ["purchases"] });
+      toast.success('Purchase created successfully');
+      queryClient.invalidateQueries({ queryKey: ['purchases'] });
     },
     onError(err: string) {
       // toast.error(err || "Error creating purchase");
-      toast.error("Error creating purchase");
+      toast.error('Error creating purchase');
     },
   });
 };
@@ -85,18 +85,18 @@ export const useCreatePurchaseMutation = () => {
 export const useUpdatePurchaseMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["purchases"],
+    mutationKey: ['purchases'],
     mutationFn: async ({ id, body }: IUpdateProps) => {
       const res = await apiClient.patch(`purchase/${id}`, body);
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Purchase updated successfully");
-      queryClient.invalidateQueries({ queryKey: ["purchases"] });
+      toast.success('Purchase updated successfully');
+      queryClient.invalidateQueries({ queryKey: ['purchases'] });
     },
     onError(err: string) {
       // toast.error(err || "Error updating purchase");
-      toast.error("Error updating purchase");
+      toast.error('Error updating purchase');
     },
   });
 };
@@ -104,18 +104,18 @@ export const useUpdatePurchaseMutation = () => {
 export const useDeletePurchaseMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["purchases"],
+    mutationKey: ['purchases'],
     mutationFn: async (id: string) => {
       const res = await apiClient.delete(`purchase/${id}`);
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Purchase deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["purchases"] });
+      toast.success('Purchase deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ['purchases'] });
     },
     onError(err: string) {
       // toast.error(err || "Error deleting purchase");
-      toast.error("Error deleting purchase");
+      toast.error('Error deleting purchase');
     },
   });
 };
@@ -140,54 +140,54 @@ export interface IFetchItems {
 export const useCreateRawMaterialMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["rawitem"],
+    mutationKey: ['rawitem'],
     mutationFn: async (body: IItems) => {
-      const res = await apiClient.post("rawitem", body);
+      const res = await apiClient.post('rawitem', body);
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Raw Material created successfully");
-      queryClient.invalidateQueries({ queryKey: ["rawitem"] });
+      toast.success('Raw Material created successfully');
+      queryClient.invalidateQueries({ queryKey: ['rawitem'] });
     },
     onError(err: string) {
       // toast.error(err || "Error creating raw material");
-      toast.error("Error creating raw material");
+      toast.error('Error creating raw material');
     },
   });
 };
 export const useUpdateRawItemsMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["rawitem"],
+    mutationKey: ['rawitem'],
     mutationFn: async ({ id, body }: { id: string; body: IItems }) => {
       const res = await apiClient.patch(`rawitem/${id}`, body);
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Raw Material updated successfully");
-      queryClient.invalidateQueries({ queryKey: ["rawitem"] });
+      toast.success('Raw Material updated successfully');
+      queryClient.invalidateQueries({ queryKey: ['rawitem'] });
     },
     onError(err: string) {
       // toast.error(err || "Error updating raw material");
-      toast.error("Error updating raw material");
+      toast.error('Error updating raw material');
     },
   });
 };
 export const useDeleteRawMaterial = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["rawitem"],
+    mutationKey: ['rawitem'],
     mutationFn: async (id: string) => {
       const res = await apiClient.delete(`rawitem/${id}`);
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Raw Material deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["rawitem"] });
+      toast.success('Raw Material deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ['rawitem'] });
     },
     onError(err: string) {
       // toast.error(err || "Error deleting raw material");
-      toast.error("Error deleting raw material");
+      toast.error('Error deleting raw material');
     },
   });
 };
@@ -230,10 +230,10 @@ interface IUpdatePurchaseReturn {
 }
 export const useGetPurchaseReturnQuery = (params = {}) => {
   return useQuery({
-    queryKey: ["purchase/return", params],
+    queryKey: ['purchase/return', params],
     queryFn: async () => {
       const res = await apiClient.get<{ data: IFetchPurchaseReturn[] }>(
-        "purchase/return",
+        'purchase/return',
         {
           params,
         }
@@ -246,18 +246,18 @@ export const useGetPurchaseReturnQuery = (params = {}) => {
 export const useCreatePurchaseReturnMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["purchase/return"],
+    mutationKey: ['purchase/return'],
     mutationFn: async (body: IPurchaseReturn) => {
-      const res = await apiClient.post("purchase/return", body);
+      const res = await apiClient.post('purchase/return', body);
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Purchase return created successfully");
-      queryClient.invalidateQueries({ queryKey: ["purchase/return"] });
+      toast.success('Purchase return created successfully');
+      queryClient.invalidateQueries({ queryKey: ['purchase/return'] });
     },
     onError(err: string) {
       // toast.error(err || "Error creating purchase return");
-      toast.error("Error creating purchase return");
+      toast.error('Error creating purchase return');
     },
   });
 };
@@ -265,18 +265,18 @@ export const useCreatePurchaseReturnMutation = () => {
 export const useUpdatePurchaseReturnMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["purchase-return"],
+    mutationKey: ['purchase-return'],
     mutationFn: async ({ id, body }: IUpdatePurchaseReturn) => {
       const res = await apiClient.patch(`purchase/return/${id}`, body);
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Purchase return updated successfully");
-      queryClient.invalidateQueries({ queryKey: ["purchase-return"] });
+      toast.success('Purchase return updated successfully');
+      queryClient.invalidateQueries({ queryKey: ['purchase-return'] });
     },
     onError(err: string) {
       // toast.error(err || "Error updating purchase return");
-      toast.error("Error updating purchase return");
+      toast.error('Error updating purchase return');
     },
   });
 };
@@ -284,18 +284,18 @@ export const useUpdatePurchaseReturnMutation = () => {
 export const useDeletePurchasReturnMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["purchase-return"],
+    mutationKey: ['purchase-return'],
     mutationFn: async (id: string) => {
       const res = await apiClient.delete(`purchase/return/${id}`);
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Purchase return deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["purchase-return"] });
+      toast.success('Purchase return deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ['purchase-return'] });
     },
     onError(err: string) {
       // toast.error(err || "Error deleting purchase return");
-      toast.error("Error deleting purchase return");
+      toast.error('Error deleting purchase return');
     },
   });
 };
@@ -318,7 +318,7 @@ export interface IReturnSummary {
 
 export const useGetPurchaseReturnSummaryQuery = (purchaseId: string) => {
   return useQuery({
-    queryKey: ["purchase-return-summary", purchaseId],
+    queryKey: ['purchase-return-summary', purchaseId],
     queryFn: async () => {
       const res = await apiClient.get<{ data: IReturnSummary }>(
         `purchase/${purchaseId}/return-summary`

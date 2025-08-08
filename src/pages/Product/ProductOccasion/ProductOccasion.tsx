@@ -1,16 +1,17 @@
-import { Icon } from "@iconify/react/dist/iconify.js";
-import { get } from "lodash";
-import React, { useMemo, useState } from "react";
-import MasterTable from "../../../components/shared/MasterTable";
-import Header from "../../../components/shared/table_heading/Header";
-import { useOutsideClick } from "../../../hooks/UseOutsideClick";
+import { Icon } from '@iconify/react/dist/iconify.js';
+import { get } from 'lodash';
+import React, { useMemo, useState } from 'react';
+import MasterTable from '../../../components/shared/MasterTable';
+import Header from '../../../components/shared/table_heading/Header';
+import { useOutsideClick } from '../../../hooks/UseOutsideClick';
 import {
   IFetchOccasion,
   useDeleteProductOccasionMutation,
   useGetAllProductOccasionsQuery,
-} from "../../../server/api/productHooks";
-import { occasionColumns } from "../productObj";
-import AddProductOccasion from "./components/AddProductOccasion";
+  useUpdateProductOccasionMutation,
+} from '../../../server/api/productHooks';
+import { occasionColumns } from '../productObj';
+import AddProductOccasion from './components/AddProductOccasion';
 
 interface IEditModal {
   state: boolean;
@@ -28,36 +29,63 @@ const ProductOccasion: React.FC = () => {
 
   const { data: occasions, isSuccess } = useGetAllProductOccasionsQuery();
   const { mutate: deleteOccasion } = useDeleteProductOccasionMutation();
+  const { mutate: updateOccasion } = useUpdateProductOccasionMutation();
 
-  console.log('occasions', occasions)
+  const handleStatusToggle = async (occasionId: string, newStatus: boolean) => {
+    const formData = new FormData();
+    formData.append('isActive', newStatus.toString());
+    updateOccasion(
+      {
+        id: occasionId,
+        body: formData,
+      },
+      {
+        onError: (err) => console.error('Update failed:', err),
+      }
+    );
+  };
+
+  console.log('occasions', occasions);
   const occasionsData = useMemo(
     () =>
       isSuccess
         ? occasions?.map((item, index) => ({
-          ...item,
-         sn: (index + 1).toString(),
-          description: get(item, "description", ""),
-          totalProducts: get(item, "totalProducts", 0),
-          image: get(item, "image", "") ? (
-            <img
-              src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${item.image.length > 0 ? item.image[0] : '/no-image.png'}`}
-              alt={item.name}
-              className="w-12 h-12 mx-auto object-cover rounded"
-            />
-          ) : (
-            <span className="text-gray-400">No image</span>
-          ),
-          video: get(item, "video", "") ? (
-            <video
-              src={get(item, "video", "")}
-              className="w-12 h-12 object-cover rounded"
-              controls={false}
-            />
-          ) : (
-            <span className="text-gray-400">No video</span>
-          ),
-          isActive: get(item, "isActive", false) ? "Active" : "Inactive",
-        }))
+            ...item,
+            sn: (index + 1).toString(),
+            description: get(item, 'description', ''),
+            totalProducts: get(item, 'totalProducts', 0),
+            image: get(item, 'image', '') ? (
+              <img
+                src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${
+                  item.image.length > 0 ? item.image[0] : '/no-image.png'
+                }`}
+                alt={item.name}
+                className="w-12 h-12 mx-auto object-cover rounded"
+              />
+            ) : (
+              <span className="text-gray-400">No image</span>
+            ),
+            video: get(item, 'video', '') ? (
+              <video
+                src={get(item, 'video', '')}
+                className="w-12 h-12 object-cover rounded"
+                controls={false}
+              />
+            ) : (
+              <span className="text-gray-400">No video</span>
+            ),
+            status: (
+              <span
+                className={`px-2 py-1 text-xs font-medium rounded-full ${
+                  get(item, 'isActive', true)
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-red-100 text-red-800'
+                }`}
+              >
+                {get(item, 'isActive', true) ? 'Active' : 'Inactive'}
+              </span>
+            ),
+          }))
         : [],
     [isSuccess, occasions]
   );
@@ -91,6 +119,10 @@ const ProductOccasion: React.FC = () => {
             });
           }}
           showAction
+          toggleAction={(row) => {
+            console.log(row, 'occasion row');
+            handleStatusToggle(row._id, !row.isActive);
+          }}
         />
       </div>
       {isModalOpen.state && (
