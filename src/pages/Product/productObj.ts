@@ -171,7 +171,6 @@ export const productListColumns = [
   { title: "Image", key: "image" },
   { title: "Product", key: "product" },
   { title: "Category", key: "categ" },
-  { title: "Sub Category", key: "subCate" },
   { title: "Material", key: "material" },
   { title: "Stock", key: "stock" },
   { title: "Sold", key: "sold" },

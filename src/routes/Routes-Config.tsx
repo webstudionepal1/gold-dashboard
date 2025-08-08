@@ -20,6 +20,7 @@ import NotificationTest from "../components/test/NotificationTest";
 
 import OrderIndex from "../pages/OrderManagement/Order/OrderIndex";
 import AddOrderForm from "../pages/OrderManagement/Order/components/AddOrderPage";
+import CancelledOrder from "../pages/OrderManagement/CancelledOrder/CancelledOrder";
 import AddBannerForm from "../pages/Banner/Components/AddBannerForm";
 import CustomerIndex from "../pages/Customer/CustomerIndex";
 // import AddCustomerForm from "../pages/Customer/components/AddCustomerForm";
@@ -63,7 +64,27 @@ export const routesConfig = [
     element: <OrderIndex />,
   },
   {
+    path: "/order/cancelled-order",
+    element: <CancelledOrder />,
+  },
+  {
     path: "/order/order-details/:id",
+    element: <OrderDetails />,
+  },
+  {
+    path: "/order/cancelled-order-details/:id",
+    element: <OrderDetails />,
+  },
+  {
+    path: "/order/completed-order-details/:id",
+    element: <OrderDetails />,
+  },
+  {
+    path: "/order/assigned-order-details/:id",
+    element: <OrderDetails />,
+  },
+  {
+    path: "/order/confirmed-order-details/:id",
     element: <OrderDetails />,
   },
   {

@@ -9,6 +9,7 @@ export interface TableActionProps {
   returnAction?: (row: any) => void;
   printAction?: (row: any) => void;
   onDelete?: (row: any) => void;
+  customActions?: (row: any) => React.ReactNode;
   row?: any;
 }
 
@@ -19,6 +20,7 @@ const TableAction: FC<TableActionProps> = ({
   returnAction,
   printAction,
   onDelete,
+  customActions,
   row,
 }) => {
   const [showDialog, setShowDialog] = useState(false);
@@ -31,12 +33,10 @@ const TableAction: FC<TableActionProps> = ({
         <div
           key={`toggle-${row._id || "unknown"}`}
           className="flex text-black cursor-pointer"
-          onClick={() => toggleAction(row)}
-        >
+          onClick={() => toggleAction(row)}>
           <label
             htmlFor={`toggle-${row._id || "unknown"}`}
-            className="relative flex cursor-pointer"
-          >
+            className="relative flex cursor-pointer">
             <input
               type="checkbox"
               id={`toggle-${row._id || "unknown"}`}
@@ -51,8 +51,7 @@ const TableAction: FC<TableActionProps> = ({
             <div
               className={`toggle-bg border-2 h-[18px] w-[36px] rounded-full transition-colors duration-200 ease-in-out ${
                 row.isActive ? "bg-[#76EE59] " : "bg-[#B1BAC8] "
-              }`}
-            >
+              }`}>
               <div
                 className={`toggle-dot absolute left-0 top-1/2 -translate-y-1/2 bg-white w-4 h-4 rounded-full transition-transform duration-200 ease-in-out transform ${
                   row.isActive
@@ -67,8 +66,7 @@ const TableAction: FC<TableActionProps> = ({
       {viewAction && (
         <div
           className="p-1 text-xl text-black rounded cursor-pointer bg-primary-blue"
-          onClick={() => viewAction(row)}
-        >
+          onClick={() => viewAction(row)}>
           <Icon icon="mdi:eye-outline" fontSize={14} color="white" />
         </div>
       )}
@@ -76,8 +74,7 @@ const TableAction: FC<TableActionProps> = ({
         <div
           key={`edit-${row._id || "unknown"}`}
           className="p-1 text-xl text-black rounded cursor-pointer bg-green"
-          onClick={() => editAction(row)}
-        >
+          onClick={() => editAction(row)}>
           <Icon icon="lucide:pen-line" fontSize={14} color="white" />
         </div>
       )}
@@ -85,8 +82,7 @@ const TableAction: FC<TableActionProps> = ({
         <div
           key={`return-${row._id || "unknown"}`}
           className="text-xl text-black cursor-pointer bg-[#df8d29] rounded p-1"
-          onClick={() => returnAction(row)}
-        >
+          onClick={() => returnAction(row)}>
           <Icon icon="carbon:return" fontSize={14} className="text-white" />
         </div>
       )}
@@ -94,17 +90,16 @@ const TableAction: FC<TableActionProps> = ({
         <div
           key={`print-${row._id || "unknown"}`}
           className="text-xl text-black cursor-pointer"
-          onClick={() => printAction(row)}
-        >
+          onClick={() => printAction(row)}>
           <Icon icon="material-symbols:print" fontSize={14} color="#FF4D4D" />
         </div>
       )}
+      {customActions && customActions(row)}
       {onDelete && (
         <div
           key={`delete-${row._id || "unknown"}`}
           className="p-1 text-base text-black rounded cursor-pointer bg-red"
-          onClick={() => setShowDialog(true)}
-        >
+          onClick={() => setShowDialog(true)}>
           <Icon
             icon="material-symbols:delete-outline-rounded"
             fontSize={14}

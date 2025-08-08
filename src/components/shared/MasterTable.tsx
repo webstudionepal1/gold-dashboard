@@ -44,6 +44,7 @@ interface MasterTableProps {
   returnAction?: (row: any) => void;
   emptyStateMessage?: string;
   printAction?: (row: any) => void;
+  customActions?: (row: any) => React.ReactNode;
   className?: string;
 }
 
@@ -68,6 +69,7 @@ const MasterTable: React.FC<MasterTableProps> = ({
   editAction,
   returnAction,
   printAction,
+  customActions,
   emptyStateMessage = "No data available",
   className,
 }) => {
@@ -365,7 +367,7 @@ const MasterTable: React.FC<MasterTableProps> = ({
             <thead className="bg-white">
               <tr className="rounded-lg">
                 {canSelect && (
-                  <th className="px-3 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase bg-gray-50">
+                  <th className="px-2 py-2 text-xs font-medium tracking-wider text-left text-gray-500 uppercase bg-gray-50 w-12">
                     <div className="flex items-center">
                       <input
                         type="checkbox"
@@ -385,8 +387,10 @@ const MasterTable: React.FC<MasterTableProps> = ({
                   <th
                     key={column.key}
                     className={clsx(
-                      "px-6 py-3 text-xs font-medium tracking-wider bg-gray-50 text-gray-500 uppercase",
-                      column.key === "action" ? "text-center" : "text-start"
+                      "px-2 py-2 text-xs font-medium tracking-wider bg-gray-50 text-gray-500 uppercase",
+                      column.key === "action" ? "text-center" : "text-start",
+                      column.key === "image" && "w-24",
+                      column.key === "sn" && "w-12"
                     )}>
                     {column.title}
                   </th>
@@ -394,7 +398,7 @@ const MasterTable: React.FC<MasterTableProps> = ({
                 {showAction && (
                   <th
                     className={clsx(
-                      "px-6 py-3 text-xs font-medium tracking-wider  text-center bg-gray-50 text-gray-500 uppercase"
+                      "px-2 py-2 text-xs font-medium tracking-wider  text-center bg-gray-50 text-gray-500 uppercase w-24"
                     )}>
                     Action
                   </th>
@@ -441,7 +445,7 @@ const MasterTable: React.FC<MasterTableProps> = ({
                         : ""
                     )}>
                     {canSelect && (
-                      <td className="px-3 py-3 text-sm">
+                      <td className="px-2 py-2 text-sm">
                         {row.id !== undefined && (
                           <input
                             type="checkbox"
@@ -459,8 +463,9 @@ const MasterTable: React.FC<MasterTableProps> = ({
                       <td
                         key={column.key}
                         className={clsx(
-                          "px-6 py-3 text-sm",
-                          column.key === "action" ? "text-center" : "text-start"
+                          "px-2 py-2 text-sm",
+                          column.key === "action" ? "text-center" : "text-start",
+                          column.key === "image" && "relative group"
                         )}>
                         {column.key === "attachment" &&
                         row[column.key] === "Null" ? (
@@ -475,7 +480,7 @@ const MasterTable: React.FC<MasterTableProps> = ({
                       </td>
                     ))}
                     {showAction && (
-                      <td className="px-3 py-3 text-sm">
+                      <td className="px-2 py-2 text-sm">
                         <TableAction
                           row={row}
                           viewAction={viewAction}
@@ -483,6 +488,7 @@ const MasterTable: React.FC<MasterTableProps> = ({
                           editAction={editAction}
                           returnAction={returnAction}
                           printAction={printAction}
+                          customActions={customActions}
                           onDelete={onDelete}
                         />
                       </td>

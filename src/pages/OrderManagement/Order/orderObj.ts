@@ -243,7 +243,7 @@ export const orderIndexColumns = [
     title: "Total Items",
   },
   {
-    key: "orderStatus",
+    key: "orderStatusDisplay",
     title: "Status",
   },
 ];
@@ -270,7 +270,7 @@ export const confirmedColumns = [
     title: "Total Items",
   },
   {
-    key: "orderStatus",
+    key: "orderStatusDisplay",
     title: "Status",
   },
 ];

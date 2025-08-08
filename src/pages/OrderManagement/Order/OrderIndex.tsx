@@ -10,7 +10,11 @@ import {
   TableLoading,
   EmptyState,
 } from "../../../components/shared/LoadingStates";
-import { useGetAllOrdersQuery } from "../../../server/api/orderHooks";
+import {
+  useGetAllOrdersQuery,
+  useUpdateOrderMutation,
+  useOrderCache,
+} from "../../../server/api/orderHooks";
 import {
   filterItems,
   FilterState,
@@ -25,6 +29,9 @@ import {
   safeGet,
   validateOrderData,
 } from "../../../utils/dataHelpers";
+import { OrderActionButtons } from "../../../components/shared/OrderActionButtons";
+import { CancelOrderModal } from "../../../components/shared/modals/CancelOrderModal";
+import { CompleteOrderModal } from "../../../components/shared/modals/CompleteOrderModal";
 
 // Tab configuration
 const orderTabs = [
@@ -58,6 +65,16 @@ const orderTabs = [
 const OrderIndex = () => {
   // State for active tab
   const [activeTab, setActiveTab] = useState<string>("pending");
+
+  // Modal states
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+
+  // API hooks
+  const { mutate: updateOrder, isPending: isUpdating } =
+    useUpdateOrderMutation();
+  const { updateOrderInCache, invalidateOrderCache } = useOrderCache();
 
   // Fetch all orders at once for better performance
   const {
@@ -98,6 +115,113 @@ const OrderIndex = () => {
 
   const navigate = useNavigate();
 
+  // Handle order status update with optimistic updates
+  const handleOrderStatusUpdate = useCallback(
+    (orderId: string, newStatus: string) => {
+      const order = allOrders?.find((o) => o._id === orderId);
+      if (!order) return;
+
+      // Optimistic update
+      updateOrderInCache(orderId, {
+        orderStatus: newStatus,
+        updatedAt: new Date().toISOString(),
+      });
+
+      updateOrder(
+        {
+          id: orderId,
+          body: { orderStatus: newStatus },
+        },
+        {
+          onError: () => {
+            // Revert optimistic update on error
+            updateOrderInCache(orderId, { orderStatus: order.orderStatus });
+            invalidateOrderCache(orderId);
+          },
+        }
+      );
+    },
+    [allOrders, updateOrder, updateOrderInCache, invalidateOrderCache]
+  );
+
+  // Handle order cancellation
+  const handleCancelOrder = useCallback(
+    (reason: string) => {
+      if (!selectedOrder) return;
+
+      const cancellationData = {
+        orderStatus: "cancelled" as const,
+        cancellation: {
+          reason,
+          date: new Date().toISOString(),
+        },
+        updatedAt: new Date().toISOString(),
+      };
+
+      // Optimistic update
+      updateOrderInCache(selectedOrder._id, cancellationData);
+
+      updateOrder(
+        {
+          id: selectedOrder._id,
+          body: cancellationData,
+        },
+        {
+          onError: () => {
+            // Revert optimistic update on error
+            updateOrderInCache(selectedOrder._id, {
+              orderStatus: selectedOrder.orderStatus,
+            });
+            invalidateOrderCache(selectedOrder._id);
+          },
+        }
+      );
+
+      setShowCancelModal(false);
+      setSelectedOrder(null);
+    },
+    [selectedOrder, updateOrder, updateOrderInCache, invalidateOrderCache]
+  );
+
+  // Handle order completion
+  const handleCompleteOrder = useCallback(
+    (notes?: string) => {
+      if (!selectedOrder) return;
+
+      const completionData = {
+        orderStatus: "delivered" as const,
+        deliveryCompletion: {
+          date: new Date().toISOString(),
+          notes: notes || undefined,
+        },
+        updatedAt: new Date().toISOString(),
+      };
+
+      // Optimistic update
+      updateOrderInCache(selectedOrder._id, completionData);
+
+      updateOrder(
+        {
+          id: selectedOrder._id,
+          body: completionData,
+        },
+        {
+          onError: () => {
+            // Revert optimistic update on error
+            updateOrderInCache(selectedOrder._id, {
+              orderStatus: selectedOrder.orderStatus,
+            });
+            invalidateOrderCache(selectedOrder._id);
+          },
+        }
+      );
+
+      setShowCompleteModal(false);
+      setSelectedOrder(null);
+    },
+    [selectedOrder, updateOrder, updateOrderInCache, invalidateOrderCache]
+  );
+
   // Handle search and sort with useCallback for performance
   const handleSearch = useCallback((query: string) => {
     setFilterState((prev) => ({ ...prev, searchQuery: query }));
@@ -124,7 +248,10 @@ const OrderIndex = () => {
             ...item,
             id: orderData.id, // Map _id to id for MasterTable compatibility
             orderedProducts: orderData.orderedProducts.length,
-            orderStatus: (
+            // Keep original orderStatus string for action buttons
+            orderStatus: orderData.orderStatus,
+            // Add separate field for display
+            orderStatusDisplay: (
               <div
                 className={`px-3 py-1 text-xs font-medium rounded-full flex items-center gap-1 ${getStatusColor(
                   orderData.orderStatus
@@ -261,6 +388,22 @@ const OrderIndex = () => {
                     }
                     showAction
                     viewAction={(row) => navigate(getDetailRoute(row._id))}
+                    customActions={(row) => (
+                      <OrderActionButtons
+                        order={row}
+                        onStatusUpdate={handleOrderStatusUpdate}
+                        onCancel={(orderId) => {
+                          setSelectedOrder(row);
+                          setShowCancelModal(true);
+                        }}
+                        onComplete={(orderId) => {
+                          setSelectedOrder(row);
+                          setShowCompleteModal(true);
+                        }}
+                        isLoading={isUpdating}
+                        compact={true}
+                      />
+                    )}
                     rows={filteredItems}
                     columns={orderIndexColumns}
                     loading={isLoading}
@@ -272,6 +415,35 @@ const OrderIndex = () => {
           </div>
         </div>
       </div>
+
+      {/* Modals */}
+      <CancelOrderModal
+        isOpen={showCancelModal}
+        onClose={() => {
+          setShowCancelModal(false);
+          setSelectedOrder(null);
+        }}
+        onConfirm={handleCancelOrder}
+        isLoading={isUpdating}
+        orderNumber={
+          selectedOrder?.orderNumber || selectedOrder?._id?.slice(-5) || ""
+        }
+      />
+
+      <CompleteOrderModal
+        isOpen={showCompleteModal}
+        onClose={() => {
+          setShowCompleteModal(false);
+          setSelectedOrder(null);
+        }}
+        onConfirm={handleCompleteOrder}
+        isLoading={isUpdating}
+        orderNumber={
+          selectedOrder?.orderNumber || selectedOrder?._id?.slice(-5) || ""
+        }
+        customerName={selectedOrder?.customer?.name || ""}
+        totalAmount={selectedOrder?.totalAmount || 0}
+      />
     </ErrorBoundary>
   );
 };

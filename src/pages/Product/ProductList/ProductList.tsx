@@ -62,27 +62,57 @@ const ProductList: React.FC = () => {
     ...product,
     sn: index + 1,
     image: (
-      <div className="size-6 text-center">
+      <div className="size-12 text-center group cursor-pointer relative">
         {product.images && product.images.length > 0 ? (
-          <img
-            src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${
-              product.images[0]
-            }`}
-            alt="product image"
-            className="w-full h-full rounded-sm object-fit aspect-square"
-          />
+          <>
+            <img
+              src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${
+                product.images[0]
+              }`}
+              alt="product image"
+              className="w-full h-full rounded-sm object-cover aspect-square transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:rounded-md"
+            />
+            {/* Large preview on hover */}
+            <div className="fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[100] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+              <div className="bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+                <img
+                  src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${
+                    product.images[0]
+                  }`}
+                  alt="product image preview"
+                  className="h-48 object-contain"
+                  style={{ width: '500px' }}
+                />
+                <div className="p-2 text-xs text-gray-600 bg-gray-50">
+                  {product.name}
+                </div>
+              </div>
+            </div>
+          </>
         ) : (
-          <img
-            src="/no-image.png"
-            alt="product image"
-            className="w-full h-full rounded-sm object-fit aspect-square"
-          />
+          <>
+            <img
+              src="/no-image.png"
+              alt="product image"
+              className="w-full h-full rounded-sm object-cover aspect-square transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:rounded-md opacity-60"
+            />
+            {/* No image preview */}
+            <div className="fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[100] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+              <div className="bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+                <div className="h-48 bg-gray-100 flex items-center justify-center" style={{ width: '500px' }}>
+                  <span className="text-gray-400 text-sm">No image available</span>
+                </div>
+                <div className="p-2 text-xs text-gray-600 bg-gray-50">
+                  {product.name}
+                </div>
+              </div>
+            </div>
+          </>
         )}
       </div>
     ),
     product: get(product, "name", ""),
     categ: get(product, "category.name", ""),
-    subCate: get(product, "subCategory.name", ""),
     material: get(product, "material", ""),
     stock: get(product, "variant[0].remainingStock", 0),
     sold: get(product, "variant[0].usedStock", 0),

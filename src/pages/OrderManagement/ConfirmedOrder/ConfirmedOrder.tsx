@@ -1,15 +1,22 @@
 import dayjs from "dayjs";
 import { get, invoke, map, size } from "lodash";
-import { useMemo } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import MasterTable from "../../../components/shared/MasterTable";
 import Header from "../../../components/shared/table_heading/Header";
-import { useGetAllOrdersQuery } from "../../../server/api/orderHooks";
+import {
+  useGetAllOrdersQuery,
+  useUpdateOrderMutation,
+  useOrderCache,
+} from "../../../server/api/orderHooks";
 import {
   confirmedColumns,
   getStatusColor,
   getStatusIcon,
 } from "../Order/orderObj";
+import { OrderActionButtons } from "../../../components/shared/OrderActionButtons";
+import { CancelOrderModal } from "../../../components/shared/modals/CancelOrderModal";
+import { CompleteOrderModal } from "../../../components/shared/modals/CompleteOrderModal";
 
 // Filter state interface
 interface FilterState {
@@ -29,6 +36,123 @@ const ConfirmedOrder = () => {
     status: "confirmed",
   });
   const navigate = useNavigate();
+
+  // Modal states
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+
+  // API hooks
+  const { mutate: updateOrder, isPending: isUpdating } =
+    useUpdateOrderMutation();
+  const { updateOrderInCache, invalidateOrderCache } = useOrderCache();
+
+  // Handle order status update with optimistic updates
+  const handleOrderStatusUpdate = useCallback(
+    (orderId: string, newStatus: string) => {
+      const order = orders?.find((o) => o._id === orderId);
+      if (!order) return;
+
+      // Optimistic update
+      updateOrderInCache(orderId, {
+        orderStatus: newStatus,
+        updatedAt: new Date().toISOString(),
+      });
+
+      updateOrder(
+        {
+          id: orderId,
+          body: { orderStatus: newStatus },
+        },
+        {
+          onError: () => {
+            // Revert optimistic update on error
+            updateOrderInCache(orderId, { orderStatus: order.orderStatus });
+            invalidateOrderCache(orderId);
+          },
+        }
+      );
+    },
+    [orders, updateOrder, updateOrderInCache, invalidateOrderCache]
+  );
+
+  // Handle order cancellation
+  const handleCancelOrder = useCallback(
+    (reason: string) => {
+      if (!selectedOrder) return;
+
+      const cancellationData = {
+        orderStatus: "cancelled" as const,
+        cancellation: {
+          reason,
+          date: new Date().toISOString(),
+        },
+        updatedAt: new Date().toISOString(),
+      };
+
+      // Optimistic update
+      updateOrderInCache(selectedOrder._id, cancellationData);
+
+      updateOrder(
+        {
+          id: selectedOrder._id,
+          body: cancellationData,
+        },
+        {
+          onError: () => {
+            // Revert optimistic update on error
+            updateOrderInCache(selectedOrder._id, {
+              orderStatus: selectedOrder.orderStatus,
+            });
+            invalidateOrderCache(selectedOrder._id);
+          },
+        }
+      );
+
+      setShowCancelModal(false);
+      setSelectedOrder(null);
+    },
+    [selectedOrder, updateOrder, updateOrderInCache, invalidateOrderCache]
+  );
+
+  // Handle order completion
+  const handleCompleteOrder = useCallback(
+    (notes?: string) => {
+      if (!selectedOrder) return;
+
+      const completionData = {
+        orderStatus: "delivered" as const,
+        deliveryCompletion: {
+          date: new Date().toISOString(),
+          notes: notes || undefined,
+        },
+        updatedAt: new Date().toISOString(),
+      };
+
+      // Optimistic update
+      updateOrderInCache(selectedOrder._id, completionData);
+
+      updateOrder(
+        {
+          id: selectedOrder._id,
+          body: completionData,
+        },
+        {
+          onError: () => {
+            // Revert optimistic update on error
+            updateOrderInCache(selectedOrder._id, {
+              orderStatus: selectedOrder.orderStatus,
+            });
+            invalidateOrderCache(selectedOrder._id);
+          },
+        }
+      );
+
+      setShowCompleteModal(false);
+      setSelectedOrder(null);
+    },
+    [selectedOrder, updateOrder, updateOrderInCache, invalidateOrderCache]
+  );
 
   const orderList = useMemo(
     () =>
@@ -55,7 +179,7 @@ const ConfirmedOrder = () => {
             ),
           }))
         : [],
-    [isSuccess, orders]
+    [isSuccess, orders, handleOrderStatusUpdate, isUpdating]
   );
 
   // // Consolidated filter state
@@ -235,10 +359,55 @@ const ConfirmedOrder = () => {
           viewAction={(row) =>
             navigate(`/order/confirmed-order-details/${row._id}`)
           }
+          customActions={(row) => (
+            <OrderActionButtons
+              order={row}
+              onStatusUpdate={handleOrderStatusUpdate}
+              onCancel={(orderId) => {
+                setSelectedOrder(row);
+                setShowCancelModal(true);
+              }}
+              onComplete={(orderId) => {
+                setSelectedOrder(row);
+                setShowCompleteModal(true);
+              }}
+              isLoading={isUpdating}
+              compact={true}
+            />
+          )}
           columns={confirmedColumns}
           rows={orderList}
         />
       </div>
+
+      {/* Modals */}
+      <CancelOrderModal
+        isOpen={showCancelModal}
+        onClose={() => {
+          setShowCancelModal(false);
+          setSelectedOrder(null);
+        }}
+        onConfirm={handleCancelOrder}
+        isLoading={isUpdating}
+        orderNumber={
+          selectedOrder?.orderNumber || selectedOrder?._id?.slice(-5) || ""
+        }
+      />
+
+      <CompleteOrderModal
+        isOpen={showCompleteModal}
+        onClose={() => {
+          setShowCompleteModal(false);
+          setSelectedOrder(null);
+        }}
+        onConfirm={handleCompleteOrder}
+        isLoading={isUpdating}
+        orderNumber={
+          selectedOrder?.orderNumber || selectedOrder?._id?.slice(-5) || ""
+        }
+        customerName={selectedOrder?.customer?.name || ""}
+        totalAmount={selectedOrder?.totalAmount || 0}
+      />
     </div>
   );
 };

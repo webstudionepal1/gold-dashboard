@@ -4,6 +4,7 @@ export type OrderStatus =
   | "pending"
   | "confirmed"
   | "assigned"
+  | "picked_up"
   | "delivered"
   | "cancelled";
 

@@ -10,6 +10,7 @@ import Header from "../../../components/shared/table_heading/Header";
 import {
   useGetOrderById,
   useUpdateOrderMutation,
+  useOrderCache,
 } from "../../../server/api/orderHooks";
 import InfoSection from "./components/InfoSection";
 import OrderTracker from "./components/OrderTracker";
@@ -79,6 +80,59 @@ const STEPS: OrderStep[] = [
   },
 ];
 
+// Utility function to get button configuration based on order status
+const getOrderActionButton = (orderStatus: string) => {
+  const statusConfig = {
+    pending: {
+      text: "Accept Order",
+      nextStatus: "confirmed",
+      variant: "primary" as const,
+      icon: <CheckIcon className="w-4 h-4" />,
+      disabled: false,
+    },
+    confirmed: {
+      text: "Assign Order",
+      nextStatus: "assigned",
+      variant: "primary" as const,
+      icon: <PackageIcon className="w-4 h-4" />,
+      disabled: false,
+    },
+    assigned: {
+      text: "Mark as Picked Up",
+      nextStatus: "picked_up",
+      variant: "primary" as const,
+      icon: <TruckIcon className="w-4 h-4" />,
+      disabled: false,
+    },
+    picked_up: {
+      text: "Mark as Delivered",
+      nextStatus: "delivered",
+      variant: "success" as const,
+      icon: <CheckIcon className="w-4 h-4" />,
+      disabled: false,
+    },
+    delivered: {
+      text: "Order Completed",
+      nextStatus: "delivered",
+      variant: "success" as const,
+      icon: <CheckIcon className="w-4 h-4" />,
+      disabled: true,
+    },
+    cancelled: {
+      text: "Order Cancelled",
+      nextStatus: "cancelled",
+      variant: "danger" as const,
+      icon: null,
+      disabled: true,
+    },
+  };
+
+  return (
+    statusConfig[orderStatus as keyof typeof statusConfig] ||
+    statusConfig.pending
+  );
+};
+
 const OrderDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -86,7 +140,7 @@ const OrderDetails: React.FC = () => {
 
   // Get the current page type from the URL
   const pagePath = pathname.split("/");
-  const page = pagePath[pagePath.length - 2];
+  const page = pagePath[pagePath.length - 2]; // This should be "order-details" for /order/order-details/123
 
   // Modal states
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -100,6 +154,9 @@ const OrderDetails: React.FC = () => {
   } = useUpdateOrderMutation();
 
   const { data: order, isLoading, isError, error } = useGetOrderById(id);
+
+  // Cache management hook
+  const { updateOrderInCache, invalidateOrderCache } = useOrderCache();
 
   // Handle navigation after successful order update with cleanup
   useEffect(() => {
@@ -119,39 +176,71 @@ const OrderDetails: React.FC = () => {
     };
   }, [isSuccess, navigate]);
 
-  // Handle order completion
+  // Handle order completion with optimistic updates
   const handleCompleteOrder = (notes?: string) => {
     if (!order?._id) return;
 
-    updateOrder({
-      id: order._id,
-      body: {
-        orderStatus: "delivered",
-        deliveryCompletion: {
-          date: new Date().toISOString(),
-          notes: notes || undefined,
-        },
+    const completionData = {
+      orderStatus: "delivered" as const,
+      deliveryCompletion: {
+        date: new Date().toISOString(),
+        notes: notes || undefined,
       },
-    });
+      updatedAt: new Date().toISOString(),
+    };
+
+    // Optimistic update
+    updateOrderInCache(order._id, completionData);
+
+    updateOrder(
+      {
+        id: order._id,
+        body: completionData,
+      },
+      {
+        onError: () => {
+          // Revert optimistic update on error
+          updateOrderInCache(order._id, { orderStatus: order.orderStatus });
+          invalidateOrderCache(order._id);
+        },
+      }
+    );
+
     setShowCompleteModal(false);
     // Navigate back to main order management page after successful completion
     setTimeout(() => navigate("/order/orders"), 1000);
   };
 
-  // Handle order cancellation
+  // Handle order cancellation with optimistic updates
   const handleCancelOrder = (reason: string) => {
     if (!order?._id) return;
 
-    updateOrder({
-      id: order._id,
-      body: {
-        orderStatus: "cancelled",
-        cancellation: {
-          reason,
-          date: new Date().toISOString(),
-        },
+    const cancellationData = {
+      orderStatus: "cancelled" as const,
+      cancellation: {
+        reason,
+        date: new Date().toISOString(),
       },
-    });
+      updatedAt: new Date().toISOString(),
+    };
+
+    // Optimistic update
+    updateOrderInCache(order._id, cancellationData);
+
+    updateOrder(
+      {
+        id: order._id,
+        body: cancellationData,
+      },
+      {
+        onError: () => {
+          // Revert optimistic update on error
+          updateOrderInCache(order._id, { orderStatus: order.orderStatus });
+          invalidateOrderCache(order._id);
+        },
+      }
+    );
+
     setShowCancelModal(false);
     // Navigate to cancelled orders page after successful cancellation
     setTimeout(() => navigate("/order/cancelled-order"), 1000);
@@ -338,14 +427,29 @@ const OrderDetails: React.FC = () => {
     ];
   }, [order]);
 
-  // Handle order status update
+  // Handle order status update with optimistic updates
   const handleOrderStatusUpdate = (newStatus: string) => {
-    if (!id) return;
+    if (!id || !order) return;
 
-    updateOrder({
-      id,
-      body: { orderStatus: newStatus },
+    // Optimistic update - immediately update the cache
+    updateOrderInCache(id, {
+      orderStatus: newStatus as any, // Type assertion for flexibility
+      updatedAt: new Date().toISOString(),
     });
+
+    updateOrder(
+      {
+        id,
+        body: { orderStatus: newStatus },
+      },
+      {
+        onError: () => {
+          // Revert optimistic update on error
+          updateOrderInCache(id, { orderStatus: order.orderStatus });
+          invalidateOrderCache(id);
+        },
+      }
+    );
   };
 
   // Handle loading state
@@ -529,48 +633,89 @@ const OrderDetails: React.FC = () => {
               )}
             </div>
             <div className="flex items-center justify-end gap-3 mt-6">
-              {page === "order-details" && (
-                <>
-                  <ButtonLoading
-                    isLoading={isPending}
-                    loadingText="Accepting..."
-                    onClick={() => handleOrderStatusUpdate("confirmed")}
-                    className="bg-blue-600 hover:bg-blue-700 px-6 py-3 text-white rounded-lg font-medium transition-all shadow-sm flex items-center gap-2">
-                    <Icon icon="mdi:check" className="w-4 h-4" />
-                    Accept Order
-                  </ButtonLoading>
-                  <ButtonLoading
-                    isLoading={isPending}
-                    loadingText="Cancelling..."
-                    onClick={() => setShowCancelModal(true)}
-                    className="bg-red-600 hover:bg-red-700 px-6 py-3 text-white rounded-lg font-medium transition-all shadow-sm flex items-center gap-2">
-                    <Icon icon="mdi:cancel" className="w-4 h-4" />
-                    Cancel Order
-                  </ButtonLoading>
-                </>
-              )}
+              {(() => {
+                const buttonConfig = getOrderActionButton(orderStatus);
+                const getButtonStyles = (variant: string) => {
+                  const baseStyles =
+                    "px-6 py-3 text-white rounded-lg font-medium transition-all shadow-sm flex items-center gap-2";
+                  const variants = {
+                    primary: "bg-blue-600 hover:bg-blue-700",
+                    success: "bg-green-600 hover:bg-green-700",
+                    danger: "bg-red-600 hover:bg-red-700",
+                    warning: "bg-orange-600 hover:bg-orange-700",
+                  };
+                  return `${baseStyles} ${
+                    variants[variant as keyof typeof variants] ||
+                    variants.primary
+                  }`;
+                };
 
-              {page === "confirmed-order-details" && (
-                <ButtonLoading
-                  isLoading={isPending}
-                  loadingText="Assigning..."
-                  onClick={() => handleOrderStatusUpdate("assigned")}
-                  className="bg-orange-600 hover:bg-orange-700 px-6 py-3 text-white rounded-lg font-medium transition-all shadow-sm flex items-center gap-2">
-                  <Icon icon="mdi:truck-delivery" className="w-4 h-4" />
-                  Assign Delivery
-                </ButtonLoading>
-              )}
+                const getLoadingText = (status: string) => {
+                  const loadingTexts = {
+                    confirmed: "Accepting...",
+                    assigned: "Assigning...",
+                    picked_up: "Updating...",
+                    delivered: "Completing...",
+                  };
+                  return (
+                    loadingTexts[status as keyof typeof loadingTexts] ||
+                    "Processing..."
+                  );
+                };
 
-              {page === "assigned-order-details" && (
-                <ButtonLoading
-                  isLoading={isPending}
-                  loadingText="Completing..."
-                  onClick={() => setShowCompleteModal(true)}
-                  className="bg-green-600 hover:bg-green-700 px-6 py-3 text-white rounded-lg font-medium transition-all shadow-sm flex items-center gap-2">
-                  <Icon icon="mdi:check-circle" className="w-4 h-4" />
-                  Complete Order
-                </ButtonLoading>
-              )}
+                const handleButtonClick = () => {
+                  if (buttonConfig.nextStatus === "delivered") {
+                    setShowCompleteModal(true);
+                  } else {
+                    handleOrderStatusUpdate(buttonConfig.nextStatus);
+                  }
+                };
+
+                return (
+                  <>
+                    {/* Main action button - only show if order is not completed or cancelled */}
+                    {orderStatus !== "delivered" &&
+                      orderStatus !== "cancelled" && (
+                        <ButtonLoading
+                          isLoading={isPending}
+                          loadingText={getLoadingText(buttonConfig.nextStatus)}
+                          onClick={handleButtonClick}
+                          disabled={buttonConfig.disabled}
+                          className={getButtonStyles(buttonConfig.variant)}>
+                          {buttonConfig.icon}
+                          {buttonConfig.text}
+                        </ButtonLoading>
+                      )}
+
+                    {/* Cancel button - only show for pending and confirmed orders */}
+                    {(orderStatus === "pending" ||
+                      orderStatus === "confirmed") && (
+                      <ButtonLoading
+                        isLoading={isPending}
+                        loadingText="Cancelling..."
+                        onClick={() => setShowCancelModal(true)}
+                        className="bg-red-600 hover:bg-red-700 px-6 py-3 text-white rounded-lg font-medium transition-all shadow-sm flex items-center gap-2">
+                        <Icon icon="mdi:cancel" className="w-4 h-4" />
+                        Cancel Order
+                      </ButtonLoading>
+                    )}
+
+                    {/* Status indicator for completed/cancelled orders */}
+                    {(orderStatus === "delivered" ||
+                      orderStatus === "cancelled") && (
+                      <div
+                        className={`px-6 py-3 rounded-lg font-medium flex items-center gap-2 ${
+                          orderStatus === "delivered"
+                            ? "bg-green-100 text-green-800 border border-green-200"
+                            : "bg-red-100 text-red-800 border border-red-200"
+                        }`}>
+                        {buttonConfig.icon}
+                        {buttonConfig.text}
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
             </div>
           </div>
         </div>
