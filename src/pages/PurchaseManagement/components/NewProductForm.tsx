@@ -594,7 +594,7 @@ const NewProductForm = ({
                     }}
                   </form.Field>
 
-                  <form.Field name={`products[${index}].unit`}>
+                  {/* <form.Field name={`products[${index}].unit`}>
                     {(field) => (
                       <div>
                         <DropdownField
@@ -613,7 +613,7 @@ const NewProductForm = ({
                         <FieldError field={field} />
                       </div>
                     )}
-                  </form.Field>
+                  </form.Field> */}
                   {/* </div> */}
                   {/* </div> */}
 

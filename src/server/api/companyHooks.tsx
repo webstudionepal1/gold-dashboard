@@ -71,6 +71,28 @@ export const useGetMainCompanyQuery = () => {
   });
 };
 
+export const useCreateCompanyDetailsMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ['company'],
+    mutationFn: async ({ body }: { body: FormData }) => {
+      const res = await apiClient.post(`company`, body, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return res?.data?.data;
+    },
+    onSuccess() {
+      toast.success('Successfully created details');
+      queryClient.invalidateQueries({ queryKey: ['company'] });
+    },
+    onError(err: string) {
+      toast.success(err || 'Error Creating Details');
+    },
+  });
+};
+
 export const useUpdateCompanyDetailsMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
