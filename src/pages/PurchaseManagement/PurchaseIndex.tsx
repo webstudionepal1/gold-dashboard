@@ -375,8 +375,6 @@ const PurchaseIndex = () => {
         });
       },
       editAction(row: IFetchProduct) {
-        console.log(row, 'row of selected');
-        console.log(purchaseList, 'purhcase');
         const selectedPurchase = purchaseList?.find(
           (item) => item._id === row._id
         );
@@ -387,14 +385,17 @@ const PurchaseIndex = () => {
           price: item?.price,
           paidAmount: item?.paidAmount,
           wt: item?.wt,
-          unit: 'gm'  ,
         }));
 
-        console.log(selectedPurchase, 'selectedPurchase');
+        const toSend = {
+          ...selectedPurchase,
+          products,
+        };
+
         setModal({
           of: 'purchase',
           edit: true,
-          data: selectedPurchase as any,
+          data: toSend as any,
         });
       },
       onDelete(id: string) {

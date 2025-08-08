@@ -7,6 +7,7 @@ import { InputField } from '../../../components/shared/form_components/InputFiel
 import Header from '../../../components/shared/table_heading/Header';
 import {
   IFetchCompany,
+  useCreateCompanyDetailsMutation,
   useGetCompanyDetailsQuery,
   useUpdateCompanyDetailsMutation,
 } from '../../../server/api/companyHooks';
@@ -43,6 +44,9 @@ const EditProfileForm = () => {
   const { data, isLoading, isSuccess } = useGetCompanyDetailsQuery();
   const { mutate: updateProfile, isPending } =
     useUpdateCompanyDetailsMutation();
+
+  const { mutateAsync: createCompanyDetails } =
+    useCreateCompanyDetailsMutation();
   const companyData: IFetchCompany = useMemo(() => {
     if (isSuccess) {
       return data?.length > 0 ? data[0] : defaultValues;
@@ -54,6 +58,7 @@ const EditProfileForm = () => {
     defaultValues: generateProfileValue(companyData) as IProfileValue,
     onSubmit: async ({ value }: { value: any }) => {
       const obj = [
+        'companyName',
         'name',
         'ownerNo',
         'address',
@@ -79,7 +84,12 @@ const EditProfileForm = () => {
       if (Array.isArray(value.qr)) {
         value.qr.forEach((item: File) => formdata.append('qr', item));
       }
-      updateProfile({ id: companyData._id, body: formdata });
+
+      if (companyData._id) {
+        updateProfile({ id: companyData._id, body: formdata });
+      } else {
+        createCompanyDetails({ body: formdata });
+      }
     },
   });
 
@@ -219,7 +229,7 @@ const EditProfileForm = () => {
             </div>
 
             <div className="flex items-center gap-4 justify-between">
-              <form.Field name="country">
+              {/* <form.Field name="country">
                 {(field) => (
                   <div className="w-full">
                     <InputField
@@ -232,7 +242,7 @@ const EditProfileForm = () => {
                     <FieldError field={field} />
                   </div>
                 )}
-              </form.Field>
+              </form.Field> */}
 
               <form.Field name="zipCode">
                 {(field) => (
