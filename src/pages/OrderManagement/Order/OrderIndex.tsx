@@ -26,12 +26,12 @@ import {
 import {
   extractOrderData,
   formatCurrency,
-  safeGet,
   validateOrderData,
 } from "../../../utils/dataHelpers";
 import { OrderActionButtons } from "../../../components/shared/OrderActionButtons";
 import { CancelOrderModal } from "../../../components/shared/modals/CancelOrderModal";
 import { CompleteOrderModal } from "../../../components/shared/modals/CompleteOrderModal";
+import type { Order, OrderStatus } from "../../../types/order";
 
 // Tab configuration
 const orderTabs = [
@@ -69,7 +69,7 @@ const OrderIndex = () => {
   // Modal states
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showCompleteModal, setShowCompleteModal] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
   // API hooks
   const { mutate: updateOrder, isPending: isUpdating } =
@@ -79,7 +79,6 @@ const OrderIndex = () => {
   // Fetch all orders at once for better performance
   const {
     data: allOrders,
-    isSuccess,
     isLoading,
     isError,
     error,
@@ -123,7 +122,7 @@ const OrderIndex = () => {
 
       // Optimistic update
       updateOrderInCache(orderId, {
-        orderStatus: newStatus,
+        orderStatus: newStatus as OrderStatus,
         updatedAt: new Date().toISOString(),
       });
 
@@ -392,11 +391,11 @@ const OrderIndex = () => {
                       <OrderActionButtons
                         order={row}
                         onStatusUpdate={handleOrderStatusUpdate}
-                        onCancel={(orderId) => {
+                        onCancel={(_orderId) => {
                           setSelectedOrder(row);
                           setShowCancelModal(true);
                         }}
-                        onComplete={(orderId) => {
+                        onComplete={(_orderId) => {
                           setSelectedOrder(row);
                           setShowCompleteModal(true);
                         }}

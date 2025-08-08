@@ -17,6 +17,7 @@ import {
 import { OrderActionButtons } from "../../../components/shared/OrderActionButtons";
 import { CancelOrderModal } from "../../../components/shared/modals/CancelOrderModal";
 import { CompleteOrderModal } from "../../../components/shared/modals/CompleteOrderModal";
+import type { OrderStatus } from "../../../types/order";
 
 // Filter state interface
 interface FilterState {
@@ -55,7 +56,7 @@ const ConfirmedOrder = () => {
 
       // Optimistic update
       updateOrderInCache(orderId, {
-        orderStatus: newStatus,
+        orderStatus: newStatus as OrderStatus,
         updatedAt: new Date().toISOString(),
       });
 
