@@ -41,6 +41,7 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
     maxFiles = 10,
   } = props;
 
+  console.log(props, 'props');
   const defaultPlaceholder = props.multiple
     ? "Drag 'n' drop files here, or click to select files"
     : "Drag 'n' drop a file here, or click to select a file";
@@ -163,6 +164,8 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
         previewUrl = `${import.meta.env.VITE_API_IMAGE_BASE_URL}${file}`;
       }
     }
+
+    console.log(previewUrl);
 
     return (
       <div

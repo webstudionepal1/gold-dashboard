@@ -1,6 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiClient } from "../utils/ApiGateway";
-import { toast } from "react-toastify";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { apiClient } from '../utils/ApiGateway';
+import { toast } from 'react-toastify';
 
 export interface IFetchCompany {
   _id: string;
@@ -52,9 +52,9 @@ interface IUpdateProps {
 }
 export const useGetCompanyDetailsQuery = () => {
   return useQuery({
-    queryKey: ["company"],
+    queryKey: ['company'],
     queryFn: async () => {
-      const res = await apiClient.get<{ data: IFetchCompany[] }>("company");
+      const res = await apiClient.get<{ data: IFetchCompany[] }>('company');
       return res?.data?.data;
     },
   });
@@ -63,9 +63,9 @@ export const useGetCompanyDetailsQuery = () => {
 // Alias for backward compatibility
 export const useGetMainCompanyQuery = () => {
   return useQuery({
-    queryKey: ["company"],
+    queryKey: ['company'],
     queryFn: async () => {
-      const res = await apiClient.get<{ data: IFetchCompany[] }>("company");
+      const res = await apiClient.get<{ data: IFetchCompany[] }>('company');
       return res?.data?.data?.[0]; // Return first company as main company
     },
   });
@@ -74,21 +74,21 @@ export const useGetMainCompanyQuery = () => {
 export const useUpdateCompanyDetailsMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["company"],
+    mutationKey: ['company'],
     mutationFn: async ({ id, body }: IUpdateProps) => {
       const res = await apiClient.patch(`company/${id}`, body, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          'Content-Type': 'multipart/form-data',
         },
       });
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Successfully updated details");
-      queryClient.invalidateQueries({ queryKey: ["company"] });
+      toast.success('Successfully updated details');
+      queryClient.invalidateQueries({ queryKey: ['company'] });
     },
     onError(err: string) {
-      toast.success(err || "Error Updating Details");
+      toast.success(err || 'Error Updating Details');
     },
   });
 };

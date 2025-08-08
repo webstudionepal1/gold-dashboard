@@ -1,83 +1,83 @@
-import React, { useState, useMemo } from "react";
-import Header from "../../../components/shared/table_heading/Header";
-import Breadcrumbs from "../../../components/shared/Breadcrumb";
-import { Icon } from "@iconify/react/dist/iconify.js";
-import { SimpleTable } from "./SimpleTable";
-import { useGetCustomerQuery } from "../../../server/api/customerHook";
+import React, { useState, useMemo } from 'react';
+import Header from '../../../components/shared/table_heading/Header';
+import Breadcrumbs from '../../../components/shared/Breadcrumb';
+import { Icon } from '@iconify/react/dist/iconify.js';
+import { SimpleTable } from './SimpleTable';
+import { useGetCustomerQuery } from '../../../server/api/customerHook';
 import {
   IFetchOrder,
   useGetAllOrdersQuery,
-} from "../../../server/api/orderHooks";
-import { Link, useParams } from "react-router-dom";
-import dayjs from "dayjs";
-import InfoSection from "../../OrderManagement/Order/components/InfoSection";
-import { ScrollableModal } from "../../../components/shared/ScrollableModal";
-import Invoice, { InvoiceData } from "./Invoice";
+} from '../../../server/api/orderHooks';
+import { Link, useParams } from 'react-router-dom';
+import dayjs from 'dayjs';
+import InfoSection from '../../OrderManagement/Order/components/InfoSection';
+import { ScrollableModal } from '../../../components/shared/ScrollableModal';
+import Invoice, { InvoiceData } from './Invoice';
 
-import { FrontendRoutes } from "../../../routes/routes";
+import { FrontendRoutes } from '../../../routes/routes';
 
 // Constants for styling and configuration
 const CARD_STYLES = {
-  base: "bg-white border-2 rounded-xl border-[#d5d9e4]",
-  compact: "p-3",
-  section: "space-y-4",
+  base: 'bg-white border-2 rounded-xl border-[#d5d9e4]',
+  compact: 'p-3',
+  section: 'space-y-4',
 } as const;
 
 const EMPTY_STATES = {
   noOrders: {
-    icon: "mdi:package-variant-closed",
-    title: "No Orders Found",
+    icon: 'mdi:package-variant-closed',
+    title: 'No Orders Found',
     message: "This customer hasn't placed any orders yet.",
   },
   noCustomer: {
-    icon: "mdi:account-question",
-    title: "Customer Not Found",
-    message: "The requested customer could not be found.",
+    icon: 'mdi:account-question',
+    title: 'Customer Not Found',
+    message: 'The requested customer could not be found.',
   },
 } as const;
 
 // Utility functions
- const getOrderStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "confirmed":
-        return "bg-[#e8faee] text-[#6db289]";
-      case "pending":
-        return "text-[#df8d28] border-2 border-[#df8d28] rounded-xl px-4 py-2 font-semibold ";
-      case "in progress":
-        return "bg-blue-100 text-blue-800";
-      case "delivered":
-        return "text-[#35c659] border-2 border-[#35c659] rounded-xl px-4 py-2 font-semibold";
-      case "cancelled":
-        return "bg-[#feeeee] text-[#ff4d4c]";
-      case "not confirmed":
-        return "bg-[#f9ebea] text-[#ce8b8e]";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
+const getOrderStatusColor = (status: string) => {
+  switch (status.toLowerCase()) {
+    case 'confirmed':
+      return 'bg-[#e8faee] text-[#6db289]';
+    case 'pending':
+      return 'text-[#df8d28] border-2 border-[#df8d28] rounded-xl px-4 py-2 font-semibold ';
+    case 'in progress':
+      return 'bg-blue-100 text-blue-800';
+    case 'delivered':
+      return 'text-[#35c659] border-2 border-[#35c659] rounded-xl px-4 py-2 font-semibold';
+    case 'cancelled':
+      return 'bg-[#feeeee] text-[#ff4d4c]';
+    case 'not confirmed':
+      return 'bg-[#f9ebea] text-[#ce8b8e]';
+    default:
+      return 'bg-gray-100 text-gray-800';
+  }
+};
 
-  const getStatusColor = (status: string) => {
-    switch (
-      status.toLowerCase() // Converts to lowercase for case-insensitive comparison
-    ) {
-      case "confirmed":
-        return "bg-[#e8faee] text-[#6db289]";
-      case "pending":
-        return "bg-[#fff7ea] text-[#f7b627] ";
-      case "assigned":
-        return "bg-[#fff7ea] text-[#f7b627] ";
-      case "in progress":
-        return "bg-blue-100 text-blue-800";
-      case "delivered":
-        return "bg-[#fff7ea] text-[#23c65f]";
-      case "cancelled":
-        return "bg-[#feeeee] text-[#ff4d4c]";
-      case "not confirmed":
-        return "bg-[#f9ebea] text-[#ce8b8e]";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
+const getStatusColor = (status: string) => {
+  switch (
+    status.toLowerCase() // Converts to lowercase for case-insensitive comparison
+  ) {
+    case 'confirmed':
+      return 'bg-[#e8faee] text-[#6db289]';
+    case 'pending':
+      return 'bg-[#fff7ea] text-[#f7b627] ';
+    case 'assigned':
+      return 'bg-[#fff7ea] text-[#f7b627] ';
+    case 'in progress':
+      return 'bg-blue-100 text-blue-800';
+    case 'delivered':
+      return 'bg-[#fff7ea] text-[#23c65f]';
+    case 'cancelled':
+      return 'bg-[#feeeee] text-[#ff4d4c]';
+    case 'not confirmed':
+      return 'bg-[#f9ebea] text-[#ce8b8e]';
+    default:
+      return 'bg-gray-100 text-gray-800';
+  }
+};
 
 // Helper Components
 const EmptyState: React.FC<{
@@ -85,15 +85,19 @@ const EmptyState: React.FC<{
   title: string;
   message: string;
   className?: string;
-}> = ({ icon, title, message, className = "" }) => (
-  <div className={`flex flex-col items-center justify-center py-12 text-center ${className}`}>
+}> = ({ icon, title, message, className = '' }) => (
+  <div
+    className={`flex flex-col items-center justify-center py-12 text-center ${className}`}
+  >
     <Icon icon={icon} className="w-16 h-16 text-gray-400 mb-4" />
     <h3 className="text-lg font-semibold text-gray-700 mb-2">{title}</h3>
     <p className="text-gray-500 max-w-md">{message}</p>
   </div>
 );
 
-const LoadingState: React.FC<{ message?: string }> = ({ message = "Loading..." }) => (
+const LoadingState: React.FC<{ message?: string }> = ({
+  message = 'Loading...',
+}) => (
   <div className="flex items-center justify-center py-8">
     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
     <span className="text-gray-600">{message}</span>
@@ -106,7 +110,7 @@ const CustomerDetails = () => {
     data: customers = [],
     isLoading: customersLoading,
     error: customersError,
-  } = useGetCustomerQuery({ role: "customer" });
+  } = useGetCustomerQuery({ role: 'customer' });
 
   const [selectedOrder, setSelectedOrder] = useState<IFetchOrder | null>(null);
   const {
@@ -120,64 +124,72 @@ const CustomerDetails = () => {
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
 
   // Customer information data - moved before early returns
-  const shippingInformation = useMemo(() => [
-    {
-      id: 1,
-      title: "Name",
-      value: customer?.name || "N/A",
-    },
-    {
-      id: 2,
-      title: "Phone No",
-      value: customer?.phone ? `+977 ${customer.phone}` : "N/A",
-    },
-    {
-      id: 3,
-      title: "Address",
-      value: customer?.address || "N/A",
-    },
-    {
-      id: 4,
-      title: "Email",
-      value: customer?.email || "N/A",
-    },
-  ], [customer]);
+  const shippingInformation = useMemo(
+    () => [
+      {
+        id: 1,
+        title: 'Name',
+        value: customer?.name || 'N/A',
+      },
+      {
+        id: 2,
+        title: 'Phone No',
+        value: customer?.phone ? `+977 ${customer.phone}` : 'N/A',
+      },
+      {
+        id: 3,
+        title: 'Address',
+        value: customer?.address || 'N/A',
+      },
+      {
+        id: 4,
+        title: 'Email',
+        value: customer?.email || 'N/A',
+      },
+    ],
+    [customer]
+  );
 
-  const billingAddress = useMemo(() => [
-    {
-      id: 1,
-      title: "Customer Name",
-      value: customer?.name || "N/A",
-    },
-    {
-      id: 2,
-      title: "Phone No",
-      value: customer?.phone ? `+977 ${customer.phone}` : "N/A",
-    },
-    {
-      id: 3,
-      title: "Email",
-      value: customer?.email || "N/A",
-    },
-    {
-      id: 4,
-      title: "Address",
-      value: customer?.address || "N/A",
-    },
-    {
-      id: 5,
-      title: "Payment",
-      value: selectedOrder?.paymentStatus ? (
-        <div
-          className={`font-semibold ${getStatusColor(
-            selectedOrder.paymentStatus
-          )}`}
-        >
-          {selectedOrder.paymentStatus}
-        </div>
-      ) : "N/A",
-    },
-  ], [customer, selectedOrder]);
+  const billingAddress = useMemo(
+    () => [
+      {
+        id: 1,
+        title: 'Customer Name',
+        value: customer?.name || 'N/A',
+      },
+      {
+        id: 2,
+        title: 'Phone No',
+        value: customer?.phone ? `+977 ${customer.phone}` : 'N/A',
+      },
+      {
+        id: 3,
+        title: 'Email',
+        value: customer?.email || 'N/A',
+      },
+      {
+        id: 4,
+        title: 'Address',
+        value: customer?.address || 'N/A',
+      },
+      {
+        id: 5,
+        title: 'Payment',
+        value: selectedOrder?.paymentStatus ? (
+          <div
+            className={`font-semibold ${getStatusColor(
+              selectedOrder.paymentStatus
+            )}`}
+          >
+            {selectedOrder.paymentStatus}
+          </div>
+        ) : (
+          'N/A'
+        ),
+      },
+    ],
+    [customer, selectedOrder]
+  );
 
   // Early returns after all hooks are called
   if (customersLoading) {
@@ -209,9 +221,6 @@ const CustomerDetails = () => {
     );
   }
 
-
-
-
   const handleInvoiceClose = () => {
     setShowInvoiceModal(!showInvoiceModal);
   };
@@ -220,28 +229,30 @@ const CustomerDetails = () => {
   };
   const handleView = (order: IFetchOrder) => {
     setShowModal(true);
-    setSelectedOrder(order);
+    setSelectedOrder({
+      ...order,
+    });
   };
 
-
-
-
+  console.log(selectedOrder, 'order selected is::');
 
   const fla = selectedOrder
     ? selectedOrder?.orderedProducts.map((item) => ({
         // name: item?.product?.name || "name",
-        name: "Name",
+        name: 'Name',
         // image:
         //   (item?.product?.images?.length > 0 && item?.product.images[0]) ||
         //   "/sdfsdf",
-        image: "/sdfsdf",
+        image: '/sdfsdf',
         price: item.selectedVariant.price,
         quantity: item.selectedVariant.quantity,
         totalPrice: item.selectedVariant.quantity * item.selectedVariant.price,
       }))
     : [];
 
- 
+  // const joinDate = customer.joinDate;
+  const joinDate = new Date(customer.createdAt).toDateString();
+
   return (
     <div className="container mx-auto">
       <div className="flex items-center justify-between">
@@ -253,31 +264,42 @@ const CustomerDetails = () => {
       <div className={`${CARD_STYLES.base} mb-6`}>
         <div className="flex items-center gap-4 p-4">
           <img
-            src={customer.image || "/no-image.png"}
-            alt={customer.name || "Customer"}
+            src={customer.image || '/no-image.png'}
+            alt={customer.name || 'Customer'}
             className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
           />
           <div className="flex-1">
             <h1 className="font-semibold text-xl mb-2">{customer.name}</h1>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
               <div className="flex items-center gap-2">
-                <Icon icon="mdi:home-location" className="w-4 h-4 text-gray-500" />
-                <span className="text-gray-600">{customer.address || "N/A"}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Icon icon="mdi-light:phone" className="w-4 h-4 text-gray-500" />
+                <Icon
+                  icon="mdi:home-location"
+                  className="w-4 h-4 text-gray-500"
+                />
                 <span className="text-gray-600">
-                  {customer.phone ? `+977-${customer.phone}` : "N/A"}
+                  {customer.address || 'N/A'}
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <Icon icon="ic:outline-mail" className="w-4 h-4 text-gray-500" />
-                <span className="text-gray-600">{customer.email || "N/A"}</span>
+                <Icon
+                  icon="mdi-light:phone"
+                  className="w-4 h-4 text-gray-500"
+                />
+                <span className="text-gray-600">
+                  {customer.phone ? `+977-${customer.phone}` : 'N/A'}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Icon
+                  icon="ic:outline-mail"
+                  className="w-4 h-4 text-gray-500"
+                />
+                <span className="text-gray-600">{customer.email || 'N/A'}</span>
               </div>
             </div>
             {customer.joinDate && (
               <p className="text-xs text-gray-500 mt-2">
-                Registered on {dayjs(customer.joinDate).format("DD MMM YYYY")}
+                Registered on {joinDate}
               </p>
             )}
           </div>
@@ -311,27 +333,27 @@ const CustomerDetails = () => {
                 showSerialNumber={true}
                 columns={[
                   {
-                    header: "Order Date",
-                    key: "createdAt",
+                    header: 'Order Date',
+                    key: 'createdAt',
                     render: (_, row) => (
                       <div className="text-sm">
-                        {dayjs(row.createdAt).format("DD MMM YYYY")}
+                        {dayjs(row.createdAt).format('DD MMM YYYY')}
                         <div className="text-xs text-gray-500">
-                          {dayjs(row.createdAt).format("hh:mm A")}
+                          {dayjs(row.createdAt).format('hh:mm A')}
                         </div>
                       </div>
                     ),
                   },
                   {
-                    header: "Total Amount",
-                    key: "totalAmount",
+                    header: 'Total Amount',
+                    key: 'totalAmount',
                     render: (_, row) => (
                       <div className="font-semibold">$ {row.totalAmount}</div>
                     ),
                   },
                   {
-                    key: "orderStatus",
-                    header: "Status",
+                    key: 'orderStatus',
+                    header: 'Status',
                     render: (value: string) => (
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
@@ -364,7 +386,7 @@ const CustomerDetails = () => {
               title="Contact Information"
               info={shippingInformation}
               showEdit={false}
-              onEditClick={() => console.log("Edit clicked")}
+              onEditClick={() => console.log('Edit clicked')}
             />
           </div>
 
@@ -374,7 +396,7 @@ const CustomerDetails = () => {
                 title="Billing Address"
                 info={billingAddress}
                 showEdit={false}
-                onEditClick={() => console.log("Edit clicked")}
+                onEditClick={() => console.log('Edit clicked')}
               />
             </div>
           )}
@@ -391,16 +413,24 @@ const CustomerDetails = () => {
                 <div className="flex justify-between">
                   <span className="text-gray-600">Total Spent:</span>
                   <span className="font-semibold">
-                    $ {orders.reduce((sum, order) => sum + (order.totalAmount || 0), 0).toFixed(2)}
+                    Rs.{' '}
+                    {orders
+                      .reduce((sum, order) => sum + (order.totalAmount || 0), 0)
+                      .toFixed(2)}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Average Order:</span>
                   <span className="font-semibold">
-                    $ {orders.length > 0
-                      ? (orders.reduce((sum, order) => sum + (order.totalAmount || 0), 0) / orders.length).toFixed(2)
-                      : "0.00"
-                    }
+                    Rs.{' '}
+                    {orders.length > 0
+                      ? (
+                          orders.reduce(
+                            (sum, order) => sum + (order.totalAmount || 0),
+                            0
+                          ) / orders.length
+                        ).toFixed(2)
+                      : '0.00'}
                   </span>
                 </div>
               </div>
@@ -426,12 +456,18 @@ const CustomerDetails = () => {
 
                 <div className="flex flex-col">
                   <h1 className="font-bold text-xl">
-                    Order{" "}
+                    #{' '}
                     <span className="text-[#ffc174] font-bold text-xl">
-                      #12
+                      {selectedOrder?.orderNumber}
                     </span>
                   </h1>
-                  <p className="text-[#b0b0b0] font-semibold">2024-10-10</p>
+                  <p className="text-[#b0b0b0] font-semibold">
+                    {
+                      selectedOrder?.orderTimeline?.orderCreated?.split(
+                        'GMT'
+                      )[0]
+                    }
+                  </p>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -441,7 +477,7 @@ const CustomerDetails = () => {
 
                   <h1
                     className={`rounded-xl px-4 py-2 font-semibold border-2 ${getOrderStatusColor(
-                      selectedOrder?.paymentStatus || ""
+                      selectedOrder?.paymentStatus || ''
                     )}`}
                   >
                     {selectedOrder?.paymentStatus}
@@ -453,7 +489,7 @@ const CustomerDetails = () => {
                     }}
                     className="flex items-center gap-2 border-2 border-[#d2dae5] px-3 py-2 rounded-xl"
                   >
-                    View Invoice{" "}
+                    View Invoice{' '}
                     <Icon
                       icon="material-symbols-light:download"
                       width="24"
@@ -477,8 +513,8 @@ const CustomerDetails = () => {
                       showSerialNumber={false}
                       columns={[
                         {
-                          header: "Item Name",
-                          key: "name",
+                          header: 'Item Name',
+                          key: 'name',
                           render: (_: unknown, row: any) => (
                             <div className="flex items-center justify-center">
                               <img
@@ -494,15 +530,15 @@ const CustomerDetails = () => {
                             </div>
                           ),
                         },
-                        { key: "quantity", header: "QTY" },
+                        { key: 'quantity', header: 'QTY' },
                         {
-                          header: "Price",
-                          key: "price",
+                          header: 'Price',
+                          key: 'price',
                           render: (_, row) => <div>$ {row.price}</div>,
                         },
                         {
-                          header: "Total Price",
-                          key: "totalPrice",
+                          header: 'Total Price',
+                          key: 'totalPrice',
                           render: (_, row) => <div>$ {row.totalPrice}</div>,
                         },
                         // {
@@ -573,7 +609,7 @@ const CustomerDetails = () => {
                     title="Shipping Information"
                     info={shippingInformation}
                     showEdit={false}
-                    onEditClick={() => console.log("Edit clicked")}
+                    onEditClick={() => console.log('Edit clicked')}
                   />
                 </div>
               </div>
@@ -584,7 +620,7 @@ const CustomerDetails = () => {
                     title="Billing Address"
                     info={billingAddress}
                     showEdit={false}
-                    onEditClick={() => console.log("Edit clicked")}
+                    onEditClick={() => console.log('Edit clicked')}
                   />
                 </div>
               </div>
@@ -633,12 +669,12 @@ const CustomerDetails = () => {
       )} */}
 
       {showInvoiceModal && selectedOrder && (
-        <ScrollableModal onClose={handleInvoiceClose} classname="w-[60%] p-6">
+        <ScrollableModal onClose={handleInvoiceClose} classname="w-[60%] ">
           <div>
             {orders?.map((selectedOrder) => {
               const invoiceData: InvoiceData = {
                 // invoiceNumber: selectedOrder._id,
-                invoiceNumber: "-",
+                invoiceNumber: '-',
 
                 date: selectedOrder.createdAt,
 
@@ -648,7 +684,7 @@ const CustomerDetails = () => {
                 items: selectedOrder.orderedProducts.map((orderedProduct) => ({
                   name: orderedProduct.product?.name,
                   weight: orderedProduct.selectedVariant.wt,
-                  purity: "",
+                  purity: '',
                   makingCharge: 0,
                   ratePerGram: orderedProduct.selectedVariant.price,
                   quantity: orderedProduct.selectedVariant.quantity,
@@ -659,9 +695,9 @@ const CustomerDetails = () => {
                 discount: selectedOrder.billDetails.discount,
                 taxRate: 0,
 
-                shopAddress: "Your Shop Address",
-                shopPhone: "Your Shop Phone",
-                shopGSTNumber: "GST Number",
+                shopAddress: 'Your Shop Address',
+                shopPhone: 'Your Shop Phone',
+                shopGSTNumber: 'GST Number',
                 paymentMethod: selectedOrder.transactionDetails.paymentMethod,
                 // notes: "Thank you for your purchase!",
               };

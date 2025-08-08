@@ -238,16 +238,16 @@
 
 // Second
 
-import { Icon } from "@iconify/react/dist/iconify.js";
-import { useCallback, useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import MasterTable from "../../components/shared/MasterTable";
-import { ScrollableModal } from "../../components/shared/ScrollableModal";
-import Header from "../../components/shared/table_heading/Header";
-import { DynamicTab } from "./components/DynamicTab";
-import { PurchaseDetailsCard } from "./components/PurchaseDetailsCard";
-import PurchaseForm from "./components/PurchaseForm";
-import PurchaseReturnForm from "./components/PurchaseReturnForm";
+import { Icon } from '@iconify/react/dist/iconify.js';
+import { useCallback, useMemo, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import MasterTable from '../../components/shared/MasterTable';
+import { ScrollableModal } from '../../components/shared/ScrollableModal';
+import Header from '../../components/shared/table_heading/Header';
+import { DynamicTab } from './components/DynamicTab';
+import { PurchaseDetailsCard } from './components/PurchaseDetailsCard';
+import PurchaseForm from './components/PurchaseForm';
+import PurchaseReturnForm from './components/PurchaseReturnForm';
 import {
   buttonObj,
   ITable,
@@ -255,24 +255,24 @@ import {
   purchaseReturnColumns,
   purchaseTabOption,
   supplierColumns,
-} from "./purchaseObj";
+} from './purchaseObj';
 import {
   IFetchPurchase,
   IFetchPurchaseReturn,
   useDeletePurchaseMutation,
   useGetPurchaseReturnQuery,
   useGetPurchasesQuery,
-} from "../../server/api/purchaseHooks";
-import { get, map } from "lodash";
+} from '../../server/api/purchaseHooks';
+import { get, map } from 'lodash';
 import {
   useDeleteSupplierMutation,
   useGetSupplierQuery,
-} from "../../server/api/supplierHooks";
+} from '../../server/api/supplierHooks';
 // import { IFetchSupplier } from "../../server/api/supplierHooks";
-import { updateSuplierState } from "../../store/supplierStore";
-import { IFetchProduct } from "../../server/api/productHooks";
-import dayjs from "dayjs";
-import { Constants } from "../../utils/constants";
+import { updateSuplierState } from '../../store/supplierStore';
+import { IFetchProduct } from '../../server/api/productHooks';
+import dayjs from 'dayjs';
+import { Constants } from '../../utils/constants';
 
 interface IModalState {
   of: string;
@@ -315,12 +315,12 @@ export interface IFetchSupplier {
 
 const PurchaseIndex = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const validTabs = ["purchase", "supplier", "purchase-return"];
-  const initialTab = validTabs.includes(searchParams.get("tab") || "")
-    ? searchParams.get("tab")!
-    : "purchase";
+  const validTabs = ['purchase', 'supplier', 'purchase-return'];
+  const initialTab = validTabs.includes(searchParams.get('tab') || '')
+    ? searchParams.get('tab')!
+    : 'purchase';
   const [modal, setModal] = useState<IModalState>({
-    of: "",
+    of: '',
     edit: false,
     data: null,
   });
@@ -360,25 +360,41 @@ const PurchaseIndex = () => {
 
         return {
           ...item,
-          date: dayjs(item.createdAt).format("MMM-DD-YYYY"),
-          supplier: get(item, "supplier.name", "-"),
-          billNo: get(item, "billNo", "-"),
+          date: dayjs(item.createdAt).format('MMM-DD-YYYY'),
+          supplier: get(item, 'supplier.name', '-'),
+          billNo: get(item, 'billNo', '-'),
           totalQuantity: totalQuantity,
           totalCost: `${Constants.currency} ${totalCost}`,
         };
       }),
       viewAction(row: IFetchProduct) {
         setModal({
-          of: "purchase-view",
+          of: 'purchase-view',
           edit: false,
           data: row,
         });
       },
       editAction(row: IFetchProduct) {
+        console.log(row, 'row of selected');
+        console.log(purchaseList, 'purhcase');
+        const selectedPurchase = purchaseList?.find(
+          (item) => item._id === row._id
+        );
+
+        const products = selectedPurchase?.products?.map((item: any) => ({
+          product: item?.product?._id,
+          quantity: item?.quantity,
+          price: item?.price,
+          paidAmount: item?.paidAmount,
+          wt: item?.wt,
+          unit: 'gm'  ,
+        }));
+
+        console.log(selectedPurchase, 'selectedPurchase');
         setModal({
-          of: "purchase",
+          of: 'purchase',
           edit: true,
-          data: row,
+          data: selectedPurchase as any,
         });
       },
       onDelete(id: string) {
@@ -386,7 +402,7 @@ const PurchaseIndex = () => {
       },
       returnAction(row: IFetchProduct) {
         setModal({
-          of: "purchase-return-form",
+          of: 'purchase-return-form',
           edit: false,
           data: row,
         });
@@ -400,18 +416,18 @@ const PurchaseIndex = () => {
       columns: supplierColumns,
       rows: map(supplierList || [], (item) => ({
         ...item,
-        contactPerson: item?.contactPerson?.name || "-",
-        contactNo: get(item, "contactPerson.phone", "-"),
+        contactPerson: item?.contactPerson?.name || '-',
+        contactNo: get(item, 'contactPerson.phone', '-'),
         leadTime: item?.updatedAt
-          ? dayjs().diff(dayjs(item.updatedAt), "days")
-          : "-",
+          ? dayjs().diff(dayjs(item.updatedAt), 'days')
+          : '-',
       })),
       viewAction(row: IFetchSupplier) {
         navigate(`/inventory/supplier/${row._id}`);
       },
       editAction(row: IFetchSupplier) {
         updateSuplierState(row);
-        navigate("/inventory/suppliers/edit");
+        navigate('/inventory/suppliers/edit');
       },
       onDelete(id: string) {
         deleteSupplier(id);
@@ -425,17 +441,17 @@ const PurchaseIndex = () => {
       columns: purchaseReturnColumns,
       rows: map(returnList || [], (item) => ({
         ...item,
-        reason: get(item, "reason", "-"),
+        reason: get(item, 'reason', '-'),
         date: item?.createdAt
-          ? dayjs(item.createdAt).format("MMM-DD-YYYY")
-          : "-",
-        totalAmount: get(item, "totalReturnAmount", 0),
-        refundAmount: get(item, "refundAmount", 0),
-        totalQuantityPurchased: get(item, "totalQuantityPurchased", 0),
-        totalQuantityReturned: get(item, "totalQuantityReturned", 0),
+          ? dayjs(item.createdAt).format('MMM-DD-YYYY')
+          : '-',
+        totalAmount: get(item, 'totalReturnAmount', 0),
+        refundAmount: get(item, 'refundAmount', 0),
+        totalQuantityPurchased: get(item, 'totalQuantityPurchased', 0),
+        totalQuantityReturned: get(item, 'totalQuantityReturned', 0),
       })),
       viewAction(row: IFetchPurchaseReturn) {
-        setModal({ of: "purchase-return", data: row, edit: false });
+        setModal({ of: 'purchase-return', data: row, edit: false });
       },
     }),
     [returnList, returnSuccess]
@@ -444,7 +460,7 @@ const PurchaseIndex = () => {
   const tableDataObj: ITable = {
     purchase: purchaseTableData,
     supplier: supplierTableData,
-    "purchase-return": returnTableData,
+    'purchase-return': returnTableData,
   };
 
   const handleTabChange = useCallback(
@@ -456,7 +472,7 @@ const PurchaseIndex = () => {
   );
 
   const closeModal = useCallback(
-    () => setModal({ of: "", edit: false, data: null }),
+    () => setModal({ of: '', edit: false, data: null }),
     []
   );
 
@@ -470,13 +486,14 @@ const PurchaseIndex = () => {
         {buttonObj[selectedTab]?.show && (
           <button
             onClick={() => {
-              if (selectedTab === "purchase") {
-                setModal((prev) => ({ ...prev, of: "purchase" }));
+              if (selectedTab === 'purchase') {
+                setModal((prev) => ({ ...prev, of: 'purchase' }));
               } else {
-                navigate("/inventory/suppliers/add");
+                navigate('/inventory/suppliers/add');
               }
             }}
-            className="px-3 py-2 flex items-center text-white bg-[#d49327] rounded-lg">
+            className="px-3 py-2 flex items-center text-white bg-[#d49327] rounded-lg"
+          >
             <Icon
               icon="material-symbols-light:add-rounded"
               width="24"
@@ -502,7 +519,7 @@ const PurchaseIndex = () => {
           columns={tableDataObj[selectedTab].columns}
         />
       </div>
-      {modal.of === "purchase" && (
+      {modal.of === 'purchase' && (
         <ScrollableModal classname="w-full max-w-xl" onClose={closeModal}>
           <PurchaseForm
             onClose={closeModal}
@@ -511,14 +528,14 @@ const PurchaseIndex = () => {
           />
         </ScrollableModal>
       )}
-      {modal.of === "purchase-view" && modal.data && (
+      {modal.of === 'purchase-view' && modal.data && (
         <ScrollableModal classname="w-full max-w-2xl" onClose={closeModal}>
           <PurchaseDetailsCard
             data={modal.data as IFetchPurchase | IFetchPurchaseReturn}
           />
         </ScrollableModal>
       )}
-      {modal.of === "purchase-return" && modal.data && (
+      {modal.of === 'purchase-return' && modal.data && (
         <ScrollableModal classname="w-full max-w-2xl" onClose={closeModal}>
           <PurchaseDetailsCard
             summary="refund"
@@ -526,7 +543,7 @@ const PurchaseIndex = () => {
           />
         </ScrollableModal>
       )}
-      {modal.of === "purchase-return-form" && modal.data && (
+      {modal.of === 'purchase-return-form' && modal.data && (
         <ScrollableModal classname="w-full max-w-2xl" onClose={closeModal}>
           <PurchaseReturnForm
             data={modal.data as IFetchPurchase}
