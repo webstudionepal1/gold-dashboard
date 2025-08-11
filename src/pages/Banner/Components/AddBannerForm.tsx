@@ -18,10 +18,7 @@ import {
   useGetAllProductSubCategoriesQuery,
 } from '../../../server/api/productHooks';
 import { bannerStore } from './bannerStore';
-import {
-  generateBannerFormDefaultValue,
-  type IBannerFormData,
-} from './bannerobj';
+import { generateBannerFormDefaultValue } from './bannerobj';
 import MultiImageUploader from '../../../components/shared/form_components/FileDropInput';
 import { cleanObject } from '../../../utils/cleanObject';
 
@@ -45,7 +42,6 @@ const AddBannerForm = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('');
 
   const formState = id ?? 'add';
-  const isEditMode = id !== 'add';
 
   const form = useForm({
     defaultValues: generateBannerFormDefaultValue(formState, bannerData),
@@ -130,13 +126,12 @@ const AddBannerForm = () => {
     if (!selectedCategory || !subCategorySuccess) {
       return [];
     }
-
-    // return categories
-    //   ?.filter((item) => item._id === form.state.values.category)
-    //   .map((item) => ({ label: item.name, value: item._id }));
     return categories
       ?.find((item) => item._id === form.state.values.category)
-      ?.subCategory?.map((item) => ({ label: item.name, value: item._id }));
+      ?.subCategory?.map((item) => ({
+        label: item.name ?? '',
+        value: item._id ?? '',
+      }));
   }, [selectedCategory, subCategories, subCategorySuccess]);
 
   const FieldError = ({ field }: { field: any }) => {
