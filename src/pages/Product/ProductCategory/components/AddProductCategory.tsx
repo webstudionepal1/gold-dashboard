@@ -1,15 +1,15 @@
-import { useForm } from "@tanstack/react-form";
-import get from "lodash/get";
-import { useEffect } from "react";
-import { Modal } from "../../../../components/shared";
+import { useForm } from '@tanstack/react-form';
+import get from 'lodash/get';
+import { useEffect } from 'react';
+import { Modal } from '../../../../components/shared';
 import {
   useCreateProductCategoriesMutation,
   useUpdateProductCategoriesMutation,
   IFetchCategory,
-} from "../../../../server/api/productHooks";
-import { z } from "zod";
-import { FieldError } from "../../../auth/LoginPage";
-import MultiImageUploader from "../../../../components/shared/form_components/FileDropInput";
+} from '../../../../server/api/productHooks';
+import { z } from 'zod';
+import { FieldError } from '../../../auth/LoginPage';
+import MultiImageUploader from '../../../../components/shared/form_components/FileDropInput';
 interface propTypes {
   modalRef: React.RefObject<HTMLDivElement | null>;
   editData?: IFetchCategory & { rawDescription?: string; image?: string };
@@ -18,10 +18,10 @@ interface propTypes {
 
 const schema = z
   .object({
-    name: z.string().min(1, "**Name is required"),
+    name: z.string().min(1, '**Name is required'),
     description: z
       .string()
-      .max(500, "**Description must be less than 500 characters")
+      .max(500, '**Description must be less than 500 characters')
       .optional(),
     image: z.instanceof(File).nullable().optional(),
     existingImage: z.string().optional(),
@@ -33,8 +33,8 @@ const schema = z
       return true; // Image is always optional for categories
     },
     {
-      message: "Image is required",
-      path: ["image"],
+      message: 'Image is required',
+      path: ['image'],
     }
   );
 
@@ -45,6 +45,7 @@ interface ICategoryValue {
   existingImage?: string;
 }
 const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
+  console.log(editData, 'editdata');
   const {
     mutate: createCategory,
     isSuccess: createSuccess,
@@ -57,10 +58,14 @@ const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
   } = useUpdateProductCategoriesMutation();
   const form = useForm({
     defaultValues: {
-      name: editData ? get(editData, "name", "") : "",
-      description: editData ? get(editData, "description", "") : "",
+      name: editData ? get(editData, 'name', '') : '',
+      description: editData
+        ? typeof editData?.description === 'object'
+          ? (editData?.description as any)?.props?.children
+          : get(editData, 'description', '')
+        : '',
       image: null,
-      existingImage: editData ? get(editData, "images[0]", "") : "",
+      existingImage: editData ? get(editData, 'images[0]', '') : '',
     } as ICategoryValue,
     validators: {
       onChange: schema,
@@ -71,19 +76,19 @@ const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
     onSubmit: async ({ value }) => {
       // Always use FormData for consistency with backend expectations
       const formData = new FormData();
-      formData.append("name", value.name);
+      formData.append('name', value.name);
       if (value.description) {
-        formData.append("description", value.description);
+        formData.append('description', value.description);
       }
 
       // Handle new image upload
       if (value.image) {
-        formData.append("images", value.image);
+        formData.append('images', value.image);
       }
 
       // Handle existing image in edit mode (only if not removed)
       if (editData && value.existingImage) {
-        formData.append("existingImages", value.existingImage);
+        formData.append('existingImages', value.existingImage);
       }
 
       if (editData) {
@@ -107,15 +112,17 @@ const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
         onSubmit={(e) => {
           e.preventDefault();
           form.handleSubmit();
-        }}>
+        }}
+      >
         <h2 className="mb-4 text-lg font-semibold">
-          {editData ? "Edit Category" : "Add New Category"}
+          {editData ? 'Edit Category' : 'Add New Category'}
         </h2>
         <div className="space-y-4">
           <div>
             <label
               htmlFor="category"
-              className="block mb-1 text-sm font-medium text-gray-700">
+              className="block mb-1 text-sm font-medium text-gray-700"
+            >
               Name
             </label>
             <form.Field name="name">
@@ -153,9 +160,10 @@ const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
                   <span
                     className={`text-xs ${
                       (field.state.value?.length || 0) > 450
-                        ? "text-red-500"
-                        : "text-gray-500"
-                    }`}>
+                        ? 'text-red-500'
+                        : 'text-gray-500'
+                    }`}
+                  >
                     {field.state.value?.length || 0}/500
                   </span>
                 </div>
@@ -179,13 +187,13 @@ const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
                     field.handleChange(file);
                     // When a new image is selected, clear the existing image
                     if (file) {
-                      form.setFieldValue("existingImage", undefined);
+                      form.setFieldValue('existingImage', undefined);
                     }
                   }}
-                  existingFile={form.getFieldValue("existingImage")}
+                  existingFile={form.getFieldValue('existingImage')}
                   existingFileField="existingImage"
                   accept={{
-                    "image/*": [".png", ".jpg", ".jpeg", ".svg", ".webp"],
+                    'image/*': ['.png', '.jpg', '.jpeg', '.svg', '.webp'],
                   }}
                   placeholder="Upload image (optional)"
                 />
@@ -199,7 +207,7 @@ const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
             {(field) => (
               <input
                 type="hidden"
-                value={field.state.value || ""}
+                value={field.state.value || ''}
                 onChange={(e) => field.handleChange(e.target.value)}
               />
             )}
@@ -210,39 +218,44 @@ const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
             type="button"
             onClick={closeModal}
             disabled={createPending || updatePending}
-            className="px-3 py-2 text-sm font-medium text-gray-700 transition-colors duration-200 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex-1">
+            className="px-3 py-2 text-sm font-medium text-gray-700 transition-colors duration-200 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex-1"
+          >
             Cancel
           </button>
           <button
             type="submit"
             disabled={createPending || updatePending}
-            className="px-3 py-2 bg-[#DF8D28] hover:bg-[#DF8D28]/90 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-md text-sm font-medium transition-colors duration-200 flex-1 flex items-center justify-center gap-2">
+            className="px-3 py-2 bg-[#DF8D28] hover:bg-[#DF8D28]/90 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-md text-sm font-medium transition-colors duration-200 flex-1 flex items-center justify-center gap-2"
+          >
             {(createPending || updatePending) && (
               <svg
                 className="animate-spin h-4 w-4 text-white"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
-                viewBox="0 0 24 24">
+                viewBox="0 0 24 24"
+              >
                 <circle
                   className="opacity-25"
                   cx="12"
                   cy="12"
                   r="10"
                   stroke="currentColor"
-                  strokeWidth="4"></circle>
+                  strokeWidth="4"
+                ></circle>
                 <path
                   className="opacity-75"
                   fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
               </svg>
             )}
             {createPending
-              ? "Creating..."
+              ? 'Creating...'
               : updatePending
-              ? "Updating..."
+              ? 'Updating...'
               : editData
-              ? "Update"
-              : "Add"}
+              ? 'Update'
+              : 'Add'}
           </button>
         </div>
       </form>

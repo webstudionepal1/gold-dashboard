@@ -1,5 +1,5 @@
 import { useForm } from '@tanstack/react-form';
-import { AnyActionArg, useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import Breadcrumbs from '../../../components/shared/Breadcrumb';
 import { DropdownField } from '../../../components/shared/form_components/Dropdown';
 import MultiImageUploader from '../../../components/shared/form_components/FileDropInput';
@@ -41,7 +41,7 @@ const defaultValues = {
 };
 
 const EditProfileForm = () => {
-  const { data, isLoading, isSuccess } = useGetCompanyDetailsQuery();
+  const { data, isSuccess } = useGetCompanyDetailsQuery();
   const { mutate: updateProfile, isPending } =
     useUpdateCompanyDetailsMutation();
 

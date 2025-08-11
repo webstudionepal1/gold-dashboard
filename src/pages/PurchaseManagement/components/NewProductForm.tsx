@@ -403,8 +403,6 @@ const NewProductForm = ({
     }));
   };
 
-  console.log(form.state.values, 'form stat');
-
   return (
     <div>
       <form
