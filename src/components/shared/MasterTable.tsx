@@ -493,7 +493,7 @@ const MasterTable: React.FC<MasterTableProps> = ({
                       </td>
                     ))}
                     {showAction && (
-                      <td className="px-2 py-2 text-sm">
+                      <td className="px-2 py-2 text-sm flex  justify-center">
                         <TableAction
                           row={row}
                           viewAction={viewAction}
