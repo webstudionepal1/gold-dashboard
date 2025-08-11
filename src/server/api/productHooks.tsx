@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../utils/ApiGateway";
+import capitalize from "lodash/capitalize";
 import { toast } from "react-toastify";
 export interface IParams {
   [key: string]: string;
@@ -195,14 +196,7 @@ export const useCreateProductsMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
     onError(err: any) {
-      // toast.error(err || "Error creating products");
-      console.log("string", err);
-      toast.error(
-        err?.response?.data?.message ||
-          err?.message ||
-          err?.data?.message ||
-          "Error Creating product"
-      );
+      toast.error(capitalize(err || 'Error Creating Product'));
     },
   });
 };
