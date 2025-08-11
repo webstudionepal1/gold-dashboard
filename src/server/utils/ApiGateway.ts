@@ -55,11 +55,12 @@ apiClient.interceptors.response.use(
   (error) => {
     // console.log("error", error);
     // Handle unauthorized access
+    console.log('error', error)
     if (error.response?.status === 401) {
       console.log(error);
       localStorage.clear();
-      const redirectPath = encodeURIComponent(window.location.pathname);
-      window.location.href = `/auth-login?redirect=${redirectPath}`;
+      // const redirectPath = encodeURIComponent(window.location.pathname);
+      // window.location.href = `/login`;
     }
 
     // If request was canceled, do not show error

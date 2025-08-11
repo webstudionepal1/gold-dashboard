@@ -35,27 +35,27 @@ export const SidebarConfig = {
               title: "Product Sub Category",
               icon: "",
             },
-            {
-              id: 23,
-              path: FrontendRoutes.PRODUCTOCCASION,
-              title: "Product Occasion",
-              icon: "",
-            },
-            {
-              id: 24,
-              path: FrontendRoutes.STONE,
-              title: "Stone Management",
-              icon: "",
-            },
+            // {
+            //   id: 23,
+            //   path: FrontendRoutes.PRODUCTOCCASION,
+            //   title: "Product Occasion",
+            //   icon: "",
+            // },
+            // {
+            //   id: 24,
+            //   path: FrontendRoutes.STONE,
+            //   title: "Stone Management",
+            //   icon: "",
+            // },
           ],
         },
-        {
-          id: 25,
-          path: FrontendRoutes.COLLECTION,
-          title: "Collections",
-          // icon: "material-symbols:collections",
-          icon: "bi:collection",
-        },
+        // {
+        //   id: 25,
+        //   path: FrontendRoutes.COLLECTION,
+        //   title: "Collections",
+        //   // icon: "material-symbols:collections",
+        //   icon: "bi:collection",
+        // },
         {
           id: 3,
           path: "#",
@@ -97,98 +97,98 @@ export const SidebarConfig = {
           title: "Customer",
           icon: "line-md:account-small",
         },
-        {
-          id: 5,
-          path: "#",
-          title: "Inventory",
-          icon: "mingcute:inventory-line",
-          children: [
-            {
-              id: 50,
-              path: FrontendRoutes.INVENTORY,
-              title: "Inventory Overview",
-            },
-            {
-              id: 51,
-              path: FrontendRoutes.PURCHASE,
-              title: "Purchase Management",
-              icon: "",
-            },
-          ],
-        },
+        // {
+        //   id: 5,
+        //   path: "#",
+        //   title: "Inventory",
+        //   icon: "mingcute:inventory-line",
+        //   children: [
+        //     {
+        //       id: 50,
+        //       path: FrontendRoutes.INVENTORY,
+        //       title: "Inventory Overview",
+        //     },
+        //     {
+        //       id: 51,
+        //       path: FrontendRoutes.PURCHASE,
+        //       title: "Purchase Management",
+        //       icon: "",
+        //     },
+        //   ],
+        // },
         // {
         //   id: 6,
         //   path: FrontendRoutes.ATTRIBUTES,
         //   title: "Attributes",
         //   icon: "game-icons:gear-stick-pattern",
         // },
-        {
-          id: 18,
-          path: FrontendRoutes.TRANSACTION,
-          title: "Transaction",
-          icon: "hugeicons:bitcoin-transaction",
-          children: [
-            // {
-            //   id: 60,
-            //   path: FrontendRoutes.TRANSACTION,
-            //   title: "Transaction",
-            // },
-            // {
-            //   id: 61,
-            //   path: FrontendRoutes.VERIFY_CASH,
-            //   title: "Verify Cash Payment",
-            //   icon: "",
-            // },
-          ],
-        },
-        {
-          id: 7,
-          path: "#",
-          title: "Finance and Expenses",
-          icon: "fluent:wallet-credit-card-24-regular",
-          children: [
-            {
-              id: 70,
-              path: FrontendRoutes.EXPENSE,
-              title: "Expenses",
-            },
-            {
-              id: 71,
-              path: FrontendRoutes.CASHFLOW,
-              title: "Cash Flow",
-              icon: "",
-            },
-            {
-              id: 72,
-              path: FrontendRoutes.PROFIT_LOSS,
-              title: "Profit & Loss",
-              icon: "",
-            },
-          ],
-        },
-        {
-          id: 8,
-          path: "#",
-          title: "Analytics",
-          icon: "ic:sharp-query-stats",
-          children: [
-            {
-              id: 70,
-              path: FrontendRoutes.ORDER_REPORT,
-              title: "Order Report",
-            },
-            {
-              id: 71,
-              path: FrontendRoutes.SALES_REPORT,
-              title: "Sales Report",
-            },
-            {
-              id: 72,
-              path: FrontendRoutes.STOCK_REPORT,
-              title: "Stock Report",
-            },
-          ],
-        },
+        // {
+        //   id: 18,
+        //   path: FrontendRoutes.TRANSACTION,
+        //   title: "Transaction",
+        //   icon: "hugeicons:bitcoin-transaction",
+        //   children: [
+        //     // {
+        //     //   id: 60,
+        //     //   path: FrontendRoutes.TRANSACTION,
+        //     //   title: "Transaction",
+        //     // },
+        //     // {
+        //     //   id: 61,
+        //     //   path: FrontendRoutes.VERIFY_CASH,
+        //     //   title: "Verify Cash Payment",
+        //     //   icon: "",
+        //     // },
+        //   ],
+        // },
+        // {
+        //   id: 7,
+        //   path: "#",
+        //   title: "Finance and Expenses",
+        //   icon: "fluent:wallet-credit-card-24-regular",
+        //   children: [
+        //     {
+        //       id: 70,
+        //       path: FrontendRoutes.EXPENSE,
+        //       title: "Expenses",
+        //     },
+        //     {
+        //       id: 71,
+        //       path: FrontendRoutes.CASHFLOW,
+        //       title: "Cash Flow",
+        //       icon: "",
+        //     },
+        //     {
+        //       id: 72,
+        //       path: FrontendRoutes.PROFIT_LOSS,
+        //       title: "Profit & Loss",
+        //       icon: "",
+        //     },
+        //   ],
+        // },
+        // {
+        //   id: 8,
+        //   path: "#",
+        //   title: "Analytics",
+        //   icon: "ic:sharp-query-stats",
+        //   children: [
+        //     {
+        //       id: 70,
+        //       path: FrontendRoutes.ORDER_REPORT,
+        //       title: "Order Report",
+        //     },
+        //     {
+        //       id: 71,
+        //       path: FrontendRoutes.SALES_REPORT,
+        //       title: "Sales Report",
+        //     },
+        //     {
+        //       id: 72,
+        //       path: FrontendRoutes.STOCK_REPORT,
+        //       title: "Stock Report",
+        //     },
+        //   ],
+        // },
 
         {
           id: 13,
@@ -201,11 +201,11 @@ export const SidebarConfig = {
               path: "/settings/profile-config",
               title: "Profile config",
             },
-            {
-              id: 108,
-              path: "/settings/attribute-config",
-              title: "Attribute config",
-            },
+            // {
+            //   id: 108,
+            //   path: "/settings/attribute-config",
+            //   title: "Attribute config",
+            // },
             {
               id:109,
               path: "/settings/calculator",
