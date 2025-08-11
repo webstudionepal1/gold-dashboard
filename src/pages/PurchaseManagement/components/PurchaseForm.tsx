@@ -1,4 +1,3 @@
-import React from 'react';
 import NewProductForm from './NewProductForm';
 import { IFetchPurchase } from '../../../server/api/purchaseHooks';
 
