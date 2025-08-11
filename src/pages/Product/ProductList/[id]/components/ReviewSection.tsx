@@ -288,7 +288,6 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = memo(({
             <div className="text-center py-12">
               <Icon icon="mdi:comment-text-outline" className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <h4 className="text-lg font-medium text-gray-500 mb-2">No Reviews Yet</h4>
-              <p className="text-sm text-gray-400">Be the first to review this product!</p>
             </div>
           )}
         </div>

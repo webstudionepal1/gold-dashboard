@@ -9,7 +9,7 @@ interface DashBottomProps {
 
 const DashBottom = ({ dashboardData }: DashBottomProps) => {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div className="space-y-4">
       {/* Enhanced Recent Transactions */}
       <div className="lg:col-span-2 bg-white rounded-2xl shadow-lg border border-slate-200/60 overflow-hidden">
         <div className="px-6 py-4 bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200">
@@ -69,7 +69,7 @@ const DashBottom = ({ dashboardData }: DashBottomProps) => {
                     <td className="px-6 py-4 text-sm text-slate-600">{transaction.orderDate}</td>
                     <td className="px-6 py-4 text-right">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        ${transaction.totalAmount.toFixed(2)}
+                        Rs {transaction.totalAmount.toFixed(2)}
                       </span>
                     </td>
                   </tr>
@@ -136,7 +136,7 @@ const DashBottom = ({ dashboardData }: DashBottomProps) => {
                         defaultChecked={item.id === 3 || item.id === 4}
                       />
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="py-4">
                       <div className="flex items-center space-x-3">
                         <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-red-400 to-red-600 rounded-lg flex items-center justify-center">
                           <Icon icon="material-symbols:warning" className="w-4 h-4 text-white" />

@@ -27,7 +27,7 @@ const ProductDescription: React.FC = () => {
   return (
     <div>
       <Header text="Product Description" />
-      <div className="space-y-6 overflow-y-auto">
+      <div className="grid lg:grid-cols-3 gap-4 overflow-y-auto">
         {/* Product Image - Smaller and at the top */}
         <div className="flex justify-center">
           <div className="w-full max-w-md">

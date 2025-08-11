@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Icon } from '@iconify/react/dist/iconify.js';
-import { VariantRows, ExpandableRowToggle } from './VariantDropdown';
+import React, { useState } from "react";
+import { Icon } from "@iconify/react/dist/iconify.js";
+import { VariantRows, ExpandableRowToggle } from "./VariantDropdown";
 
 interface ProductVariant {
   _id?: string;
@@ -23,7 +23,7 @@ interface InventoryItem {
   usedStock: number;
   unit: string;
   reorder_point: number;
-  status: 'On Stock' | 'Low Stock' | 'Out of Stock';
+  status: "On Stock" | "Low Stock" | "Out of Stock";
   image?: string;
   category?: string;
   subCategory?: string;
@@ -46,14 +46,14 @@ interface ExpandableInventoryTableProps {
 
 const getStatusColor = (status: string) => {
   switch (status) {
-    case 'On Stock':
-      return 'bg-green text-white';
-    case 'Low Stock':
-      return 'bg-yellow text-white';
-    case 'Out of Stock':
-      return 'bg-red text-white';
+    case "On Stock":
+      return "bg-green text-white";
+    case "Low Stock":
+      return "bg-yellow text-white";
+    case "Out of Stock":
+      return "bg-red text-white";
     default:
-      return 'bg-gray-100 text-gray-800';
+      return "bg-gray-100 text-gray-800";
   }
 };
 
@@ -73,7 +73,7 @@ export const ExpandableInventoryTable: React.FC<
   };
 
   const renderCell = (column: Column, item: InventoryItem): React.ReactNode => {
-    if (column.key === 'name') {
+    if (column.key === "name") {
       return (
         <div className="flex items-center gap-2">
           <span className="font-medium">{item.name}</span>
@@ -85,8 +85,8 @@ export const ExpandableInventoryTable: React.FC<
               <Icon
                 icon={
                   expandedRows.has(item._id)
-                    ? 'material-symbols:expand-less'
-                    : 'material-symbols:expand-more'
+                    ? "material-symbols:expand-less"
+                    : "material-symbols:expand-more"
                 }
                 className="w-4 h-4 text-gray-500 ml-auto"
               />
@@ -96,18 +96,18 @@ export const ExpandableInventoryTable: React.FC<
       );
     }
 
-    if (column.key === 'price' && item.variants && item.variants.length > 1) {
+    if (column.key === "price" && item.variants && item.variants.length > 1) {
       const prices = item.variants
         .map((v: any) => v.price || 0)
         .filter((p: number) => p > 0);
       const minPrice = Math.min(...prices);
       const maxPrice = Math.max(...prices);
       return minPrice === maxPrice
-        ? `₹${minPrice}`
-        : `₹${minPrice} - ₹${maxPrice}`;
+        ? `Rs ${minPrice}`
+        : `Rs ${minPrice} - Rs${maxPrice}`;
     }
 
-    if (column.key === 'status') {
+    if (column.key === "status") {
       return (
         <span
           className={`px-2 py-1 text-xs rounded-full ${getStatusColor(
@@ -124,7 +124,7 @@ export const ExpandableInventoryTable: React.FC<
     }
 
     const value = item[column.key as keyof InventoryItem];
-    return value !== undefined && value !== null ? String(value) : '—';
+    return value !== undefined && value !== null ? String(value) : "—";
   };
 
   if (loading) {
@@ -167,8 +167,8 @@ export const ExpandableInventoryTable: React.FC<
                 <tr
                   className={`hover:bg-gray-50 transition-colors ${
                     item.variants && item.variants.length > 1
-                      ? 'cursor-pointer select-none'
-                      : ''
+                      ? "cursor-pointer select-none"
+                      : ""
                   }`}
                   onClick={() => {
                     if (item.variants && item.variants.length > 1) {

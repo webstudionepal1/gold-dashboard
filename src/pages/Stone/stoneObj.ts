@@ -16,11 +16,11 @@ export const stoneColumns = [
     key: "carat",
   },
   {
-    title: "Price Per Carat",
+    title: "Price Per Carat (Rs)",
     key: "pricePerCarat",
   },
   {
-    title: "Total Price",
+    title: "Total Price (Rs)",
     key: "totalPrice",
   },
   {

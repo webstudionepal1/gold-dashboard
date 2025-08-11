@@ -266,21 +266,8 @@ const InventoryIndex = () => {
 
   if (error) return <div>Error loading inventory</div>;
   return (
-    <div className="container mx-auto px-4 py-3">
-      <Header text="Inventory">
-        {/* <Link
-          to="/product/add"
-          className="px-3 py-2 flex items-center text-white bg-[#d49327] transition-transform duration-200 ease-in-out hover:scale-105 rounded-lg"
-        >
-          <Icon
-            icon="material-symbols-light:add-rounded"
-            width="24"
-            height="24"
-            className="fill-white"
-          />
-          New Product
-        </Link> */}
-      </Header>
+    <div className="container mx-auto md:px-0 px-2 py-3">
+      <Header text="Inventory" />
 
       <div className="bg-white border-[#dcdddf] pb-4 border rounded-xl">
         <div className="mx-2">

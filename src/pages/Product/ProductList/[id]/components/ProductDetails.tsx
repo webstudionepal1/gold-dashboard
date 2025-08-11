@@ -40,7 +40,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 col-span-2">
       {/* Compact Header Section */}
       <div className="bg-gradient-to-r from-white to-gray-50 border border-gray-200 rounded-lg p-4 shadow-sm">
         <div className="flex items-start justify-between mb-2">

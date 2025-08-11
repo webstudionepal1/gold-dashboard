@@ -85,7 +85,7 @@ export const DropdownField = React.forwardRef<
         {label && (
           <label className="flex gap-1 text-nowrap">
             <span className="text-sm font-medium text-gray-700">{label}</span>
-            {required && <span className="text-red-500">*</span>}
+            {required && <span className="text-red">*</span>}
           </label>
         )}
 

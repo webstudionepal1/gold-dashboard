@@ -127,11 +127,11 @@ export const ProductInventoryStatusPage: React.FC = () => {
                 <p>
                   <strong>Price Range:</strong>{" "}
                   {priceRange.min === priceRange.max
-                    ? `$${priceRange.min}`
-                    : `$${priceRange.min} - $${priceRange.max}`}
+                    ? `Rs ${priceRange.min}`
+                    : `Rs ${priceRange.min} - Rs ${priceRange.max}`}
                 </p>
                 <p>
-                  <strong>Making Charges:</strong> ${formData.makingCharges}
+                  <strong>Making Charges:</strong> Rs {formData.makingCharges}
                 </p>
               </div>
             </div>
@@ -242,7 +242,7 @@ export const ProductInventoryStatusPage: React.FC = () => {
                 <p>
                   <strong>Compare Price:</strong>{" "}
                   {formData.metadata?.compareAtPrice
-                    ? `$${formData.metadata.compareAtPrice}`
+                    ? `Rs ${formData.metadata.compareAtPrice}`
                     : "Not set"}
                 </p>
                 <p>

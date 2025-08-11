@@ -49,7 +49,7 @@ const DashTopLeft = ({ dashboardData }: DashTopLeftProps) => {
         y: {
           beginAtZero: true,
           ticks: {
-            callback: (value: string | number) => `$${value}`,
+            callback: (value: string | number) => `Rs ${value}`,
             color: "#A3A3A3",
             font: {
               size: 12,
@@ -97,7 +97,7 @@ const DashTopLeft = ({ dashboardData }: DashTopLeftProps) => {
             <div>
               <p className="text-sm font-medium text-slate-600">Total Revenue</p>
               <p className="text-xl font-bold text-slate-900">
-                ${dashboardData.salesMetrics?.totalRevenue?.toLocaleString() || '0'}
+                Rs {dashboardData.salesMetrics?.totalRevenue?.toLocaleString() || '0'}
               </p>
             </div>
           </div>
@@ -125,7 +125,7 @@ const DashTopLeft = ({ dashboardData }: DashTopLeftProps) => {
             <div>
               <p className="text-sm font-medium text-slate-600">Avg Order Value</p>
               <p className="text-xl font-bold text-slate-900">
-                ${dashboardData.salesMetrics?.averageOrderValue?.toFixed(2) || '0.00'}
+                Rs {dashboardData.salesMetrics?.averageOrderValue?.toFixed(2) || '0.00'}
               </p>
             </div>
           </div>

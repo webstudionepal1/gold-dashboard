@@ -5,7 +5,7 @@ export const DashboardPage = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
             {/* Enhanced Header */}
-            <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-slate-200/60 shadow-sm">
+            <div className="sticky top-0 z-[999] bg-white/80 backdrop-blur-md border-b border-slate-200/60 shadow-sm">
                 <div className="px-6 py-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
@@ -33,7 +33,7 @@ export const DashboardPage = () => {
             </div>
 
             {/* Main Content */}
-            <div className="px-6 py-6">
+            <div className="sm:px-0 px-2 py-4">
                 <DashboardComp />
             </div>
         </div>

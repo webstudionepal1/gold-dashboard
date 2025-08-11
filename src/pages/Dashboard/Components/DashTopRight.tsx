@@ -184,7 +184,7 @@ const DashTopRight = ({ dashboardData }: DashTopRightProps) => {
   }));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Enhanced Price List Section */}
       <div className="bg-white rounded-2xl shadow-lg border border-slate-200/60 overflow-hidden">
         <div className="px-6 py-4 bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200">

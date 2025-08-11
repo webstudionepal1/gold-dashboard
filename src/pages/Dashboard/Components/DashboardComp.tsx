@@ -64,22 +64,22 @@ const DashboardComp = () => {
     : emptyData;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Top Section - Main Content Grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
         {/* Left Column - Takes 2/3 on xl screens */}
         <div className="xl:col-span-2 space-y-6">
           <DashTopLeft dashboardData={combinedData} />
+          <DashBottom dashboardData={combinedData} />
         </div>
 
         {/* Right Column - Takes 1/3 on xl screens */}
-        <div className="xl:col-span-1 space-y-6">
+        <div className="xl:col-span-1 space-y-4">
           <DashTopRight dashboardData={combinedData} />
         </div>
       </div>
 
       {/* Bottom Section */}
-      <DashBottom dashboardData={combinedData} />
     </div>
   );
 };

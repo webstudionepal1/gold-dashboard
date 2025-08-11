@@ -83,27 +83,6 @@ export const AddProductSubCategory = ({
         </h2>
         <div className="space-y-6">
           <div>
-            {/* <label
-              htmlFor="name"
-              className="block mb-1 text-sm font-medium text-gray-700"
-            >
-              Name
-            </label> */}
-            {/* <form.Field name="name">
-              {(field) => (
-                <div>
-                  <input
-                    id="sub-category"
-                    type="text"
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    className={`border border-gray-300 bg-[#f6f7f9] rounded-md p-2 w-full focus:ring-2 `}
-                    placeholder="Enter subcategory name"
-                  />
-                  <FieldError field={field} />
-                </div>
-              )}
-            </form.Field> */}
 
             <form.Field name="name">
               {(field) => (
@@ -111,16 +90,11 @@ export const AddProductSubCategory = ({
                   <InputField
                     label="Name"
                     required
-                    placeholder="Enter product name"
+                    placeholder="Enter Subcategory Name"
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
                   />
                   <FieldError field={field} />
-                  {/* {getFieldError("name").length > 0 && (
-                    <div className="text-red-500 text-sm mt-1">
-                      {getFieldError("name").join(", ")}
-                    </div>
-                  )} */}
                 </div>
               )}
             </form.Field>
@@ -131,7 +105,7 @@ export const AddProductSubCategory = ({
                 <DropdownField
                   label="Category"
                   required
-                  firstInput="Select Category"
+                  firstInput="Select Parent Category"
                   options={categoriesList}
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
@@ -145,7 +119,7 @@ export const AddProductSubCategory = ({
               <div>
                 <div className="flex flex-col">
                   <label className="mb-1 text-sm font-medium text-gray-700">
-                    Description <span className="text-red">*</span>
+                    Description 
                   </label>
                   <textarea
                     placeholder="Enter short description"

@@ -7,6 +7,7 @@ interface ProductImageProps {
 }
 
 export const ProductImage: React.FC<ProductImageProps> = ({ images }) => {
+  console.log('images', images)
   const [selectedImage, setSelectedImage] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
   const [isLoading, setIsLoading] = useState(true);

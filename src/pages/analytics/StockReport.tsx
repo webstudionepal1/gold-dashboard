@@ -523,10 +523,8 @@ const StoreReport = () => {
   );
 
   return (
-    <div className="container px-4 py-3 mx-auto">
-      <div className="mb-6">
-        <Header text="Stock Report" />
-      </div>
+    <div className="container px-2 md:px-0 py-3 mx-auto">
+      <Header text="Stock Report" />
 
       <div className="bg-white rounded-lg shadow-sm">
         <MasterTable
@@ -554,7 +552,6 @@ const StoreReport = () => {
           }
           rows={tableDataObj[selectedTab].rows || []}
           columns={tableDataObj[selectedTab].columns}
-          canSelect
         />
       </div>
     </div>

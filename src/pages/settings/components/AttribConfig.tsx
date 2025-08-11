@@ -66,14 +66,14 @@ const AttribConfig = () => {
                     item.images[0]
                   }`}
                   alt="hello"
-                  className="size-8"
+                  className="size-8 mx-auto"
                 />
               )
             ) : (
               <img
                 src={"/public/no-image.png"}
                 alt="no-imgage"
-                className="size-8"
+                className="size-8 mx-auto"
               />
             )}
           </div>

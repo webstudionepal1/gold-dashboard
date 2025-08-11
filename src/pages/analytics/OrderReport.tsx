@@ -4,7 +4,9 @@ import MasterTable from "../../components/shared/MasterTable";
 import Header from "../../components/shared/table_heading/Header";
 import { DynamicTab } from "../PurchaseManagement/components/DynamicTab";
 import { orderReportTabOption, type ITable } from "../analytics/OrderReportObj";
-import { map } from "lodash";
+import map from 'lodash/map'
+import capitalize from 'lodash/capitalize'
+
 import type { IFetchExpenses } from "../../server/api/expensesHook";
 import { SearchFilterSort } from "../../components/global/SearchFilterSort";
 import {
@@ -359,6 +361,7 @@ const OrderReport = () => {
       ],
       rows: map(statusDataFiltered, (item) => ({
         ...item,
+        status:capitalize(item.status),
         formattedPercentage: `${item.percentage} %`,
       })),
     }),
@@ -416,10 +419,8 @@ const OrderReport = () => {
   );
 
   return (
-    <div className="container px-4 py-3 mx-auto">
-      <div className="mb-6">
+    <div className="container px-2 md:px-0 py-3 mx-auto">
         <Header text="Order Report" />
-      </div>
 
       {(selectedTab === "topOrderProducts" ||
         selectedTab === "orderCategory") && (
@@ -456,6 +457,7 @@ const OrderReport = () => {
           loading={
             orderStatusLoading || topOrderLoading || orderCategoryLoading
           }
+          
           tabsOptions={
             <DynamicTab
               selectedTab={selectedTab}
@@ -478,7 +480,6 @@ const OrderReport = () => {
           }
           rows={tableDataObj[selectedTab].rows || []}
           columns={tableDataObj[selectedTab].columns}
-          canSelect
         />
       </div>
     </div>

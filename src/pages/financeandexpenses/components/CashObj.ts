@@ -53,7 +53,7 @@ export const cashFlowColumns = [
   },
   {
     key: "total",
-    title: "Balance",
+    title: "Balance (Rs)",
   },
 ];
 

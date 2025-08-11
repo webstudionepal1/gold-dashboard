@@ -488,7 +488,7 @@ const SalesReport = () => {
         { key: "category", title: "Category" },
         { key: "subCategory", title: "Sub Category" },
         { key: "product", title: "Products" },
-        { key: "totalRevenue", title: "Revenue" },
+        { key: "totalRevenue", title: "Revenue (Rs)" },
       ],
       rows: map(productWiseDataFiltered, (item) => {
         const row = {
@@ -508,7 +508,7 @@ const SalesReport = () => {
       columns: [
         { key: "category", title: "Category" },
         { key: "totalOrders", title: "Total Orders" },
-        { key: "totalRevenue", title: "Revenue" },
+        { key: "totalRevenue", title: "Revenue (Rs)" },
         { key: "percentageSharee", title: "Percentage Share" },
       ],
       rows: map(categoryWiseDataFiltered, (item) => {
@@ -529,7 +529,7 @@ const SalesReport = () => {
       columns: [
         { key: "subCategory", title: "Sub Category" },
         { key: "totalOrders", title: "Total Orders" },
-        { key: "totalRevenue", title: "Revenue" },
+        { key: "totalRevenue", title: "Revenue (Rs)" },
         { key: "percentageSharee", title: "Percentage Share" },
       ],
       rows: map(subCategoryWiseDataFiltered, (item) => {
@@ -562,10 +562,8 @@ const SalesReport = () => {
   );
 
   return (
-    <div className="container px-4 py-3 mx-auto">
-      <div className="mb-6">
+    <div className="container px-2 md:px-0 py-3 mx-auto">
         <Header text="Sales Report" />
-      </div>
 
       <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -624,7 +622,6 @@ const SalesReport = () => {
           }
           rows={tableDataObj[selectedTab].rows || []}
           columns={tableDataObj[selectedTab].columns}
-          canSelect
         />
       </div>
     </div>
