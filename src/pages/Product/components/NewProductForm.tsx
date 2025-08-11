@@ -75,9 +75,9 @@ const NewProductForm: React.FC = () => {
       // Stones and Occasions
       stones: [],
       occasions: [],
-
+      existingImages: product.images || [],
       // Media
-      images: product.images || [],
+      images: [],
 
       // SEO & Marketing
       tags: product.tags || [],

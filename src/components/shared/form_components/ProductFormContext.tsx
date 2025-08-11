@@ -31,6 +31,7 @@ export interface ProductFormData {
   description: string;
   category: string;
   subCategory: string;
+  existingImages?: string[];
 
   // Page 2: Product Specifications
   length: number;

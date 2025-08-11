@@ -5,6 +5,7 @@ import { useProductForm } from "../ProductFormContext";
 export const ProductMediaPage: React.FC = () => {
   const { formData, updateFormData, updateValidation, validationState } =
     useProductForm();
+  console.log("formDataaaaaaaaaaaaaaaaaaaaaaaaaaaa", formData);
 
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [dragActive, setDragActive] = useState(false);
@@ -130,7 +131,8 @@ export const ProductMediaPage: React.FC = () => {
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
             onDragOver={handleDrag}
-            onDrop={handleDrop}>
+            onDrop={handleDrop}
+          >
             <input
               type="file"
               multiple
@@ -146,7 +148,8 @@ export const ProductMediaPage: React.FC = () => {
                 selectedImages.length >= 10
                   ? "cursor-not-allowed opacity-50"
                   : ""
-              }`}>
+              }`}
+            >
               <div className="flex flex-col items-center gap-3">
                 <Icon
                   icon="material-symbols:add-photo-alternate"
@@ -172,7 +175,7 @@ export const ProductMediaPage: React.FC = () => {
           </div>
 
           {/* Image Preview Grid */}
-          {selectedImages.length > 0 && (
+          {selectedImages.length > 0 ? (
             <div className="mt-6">
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {selectedImages.map((file, index) => (
@@ -199,7 +202,8 @@ export const ProductMediaPage: React.FC = () => {
                             <button
                               type="button"
                               onClick={() => moveImage(index, index - 1)}
-                              className="bg-white text-gray-700 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors">
+                              className="bg-white text-gray-700 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors"
+                            >
                               <Icon
                                 icon="material-symbols:chevron-left"
                                 className="w-4 h-4"
@@ -212,7 +216,8 @@ export const ProductMediaPage: React.FC = () => {
                             <button
                               type="button"
                               onClick={() => moveImage(index, index + 1)}
-                              className="bg-white text-gray-700 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors">
+                              className="bg-white text-gray-700 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors"
+                            >
                               <Icon
                                 icon="material-symbols:chevron-right"
                                 className="w-4 h-4"
@@ -224,7 +229,8 @@ export const ProductMediaPage: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => removeImage(index)}
-                            className="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors">
+                            className="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors"
+                          >
                             <Icon
                               icon="material-symbols:close"
                               className="w-4 h-4"
@@ -256,13 +262,30 @@ export const ProductMediaPage: React.FC = () => {
                 </p>
               </div>
             </div>
+          ) : (
+              <div className="grid grid-cols-2 mt-6 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {formData.existingImages?.map((file, index) => (
+                  <div key={index} className="relative group">
+                    <div className="relative aspect-square">
+                      <img
+                        src={import.meta.env.VITE_API_IMAGE_BASE_URL.toString().concat(
+                          file
+                        )}
+                        alt={`Product ${index + 1}`}
+                        className="w-full h-full object-cover rounded-lg border border-gray-200"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
           )}
 
           {/* Validation Errors */}
           {validationState.images?.errors.map((error, index) => (
             <div
               key={index}
-              className="mt-4 p-3 bg-red-50 rounded-lg border border-red-200">
+              className="mt-4 p-3 bg-red-50 rounded-lg border border-red-200"
+            >
               <p className="text-red-600 text-sm flex items-center gap-2">
                 <Icon icon="material-symbols:error" className="w-4 h-4" />
                 {error}
