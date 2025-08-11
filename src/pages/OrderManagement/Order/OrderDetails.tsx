@@ -23,6 +23,7 @@ import {
 import { Constants } from "../../../utils/constants";
 import { CancelOrderModal } from "../../../components/shared/modals/CancelOrderModal";
 import { CompleteOrderModal } from "../../../components/shared/modals/CompleteOrderModal";
+import { PickupOrderModal } from "../../../components/shared/modals/PickupOrderModal";
 import {
   extractOrderData,
   extractProductData,
@@ -75,8 +76,13 @@ const STEPS: OrderStep[] = [
   },
   {
     id: 3,
-    name: "Delivery Completion",
+    name: "Pickup",
     icon: <TruckIcon className="w-6 h-6 text-white" />,
+  },
+  {
+    id: 4,
+    name: "Delivery Completion",
+    icon: <CheckIcon className="w-6 h-6 text-white" />,
   },
 ];
 
@@ -145,6 +151,7 @@ const OrderDetails: React.FC = () => {
   // Modal states
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showCompleteModal, setShowCompleteModal] = useState(false);
+  const [showPickupModal, setShowPickupModal] = useState(false);
 
   // API hooks with proper error handling
   const {
@@ -175,6 +182,50 @@ const OrderDetails: React.FC = () => {
       }
     };
   }, [isSuccess, navigate]);
+
+  // Handle order pickup with optimistic updates
+  const handlePickupOrder = (pickupDetails: {
+    pickedUpBy?: string;
+    location?: string;
+    notes?: string;
+  }) => {
+    if (!order?._id) return;
+
+    const pickupData = {
+      orderStatus: "picked_up" as const,
+      pickup: {
+        date: new Date().toISOString(),
+        pickedUpBy: pickupDetails.pickedUpBy,
+        location: pickupDetails.location,
+        notes: pickupDetails.notes,
+        confirmedBy: "Admin", // You can get this from auth context
+      },
+      orderTimeline: {
+        ...order.orderTimeline,
+        pickUp: new Date().toISOString(),
+      },
+      updatedAt: new Date().toISOString(),
+    };
+
+    // Optimistic update
+    updateOrderInCache(order._id, pickupData);
+
+    updateOrder(
+      {
+        id: order._id,
+        body: pickupData,
+      },
+      {
+        onError: () => {
+          // Revert optimistic update on error
+          updateOrderInCache(order._id, { orderStatus: order.orderStatus });
+          invalidateOrderCache(order._id);
+        },
+      }
+    );
+
+    setShowPickupModal(false);
+  };
 
   // Handle order completion with optimistic updates
   const handleCompleteOrder = (notes?: string) => {
@@ -666,6 +717,8 @@ const OrderDetails: React.FC = () => {
                 const handleButtonClick = () => {
                   if (buttonConfig.nextStatus === "delivered") {
                     setShowCompleteModal(true);
+                  } else if (buttonConfig.nextStatus === "picked_up") {
+                    setShowPickupModal(true);
                   } else {
                     handleOrderStatusUpdate(buttonConfig.nextStatus);
                   }
@@ -729,6 +782,14 @@ const OrderDetails: React.FC = () => {
           orderNumber={get(order, "orderNumber", "")}
           customerName={get(order, "customer.name", "")}
           totalAmount={get(order, "totalAmount", 0)}
+        />
+
+        <PickupOrderModal
+          isOpen={showPickupModal}
+          onClose={() => setShowPickupModal(false)}
+          onConfirm={handlePickupOrder}
+          orderNumber={get(order, "orderNumber", "")}
+          isLoading={isPending}
         />
 
         <CancelOrderModal

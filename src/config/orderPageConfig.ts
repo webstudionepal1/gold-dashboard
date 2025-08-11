@@ -5,6 +5,7 @@ export type PageType =
   | "confirmed-order-details"
   | "completed-order-details"
   | "assigned-order-details"
+  | "pickup-order-details"
   | "cancelled-order-details";
 
 export const pageConfigs: Record<
@@ -41,6 +42,13 @@ export const pageConfigs: Record<
     buttonText: "Track Delivery",
     onClick: () => {
       console.log("Tracking...");
+    },
+  },
+  "pickup-order-details": {
+    heading: "Pickup Order",
+    buttonText: "Mark as Delivered",
+    onClick: () => {
+      console.log("Marking as delivered...");
     },
   },
   "cancelled-order-details": {

@@ -111,6 +111,14 @@ export interface CancellationDetails {
   refundAmount?: number;
 }
 
+export interface PickupDetails {
+  date: string;
+  pickedUpBy?: string;
+  location?: string;
+  notes?: string;
+  confirmedBy?: string; // Staff member who confirmed pickup
+}
+
 export interface Order {
   _id: string;
   orderNumber: string;
@@ -127,6 +135,7 @@ export interface Order {
   transactionDetails?: TransactionDetails;
   deliveryDetails?: DeliveryDetails;
   cancellation?: CancellationDetails;
+  pickup?: PickupDetails;
   notes?: string;
   createdAt: string;
   updatedAt: string;

@@ -8,6 +8,7 @@ interface OrderActionButtonsProps {
   onStatusUpdate: (orderId: string, newStatus: string) => void;
   onCancel: (orderId: string) => void;
   onComplete: (orderId: string) => void;
+  onPickup?: (orderId: string) => void;
   isLoading?: boolean;
   compact?: boolean;
 }
@@ -69,14 +70,14 @@ const getButtonStyles = (variant: string, compact: boolean = false) => {
   const baseStyles = compact
     ? "px-2 py-1 text-xs font-medium transition-all shadow-sm flex items-center gap-1 rounded"
     : "px-3 py-1.5 text-xs font-medium transition-all shadow-sm flex items-center gap-1 rounded";
-  
+
   const variants = {
     primary: "bg-blue-600 hover:bg-blue-700 text-white",
     success: "bg-green-600 hover:bg-green-700 text-white",
     danger: "bg-red-600 hover:bg-red-700 text-white",
     warning: "bg-orange-600 hover:bg-orange-700 text-white",
   };
-  
+
   return `${baseStyles} ${
     variants[variant as keyof typeof variants] || variants.primary
   }`;
@@ -87,11 +88,12 @@ export const OrderActionButtons: React.FC<OrderActionButtonsProps> = ({
   onStatusUpdate,
   onCancel,
   onComplete,
+  onPickup,
   isLoading = false,
   compact = true,
 }) => {
   const [localLoading, setLocalLoading] = useState<string | null>(null);
-  
+
   const orderStatus = order.orderStatus || "pending";
   const buttonConfig = getOrderActionButton(orderStatus);
 
@@ -100,6 +102,8 @@ export const OrderActionButtons: React.FC<OrderActionButtonsProps> = ({
     try {
       if (newStatus === "delivered") {
         onComplete(order._id);
+      } else if (newStatus === "picked_up" && onPickup) {
+        onPickup(order._id);
       } else {
         onStatusUpdate(order._id, newStatus);
       }
@@ -141,7 +145,7 @@ export const OrderActionButtons: React.FC<OrderActionButtonsProps> = ({
         onClick={() => handleStatusUpdate(buttonConfig.nextStatus)}
         disabled={buttonConfig.disabled || isLoading || localLoading !== null}
         className={`${getButtonStyles(buttonConfig.variant, compact)} ${
-          (buttonConfig.disabled || isLoading || localLoading !== null)
+          buttonConfig.disabled || isLoading || localLoading !== null
             ? "opacity-50 cursor-not-allowed"
             : ""
         }`}>
@@ -159,7 +163,7 @@ export const OrderActionButtons: React.FC<OrderActionButtonsProps> = ({
           onClick={handleCancel}
           disabled={isLoading || localLoading !== null}
           className={`${getButtonStyles("danger", compact)} ${
-            (isLoading || localLoading !== null)
+            isLoading || localLoading !== null
               ? "opacity-50 cursor-not-allowed"
               : ""
           }`}>

@@ -10,6 +10,7 @@ export const FrontendRoutes = {
 
   ORDER: "/order/orders",
   ORDERDETAILS: "/order/order-details",
+  PICKUPORDER: "/order/pickup-order",
   CUSTOMER: "/customer/customer-list",
   CUSTOMERDETAILS: "/customer/customer-details/:id",
   ADDCUSTOMER: "/customer/add-customer",

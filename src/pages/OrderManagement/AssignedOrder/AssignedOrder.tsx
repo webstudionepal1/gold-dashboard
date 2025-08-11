@@ -19,6 +19,7 @@ import {
 import { OrderActionButtons } from "../../../components/shared/OrderActionButtons";
 import { CancelOrderModal } from "../../../components/shared/modals/CancelOrderModal";
 import { CompleteOrderModal } from "../../../components/shared/modals/CompleteOrderModal";
+import { PickupOrderModal } from "../../../components/shared/modals/PickupOrderModal";
 import type { OrderStatus } from "../../../types/order";
 
 const AssignedOrder = () => {
@@ -34,6 +35,7 @@ const AssignedOrder = () => {
   // Modal states
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showCompleteModal, setShowCompleteModal] = useState(false);
+  const [showPickupModal, setShowPickupModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
 
   // API hooks
@@ -78,6 +80,56 @@ const AssignedOrder = () => {
       );
     },
     [orders, updateOrder, updateOrderInCache, invalidateOrderCache]
+  );
+
+  // Handle order pickup
+  const handlePickupOrder = useCallback(
+    (pickupDetails: {
+      pickedUpBy?: string;
+      location?: string;
+      notes?: string;
+    }) => {
+      if (!selectedOrder) return;
+
+      const pickupData = {
+        orderStatus: "picked_up" as const,
+        pickup: {
+          date: new Date().toISOString(),
+          pickedUpBy: pickupDetails.pickedUpBy,
+          location: pickupDetails.location,
+          notes: pickupDetails.notes,
+          confirmedBy: "Admin",
+        },
+        orderTimeline: {
+          ...selectedOrder.orderTimeline,
+          pickUp: new Date().toISOString(),
+        },
+        updatedAt: new Date().toISOString(),
+      };
+
+      // Optimistic update
+      updateOrderInCache(selectedOrder._id, pickupData);
+
+      updateOrder(
+        {
+          id: selectedOrder._id,
+          body: pickupData,
+        },
+        {
+          onError: () => {
+            // Revert optimistic update on error
+            updateOrderInCache(selectedOrder._id, {
+              orderStatus: selectedOrder.orderStatus,
+            });
+            invalidateOrderCache(selectedOrder._id);
+          },
+        }
+      );
+
+      setShowPickupModal(false);
+      setSelectedOrder(null);
+    },
+    [selectedOrder, updateOrder, updateOrderInCache, invalidateOrderCache]
   );
 
   // Handle order cancellation
@@ -238,6 +290,10 @@ const AssignedOrder = () => {
                 setSelectedOrder(row);
                 setShowCancelModal(true);
               }}
+              onPickup={(orderId) => {
+                setSelectedOrder(row);
+                setShowPickupModal(true);
+              }}
               onComplete={(orderId) => {
                 setSelectedOrder(row);
                 setShowCompleteModal(true);
@@ -259,6 +315,19 @@ const AssignedOrder = () => {
           setSelectedOrder(null);
         }}
         onConfirm={handleCancelOrder}
+        isLoading={isUpdating}
+        orderNumber={
+          selectedOrder?.orderNumber || selectedOrder?._id?.slice(-5) || ""
+        }
+      />
+
+      <PickupOrderModal
+        isOpen={showPickupModal}
+        onClose={() => {
+          setShowPickupModal(false);
+          setSelectedOrder(null);
+        }}
+        onConfirm={handlePickupOrder}
         isLoading={isUpdating}
         orderNumber={
           selectedOrder?.orderNumber || selectedOrder?._id?.slice(-5) || ""

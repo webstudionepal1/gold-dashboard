@@ -21,6 +21,7 @@ import NotificationTest from "../components/test/NotificationTest";
 import OrderIndex from "../pages/OrderManagement/Order/OrderIndex";
 import AddOrderForm from "../pages/OrderManagement/Order/components/AddOrderPage";
 import CancelledOrder from "../pages/OrderManagement/CancelledOrder/CancelledOrder";
+import PickupOrder from "../pages/OrderManagement/PickupOrder/PickupOrder";
 import AddBannerForm from "../pages/Banner/Components/AddBannerForm";
 import CustomerIndex from "../pages/Customer/CustomerIndex";
 // import AddCustomerForm from "../pages/Customer/components/AddCustomerForm";
@@ -68,6 +69,10 @@ export const routesConfig = [
     element: <CancelledOrder />,
   },
   {
+    path: "/order/pickup-order",
+    element: <PickupOrder />,
+  },
+  {
     path: "/order/order-details/:id",
     element: <OrderDetails />,
   },
@@ -81,6 +86,10 @@ export const routesConfig = [
   },
   {
     path: "/order/assigned-order-details/:id",
+    element: <OrderDetails />,
+  },
+  {
+    path: "/order/pickup-order-details/:id",
     element: <OrderDetails />,
   },
   {

@@ -175,9 +175,10 @@ export const StepperObj: Record<string, number> = {
   pending: 0,
   confirmed: 1,
   assigned: 2,
-  delivery: 3,
-  delivered: 3, // Completed orders should show step 3 (Delivery Completion)
-  cancelled: 3, // Cancelled orders should also show step 3 but with different styling
+  picked_up: 3,
+  delivery: 4,
+  delivered: 4, // Completed orders should show step 4 (Delivery Completion)
+  cancelled: 4, // Cancelled orders should also show step 4 but with different styling
 };
 
 export const getStatusColor = (status: string) => {
@@ -190,6 +191,8 @@ export const getStatusColor = (status: string) => {
       return "bg-blue-100 text-blue-800 border border-blue-200";
     case "assigned":
       return "bg-yellow-100 text-yellow-800 border border-yellow-200";
+    case "picked_up":
+      return "bg-purple-100 text-purple-800 border border-purple-200";
     case "delivered":
     case "completed":
       return "bg-green-100 text-green-800 border border-green-200";
@@ -215,6 +218,8 @@ export const getStatusIcon = (status: string) => {
       return "✅";
     case "assigned":
       return "📦";
+    case "picked_up":
+      return "🚛";
     case "delivered":
     case "completed":
       return "🚚";
@@ -289,6 +294,7 @@ export const filterOptions = [
   { value: "pending", label: "Pending" },
   { value: "confirmed", label: "Confirmed" },
   { value: "assigned", label: "Assigned" },
+  { value: "picked_up", label: "Pickup" },
   { value: "delivered", label: "Delivered" },
   { value: "completed", label: "Completed" },
   { value: "cancelled", label: "Cancelled" },
