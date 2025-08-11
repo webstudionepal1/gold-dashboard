@@ -1,5 +1,8 @@
 import dayjs from "dayjs";
-import { get, invoke, size } from "lodash";
+import capitalize from "lodash/capitalize";
+import get from 'lodash/get';
+import invoke from 'lodash/invoke';
+import size from 'lodash/size';
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SearchFilterSort } from "../../../components/global/SearchFilterSort";
@@ -7,10 +10,10 @@ import MasterTable from "../../../components/shared/MasterTable";
 import Header from "../../../components/shared/table_heading/Header";
 import { useGetAllOrdersQuery } from "../../../server/api/orderHooks";
 import {
-  confirmedColumns,
+  deliveredColumns,
   filterItems,
   FilterState,
-  sortOptions,
+  sortOptions
 } from "../Order/orderObj";
 
 // Filter state interface
@@ -21,7 +24,7 @@ const CompletedOrder = () => {
     isSuccess,
     isLoading,
   } = useGetAllOrdersQuery({
-    orderStatus: "completed",
+    orderStatus: "delivered",
   });
   const navigate = useNavigate();
 
@@ -42,15 +45,16 @@ const CompletedOrder = () => {
         orderedProducts: size(item.orderedProducts),
         orderStatus: (
           <div className="px-2 py-1 text-xs text-white rounded-full bg-green">
-            {item.orderStatus}
+            {capitalize(item.orderStatus)}
           </div>
         ),
+        deliveryDate: dayjs(item.updatedAt).format("MMM D, YYYY"),
         customer: get(item, "customer.name", "-"),
         createdAt: (
           <div className="text-center">
-            {invoke(dayjs(item.createdAt), "format", "MMMM D, YYYY")}
+            {invoke(dayjs(item.createdAt), "format", "MMM D, YYYY")}
             <br />
-            {invoke(dayjs(item.createdAt), "format", "h:mm A")}
+            {invoke(dayjs(item.createdAt), "format", "h:mm a")}
           </div>
         ),
       })),
@@ -72,9 +76,9 @@ const CompletedOrder = () => {
             <SearchFilterSort onSort={handleSort} sortOptions={sortOptions} />
           }
           viewAction={(row) =>
-            navigate(`/order/assigned-order-details/${row._id}`)
+            navigate(`/order/completed-order-details/${row._id}`)
           }
-          columns={confirmedColumns}
+          columns={deliveredColumns}
           rows={filteredItems}
         />
       </div>

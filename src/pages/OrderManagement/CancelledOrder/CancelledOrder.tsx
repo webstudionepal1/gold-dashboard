@@ -1,7 +1,11 @@
 import dayjs from "dayjs";
-import { get, invoke, map, size } from "lodash";
+import capitalize from "lodash/capitalize";
+import get from 'lodash/get';
+import invoke from 'lodash/invoke';
+import size from 'lodash/size';
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { SearchFilterSort } from "../../../components/global/SearchFilterSort";
 import MasterTable from "../../../components/shared/MasterTable";
 import Header from "../../../components/shared/table_heading/Header";
 import { useGetAllOrdersQuery } from "../../../server/api/orderHooks";
@@ -11,7 +15,6 @@ import {
   FilterState,
   sortOptions,
 } from "../Order/orderObj";
-import { SearchFilterSort } from "../../../components/global/SearchFilterSort";
 
 // Filter state interface
 
@@ -42,7 +45,7 @@ const CancelledOrder = () => {
         orderedProducts: size(item.orderedProducts),
         orderStatus: (
           <div className="px-2 py-1 text-xs text-white rounded-full bg-red">
-            {item.orderStatus}
+         {capitalize(item.orderStatus)}
           </div>
         ),
         customer: get(item, "customer.name", "-"),

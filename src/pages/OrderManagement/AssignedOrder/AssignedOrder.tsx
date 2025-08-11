@@ -1,5 +1,8 @@
 import dayjs from "dayjs";
-import { get, invoke, size } from "lodash";
+import capitalize from "lodash/capitalize";
+import get from 'lodash/get';
+import invoke from 'lodash/invoke';
+import size from 'lodash/size';
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SearchFilterSort } from "../../../components/global/SearchFilterSort";
@@ -39,7 +42,7 @@ const AssignedOrder = () => {
         orderedProducts: size(item.orderedProducts),
         orderStatus: (
           <div className="px-2 py-1 text-xs text-white rounded-full bg-green">
-            {item.orderStatus}
+         {capitalize(item.orderStatus)}
           </div>
         ),
         customer: get(item, "customer.name", "-"),

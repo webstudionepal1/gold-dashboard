@@ -175,7 +175,7 @@ export const StepperObj: Record<string, number> = {
   pending: 0,
   confirmed: 1,
   assigned: 2,
-  delivery: 3,
+  delivered: 3,
   cancelled: -1, // Special case for cancelled orders
 };
 
@@ -222,6 +222,28 @@ export const orderIndexColumns = [
 ];
 
 export const confirmedColumns = [
+  {
+    key: "customer",
+    title: "Customer Name",
+  },
+  {
+    key: "createdAt",
+    title: "Order Date",
+  },
+  {
+    key: "totalAmount",
+    title: "Total Amount",
+  },
+  {
+    key: "orderedProducts",
+    title: "Total Items",
+  },
+  {
+    key: "orderStatus",
+    title: "Status",
+  },
+];
+export const deliveredColumns = [
   {
     key: "customer",
     title: "Customer Name",
