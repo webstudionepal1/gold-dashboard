@@ -1,24 +1,17 @@
-import { Icon } from "@iconify/react/dist/iconify.js";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import MasterTable from "../../components/shared/MasterTable";
-import { ScrollableModal } from "../../components/shared/ScrollableModal";
-import Header from "../../components/shared/table_heading/Header";
-import { DynamicTab } from "../PurchaseManagement/components/DynamicTab";
+import { Icon } from '@iconify/react/dist/iconify.js';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import MasterTable from '../../components/shared/MasterTable';
+import Header from '../../components/shared/table_heading/Header';
+import { DynamicTab } from '../PurchaseManagement/components/DynamicTab';
 
-import {
-  buttonObj,
-  transactionTabOption,
-  ITable,
-} from "../transaction/transactionObj";
+import { transactionTabOption, ITable } from '../transaction/transactionObj';
 
-import { map } from "lodash";
-import { format } from "date-fns";
-import { useGetTransactionsQuery } from "../../server/api/transactionHooks";
-import { useOutsideClick } from "../../hooks/UseOutsideClick";
+import { map } from 'lodash';
+import { format } from 'date-fns';
+import { useGetTransactionsQuery } from '../../server/api/transactionHooks';
 
-import { SearchFilterSort } from "../../components/global/SearchFilterSort";
-import { filterOptions, sortOptions } from "../../constants/DropDownOptions";
+import { SearchFilterSort } from '../../components/global/SearchFilterSort';
 
 interface FilterState {
   searchQuery: string;
@@ -33,21 +26,21 @@ interface DateFilter {
 
 const Transaction = () => {
   const navigate = useNavigate();
-  const [selectedTab, setSelectedTab] = useState("cash");
+  const [selectedTab, setSelectedTab] = useState('cash');
 
   const [filterState, setFilterState] = useState<FilterState>({
-    searchQuery: "",
-    filterValue: "",
-    sortValue: "",
+    searchQuery: '',
+    filterValue: '',
+    sortValue: '',
   });
 
   // Set default date range to current month
   const [dateFilter, setDateFilter] = useState<DateFilter>({
     fromDate: format(
       new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-      "yyyy-MM-dd"
+      'yyyy-MM-dd'
     ),
-    toDate: format(new Date(), "yyyy-MM-dd"),
+    toDate: format(new Date(), 'yyyy-MM-dd'),
   });
 
   const {
@@ -98,24 +91,24 @@ const Transaction = () => {
 
     if (filterState.sortValue) {
       switch (filterState.sortValue) {
-        case "date_asc":
+        case 'date_asc':
           result.sort(
             (a, b) =>
               new Date(a.paymentDate).getTime() -
               new Date(b.paymentDate).getTime()
           );
           break;
-        case "date_desc":
+        case 'date_desc':
           result.sort(
             (a, b) =>
               new Date(b.paymentDate).getTime() -
               new Date(a.paymentDate).getTime()
           );
           break;
-        case "amount_asc":
+        case 'amount_asc':
           result.sort((a, b) => a.totalAmount - b.totalAmount);
           break;
-        case "amount_desc":
+        case 'amount_desc':
           result.sort((a, b) => b.totalAmount - a.totalAmount);
           break;
       }
@@ -139,23 +132,23 @@ const Transaction = () => {
   const cashTransactionTableData = useMemo(
     () => ({
       columns: [
-        { key: "customerName", title: "Customer Name" },
-        { key: "customerPhone", title: "Phone No." },
-        { key: "orderId", title: "Order ID" },
-        { key: "transactionId", title: "Transaction ID" },
-        { key: "orderDate", title: "Order Date" },
-        { key: "paymentDate", title: "Payment Date" },
-        { key: "totalAmount", title: "Total Amount" },
-        { key: "payment", title: "Payment" },
-        { key: "remainingPayment", title: "Remaining" },
-        { key: "paymentStatus", title: "Status" },
+        { key: 'customerName', title: 'Customer Name' },
+        { key: 'customerPhone', title: 'Phone No.' },
+        { key: 'orderId', title: 'Order ID' },
+        { key: 'transactionId', title: 'Transaction ID' },
+        { key: 'orderDate', title: 'Order Date' },
+        { key: 'paymentDate', title: 'Payment Date' },
+        { key: 'totalAmount', title: 'Total Amount' },
+        { key: 'payment', title: 'Payment' },
+        { key: 'remainingPayment', title: 'Remaining' },
+        { key: 'paymentStatus', title: 'Status' },
       ],
       rows: map(
-        filteredTransactions.filter((item) => item.paymentMethod === "cash"),
+        filteredTransactions.filter((item) => item.paymentMethod === 'cash'),
         (item) => ({
           ...item,
-          orderDate: format(new Date(item.orderDate), "dd MMM yyyy"),
-          paymentDate: format(new Date(item.paymentDate), "dd MMM yyyy"),
+          orderDate: format(new Date(item.orderDate), 'dd MMM yyyy'),
+          paymentDate: format(new Date(item.paymentDate), 'dd MMM yyyy'),
           totalAmount: `Rs. ${item.totalAmount.toLocaleString()}`,
           payment: `Rs. ${item.payment.toLocaleString()}`,
           remainingPayment: `Rs. ${item.remainingPayment.toLocaleString()}`,
@@ -171,42 +164,42 @@ const Transaction = () => {
   const digitalPaymentTableData = useMemo(
     () => ({
       columns: [
-        { key: "customerName", title: "Customer Name" },
-        { key: "customerPhone", title: "Phone No." },
-        { key: "orderId", title: "Order ID" },
-        { key: "transactionId", title: "Transaction ID" },
-        { key: "paymentMethodFormatted", title: "Payment Method" },
-        { key: "orderDate", title: "Order Date" },
-        { key: "paymentDate", title: "Payment Date" },
-        { key: "totalAmount", title: "Total Amount" },
-        { key: "payment", title: "Payment" },
-        { key: "remainingPayment", title: "Remaining" },
-        { key: "paymentStatus", title: "Status" },
+        { key: 'customerName', title: 'Customer Name' },
+        { key: 'customerPhone', title: 'Phone No.' },
+        { key: 'orderId', title: 'Order ID' },
+        { key: 'transactionId', title: 'Transaction ID' },
+        { key: 'paymentMethodFormatted', title: 'Payment Method' },
+        { key: 'orderDate', title: 'Order Date' },
+        { key: 'paymentDate', title: 'Payment Date' },
+        { key: 'totalAmount', title: 'Total Amount' },
+        { key: 'payment', title: 'Payment' },
+        { key: 'remainingPayment', title: 'Remaining' },
+        { key: 'paymentStatus', title: 'Status' },
       ],
       rows: map(
         filteredTransactions.filter((item) =>
-          ["card", "bank_transfer", "online", "paypal", "afterpay"].includes(
+          ['card', 'bank_transfer', 'online', 'paypal', 'afterpay'].includes(
             item.paymentMethod
           )
         ),
         (item) => {
           // Format payment method to be more readable
-          let paymentMethodFormatted = "";
+          let paymentMethodFormatted = '';
           switch (item.paymentMethod) {
-            case "card":
-              paymentMethodFormatted = "Card";
+            case 'card':
+              paymentMethodFormatted = 'Card';
               break;
-            case "bank_transfer":
-              paymentMethodFormatted = "Bank Transfer";
+            case 'bank_transfer':
+              paymentMethodFormatted = 'Bank Transfer';
               break;
-            case "online":
-              paymentMethodFormatted = "Online";
+            case 'online':
+              paymentMethodFormatted = 'Online';
               break;
-            case "paypal":
-              paymentMethodFormatted = "PayPal";
+            case 'paypal':
+              paymentMethodFormatted = 'PayPal';
               break;
-            case "afterpay":
-              paymentMethodFormatted = "AfterPay";
+            case 'afterpay':
+              paymentMethodFormatted = 'AfterPay';
               break;
             default:
               paymentMethodFormatted =
@@ -217,8 +210,8 @@ const Transaction = () => {
           return {
             ...item,
             paymentMethodFormatted,
-            orderDate: format(new Date(item.orderDate), "dd MMM yyyy"),
-            paymentDate: format(new Date(item.paymentDate), "dd MMM yyyy"),
+            orderDate: format(new Date(item.orderDate), 'dd MMM yyyy'),
+            paymentDate: format(new Date(item.paymentDate), 'dd MMM yyyy'),
             totalAmount: `Rs. ${item.totalAmount.toLocaleString()}`,
             payment: `Rs. ${item.payment.toLocaleString()}`,
             remainingPayment: `Rs. ${item.remainingPayment.toLocaleString()}`,
@@ -246,12 +239,12 @@ const Transaction = () => {
     digitalPayment: digitalPaymentTableData,
   };
   const [modal, setModal] = useState({
-    of: "",
+    of: '',
     edit: false,
     data: null,
   });
   const closeModal = useCallback(
-    () => setModal({ of: "", edit: false, data: null }),
+    () => setModal({ of: '', edit: false, data: null }),
     []
   );
   return (
@@ -324,19 +317,19 @@ const Transaction = () => {
             showSort={true}
             showView={false}
             filterOptions={[
-              { label: "All", value: "" },
-              { label: "Cash", value: "cash" },
-              { label: "Card", value: "card" },
-              { label: "Bank Transfer", value: "bank_transfer" },
-              { label: "Online", value: "online" },
-              { label: "PayPal", value: "paypal" },
-              { label: "AfterPay", value: "afterpay" },
+              { label: 'All', value: '' },
+              { label: 'Cash', value: 'cash' },
+              { label: 'Card', value: 'card' },
+              { label: 'Bank Transfer', value: 'bank_transfer' },
+              { label: 'Online', value: 'online' },
+              { label: 'PayPal', value: 'paypal' },
+              { label: 'AfterPay', value: 'afterpay' },
             ]}
             sortOptions={[
-              { label: "Date (Newest)", value: "date_desc" },
-              { label: "Date (Oldest)", value: "date_asc" },
-              { label: "Amount (High-Low)", value: "amount_desc" },
-              { label: "Amount (Low-High)", value: "amount_asc" },
+              { label: 'Date (Newest)', value: 'date_desc' },
+              { label: 'Date (Oldest)', value: 'date_asc' },
+              { label: 'Amount (High-Low)', value: 'amount_desc' },
+              { label: 'Amount (Low-High)', value: 'amount_asc' },
             ]}
             placeholder="Search by name, order ID..."
           />
@@ -345,7 +338,7 @@ const Transaction = () => {
         columns={tableDataObj[selectedTab].columns}
         emptyStateMessage="No transactions found for the selected period. Try changing the date range."
         showAction={true}
-        viewAction={(id) => navigate(`/order/${id}`)}
+        viewAction={(row) => navigate(`/order/order-details/${row._id}`)}
       />
       {/* {modal.of === "expenses" && (
         <ScrollableModal onClose={closeModal} classname="w-[35rem]">

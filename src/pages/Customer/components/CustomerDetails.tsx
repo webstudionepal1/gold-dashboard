@@ -1,25 +1,25 @@
-import { Icon } from "@iconify/react/dist/iconify.js";
-import dayjs from "dayjs";
-import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import Breadcrumbs from "../../../components/shared/Breadcrumb";
-import { ScrollableModal } from "../../../components/shared/ScrollableModal";
-import Header from "../../../components/shared/table_heading/Header";
-import { FrontendRoutes } from "../../../routes/routes";
-import { useGetCustomerById } from "../../../server/api/customerHook";
+import { Icon } from '@iconify/react/dist/iconify.js';
+import dayjs from 'dayjs';
+import { useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import Breadcrumbs from '../../../components/shared/Breadcrumb';
+import { ScrollableModal } from '../../../components/shared/ScrollableModal';
+import Header from '../../../components/shared/table_heading/Header';
+import { FrontendRoutes } from '../../../routes/routes';
+import { useGetCustomerById } from '../../../server/api/customerHook';
 import {
   IFetchOrder,
   useGetAllOrdersQuery,
-} from "../../../server/api/orderHooks";
-import InfoSection from "../../OrderManagement/Order/components/InfoSection";
-import Invoice, { InvoiceData } from "./Invoice";
-import { SimpleTable } from "./SimpleTable";
+} from '../../../server/api/orderHooks';
+import InfoSection from '../../OrderManagement/Order/components/InfoSection';
+import Invoice, { InvoiceData } from './Invoice';
+import { SimpleTable } from './SimpleTable';
 interface CustomerDetails {
   _id: string;
   order_id: string;
   order_date: string;
   total_price: number;
-  status: "Out of Stock" | "Delivered" | "Canceled" | "In Stock";
+  status: 'Out of Stock' | 'Delivered' | 'Canceled' | 'In Stock';
   isActive?: boolean;
 }
 
@@ -36,53 +36,53 @@ const getShippingStatusColor = (status: string) => {
   switch (
     status.toLowerCase() // Converts to lowercase for case-insensitive comparison
   ) {
-    case "confirmed":
-      return "bg-[#e8faee] text-[#6db289]";
-    case "pending":
-      return "text-[#df8d28]   font-semibold ";
-    case "in progress":
-      return "bg-blue-100 text-blue-800";
-    case "delivered":
-      return "text-[#35c659]  font-semibold";
-    case "cancelled":
-      return "bg-[#feeeee] text-[#ff4d4c]";
-    case "not confirmed":
-      return "bg-[#f9ebea] text-[#ce8b8e]";
+    case 'confirmed':
+      return 'bg-[#e8faee] text-[#6db289]';
+    case 'pending':
+      return 'text-[#df8d28]   font-semibold ';
+    case 'in progress':
+      return 'bg-blue-100 text-blue-800';
+    case 'delivered':
+      return 'text-[#35c659]  font-semibold';
+    case 'cancelled':
+      return 'bg-[#feeeee] text-[#ff4d4c]';
+    case 'not confirmed':
+      return 'bg-[#f9ebea] text-[#ce8b8e]';
     default:
-      return "bg-gray-100 text-gray-800";
+      return 'bg-gray-100 text-gray-800';
   }
 };
 
 const todaysOrders = [
   {
-    order_id: "01",
-    order_date: "2025-02-11",
-    total_price: "$262",
-    status: "Out of Stock",
+    order_id: '01',
+    order_date: '2025-02-11',
+    total_price: '$262',
+    status: 'Out of Stock',
   },
   {
-    order_id: "01",
-    order_date: "2025-02-15",
-    total_price: "$262",
-    status: "Delivered",
+    order_id: '01',
+    order_date: '2025-02-15',
+    total_price: '$262',
+    status: 'Delivered',
   },
   {
-    order_id: "01",
-    order_date: "2025-01-11",
-    total_price: "$262",
-    status: "Delivered",
+    order_id: '01',
+    order_date: '2025-01-11',
+    total_price: '$262',
+    status: 'Delivered',
   },
   {
-    order_id: "01",
-    order_date: "2025-02-12",
-    total_price: "$262",
-    status: "Cancelled",
+    order_id: '01',
+    order_date: '2025-02-12',
+    total_price: '$262',
+    status: 'Cancelled',
   },
   {
-    order_id: "01",
-    order_date: "2025-02-12",
-    total_price: "$262",
-    status: "In Stock",
+    order_id: '01',
+    order_date: '2025-02-12',
+    total_price: '$262',
+    status: 'In Stock',
   },
 ];
 
@@ -120,23 +120,23 @@ const CustomerDetails = () => {
   const shippingInformation = [
     {
       id: 1,
-      title: "Name",
-      value: customer?.name || "N/A",
+      title: 'Name',
+      value: customer?.name || 'N/A',
     },
     {
       id: 2,
-      title: "Phone No",
+      title: 'Phone No',
       value: <div>+977 {customer?.phone}</div>,
     },
     {
       id: 3,
-      title: "Address",
-      value: customer?.address || "N/A",
+      title: 'Address',
+      value: customer?.address || 'N/A',
     },
     {
       id: 4,
-      title: "Email",
-      value: customer?.email || "N/A",
+      title: 'Email',
+      value: customer?.email || 'N/A',
     },
 
     // {
@@ -154,32 +154,33 @@ const CustomerDetails = () => {
   const billingAddress = [
     {
       id: 1,
-      title: "Customer Name",
-      value: customer?.name || "N/A",
+      title: 'Customer Name',
+      value: customer?.name || 'N/A',
     },
     {
       id: 2,
-      title: "Phone No",
+      title: 'Phone No',
       value: <div>+977 {customer?.phone}</div>,
     },
     {
       id: 3,
-      title: "Email",
-      value: customer?.email || "N/A",
+      title: 'Email',
+      value: customer?.email || 'N/A',
     },
     {
       id: 4,
-      title: "Address",
-      value: customer?.address || "N/A",
+      title: 'Address',
+      value: customer?.address || 'N/A',
     },
     {
       id: 5,
-      title: "Payment",
+      title: 'Payment',
       value: (
         <div
           className={` font-semibold  ${getShippingStatusColor(
-            selectedOrder?.paymentStatus || ""
-          )}`}>
+            selectedOrder?.paymentStatus || ''
+          )}`}
+        >
           {selectedOrder?.paymentStatus}
         </div>
       ),
@@ -201,7 +202,7 @@ const CustomerDetails = () => {
   const fla = selectedOrder
     ? selectedOrder?.orderedProducts.map((item) => ({
         ...item,
-        name: "Name",
+        name: 'Name',
         price: item.selectedVariant.price,
         quantity: item.selectedVariant.quantity,
         totalPrice: item.selectedVariant.quantity * item.selectedVariant.price,
@@ -210,20 +211,20 @@ const CustomerDetails = () => {
 
   const getOrderStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case "confirmed":
-        return "bg-[#e8faee] text-[#6db289]";
-      case "pending":
-        return "text-[#df8d28] border-2 border-[#df8d28] rounded-xl px-4 py-2 font-semibold ";
-      case "in progress":
-        return "bg-blue-100 text-blue-800";
-      case "delivered":
-        return "text-[#35c659] border-2 border-[#35c659] rounded-xl px-4 py-2 font-semibold";
-      case "cancelled":
-        return "bg-[#feeeee] text-[#ff4d4c]";
-      case "not confirmed":
-        return "bg-[#f9ebea] text-[#ce8b8e]";
+      case 'confirmed':
+        return 'bg-[#e8faee] text-[#6db289]';
+      case 'pending':
+        return 'text-[#df8d28] border-2 border-[#df8d28] rounded-xl px-4 py-2 font-semibold ';
+      case 'in progress':
+        return 'bg-blue-100 text-blue-800';
+      case 'delivered':
+        return 'text-[#35c659] border-2 border-[#35c659] rounded-xl px-4 py-2 font-semibold';
+      case 'cancelled':
+        return 'bg-[#feeeee] text-[#ff4d4c]';
+      case 'not confirmed':
+        return 'bg-[#f9ebea] text-[#ce8b8e]';
       default:
-        return "bg-gray-100 text-gray-800";
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -231,26 +232,26 @@ const CustomerDetails = () => {
     switch (
       status.toLowerCase() // Converts to lowercase for case-insensitive comparison
     ) {
-      case "confirmed":
-        return "bg-[#e8faee] text-[#6db289]";
-      case "pending":
-        return "bg-[#fff7ea] text-[#f7b627] ";
-      case "assigned":
-        return "bg-[#fff7ea] text-[#f7b627] ";
-      case "in progress":
-        return "bg-blue-100 text-blue-800";
-      case "delivered":
-        return "bg-[#fff7ea] text-[#23c65f]";
-      case "cancelled":
-        return "bg-[#feeeee] text-[#ff4d4c]";
-      case "not confirmed":
-        return "bg-[#f9ebea] text-[#ce8b8e]";
+      case 'confirmed':
+        return 'bg-[#e8faee] text-[#6db289]';
+      case 'pending':
+        return 'bg-[#fff7ea] text-[#f7b627] ';
+      case 'assigned':
+        return 'bg-[#fff7ea] text-[#f7b627] ';
+      case 'in progress':
+        return 'bg-blue-100 text-blue-800';
+      case 'delivered':
+        return 'bg-[#fff7ea] text-[#23c65f]';
+      case 'cancelled':
+        return 'bg-[#feeeee] text-[#ff4d4c]';
+      case 'not confirmed':
+        return 'bg-[#f9ebea] text-[#ce8b8e]';
       default:
-        return "bg-gray-100 text-gray-800";
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
-  console.log("orderedProducts", selectedOrder);
+  console.log('orderedProducts', selectedOrder);
   return (
     <div className="container mx-auto px-4 py-2">
       <div className="flex items-center justify-between mb-3">
@@ -267,9 +268,9 @@ const CustomerDetails = () => {
                 src={
                   `${import.meta.env.VITE_API_IMAGE_BASE_URL}${
                     customer?.image
-                  }` || "https://via.placeholder.com/150?text=User"
+                  }` || 'https://via.placeholder.com/150?text=User'
                 }
-                alt={customer?.name || "Customer"}
+                alt={customer?.name || 'Customer'}
                 className="w-14 h-14 rounded-full object-cover border-2 border-gray-100"
               />
               <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
@@ -292,7 +293,7 @@ const CustomerDetails = () => {
                     className="w-4 h-4 text-gray-500"
                   />
                   <span className="text-gray-600 truncate">
-                    {customer?.address || "N/A"}
+                    {customer?.address || 'N/A'}
                   </span>
                 </div>
 
@@ -311,7 +312,7 @@ const CustomerDetails = () => {
 
               <div className="mt-2 text-xs text-gray-500">
                 <Icon icon="mdi:calendar" className="w-3 h-3 inline mr-1" />
-                Registered on {dayjs(customer?.joinDate).format("MMM DD, YYYY")}
+                Registered on {dayjs(customer?.joinDate).format('MMM DD, YYYY')}
               </div>
             </div>
           </div>
@@ -339,20 +340,20 @@ const CustomerDetails = () => {
               showSerialNumber={true}
               columns={[
                 {
-                  header: "Order Date",
-                  key: "createdAt",
+                  header: 'Order Date',
+                  key: 'createdAt',
                   render: (_, row) => (
                     <div className="text-sm">
-                      {dayjs(row.createdAt).format("MMM DD, YYYY")}
+                      {dayjs(row.createdAt).format('MMM DD, YYYY')}
                       <div className="text-xs text-gray-500">
-                        {dayjs(row.createdAt).format("hh:mm A")}
+                        {dayjs(row.createdAt).format('hh:mm A')}
                       </div>
                     </div>
                   ),
                 },
                 {
-                  header: "Total Amount",
-                  key: "totalAmount",
+                  header: 'Total Amount',
+                  key: 'totalAmount',
                   render: (_, row) => (
                     <div className="font-semibold text-gray-900">
                       ${row.totalAmount}
@@ -360,14 +361,15 @@ const CustomerDetails = () => {
                   ),
                 },
                 {
-                  key: "orderStatus",
-                  header: "Status",
+                  key: 'orderStatus',
+                  header: 'Status',
                   render: (value: string) => {
                     return (
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
                           value
-                        )}`}>
+                        )}`}
+                      >
                         {value}
                       </span>
                     );
@@ -375,14 +377,14 @@ const CustomerDetails = () => {
                 },
               ]}
               onView={handleView}
-              viewAllButton={
-                <Link
-                  to={FrontendRoutes.ORDER}
-                  className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-amber-600 bg-amber-50 border border-amber-200 rounded-md hover:bg-amber-100 transition-colors">
-                  <Icon icon="mdi:eye" className="w-4 h-4 mr-1" />
-                  View All
-                </Link>
-              }
+              // viewAllButton={
+              //   <Link
+              //     to={FrontendRoutes.ORDER}
+              //     className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-amber-600 bg-amber-50 border border-amber-200 rounded-md hover:bg-amber-100 transition-colors">
+              //     <Icon icon="mdi:eye" className="w-4 h-4 mr-1" />
+              //     View All
+              //   </Link>
+              // }
             />
           </div>
         </div>
@@ -394,7 +396,7 @@ const CustomerDetails = () => {
               title="Contact Information"
               info={shippingInformation}
               showEdit={false}
-              onEditClick={() => console.log("Edit clicked")}
+              onEditClick={() => console.log('Edit clicked')}
             />
           </div>
         </div>
@@ -403,21 +405,22 @@ const CustomerDetails = () => {
       {showModal && selectedOrder && (
         <ScrollableModal
           onClose={handleCloseModal}
-          classname="w-[90%] max-w-4xl p-4">
+          classname="w-[90%] max-w-4xl p-4"
+        >
           <div className="space-y-4">
             {/* Order Header - Compact */}
             <div className="bg-white border border-gray-200 rounded-lg p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h1 className="font-bold text-lg text-gray-900">
-                    Order{" "}
+                    Order{' '}
                     <span className="text-amber-600">
                       #{selectedOrder._id.slice(-6)}
                     </span>
                   </h1>
                   <p className="text-sm text-gray-500">
                     {dayjs(selectedOrder.createdAt).format(
-                      "MMM DD, YYYY - hh:mm A"
+                      'MMM DD, YYYY - hh:mm A'
                     )}
                   </p>
                 </div>
@@ -425,8 +428,9 @@ const CustomerDetails = () => {
                 <div className="flex items-center gap-3">
                   <span
                     className={`px-3 py-1 rounded-full text-sm font-medium ${getOrderStatusColor(
-                      selectedOrder?.paymentStatus || ""
-                    )}`}>
+                      selectedOrder?.paymentStatus || ''
+                    )}`}
+                  >
                     {selectedOrder?.paymentStatus}
                   </span>
                   <button
@@ -434,7 +438,8 @@ const CustomerDetails = () => {
                       setShowInvoiceModal(true);
                       setShowModal(false);
                     }}
-                    className="flex items-center gap-2 px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                    className="flex items-center gap-2 px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
                     <Icon icon="mdi:file-document" className="w-4 h-4" />
                     View Invoice
                   </button>
@@ -460,10 +465,10 @@ const CustomerDetails = () => {
                     showSerialNumber={false}
                     columns={[
                       {
-                        header: "Item",
-                        key: "name",
+                        header: 'Item',
+                        key: 'name',
                         render: (_: unknown, row: any) => {
-                          console.log("rows", row);
+                          console.log('rows', row);
                           return (
                             <div className="flex items-center gap-2">
                               <img
@@ -481,15 +486,15 @@ const CustomerDetails = () => {
                         },
                       },
                       {
-                        key: "quantity",
-                        header: "Qty",
+                        key: 'quantity',
+                        header: 'Qty',
                         render: (value: number) => (
                           <span className="text-sm font-medium">{value}</span>
                         ),
                       },
                       {
-                        header: "Price",
-                        key: "price",
+                        header: 'Price',
+                        key: 'price',
                         render: (_, row: any) => (
                           <span className="text-sm font-semibold text-gray-900">
                             ${row.price}
@@ -497,8 +502,8 @@ const CustomerDetails = () => {
                         ),
                       },
                       {
-                        header: "Total",
-                        key: "totalPrice",
+                        header: 'Total',
+                        key: 'totalPrice',
                         render: (_, row: any) => (
                           <span className="text-sm font-bold text-gray-900">
                             ${row.totalPrice}
@@ -521,7 +526,7 @@ const CustomerDetails = () => {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-gray-600">
-                        Subtotal ({selectedOrder?.orderedProducts?.length || 0}{" "}
+                        Subtotal ({selectedOrder?.orderedProducts?.length || 0}{' '}
                         items)
                       </span>
                       <span className="font-medium">
@@ -568,7 +573,7 @@ const CustomerDetails = () => {
                 title="Shipping Information"
                 info={shippingInformation}
                 showEdit={false}
-                onEditClick={() => console.log("Edit clicked")}
+                onEditClick={() => console.log('Edit clicked')}
               />
             </div>
 
@@ -577,7 +582,7 @@ const CustomerDetails = () => {
                 title="Billing Address"
                 info={billingAddress}
                 showEdit={false}
-                onEditClick={() => console.log("Edit clicked")}
+                onEditClick={() => console.log('Edit clicked')}
               />
             </div>
           </div>
@@ -629,7 +634,7 @@ const CustomerDetails = () => {
             {orders?.map((selectedOrder) => {
               const invoiceData: InvoiceData = {
                 // invoiceNumber: selectedOrder._id,
-                invoiceNumber: "-",
+                invoiceNumber: '-',
 
                 date: selectedOrder.createdAt,
 
@@ -639,7 +644,7 @@ const CustomerDetails = () => {
                 items: selectedOrder.orderedProducts.map((orderedProduct) => ({
                   name: orderedProduct.product?.name,
                   weight: orderedProduct.selectedVariant.wt || 0,
-                  purity: "",
+                  purity: '',
                   makingCharge: 0,
                   ratePerGram: orderedProduct.selectedVariant.price,
                   quantity: orderedProduct.selectedVariant.quantity,
@@ -650,11 +655,11 @@ const CustomerDetails = () => {
                 discount: selectedOrder.billDetails.discount,
                 taxRate: 0,
 
-                shopAddress: "Your Shop Address",
-                shopPhone: "Your Shop Phone",
-                shopGSTNumber: "GST Number",
+                shopAddress: 'Your Shop Address',
+                shopPhone: 'Your Shop Phone',
+                shopGSTNumber: 'GST Number',
                 paymentMethod:
-                  selectedOrder.transactionDetails?.paymentMethod || "N/A",
+                  selectedOrder.transactionDetails?.paymentMethod || 'N/A',
                 // notes: "Thank you for your purchase!",
               };
 
