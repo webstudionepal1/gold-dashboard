@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import { Icon } from "@iconify/react";
-import { CheckIcon, PackageIcon, TruckIcon } from "lucide-react";
-import { ButtonLoading } from "./LoadingStates";
+import React, { useState } from 'react';
+import { Icon } from '@iconify/react';
+import { CheckIcon, PackageIcon, TruckIcon } from 'lucide-react';
+import { ButtonLoading } from './LoadingStates';
 
 interface OrderActionButtonsProps {
   order: any;
@@ -17,44 +17,44 @@ interface OrderActionButtonsProps {
 const getOrderActionButton = (orderStatus: string) => {
   const statusConfig = {
     pending: {
-      text: "Accept",
-      nextStatus: "confirmed",
-      variant: "primary" as const,
+      text: 'Accept',
+      nextStatus: 'confirmed',
+      variant: 'primary' as const,
       icon: <CheckIcon className="w-3 h-3" />,
       disabled: false,
     },
     confirmed: {
-      text: "Assign",
-      nextStatus: "assigned",
-      variant: "primary" as const,
+      text: 'Assign',
+      nextStatus: 'assigned',
+      variant: 'primary' as const,
       icon: <PackageIcon className="w-3 h-3" />,
       disabled: false,
     },
     assigned: {
-      text: "Pick Up",
-      nextStatus: "picked_up",
-      variant: "primary" as const,
+      text: 'Pick Up',
+      nextStatus: 'picked_up',
+      variant: 'primary' as const,
       icon: <TruckIcon className="w-3 h-3" />,
       disabled: false,
     },
     picked_up: {
-      text: "Deliver",
-      nextStatus: "delivered",
-      variant: "success" as const,
+      text: 'Deliver',
+      nextStatus: 'delivered',
+      variant: 'success' as const,
       icon: <CheckIcon className="w-3 h-3" />,
       disabled: false,
     },
     delivered: {
-      text: "Completed",
-      nextStatus: "delivered",
-      variant: "success" as const,
+      text: 'Completed',
+      nextStatus: 'delivered',
+      variant: 'success' as const,
       icon: <CheckIcon className="w-3 h-3" />,
       disabled: true,
     },
     cancelled: {
-      text: "Cancelled",
-      nextStatus: "cancelled",
-      variant: "danger" as const,
+      text: 'Cancelled',
+      nextStatus: 'cancelled',
+      variant: 'danger' as const,
       icon: null,
       disabled: true,
     },
@@ -68,14 +68,14 @@ const getOrderActionButton = (orderStatus: string) => {
 
 const getButtonStyles = (variant: string, compact: boolean = false) => {
   const baseStyles = compact
-    ? "px-2 py-1 text-xs font-medium transition-all shadow-sm flex items-center gap-1 rounded"
-    : "px-3 py-1.5 text-xs font-medium transition-all shadow-sm flex items-center gap-1 rounded";
+    ? 'px-2 py-1 text-xs font-medium transition-all shadow-sm flex items-center gap-1 rounded whitespace-nowrap'
+    : 'px-3 py-1.5 text-xs font-medium transition-all shadow-sm flex items-center gap-1 rounded whitespace-nowrap';
 
   const variants = {
-    primary: "bg-blue-600 hover:bg-blue-700 text-white",
-    success: "bg-green-600 hover:bg-green-700 text-white",
-    danger: "bg-red-600 hover:bg-red-700 text-white",
-    warning: "bg-orange-600 hover:bg-orange-700 text-white",
+    primary: 'bg-blue-600 hover:bg-blue-700 text-white',
+    success: 'bg-green hover:bg-green-700 text-black',
+    danger: 'bg-red hover:bg-red-700 text-white',
+    warning: 'bg-orange hover:bg-orange-700 text-black',
   };
 
   return `${baseStyles} ${
@@ -94,15 +94,15 @@ export const OrderActionButtons: React.FC<OrderActionButtonsProps> = ({
 }) => {
   const [localLoading, setLocalLoading] = useState<string | null>(null);
 
-  const orderStatus = order.orderStatus || "pending";
+  const orderStatus = order.orderStatus || 'pending';
   const buttonConfig = getOrderActionButton(orderStatus);
 
   const handleStatusUpdate = async (newStatus: string) => {
     setLocalLoading(newStatus);
     try {
-      if (newStatus === "delivered") {
+      if (newStatus === 'delivered') {
         onComplete(order._id);
-      } else if (newStatus === "picked_up" && onPickup) {
+      } else if (newStatus === 'picked_up' && onPickup) {
         onPickup(order._id);
       } else {
         onStatusUpdate(order._id, newStatus);
@@ -113,7 +113,7 @@ export const OrderActionButtons: React.FC<OrderActionButtonsProps> = ({
   };
 
   const handleCancel = async () => {
-    setLocalLoading("cancel");
+    setLocalLoading('cancel');
     try {
       onCancel(order._id);
     } finally {
@@ -122,15 +122,16 @@ export const OrderActionButtons: React.FC<OrderActionButtonsProps> = ({
   };
 
   // Don't show buttons for completed or cancelled orders
-  if (orderStatus === "delivered" || orderStatus === "cancelled") {
+  if (orderStatus === 'delivered' || orderStatus === 'cancelled') {
     return (
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 flex-wrap justify-center w-full">
         <div
           className={`px-2 py-1 text-xs font-medium rounded flex items-center gap-1 ${
-            orderStatus === "delivered"
-              ? "bg-green-100 text-green-800"
-              : "bg-red-100 text-red-800"
-          }`}>
+            orderStatus === 'delivered'
+              ? 'bg-green-100 text-green-800'
+              : 'bg-red-100 text-red-800'
+          }`}
+        >
           {buttonConfig.icon}
           {buttonConfig.text}
         </div>
@@ -139,16 +140,17 @@ export const OrderActionButtons: React.FC<OrderActionButtonsProps> = ({
   }
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-1 r w-full">
       {/* Main action button */}
       <button
         onClick={() => handleStatusUpdate(buttonConfig.nextStatus)}
         disabled={buttonConfig.disabled || isLoading || localLoading !== null}
         className={`${getButtonStyles(buttonConfig.variant, compact)} ${
           buttonConfig.disabled || isLoading || localLoading !== null
-            ? "opacity-50 cursor-not-allowed"
-            : ""
-        }`}>
+            ? 'opacity-50 cursor-not-allowed'
+            : ''
+        }`}
+      >
         {localLoading === buttonConfig.nextStatus ? (
           <Icon icon="mdi:loading" className="w-3 h-3 animate-spin" />
         ) : (
@@ -158,16 +160,17 @@ export const OrderActionButtons: React.FC<OrderActionButtonsProps> = ({
       </button>
 
       {/* Cancel button - only show for pending and confirmed orders */}
-      {(orderStatus === "pending" || orderStatus === "confirmed") && (
+      {(orderStatus === 'pending' || orderStatus === 'confirmed') && (
         <button
           onClick={handleCancel}
           disabled={isLoading || localLoading !== null}
-          className={`${getButtonStyles("danger", compact)} ${
+          className={`${getButtonStyles('danger', compact)} ${
             isLoading || localLoading !== null
-              ? "opacity-50 cursor-not-allowed"
-              : ""
-          }`}>
-          {localLoading === "cancel" ? (
+              ? 'opacity-50 cursor-not-allowed'
+              : ''
+          }`}
+        >
+          {localLoading === 'cancel' ? (
             <Icon icon="mdi:loading" className="w-3 h-3 animate-spin" />
           ) : (
             <Icon icon="mdi:cancel" className="w-3 h-3" />

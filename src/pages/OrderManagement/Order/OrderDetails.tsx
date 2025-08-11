@@ -1,36 +1,36 @@
-import { Icon } from "@iconify/react/dist/iconify.js";
-import clsx from "clsx";
-import { map, get } from "lodash";
-import { CheckIcon, Download, PackageIcon, TruckIcon } from "lucide-react";
-import React, { useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { Icon } from '@iconify/react/dist/iconify.js';
+import clsx from 'clsx';
+import { map, get } from 'lodash';
+import { CheckIcon, Download, PackageIcon, TruckIcon } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
-import MasterTable from "../../../components/shared/MasterTable";
-import Header from "../../../components/shared/table_heading/Header";
+import MasterTable from '../../../components/shared/MasterTable';
+import Header from '../../../components/shared/table_heading/Header';
 import {
   useGetOrderById,
   useUpdateOrderMutation,
   useOrderCache,
-} from "../../../server/api/orderHooks";
-import InfoSection from "./components/InfoSection";
-import OrderTracker from "./components/OrderTracker";
-import { order_details_columns, Ordertitle, StepperObj } from "./orderObj";
-import ErrorBoundary from "../../../components/shared/ErrorBoundary";
+} from '../../../server/api/orderHooks';
+import InfoSection from './components/InfoSection';
+import OrderTracker from './components/OrderTracker';
+import { order_details_columns, Ordertitle, StepperObj } from './orderObj';
+import ErrorBoundary from '../../../components/shared/ErrorBoundary';
 import {
   OrderDetailsSkeleton,
   ButtonLoading,
-} from "../../../components/shared/LoadingStates";
-import { Constants } from "../../../utils/constants";
-import { CancelOrderModal } from "../../../components/shared/modals/CancelOrderModal";
-import { CompleteOrderModal } from "../../../components/shared/modals/CompleteOrderModal";
-import { PickupOrderModal } from "../../../components/shared/modals/PickupOrderModal";
+} from '../../../components/shared/LoadingStates';
+import { Constants } from '../../../utils/constants';
+import { CancelOrderModal } from '../../../components/shared/modals/CancelOrderModal';
+import { CompleteOrderModal } from '../../../components/shared/modals/CompleteOrderModal';
+import { PickupOrderModal } from '../../../components/shared/modals/PickupOrderModal';
 import {
   extractOrderData,
   extractProductData,
   formatCurrency,
   safeGet,
   validateOrderData,
-} from "../../../utils/dataHelpers";
+} from '../../../utils/dataHelpers';
 
 // Define proper TypeScript interfaces
 interface OrderedProduct {
@@ -62,26 +62,26 @@ interface InfoItem {
 const STEPS: OrderStep[] = [
   {
     id: 0,
-    name: "Pending",
+    name: 'Pending',
   },
   {
     id: 1,
-    name: "Confirmed",
+    name: 'Confirmed',
     icon: <CheckIcon className="w-6 h-6 text-white" />,
   },
   {
     id: 2,
-    name: "Order Handover",
+    name: 'Assigned Order',
     icon: <PackageIcon className="w-6 h-6 text-white" />,
   },
   {
     id: 3,
-    name: "Pickup",
+    name: 'Pickup',
     icon: <TruckIcon className="w-6 h-6 text-white" />,
   },
   {
     id: 4,
-    name: "Delivery Completion",
+    name: 'Delivery Completion',
     icon: <CheckIcon className="w-6 h-6 text-white" />,
   },
 ];
@@ -90,44 +90,44 @@ const STEPS: OrderStep[] = [
 const getOrderActionButton = (orderStatus: string) => {
   const statusConfig = {
     pending: {
-      text: "Accept Order",
-      nextStatus: "confirmed",
-      variant: "primary" as const,
+      text: 'Accept Order',
+      nextStatus: 'confirmed',
+      variant: 'primary' as const,
       icon: <CheckIcon className="w-4 h-4" />,
       disabled: false,
     },
     confirmed: {
-      text: "Assign Order",
-      nextStatus: "assigned",
-      variant: "primary" as const,
+      text: 'Assign Order',
+      nextStatus: 'assigned',
+      variant: 'primary' as const,
       icon: <PackageIcon className="w-4 h-4" />,
       disabled: false,
     },
     assigned: {
-      text: "Mark as Picked Up",
-      nextStatus: "picked_up",
-      variant: "primary" as const,
+      text: 'Mark as Picked Up',
+      nextStatus: 'picked_up',
+      variant: 'primary' as const,
       icon: <TruckIcon className="w-4 h-4" />,
       disabled: false,
     },
     picked_up: {
-      text: "Mark as Delivered",
-      nextStatus: "delivered",
-      variant: "success" as const,
+      text: 'Mark as Delivered',
+      nextStatus: 'delivered',
+      variant: 'success' as const,
       icon: <CheckIcon className="w-4 h-4" />,
       disabled: false,
     },
     delivered: {
-      text: "Order Completed",
-      nextStatus: "delivered",
-      variant: "success" as const,
+      text: 'Order Completed',
+      nextStatus: 'delivered',
+      variant: 'success' as const,
       icon: <CheckIcon className="w-4 h-4" />,
       disabled: true,
     },
     cancelled: {
-      text: "Order Cancelled",
-      nextStatus: "cancelled",
-      variant: "danger" as const,
+      text: 'Order Cancelled',
+      nextStatus: 'cancelled',
+      variant: 'danger' as const,
       icon: null,
       disabled: true,
     },
@@ -145,7 +145,7 @@ const OrderDetails: React.FC = () => {
   const { pathname } = useLocation();
 
   // Get the current page type from the URL
-  const pagePath = pathname.split("/");
+  const pagePath = pathname.split('/');
   const page = pagePath[pagePath.length - 2]; // This should be "order-details" for /order/order-details/123
 
   // Modal states
@@ -172,7 +172,7 @@ const OrderDetails: React.FC = () => {
     if (isSuccess) {
       // Add a small delay to ensure the success message is shown
       timeoutId = setTimeout(() => {
-        navigate("/order/orders");
+        navigate('/order/orders');
       }, 500);
     }
 
@@ -192,13 +192,13 @@ const OrderDetails: React.FC = () => {
     if (!order?._id) return;
 
     const pickupData = {
-      orderStatus: "picked_up" as const,
+      orderStatus: 'picked_up' as const,
       pickup: {
         date: new Date().toISOString(),
         pickedUpBy: pickupDetails.pickedUpBy,
         location: pickupDetails.location,
         notes: pickupDetails.notes,
-        confirmedBy: "Admin", // You can get this from auth context
+        confirmedBy: 'Admin', // You can get this from auth context
       },
       orderTimeline: {
         ...order.orderTimeline,
@@ -232,7 +232,7 @@ const OrderDetails: React.FC = () => {
     if (!order?._id) return;
 
     const completionData = {
-      orderStatus: "delivered" as const,
+      orderStatus: 'delivered' as const,
       deliveryCompletion: {
         date: new Date().toISOString(),
         notes: notes || undefined,
@@ -259,7 +259,7 @@ const OrderDetails: React.FC = () => {
 
     setShowCompleteModal(false);
     // Navigate back to main order management page after successful completion
-    setTimeout(() => navigate("/order/orders"), 1000);
+    setTimeout(() => navigate('/order/orders'), 1000);
   };
 
   // Handle order cancellation with optimistic updates
@@ -267,7 +267,7 @@ const OrderDetails: React.FC = () => {
     if (!order?._id) return;
 
     const cancellationData = {
-      orderStatus: "cancelled" as const,
+      orderStatus: 'cancelled' as const,
       cancellation: {
         reason,
         date: new Date().toISOString(),
@@ -294,7 +294,7 @@ const OrderDetails: React.FC = () => {
 
     setShowCancelModal(false);
     // Navigate to cancelled orders page after successful cancellation
-    setTimeout(() => navigate("/order/cancelled-order"), 1000);
+    setTimeout(() => navigate('/order/cancelled-order'), 1000);
   };
 
   // Transform order products data with safe access and performance optimization
@@ -306,7 +306,7 @@ const OrderDetails: React.FC = () => {
       const imageUrl =
         productData.images.length > 0
           ? `${import.meta.env.VITE_API_IMAGE_BASE_URL}${productData.images[0]}`
-          : "/no-image.png";
+          : '/no-image.png';
 
       return {
         image: (
@@ -318,7 +318,7 @@ const OrderDetails: React.FC = () => {
                 className="w-full h-full rounded-md object-cover aspect-square"
                 loading="lazy"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = "/no-image.png";
+                  (e.target as HTMLImageElement).src = '/no-image.png';
                 }}
               />
             </div>
@@ -336,10 +336,10 @@ const OrderDetails: React.FC = () => {
   const orderDetails = useMemo(() => {
     if (!order) {
       return {
-        subTotal: { label: "SubTotal", value: 0 },
-        shippingCost: { label: "Shipping Cost", value: 0 },
-        discounts: { label: "Discounts", value: 0 },
-        taxes: { label: "Taxes", value: 0 },
+        subTotal: { label: 'SubTotal', value: 0 },
+        shippingCost: { label: 'Shipping Cost', value: 0 },
+        discounts: { label: 'Discounts', value: 0 },
+        taxes: { label: 'Taxes', value: 0 },
       };
     }
 
@@ -352,15 +352,15 @@ const OrderDetails: React.FC = () => {
         value: orderData.totalAmount,
       },
       shippingCost: {
-        label: "Shipping Cost",
+        label: 'Shipping Cost',
         value: orderData.billDetails.shippingCost,
       },
       discounts: {
-        label: "Discounts",
+        label: 'Discounts',
         value: orderData.billDetails.discount,
       },
       taxes: {
-        label: "Taxes",
+        label: 'Taxes',
         value: orderData.billDetails.taxes,
       },
     };
@@ -383,39 +383,40 @@ const OrderDetails: React.FC = () => {
     return [
       {
         id: 1,
-        title: "Customer",
-        value: orderData.shippingAddress.fullname || "N/A",
+        title: 'Customer',
+        value: orderData.shippingAddress.fullname || 'N/A',
       },
       {
         id: 2,
-        title: "Phone Number",
-        value: orderData.shippingAddress.phone || "N/A",
+        title: 'Phone Number',
+        value: orderData.shippingAddress.phone || 'N/A',
       },
       {
         id: 3,
-        title: "Address",
-        value: orderData.shippingAddress.address || "N/A",
+        title: 'Address',
+        value: orderData.shippingAddress.address || 'N/A',
       },
       {
         id: 4,
-        title: "Email",
-        value: orderData.shippingAddress.email || "N/A",
+        title: 'Email',
+        value: orderData.shippingAddress.email || 'N/A',
       },
       {
         id: 5,
-        title: "Shipping Method",
-        value: safeGet(order, "shippingMethod", "Standard"),
+        title: 'Shipping Method',
+        value: safeGet(order, 'shippingMethod', 'Standard'),
       },
       {
         id: 6,
-        title: "Payment Status",
+        title: 'Payment Status',
         value: (
           <div
             className={`text-sm rounded-full py-1 px-4 font-medium ${
-              orderData.paymentStatus === "paid"
-                ? "text-white bg-green-600"
-                : "text-white bg-red-600"
-            }`}>
+              orderData.paymentStatus === 'paid'
+                ? 'text-white bg-green-600'
+                : 'text-white bg-red-600'
+            }`}
+          >
             <span className="capitalize">{orderData.paymentStatus}</span>
           </div>
         ),
@@ -430,28 +431,28 @@ const OrderDetails: React.FC = () => {
     return [
       {
         id: 1,
-        title: "Customer Name",
-        value: get(order, "billingAddress.fullname", "-"),
+        title: 'Customer Name',
+        value: get(order, 'billingAddress.fullname', '-'),
       },
       {
         id: 2,
-        title: "Phone Number",
-        value: get(order, "billingAddress.phone", ""),
+        title: 'Phone Number',
+        value: get(order, 'billingAddress.phone', ''),
       },
       {
         id: 3,
-        title: "Email",
-        value: get(order, "billingAddress.email", ""),
+        title: 'Email',
+        value: get(order, 'billingAddress.email', ''),
       },
       {
         id: 4,
-        title: "Address",
-        value: get(order, "billingAddress.address", ""),
+        title: 'Address',
+        value: get(order, 'billingAddress.address', ''),
       },
       {
         id: 5,
-        title: "landmark",
-        Note: get(order, "billingAddress.landMark", "N/A"),
+        title: 'landmark',
+        Note: get(order, 'billingAddress.landMark', 'N/A'),
       },
     ];
   }, [order]);
@@ -463,17 +464,17 @@ const OrderDetails: React.FC = () => {
     return [
       {
         id: 5,
-        title: "Cancelled Date",
+        title: 'Cancelled Date',
         date: (
           <div className="text-red">
-            {get(order, "cancellation.data", "N/A")}
+            {get(order, 'cancellation.data', 'N/A')}
           </div>
         ),
       },
       {
         id: 6,
-        title: "Reason for cancellation",
-        reason: get(order, "cancellation.reason", "N/A"),
+        title: 'Reason for cancellation',
+        reason: get(order, 'cancellation.reason', 'N/A'),
       },
     ];
   }, [order]);
@@ -521,39 +522,41 @@ const OrderDetails: React.FC = () => {
             <Icon icon="mdi:alert-circle" className="w-16 h-16 text-red-500" />
             <h2 className="text-xl font-medium">Error loading order details</h2>
             <p className="text-gray-600">
-              {error?.message || "Please check your connection and try again"}
+              {error?.message || 'Please check your connection and try again'}
             </p>
             <button
               onClick={() => window.location.reload()}
-              className="px-4 py-2 mt-4 text-white rounded-lg bg-blue-600 hover:bg-blue-700 transition-colors">
+              className="px-4 py-2 mt-4 text-white rounded-lg bg-blue-600 hover:bg-blue-700 transition-colors"
+            >
               Retry
             </button>
           </div>
-        }>
+        }
+      >
         <div></div>
       </ErrorBoundary>
     );
   }
 
-  const orderStatus = get(order, "orderStatus", "pending");
-  const orderDate = get(order, "orderDate", "").split("T")[0];
-  const orderNumber = get(order, "id", "").slice(-5);
+  const orderStatus = get(order, 'orderStatus', 'pending');
+  const orderDate = get(order, 'orderDate', '').split('T')[0];
+  const orderNumber = get(order, 'id', '').slice(-5);
 
   return (
     <ErrorBoundary>
       <div className="container px-4 py-3 mx-auto">
-        <Header text={Ordertitle[page] || "Order Details"} />
+        <Header text={Ordertitle[page] || 'Order Details'} />
 
         {/* Order Progress Tracker */}
         <OrderTracker
           steps={STEPS}
           currentStep={StepperObj[orderStatus] || 0}
-          cancelledBg={orderStatus === "cancelled" ? "bg-red-600" : undefined}
+          cancelledBg={orderStatus === 'cancelled' ? 'bg-red-600' : undefined}
           cancelledBorder={
-            orderStatus === "cancelled" ? "border-red-600" : undefined
+            orderStatus === 'cancelled' ? 'border-red-600' : undefined
           }
           cancelledText={
-            orderStatus === "cancelled" ? "text-red-600 font-medium" : undefined
+            orderStatus === 'cancelled' ? 'text-red-600 font-medium' : undefined
           }
         />
 
@@ -638,11 +641,12 @@ const OrderDetails: React.FC = () => {
                       ([key, { label, value }]) => (
                         <div
                           key={key}
-                          className="flex items-center justify-between text-sm">
+                          className="flex items-center justify-between text-sm"
+                        >
                           <p>{label}</p>
                           <p>
-                            {Constants.currency}{" "}
-                            {typeof value === "number"
+                            {Constants.currency}{' '}
+                            {typeof value === 'number'
                               ? value.toFixed(2)
                               : value}
                           </p>
@@ -663,7 +667,7 @@ const OrderDetails: React.FC = () => {
               </div>
             </div>
             <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-              {page === "cancelled-order-details" ? (
+              {page === 'cancelled-order-details' ? (
                 <InfoSection
                   title="Order Cancelled"
                   info={orderCancelled}
@@ -688,12 +692,12 @@ const OrderDetails: React.FC = () => {
                 const buttonConfig = getOrderActionButton(orderStatus);
                 const getButtonStyles = (variant: string) => {
                   const baseStyles =
-                    "px-6 py-3 text-white rounded-lg font-medium transition-all shadow-sm flex items-center gap-2";
+                    'px-6 py-3 text-white rounded-lg font-medium transition-all shadow-sm flex items-center gap-2';
                   const variants = {
-                    primary: "bg-blue-600 hover:bg-blue-700",
-                    success: "bg-green-600 hover:bg-green-700",
-                    danger: "bg-red-600 hover:bg-red-700",
-                    warning: "bg-orange-600 hover:bg-orange-700",
+                    primary: 'bg-blue-600 hover:bg-blue-700',
+                    success: 'bg-green hover:bg-green-700',
+                    danger: 'bg-red hover:bg-red-700',
+                    warning: 'bg-orange hover:bg-orange-700',
                   };
                   return `${baseStyles} ${
                     variants[variant as keyof typeof variants] ||
@@ -703,21 +707,21 @@ const OrderDetails: React.FC = () => {
 
                 const getLoadingText = (status: string) => {
                   const loadingTexts = {
-                    confirmed: "Accepting...",
-                    assigned: "Assigning...",
-                    picked_up: "Updating...",
-                    delivered: "Completing...",
+                    confirmed: 'Accepting...',
+                    assigned: 'Assigning...',
+                    picked_up: 'Updating...',
+                    delivered: 'Completing...',
                   };
                   return (
                     loadingTexts[status as keyof typeof loadingTexts] ||
-                    "Processing..."
+                    'Processing...'
                   );
                 };
 
                 const handleButtonClick = () => {
-                  if (buttonConfig.nextStatus === "delivered") {
+                  if (buttonConfig.nextStatus === 'delivered') {
                     setShowCompleteModal(true);
-                  } else if (buttonConfig.nextStatus === "picked_up") {
+                  } else if (buttonConfig.nextStatus === 'picked_up') {
                     setShowPickupModal(true);
                   } else {
                     handleOrderStatusUpdate(buttonConfig.nextStatus);
@@ -727,41 +731,44 @@ const OrderDetails: React.FC = () => {
                 return (
                   <>
                     {/* Main action button - only show if order is not completed or cancelled */}
-                    {orderStatus !== "delivered" &&
-                      orderStatus !== "cancelled" && (
+                    {orderStatus !== 'delivered' &&
+                      orderStatus !== 'cancelled' && (
                         <ButtonLoading
                           isLoading={isPending}
                           loadingText={getLoadingText(buttonConfig.nextStatus)}
                           onClick={handleButtonClick}
                           disabled={buttonConfig.disabled}
-                          className={getButtonStyles(buttonConfig.variant)}>
+                          className={getButtonStyles(buttonConfig.variant)}
+                        >
                           {buttonConfig.icon}
                           {buttonConfig.text}
                         </ButtonLoading>
                       )}
 
                     {/* Cancel button - only show for pending and confirmed orders */}
-                    {(orderStatus === "pending" ||
-                      orderStatus === "confirmed") && (
+                    {(orderStatus === 'pending' ||
+                      orderStatus === 'confirmed') && (
                       <ButtonLoading
                         isLoading={isPending}
                         loadingText="Cancelling..."
                         onClick={() => setShowCancelModal(true)}
-                        className="bg-red-600 hover:bg-red-700 px-6 py-3 text-white rounded-lg font-medium transition-all shadow-sm flex items-center gap-2">
+                        className="bg-red-600 hover:bg-red-700 px-6 py-3 text-white rounded-lg font-medium transition-all shadow-sm flex items-center gap-2"
+                      >
                         <Icon icon="mdi:cancel" className="w-4 h-4" />
                         Cancel Order
                       </ButtonLoading>
                     )}
 
                     {/* Status indicator for completed/cancelled orders */}
-                    {(orderStatus === "delivered" ||
-                      orderStatus === "cancelled") && (
+                    {(orderStatus === 'delivered' ||
+                      orderStatus === 'cancelled') && (
                       <div
                         className={`px-6 py-3 rounded-lg font-medium flex items-center gap-2 ${
-                          orderStatus === "delivered"
-                            ? "bg-green-100 text-green-800 border border-green-200"
-                            : "bg-red-100 text-red-800 border border-red-200"
-                        }`}>
+                          orderStatus === 'delivered'
+                            ? 'bg-green-100 text-green-800 border border-green-200'
+                            : 'bg-red-100 text-red-800 border border-red-200'
+                        }`}
+                      >
                         {buttonConfig.icon}
                         {buttonConfig.text}
                       </div>
@@ -779,16 +786,16 @@ const OrderDetails: React.FC = () => {
           onClose={() => setShowCompleteModal(false)}
           onConfirm={handleCompleteOrder}
           isLoading={isPending}
-          orderNumber={get(order, "orderNumber", "")}
-          customerName={get(order, "customer.name", "")}
-          totalAmount={get(order, "totalAmount", 0)}
+          orderNumber={get(order, 'orderNumber', '')}
+          customerName={get(order, 'customer.name', '')}
+          totalAmount={get(order, 'totalAmount', 0)}
         />
 
         <PickupOrderModal
           isOpen={showPickupModal}
           onClose={() => setShowPickupModal(false)}
           onConfirm={handlePickupOrder}
-          orderNumber={get(order, "orderNumber", "")}
+          orderNumber={get(order, 'orderNumber', '')}
           isLoading={isPending}
         />
 
@@ -797,7 +804,7 @@ const OrderDetails: React.FC = () => {
           onClose={() => setShowCancelModal(false)}
           onConfirm={handleCancelOrder}
           isLoading={isPending}
-          orderNumber={safeGet(order, "orderNumber", "")}
+          orderNumber={safeGet(order, 'orderNumber', '')}
         />
       </div>
     </ErrorBoundary>

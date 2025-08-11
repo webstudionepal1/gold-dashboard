@@ -490,20 +490,20 @@
 
 // Second
 
-import React, { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import { Icon } from "@iconify/react/dist/iconify.js";
-import { SearchFilterSort } from "../../components/global/SearchFilterSort";
-import Header from "../../components/shared/table_heading/Header";
-import { ScrollableModal } from "../../components/shared/ScrollableModal";
-import { DynamicTab } from "../PurchaseManagement/components/DynamicTab";
-import MasterTable from "../../components/shared/MasterTable";
+import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Icon } from '@iconify/react/dist/iconify.js';
+import { SearchFilterSort } from '../../components/global/SearchFilterSort';
+import Header from '../../components/shared/table_heading/Header';
+import { ScrollableModal } from '../../components/shared/ScrollableModal';
+import { DynamicTab } from '../PurchaseManagement/components/DynamicTab';
+import MasterTable from '../../components/shared/MasterTable';
 import {
   IFetchBanner,
   useDeleteBannerMutation,
   useGetAllBannerQuery,
-} from "../../server/api/bannerHook";
-import { updateBannerState } from "./Components/bannerStore";
+} from '../../server/api/bannerHook';
+import { updateBannerState } from './Components/bannerStore';
 
 interface BannerItem {
   _id: string;
@@ -522,23 +522,23 @@ interface BannerItem {
 }
 
 const bannerTabOptions = [
-  { value: "homepage", label: "Home Page" },
-  { value: "category-page", label: "Category Page" },
-  { value: "product-page", label: "Product Page" },
+  { value: 'homepage', label: 'Home Page' },
+  { value: 'category-page', label: 'Category Page' },
+  { value: 'product-page', label: 'Product Page' },
 ];
 
 const filterOptions = [
-  { value: "", label: "All Banners" },
-  { value: "active", label: "Active" },
-  { value: "inactive", label: "Inactive" },
+  { value: '', label: 'All Banners' },
+  { value: 'active', label: 'Active' },
+  { value: 'inactive', label: 'Inactive' },
 ];
 
 const sortOptions = [
-  { value: "", label: "Default" },
-  { value: "title-asc", label: "Title (A-Z)" },
-  { value: "title-desc", label: "Title (Z-A)" },
-  { value: "priority-high", label: "Priority (High)" },
-  { value: "priority-low", label: "Priority (Low)" },
+  { value: '', label: 'Default' },
+  { value: 'title-asc', label: 'Title (A-Z)' },
+  { value: 'title-desc', label: 'Title (Z-A)' },
+  { value: 'priority-high', label: 'Priority (High)' },
+  { value: 'priority-low', label: 'Priority (Low)' },
 ];
 
 interface FilterState {
@@ -556,18 +556,18 @@ interface ITable {
 
 const BannerIndex: React.FC = () => {
   const navigate = useNavigate();
-  const [selectedTab, setSelectedTab] = useState("homepage");
+  const [selectedTab, setSelectedTab] = useState('homepage');
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<IFetchBanner | null>(null);
   const [filterState, setFilterState] = useState<FilterState>({
-    searchQuery: "",
-    filterValue: "",
-    sortValue: "",
+    searchQuery: '',
+    filterValue: '',
+    sortValue: '',
   });
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<{
     url: string | null;
-    type: "web" | "mobile" | null;
+    type: 'web' | 'mobile' | null;
   }>({ url: null, type: null });
 
   const { data: banners = [], isLoading, error } = useGetAllBannerQuery();
@@ -585,7 +585,7 @@ const BannerIndex: React.FC = () => {
     setFilterState((prev: FilterState) => ({ ...prev, sortValue: sort }));
   };
 
-  const handleImageClick = (imageUrl: string, imageType: "web" | "mobile") => {
+  const handleImageClick = (imageUrl: string, imageType: 'web' | 'mobile') => {
     setSelectedImage({ url: imageUrl, type: imageType });
     setIsImageModalOpen(true);
   };
@@ -593,33 +593,33 @@ const BannerIndex: React.FC = () => {
   const handleDownloadImage = async (imageUrl: string) => {
     try {
       const response = await fetch(imageUrl, {
-        mode: "cors",
-        credentials: "same-origin",
+        mode: 'cors',
+        credentials: 'same-origin',
       });
       if (!response.ok) {
-        throw new Error("Failed to fetch image");
+        throw new Error('Failed to fetch image');
       }
       const blob = await response.blob();
       const blobUrl = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
+      const link = document.createElement('a');
       link.href = blobUrl;
-      const filename = imageUrl.split("/").pop() || "banner-image";
-      const extension = filename.split(".").pop() || "jpg";
+      const filename = imageUrl.split('/').pop() || 'banner-image';
+      const extension = filename.split('.').pop() || 'jpg';
       link.download = `${
-        filename.split(".")[0] || "banner-image"
+        filename.split('.')[0] || 'banner-image'
       }.${extension}`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(blobUrl);
     } catch (error) {
-      console.error("Download failed:", error);
-      const link = document.createElement("a");
+      console.error('Download failed:', error);
+      const link = document.createElement('a');
       link.href = imageUrl;
-      const filename = imageUrl.split("/").pop() || "banner-image";
-      const extension = filename.split(".").pop() || "jpg";
+      const filename = imageUrl.split('/').pop() || 'banner-image';
+      const extension = filename.split('.').pop() || 'jpg';
       link.download = `${
-        filename.split(".")[0] || "banner-image"
+        filename.split('.')[0] || 'banner-image'
       }.${extension}`;
       document.body.appendChild(link);
       link.click();
@@ -628,7 +628,7 @@ const BannerIndex: React.FC = () => {
   };
 
   const filteredBanners = useMemo(() => {
-    let result = banners.filter((item) =>
+    let result = banners?.filter((item) =>
       item.locations?.includes(selectedTab)
     );
 
@@ -647,16 +647,16 @@ const BannerIndex: React.FC = () => {
 
     if (filterState.sortValue) {
       switch (filterState.sortValue) {
-        case "title-asc":
-          result.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
+        case 'title-asc':
+          result.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
           break;
-        case "title-desc":
-          result.sort((a, b) => (b.title || "").localeCompare(a.title || ""));
+        case 'title-desc':
+          result.sort((a, b) => (b.title || '').localeCompare(a.title || ''));
           break;
-        case "priority-high":
+        case 'priority-high':
           result.sort((a, b) => (b.priority || 0) - (a.priority || 0));
           break;
-        case "priority-low":
+        case 'priority-low':
           result.sort((a, b) => (a.priority || 0) - (b.priority || 0));
           break;
       }
@@ -669,10 +669,10 @@ const BannerIndex: React.FC = () => {
     () => ({
       homepage: {
         columns: [
-          { key: "title", title: "Title" },
-          { key: "type", title: "Banner Type" },
-          { key: "image", title: "Web Image" },
-          { key: "mobImage", title: "Mobile Image" },
+          { key: 'title', title: 'Title' },
+          { key: 'type', title: 'Banner Type' },
+          { key: 'image', title: 'Web Image' },
+          { key: 'mobImage', title: 'Mobile Image' },
         ],
         rows: filteredBanners.map((banner) => ({
           id: banner._id,
@@ -691,7 +691,7 @@ const BannerIndex: React.FC = () => {
                   onClick={() =>
                     handleImageClick(
                       `https://gold-api.webstudiomatrix.com/${item}`,
-                      "web"
+                      'web'
                     )
                   }
                 />
@@ -712,7 +712,7 @@ const BannerIndex: React.FC = () => {
                   onClick={() =>
                     handleImageClick(
                       `https://gold-api.webstudiomatrix.com/${item}`,
-                      "mobile"
+                      'mobile'
                     )
                   }
                 />
@@ -724,12 +724,12 @@ const BannerIndex: React.FC = () => {
           original: banner,
         })),
       },
-      "category-page": {
+      'category-page': {
         columns: [
-          { key: "title", title: "Title" },
-          { key: "type", title: "Banner Type" },
-          { key: "image", title: "Web Image" },
-          { key: "mobImage", title: "Mobile Image" },
+          { key: 'title', title: 'Title' },
+          { key: 'type', title: 'Banner Type' },
+          { key: 'image', title: 'Web Image' },
+          { key: 'mobImage', title: 'Mobile Image' },
         ],
         rows: filteredBanners.map((banner) => ({
           id: banner._id,
@@ -748,7 +748,7 @@ const BannerIndex: React.FC = () => {
                   onClick={() =>
                     handleImageClick(
                       `https://gold-api.webstudiomatrix.com/${item}`,
-                      "web"
+                      'web'
                     )
                   }
                 />
@@ -769,7 +769,7 @@ const BannerIndex: React.FC = () => {
                   onClick={() =>
                     handleImageClick(
                       `https://gold-api.webstudiomatrix.com/${item}`,
-                      "mobile"
+                      'mobile'
                     )
                   }
                 />
@@ -781,12 +781,12 @@ const BannerIndex: React.FC = () => {
           original: banner,
         })),
       },
-      "product-page": {
+      'product-page': {
         columns: [
-          { key: "title", title: "Title" },
-          { key: "type", title: "Banner Type" },
-          { key: "image", title: "Web Image" },
-          { key: "mobImage", title: "Mobile Image" },
+          { key: 'title', title: 'Title' },
+          { key: 'type', title: 'Banner Type' },
+          { key: 'image', title: 'Web Image' },
+          { key: 'mobImage', title: 'Mobile Image' },
         ],
         rows: filteredBanners.map((banner) => ({
           id: banner._id,
@@ -805,7 +805,7 @@ const BannerIndex: React.FC = () => {
                   onClick={() =>
                     handleImageClick(
                       `https://gold-api.webstudiomatrix.com/${item}`,
-                      "web"
+                      'web'
                     )
                   }
                 />
@@ -826,7 +826,7 @@ const BannerIndex: React.FC = () => {
                   onClick={() =>
                     handleImageClick(
                       `https://gold-api.webstudiomatrix.com/${item}`,
-                      "mobile"
+                      'mobile'
                     )
                   }
                 />
@@ -914,7 +914,7 @@ const BannerIndex: React.FC = () => {
           <div className="bg-white rounded-lg shadow-lg">
             <div className="flex items-center justify-between p-4 border-b border-gray-200">
               <h2 className="text-lg font-bold text-gray-800">
-                {selectedImage.type === "mobile" ? "Mobile Image" : "Web Image"}
+                {selectedImage.type === 'mobile' ? 'Mobile Image' : 'Web Image'}
               </h2>
               <div className="flex items-center gap-3">
                 <button

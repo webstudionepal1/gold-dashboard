@@ -1,14 +1,14 @@
-import clsx from "clsx";
-import { debounce } from "lodash";
+import clsx from 'clsx';
+import { debounce } from 'lodash';
 import React, {
   ReactNode,
   useCallback,
   useEffect,
   useState,
   useMemo,
-} from "react";
-import TableAction from "./_table/TableAction";
-import { TableLoading, EmptyState } from "./LoadingStates";
+} from 'react';
+import TableAction from './_table/TableAction';
+import { TableLoading, EmptyState } from './LoadingStates';
 
 // Define proper TypeScript interfaces
 interface Column {
@@ -70,11 +70,11 @@ const MasterTable: React.FC<MasterTableProps> = ({
   returnAction,
   printAction,
   customActions,
-  emptyStateMessage = "No data available",
+  emptyStateMessage = 'No data available',
   className,
 }) => {
   // State
-  const [globalFilter, setGlobalFilter] = useState<string>("");
+  const [globalFilter, setGlobalFilter] = useState<string>('');
   const [pageIndex, setPageIndex] = useState<number>(0);
   const [pageSize] = useState<number>(entriesPerPage);
   const [filteredRows, setFilteredRows] = useState<Row[]>(rows);
@@ -106,10 +106,10 @@ const MasterTable: React.FC<MasterTableProps> = ({
     checkScreenSize();
 
     // Add event listener for window resize
-    window.addEventListener("resize", checkScreenSize);
+    window.addEventListener('resize', checkScreenSize);
 
     // Cleanup
-    return () => window.removeEventListener("resize", checkScreenSize);
+    return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
   // Initialize filtered rows when rows change with better performance
@@ -290,9 +290,10 @@ const MasterTable: React.FC<MasterTableProps> = ({
           onClick={() => handlePageChange(i)}
           className={`relative inline-flex items-center justify-center size-6 rounded-md text-sm font-medium ${
             pageIndex === i
-              ? "bg-[#DF8D28] text-white"
-              : "text-gray-500 hover:bg-gray-100"
-          }`}>
+              ? 'bg-[#DF8D28] text-white'
+              : 'text-gray-500 hover:bg-gray-100'
+          }`}
+        >
           {i + 1}
         </button>
       );
@@ -302,16 +303,17 @@ const MasterTable: React.FC<MasterTableProps> = ({
   };
 
   return (
-    <div className={clsx("p-4 bg-white rounded-md", className)}>
+    <div className={clsx('p-4 bg-white rounded-md', className)}>
       <div className="flex flex-col justify-between gap-3 pb-4 md:flex-row md:items-center">
         {tabsOptions && tabsOptions}
 
         <div
           className={clsx(
-            "flex items-center gap-2",
-            tabsOptions ? "md:justify-end  w-fit" : "justify-between ",
-            (filterSection || canSearch) && "w-full"
-          )}>
+            'flex items-center gap-2',
+            tabsOptions ? 'md:justify-end  w-fit' : 'justify-between ',
+            (filterSection || canSearch) && 'w-full'
+          )}
+        >
           {canSearch && (
             <div className="relative w-full md:w-64">
               <input
@@ -325,7 +327,8 @@ const MasterTable: React.FC<MasterTableProps> = ({
                   className="w-4 h-4 text-gray-400"
                   fill="currentColor"
                   viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg">
+                  xmlns="http://www.w3.org/2000/svg"
+                >
                   <path
                     fillRule="evenodd"
                     d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
@@ -341,13 +344,15 @@ const MasterTable: React.FC<MasterTableProps> = ({
               <button
                 onClick={() => setShowDeleteConfirm(true)}
                 className="p-1.5 text-red-600 bg-red-50 rounded-xl hover:bg-red-100"
-                title="Delete selected">
+                title="Delete selected"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="w-5 h-5"
                   fill="none"
                   viewBox="0 0 24 24"
-                  stroke="currentColor">
+                  stroke="currentColor"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -387,19 +392,21 @@ const MasterTable: React.FC<MasterTableProps> = ({
                   <th
                     key={column.key}
                     className={clsx(
-                      "px-2 py-2 text-xs font-medium tracking-wider bg-gray-50 text-gray-500 uppercase",
-                      column.key === "action" ? "text-center" : "text-start",
-                      column.key === "image" && "w-24",
-                      column.key === "sn" && "w-12"
-                    )}>
+                      'px-2 py-2 text-xs font-medium tracking-wider bg-gray-50 text-gray-500 uppercase',
+                      column.key === 'action' ? 'text-center' : 'text-start',
+                      column.key === 'image' && 'w-24',
+                      column.key === 'sn' && 'w-12'
+                    )}
+                  >
                     {column.title}
                   </th>
                 ))}
                 {showAction && (
                   <th
                     className={clsx(
-                      "px-2 py-2 text-xs font-medium tracking-wider  text-center bg-gray-50 text-gray-500 uppercase w-24"
-                    )}>
+                      'px-2 py-2 text-xs font-medium tracking-wider text-center bg-gray-50 text-gray-500 uppercase '
+                    )}
+                  >
                     Action
                   </th>
                 )}
@@ -414,7 +421,8 @@ const MasterTable: React.FC<MasterTableProps> = ({
                       columns.length +
                       (showAction ? 1 : 0)
                     }
-                    className="px-6 py-8">
+                    className="px-6 py-8"
+                  >
                     <TableLoading rows={3} columns={columns.length} />
                   </td>
                 </tr>
@@ -426,7 +434,8 @@ const MasterTable: React.FC<MasterTableProps> = ({
                       columns.length +
                       (showAction ? 1 : 0)
                     }
-                    className="px-6 py-8">
+                    className="px-6 py-8"
+                  >
                     <EmptyState
                       title="No data available"
                       description={emptyStateMessage}
@@ -439,11 +448,12 @@ const MasterTable: React.FC<MasterTableProps> = ({
                   <tr
                     key={row.id ?? `row-${index}`}
                     className={clsx(
-                      "hover:bg-gray-50 transition-colors duration-150",
+                      'hover:bg-gray-50 transition-colors duration-150',
                       row.id !== undefined && selectedRows.has(row.id)
-                        ? "bg-blue-50"
-                        : ""
-                    )}>
+                        ? 'bg-blue-50'
+                        : ''
+                    )}
+                  >
                     {canSelect && (
                       <td className="px-2 py-2 text-sm">
                         {row.id !== undefined && (
@@ -463,12 +473,15 @@ const MasterTable: React.FC<MasterTableProps> = ({
                       <td
                         key={column.key}
                         className={clsx(
-                          "px-2 py-2 text-sm",
-                          column.key === "action" ? "text-center" : "text-start",
-                          column.key === "image" && "relative group"
-                        )}>
-                        {column.key === "attachment" &&
-                        row[column.key] === "Null" ? (
+                          'px-2 py-2 text-sm',
+                          column.key === 'action'
+                            ? 'text-center'
+                            : 'text-start',
+                          column.key === 'image' && 'relative group'
+                        )}
+                      >
+                        {column.key === 'attachment' &&
+                        row[column.key] === 'Null' ? (
                           <span className="text-gray-400 italic">
                             No attachment
                           </span>
@@ -506,7 +519,7 @@ const MasterTable: React.FC<MasterTableProps> = ({
             <div className="flex items-center text-sm text-gray-600">
               {currentPageRows.length > 0 ? (
                 <>
-                  Showing {start + 1} to {end} of{" "}
+                  Showing {start + 1} to {end} of{' '}
                   {apiPagination ? totalItems : filteredRows.length}
                 </>
               ) : (
@@ -520,15 +533,17 @@ const MasterTable: React.FC<MasterTableProps> = ({
                   disabled={pageIndex === 0}
                   className={`relative inline-flex items-center px-2 py-1 rounded-full text-sm font-medium ${
                     pageIndex === 0
-                      ? "text-gray-300 cursor-not-allowed"
-                      : "text-gray-500 hover:bg-gray-100"
-                  }`}>
+                      ? 'text-gray-300 cursor-not-allowed'
+                      : 'text-gray-500 hover:bg-gray-100'
+                  }`}
+                >
                   <span className="sr-only">Previous</span>
                   <svg
                     className="w-5 h-5"
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
-                    fill="currentColor">
+                    fill="currentColor"
+                  >
                     <path
                       fillRule="evenodd"
                       d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
@@ -547,15 +562,17 @@ const MasterTable: React.FC<MasterTableProps> = ({
                   disabled={pageIndex === totalPages - 1 || totalPages === 0}
                   className={`relative inline-flex items-center px-2 py-2 rounded-full text-sm font-medium ${
                     pageIndex === totalPages - 1 || totalPages === 0
-                      ? "text-gray-300 cursor-not-allowed"
-                      : "text-gray-500 hover:bg-gray-100"
-                  }`}>
+                      ? 'text-gray-300 cursor-not-allowed'
+                      : 'text-gray-500 hover:bg-gray-100'
+                  }`}
+                >
                   <span className="sr-only">Next</span>
                   <svg
                     className="w-5 h-5"
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
-                    fill="currentColor">
+                    fill="currentColor"
+                  >
                     <path
                       fillRule="evenodd"
                       d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
@@ -574,13 +591,15 @@ const MasterTable: React.FC<MasterTableProps> = ({
             <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
               <div
                 className="fixed inset-0 transition-opacity"
-                aria-hidden="true">
+                aria-hidden="true"
+              >
                 <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
               </div>
 
               <span
                 className="hidden sm:inline-block sm:align-middle sm:h-screen"
-                aria-hidden="true">
+                aria-hidden="true"
+              >
                 &#8203;
               </span>
 
@@ -593,7 +612,8 @@ const MasterTable: React.FC<MasterTableProps> = ({
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
-                        stroke="currentColor">
+                        stroke="currentColor"
+                      >
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -619,13 +639,15 @@ const MasterTable: React.FC<MasterTableProps> = ({
                   <button
                     type="button"
                     className="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-red-600 border border-transparent rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
-                    onClick={handleDelete}>
+                    onClick={handleDelete}
+                  >
                     Delete
                   </button>
                   <button
                     type="button"
                     className="inline-flex justify-center w-full px-4 py-2 mt-3 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                    onClick={() => setShowDeleteConfirm(false)}>
+                    onClick={() => setShowDeleteConfirm(false)}
+                  >
                     Cancel
                   </button>
                 </div>
