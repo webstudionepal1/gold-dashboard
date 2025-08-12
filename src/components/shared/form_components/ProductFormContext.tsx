@@ -34,7 +34,7 @@ export interface ProductFormData {
   name: string;
   slug?: string;
   description: string;
-  productType?: "diamond" | "gold" | "silver";
+  productType?: "normal" | "diamond" | "gold" | "silver";
   category: string;
   subCategory: string;
   existingImages?: string[];
@@ -138,7 +138,7 @@ const defaultFormData: ProductFormData = {
   name: "",
   slug: "",
   description: "",
-  productType: undefined,
+  productType: 'gold',
   category: "",
   subCategory: "",
 

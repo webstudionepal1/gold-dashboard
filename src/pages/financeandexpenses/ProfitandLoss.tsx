@@ -1,14 +1,13 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { SearchFilterSort } from "../../components/global/SearchFilterSort";
 import Header from "../../components/shared/table_heading/Header";
 import { FrontendRoutes } from "../../routes/routes";
 
-import ProfitTable from "./components/ProfitTable";
 import {
   RevenueCategory,
   useGetFinancialReportQuery,
 } from "../../server/api/profitandlossHook";
+import ProfitTable from "./components/ProfitTable";
 import { profitandlossColumns } from "./profitandlossObj";
 
 // Filter state interface

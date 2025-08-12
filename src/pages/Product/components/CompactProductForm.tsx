@@ -243,13 +243,13 @@ const CompactFormContent: React.FC<{
                     />
                     <ErrorDisplay errors={validationState.name?.errors || []} />
                   </div>
-``
                   <div>
                     <DropdownField
                       label="Product Type"
                       required
                       options={[
                         { value: '', label: 'Select Product Type' },
+                        { value: 'normal', label: 'Normal' },
                         // { value: 'diamond', label: 'Diamond' },
                         { value: 'gold', label: 'Gold' },
                         { value: 'silver', label: 'Silver' }
@@ -260,41 +260,46 @@ const CompactFormContent: React.FC<{
                     <ErrorDisplay errors={validationState.productType?.errors || []} />
                   </div>
 
-                  <div>
-                    <DropdownField
-                      label="Category"
-                      required
-                      options={[{ value: '', label: 'Select Category' }, ...categoryOptions]}
-                      value={formData.category}
-                      onChange={(e) => updateFormData({ category: e.target.value })}
-                    />
-                    <ErrorDisplay errors={validationState.category?.errors || []} />
-                  </div>
+                  {/* Show additional fields only if product type is not 'normal' */}
+                  {formData.productType !== 'normal' && (
+                    <>
+                      <div>
+                        <DropdownField
+                          label="Category"
+                          required
+                          options={[{ value: '', label: 'Select Category' }, ...categoryOptions]}
+                          value={formData.category}
+                          onChange={(e) => updateFormData({ category: e.target.value })}
+                        />
+                        <ErrorDisplay errors={validationState.category?.errors || []} />
+                      </div>
 
-                  <div>
-                    <DropdownField
-                      label="Sub Category"
-                      required
-                      options={[{ value: '', label: 'Select Sub Category' }, ...subCategoryOptions]}
-                      value={formData.subCategory}
-                      onChange={(e) => updateFormData({ subCategory: e.target.value })}
-                    />
-                    <ErrorDisplay errors={validationState.subCategory?.errors || []} />
-                  </div>
+                      <div>
+                        <DropdownField
+                          label="Sub Category"
+                          required
+                          options={[{ value: '', label: 'Select Sub Category' }, ...subCategoryOptions]}
+                          value={formData.subCategory}
+                          onChange={(e) => updateFormData({ subCategory: e.target.value })}
+                        />
+                        <ErrorDisplay errors={validationState.subCategory?.errors || []} />
+                      </div>
 
-                  <div>
-                    <DropdownField
-                      label="Gender"
-                      options={[
-                        { value: '', label: 'Select Gender' },
-                        { value: 'male', label: 'Male' },
-                        { value: 'female', label: 'Female' },
-                        { value: 'unisex', label: 'Unisex' }
-                      ]}
-                      value={formData.gender || ''}
-                      onChange={(e) => updateFormData({ gender: e.target.value as any })}
-                    />
-                  </div>
+                      <div>
+                        <DropdownField
+                          label="Gender"
+                          options={[
+                            { value: '', label: 'Select Gender' },
+                            { value: 'male', label: 'Male' },
+                            { value: 'female', label: 'Female' },
+                            { value: 'unisex', label: 'Unisex' }
+                          ]}
+                          value={formData.gender || ''}
+                          onChange={(e) => updateFormData({ gender: e.target.value as any })}
+                        />
+                      </div>
+                    </>
+                  )}
                 </FieldGroup>
                 
                 <div className="mt-3">
@@ -312,8 +317,9 @@ const CompactFormContent: React.FC<{
                 </div>
               </FormSection>
 
-              {/* Product Specifications */}
-              <FormSection title="Specifications" icon="material-symbols:straighten">
+              {/* Product Specifications - Hide for normal products */}
+              {formData.productType !== 'normal' && (
+                <FormSection title="Specifications" icon="material-symbols:straighten">
                 <FieldGroup columns={3}>
                   <div>
                     <InputField
@@ -435,113 +441,139 @@ const CompactFormContent: React.FC<{
                   </FieldGroup>
                 </div>
               </FormSection>
+              )}
 
-              {/* Product Variants */}
-              <FormSection title="Variants & Pricing" icon="material-symbols:inventory">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
-                  <div>
-                    <p className="text-xs text-gray-600">Configure variants with pricing and inventory</p>
-                    <p className="text-xs text-gray-500">
-                      {formData.variants.length} variant{formData.variants.length !== 1 ? 's' : ''}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={addVariant}
-                    className="flex items-center gap-1 px-3 py-1.5 bg-[#DF8D28] text-white rounded text-xs font-medium hover:bg-[#B8691A] transition-colors"
-                  >
-                    <Icon icon="material-symbols:add" className="w-3 h-3" />
-                    Add
-                  </button>
-                </div>
-
-                <div className="space-y-3">
-                  {formData.variants.map((variant, index) => (
-                    <div key={index} className="bg-gray-50 rounded p-3 border border-gray-200">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 bg-[#DF8D28] text-white rounded-full flex items-center justify-center text-xs font-medium">
-                            {index + 1}
-                          </div>
-                          <div>
-                            <h4 className="text-sm font-medium text-gray-900">Variant {index + 1}</h4>
-                            <p className="text-xs text-gray-500">
-                              {variant.price > 0 ? `₹${variant.price}` : 'No price'} • {variant.wt > 0 ? `${variant.wt} ${variant.unit}` : 'No weight'}
-                            </p>
-                          </div>
-                        </div>
-                        {formData.variants.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() => removeVariant(index)}
-                            className="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50 transition-colors"
-                            title="Remove variant"
-                          >
-                            <Icon icon="material-symbols:delete" className="w-3 h-3" />
-                          </button>
-                        )}
-                      </div>
-
-                      <FieldGroup columns={3}>
-                        <div>
-                          <InputField
-                            label="Price"
-                            type="number"
-                            step="0.01"
-                            placeholder="0.00"
-                            numberValue={variant.price}
-                            onNumberChange={(value) => updateVariant(index, 'price', value)}
-                            allowNegative={false}
-                            clearZeroOnFocus
-                          />
-                        </div>
-
-                        <div>
-                          <InputField
-                            label="Weight"
-                            type="number"
-                            step="0.01"
-                            placeholder="0.00"
-                            numberValue={variant.wt}
-                            onNumberChange={(value) => updateVariant(index, 'wt', value)}
-                            allowNegative={false}
-                            clearZeroOnFocus
-                          />
-                        </div>
-
-                        <div>
-                          <DropdownField
-                            label="Unit"
-                            options={[
-                              { value: 'grams', label: 'Grams' },
-                              { value: 'kg', label: 'Kilograms' },
-                              { value: 'pieces', label: 'Pieces' },
-                              { value: 'carats', label: 'Carats' }
-                            ]}
-                            value={variant.unit}
-                            onChange={(e) => updateVariant(index, 'unit', e.target.value)}
-                          />
-                        </div>
-                      </FieldGroup>
-
-                      <div className="mt-2 flex items-center">
-                        <label className="flex items-center gap-1 text-xs font-medium text-gray-700">
-                          <input
-                            type="checkbox"
-                            checked={variant.isActive}
-                            onChange={(e) => updateVariant(index, 'isActive', e.target.checked)}
-                            className="rounded border-gray-300 text-[#DF8D28] focus:ring-[#DF8D28] w-3 h-3"
-                          />
-                          Active
-                        </label>
+              {/* Product Variants - Show simplified version for normal products */}
+              <FormSection title={formData.productType === 'normal' ? 'Pricing' : 'Variants & Pricing'} icon="material-symbols:inventory">
+                {formData.productType === 'normal' ? (
+                  // Simplified pricing for normal products
+                  <div className="space-y-3">
+                    <div className="bg-gray-50 rounded p-3 border border-gray-200">
+                      <h4 className="text-sm font-medium text-gray-900 mb-3">Product Price</h4>
+                      <div className="max-w-xs">
+                        <InputField
+                          label="Price"
+                          type="number"
+                          step="0.01"
+                          placeholder="0.00"
+                          numberValue={formData.variants[0]?.price || 0}
+                          onNumberChange={(value) => updateVariant(0, 'price', value)}
+                          allowNegative={false}
+                          clearZeroOnFocus
+                        />
                       </div>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ) : (
+                  // Full variants for other product types
+                  <>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+                      <div>
+                        <p className="text-xs text-gray-600">Configure variants with pricing and inventory</p>
+                        <p className="text-xs text-gray-500">
+                          {formData.variants.length} variant{formData.variants.length !== 1 ? 's' : ''}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={addVariant}
+                        className="flex items-center gap-1 px-3 py-1.5 bg-[#DF8D28] text-white rounded text-xs font-medium hover:bg-[#B8691A] transition-colors"
+                      >
+                        <Icon icon="material-symbols:add" className="w-3 h-3" />
+                        Add
+                      </button>
+                    </div>
+
+                    <div className="space-y-3">
+                      {formData.variants.map((variant, index) => (
+                        <div key={index} className="bg-gray-50 rounded p-3 border border-gray-200">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                              <div className="w-6 h-6 bg-[#DF8D28] text-white rounded-full flex items-center justify-center text-xs font-medium">
+                                {index + 1}
+                              </div>
+                              <div>
+                                <h4 className="text-sm font-medium text-gray-900">Variant {index + 1}</h4>
+                                <p className="text-xs text-gray-500">
+                                  {variant.price > 0 ? `₹${variant.price}` : 'No price'} • {variant.wt > 0 ? `${variant.wt} ${variant.unit}` : 'No weight'}
+                                </p>
+                              </div>
+                            </div>
+                            {formData.variants.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => removeVariant(index)}
+                                className="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50 transition-colors"
+                                title="Remove variant"
+                              >
+                                <Icon icon="material-symbols:delete" className="w-3 h-3" />
+                              </button>
+                            )}
+                          </div>
+
+                          <FieldGroup columns={3}>
+                            <div>
+                              <InputField
+                                label="Price"
+                                type="number"
+                                step="0.01"
+                                placeholder="0.00"
+                                numberValue={variant.price}
+                                onNumberChange={(value) => updateVariant(index, 'price', value)}
+                                allowNegative={false}
+                                clearZeroOnFocus
+                              />
+                            </div>
+
+                            <div>
+                              <InputField
+                                label="Weight"
+                                type="number"
+                                step="0.01"
+                                placeholder="0.00"
+                                numberValue={variant.wt}
+                                onNumberChange={(value) => updateVariant(index, 'wt', value)}
+                                allowNegative={false}
+                                clearZeroOnFocus
+                              />
+                            </div>
+
+                            <div>
+                              <DropdownField
+                                label="Unit"
+                                options={[
+                                  { value: 'grams', label: 'Grams' },
+                                  { value: 'kg', label: 'Kilograms' },
+                                  { value: 'pieces', label: 'Pieces' },
+                                  { value: 'carats', label: 'Carats' }
+                                ]}
+                                value={variant.unit}
+                                onChange={(e) => updateVariant(index, 'unit', e.target.value)}
+                              />
+                            </div>
+                          </FieldGroup>
+
+                          <div className="mt-2 flex items-center">
+                            <label className="flex items-center gap-1 text-xs font-medium text-gray-700">
+                              <input
+                                type="checkbox"
+                                checked={variant.isActive}
+                                onChange={(e) => updateVariant(index, 'isActive', e.target.checked)}
+                                className="rounded border-gray-300 text-[#DF8D28] focus:ring-[#DF8D28] w-3 h-3"
+                              />
+                              Active
+                            </label>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
               </FormSection>
 
-              {/* Gemstones */}
-              <FormSection title="Gemstones" icon="material-symbols:diamond">
+              {/* Gemstones - Hide for normal products */}
+              {formData.productType !== 'normal' && (
+                <FormSection title="Gemstones" icon="material-symbols:diamond">
                 <div className="space-y-3">
                   {formData.stones && formData.stones.length > 0 ? (
                     formData.stones.map((stone, index) => (
@@ -619,9 +651,11 @@ const CompactFormContent: React.FC<{
                   </button>
                 </div>
               </FormSection>
+              )}
 
-              {/* Other Charges */}
-              <FormSection title="Other Charges" icon="material-symbols:receipt-long">
+              {/* Other Charges - Hide for normal products */}
+              {formData.productType !== 'normal' && (
+                <FormSection title="Other Charges" icon="material-symbols:receipt-long">
                 <div className="space-y-3">
                   {formData.otherCharges && formData.otherCharges.length > 0 ? (
                     formData.otherCharges.map((charge, index) => (
@@ -677,8 +711,11 @@ const CompactFormContent: React.FC<{
                   </button>
                 </div>
               </FormSection>
+              )}
 
-              {/* Product Images */}
+
+
+              {/* Product Images - Show for all product types */}
               <FormSection title="Product Images" icon="material-symbols:image">
                 <div className="space-y-2">
                   <p className="text-xs text-gray-600">Upload product images (Max 10)</p>
@@ -690,8 +727,9 @@ const CompactFormContent: React.FC<{
                 </div>
               </FormSection>
 
-              {/* Status & Visibility Settings */}
-              <FormSection title="Status & Visibility" icon="material-symbols:settings">
+              {/* Status & Visibility Settings - Hide for normal products */}
+              {formData.productType !== 'normal' && (
+                <FormSection title="Status & Visibility" icon="material-symbols:settings">
                 <FieldGroup columns={3}>
                   <div>
                     <DropdownField
@@ -732,6 +770,7 @@ const CompactFormContent: React.FC<{
                   </div>
                 </FieldGroup>
               </FormSection>
+              )}
 
           {/* Form Actions */}
           <div className="bg-white rounded-md border border-gray-200 shadow-sm sticky bottom-2">
