@@ -53,8 +53,10 @@ export interface ProductFormData {
   makingCharges: number;
 
   // Wastage
-  wastageType?: "percentage" | "flat";
-  wastageValue?: number;
+  wastage?: {
+    type: "fixed" | "per";
+    value: number;
+  };
 
   // Page 3: Product Variants
   variants: ProductVariant[];
@@ -156,8 +158,7 @@ const defaultFormData: ProductFormData = {
   makingCharges: 0,
 
   // Wastage
-  wastageType: undefined,
-  wastageValue: 0,
+  wastage: undefined,
 
   // Page 3: Product Variants
   variants: [

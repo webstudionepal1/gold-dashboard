@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { CompactProductForm } from "./CompactProductForm"; 
+import { CompactProductForm } from "./CompactProductForm";
+import get from "lodash/get";
 import {
   useCreateProductsMutation,
   useUpdateProductsMutation,
@@ -59,11 +60,10 @@ const NewProductForm: React.FC = () => {
       makingCharges: product.makingCharges || 0,
 
       // Wastage
-      wastageType: undefined, // Will be set by user
-      wastageValue: 0,
+      wastage: get(product, "wastage", undefined), // Will be set by user
 
       // Variants
-      variants: [
+      variants: get(product, "variant", [
         {
           sku: "",
           price: 0,
@@ -75,12 +75,12 @@ const NewProductForm: React.FC = () => {
           reorderPoint: 10,
           isActive: true,
         },
-      ],
+      ]),
 
       // Stones and Occasions
-      stones: [],
+      stones: get(product, "st"),
       occasions: [],
-      otherCharges: [],
+      otherCharges: get(product, "others", []),
       existingImages: product.images || [],
       // Media
       images: [],
@@ -93,18 +93,10 @@ const NewProductForm: React.FC = () => {
           | "bestSellers"
           | "newArrivals"
           | "normal") || "normal",
-      // metadata: {
-      //   seoTitle: "",
-      //   seoDescription: "",
-      //   keywords: [],
-      //   vendor: "",
-      //   barcode: "",
-      //   compareAtPrice: 0,
-      // },
-
+   
       // Status
-      isActive: true,
-      isFeatured: false,
+      isActive: get(product, "isActive", true),
+      isFeatured: get(product, "isFeatured", false),
     };
   };
 
@@ -135,87 +127,70 @@ const NewProductForm: React.FC = () => {
   const transformFormDataToAPI = (formData: ProductFormData) => {
     const formDataObj = new FormData();
 
-    // Basic Information
+    // Basic Information - Always present
     formDataObj.append("name", formData.name);
-    if (formData.slug) formDataObj.append("slug", formData.slug);
     formDataObj.append("description", formData.description);
-    if (formData.productType) formDataObj.append("productType", formData.productType);
-    formDataObj.append("category", formData.category);
-    formDataObj.append("subCategory", formData.subCategory);
+    if (formData.productType)
+      formDataObj.append("productType", formData.productType);
 
-    // Specifications
-    formDataObj.append("length", formData.length.toString());
-    if (formData.claspType) formDataObj.append("claspType", formData.claspType);
-    formDataObj.append("rhodoumFinishes", formData.rhodoumFinishes.toString());
-    formDataObj.append("shape", formData.shape);
-    formDataObj.append("quantity", formData.quantity.toString());
-    if (formData.totalCarat)
-      formDataObj.append("totalCarat", formData.totalCarat.toString());
-    if (formData.color) formDataObj.append("color", formData.color);
-    formDataObj.append("clarity", formData.clarity);
-    formDataObj.append("dimension", formData.dimension.toString());
-    if (formData.gender) formDataObj.append("gender", formData.gender);
-    formDataObj.append("makingCharges", formData.makingCharges.toString());
+    // Only add these fields if product type is not 'normal'
+    if (formData.productType !== "normal") {
+      if (formData.category) formDataObj.append("category", formData.category);
+      if (formData.subCategory)
+        formDataObj.append("subCategory", formData.subCategory);
+      if (formData.gender) formDataObj.append("gender", formData.gender);
 
-    // Wastage
-    if (formData.wastageType) formDataObj.append("wastageType", formData.wastageType);
-    if (formData.wastageValue) formDataObj.append("wastageValue", formData.wastageValue.toString());
-
-    // Variants
-    formData.variants.forEach((variant, index) => {
-      if (variant.sku)
-        formDataObj.append(`variants[${index}][sku]`, variant.sku);
-      formDataObj.append(`variants[${index}][price]`, variant.price.toString());
-      formDataObj.append(`variants[${index}][wt]`, variant.wt.toString());
-      formDataObj.append(`variants[${index}][unit]`, variant.unit);
-      formDataObj.append(
-        `variants[${index}][totalStock]`,
-        variant.totalStock.toString()
-      );
-      formDataObj.append(
-        `variants[${index}][usedStock]`,
-        variant.usedStock.toString()
-      );
-      formDataObj.append(
-        `variants[${index}][remainingStock]`,
-        variant.remainingStock.toString()
-      );
-      formDataObj.append(
-        `variants[${index}][reorderPoint]`,
-        variant.reorderPoint.toString()
-      );
-      if (variant.costPrice)
+      // Specifications - only for non-normal products
+      if (formData.length)
+        formDataObj.append("length", formData.length.toString());
+      if (formData.dimension)
+        formDataObj.append("dimension", formData.dimension.toString());
+      if (formData.makingCharges)
+        formDataObj.append("makingCharges", formData.makingCharges.toString());
+      if (formData.color) formDataObj.append("color", formData.color);
+      if (formData.clarity) formDataObj.append("clarity", formData.clarity);
+      if (formData.totalCarat)
+        formDataObj.append("totalCarat", formData.totalCarat.toString());
+      if (formData.rhodoumFinishes)
         formDataObj.append(
-          `variants[${index}][costPrice]`,
-          variant.costPrice.toString()
+          "rhodoumFinishes",
+          formData.rhodoumFinishes.toString()
         );
-      formDataObj.append(
-        `variants[${index}][isActive]`,
-        variant.isActive.toString()
-      );
+
+      // Wastage - only for non-normal products
+      if (formData.wastage) {
+        formDataObj.append("wastage[type]", formData.wastage.type);
+        formDataObj.append("wastage[value]", formData.wastage.value.toString());
+      }
+    }
+
+    // Variants - Only send fields that are actually used in the form
+    formData.variants.forEach((variant, index) => {
+      formDataObj.append(`variant[${index}][price]`, variant.price.toString());
+
+      // Only add weight and unit for non-normal products
+      if (formData.productType !== "normal") {
+        formDataObj.append(`variant[${index}][wt]`, variant.wt.toString());
+        formDataObj.append(`variant[${index}][unit]`, variant.unit);
+        formDataObj.append(
+          `variant[${index}][isActive]`,
+          variant.isActive.toString()
+        );
+      }
     });
 
-    // Stones
-    if (formData.stones) {
+    // Stones - Only for non-normal products
+    if (formData.productType !== "normal" && formData.stones) {
       formData.stones.forEach((stone, index) => {
         formDataObj.append(`stones[${index}][name]`, stone.name);
-        formDataObj.append(
-          `stones[${index}][weight]`,
-          stone.weight.toString()
-        );
-        formDataObj.append(
-          `stones[${index}][price]`,
-          stone.price.toString()
-        );
-        formDataObj.append(
-          `stones[${index}][color]`,
-          stone.color
-        );
+        formDataObj.append(`stones[${index}][weight]`, stone.weight.toString());
+        formDataObj.append(`stones[${index}][price]`, stone.price.toString());
+        formDataObj.append(`stones[${index}][color]`, stone.color);
       });
     }
 
-    // Other Charges
-    if (formData.otherCharges) {
+    // Other Charges - Only for non-normal products
+    if (formData.productType !== "normal" && formData.otherCharges) {
       formData.otherCharges.forEach((charge, index) => {
         formDataObj.append(`otherCharges[${index}][name]`, charge.name);
         formDataObj.append(
@@ -225,56 +200,17 @@ const NewProductForm: React.FC = () => {
       });
     }
 
-    // Occasions
-    if (formData.occasions) {
-      formData.occasions.forEach((occasion, index) => {
-        formDataObj.append(`occasions[${index}]`, occasion);
-      });
+    // Status & Visibility - Only for non-normal products
+    if (formData.productType !== "normal") {
+      if (formData.visibleAs)
+        formDataObj.append("visibleAs", formData.visibleAs);
+      if (formData.isActive !== undefined)
+        formDataObj.append("isActive", formData.isActive.toString());
+      if (formData.isFeatured !== undefined)
+        formDataObj.append("isFeatured", formData.isFeatured.toString());
     }
 
-    // Tags
-    formData.tags.forEach((tag, index) => {
-      formDataObj.append(`tags[${index}]`, tag);
-    });
-
-    // Visibility
-    formDataObj.append("visibleAs", formData.visibleAs);
-
-    // Status
-    formDataObj.append("isActive", formData.isActive.toString());
-    formDataObj.append("isFeatured", formData.isFeatured.toString());
-
-    // Metadata
-    // if (formData.metadata) {
-    //   if (formData.metadata.seoTitle) {
-    //     formDataObj.append("metadata[seoTitle]", formData.metadata.seoTitle);
-    //   }
-    //   if (formData.metadata.seoDescription) {
-    //     formDataObj.append(
-    //       "metadata[seoDescription]",
-    //       formData.metadata.seoDescription
-    //     );
-    //   }
-    //   if (formData.metadata.keywords) {
-    //     formData.metadata.keywords.forEach((keyword, index) => {
-    //       formDataObj.append(`metadata[keywords][${index}]`, keyword);
-    //     });
-    //   }
-    //   if (formData.metadata.vendor) {
-    //     formDataObj.append("metadata[vendor]", formData.metadata.vendor);
-    //   }
-    //   if (formData.metadata.barcode) {
-    //     formDataObj.append("metadata[barcode]", formData.metadata.barcode);
-    //   }
-    //   if (formData.metadata.compareAtPrice) {
-    //     formDataObj.append(
-    //       "metadata[compareAtPrice]",
-    //       formData.metadata.compareAtPrice.toString()
-    //     );
-    //   }
-    // }
-
-    // Handle images - append actual File objects instead of URLs
+    // Handle images - All product types can have images
     if (formData.images && Array.isArray(formData.images)) {
       formData.images.forEach((image: File | string, index: number) => {
         if (image instanceof File) {

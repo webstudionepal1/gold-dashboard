@@ -11,7 +11,7 @@
  * 7. Reusable event handlers for form updates
  */
 
-import React from "react";
+import React, { useState } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { ProductFormProvider, useProductForm, ProductFormData } from "../../../components/shared/form_components/ProductFormContext";
 import { InputField } from "../../../components/shared/form_components/InputField";
@@ -93,6 +93,10 @@ const CompactFormContent: React.FC<{
   isEdit?: boolean;
 }> = ({ onSubmit, onCancel, isEdit = false }) => {
   const { formData, updateFormData, validationState, isLoading, setIsLoading } = useProductForm();
+
+  // Image upload state
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [dragActive, setDragActive] = useState(false);
 
   // API hooks
   const { data: categories } = useGetAllProductCategoriesQuery();
@@ -190,6 +194,65 @@ const CompactFormContent: React.FC<{
     const newCharges = [...currentCharges];
     newCharges[index] = { ...newCharges[index], [field]: value };
     updateFormData({ otherCharges: newCharges });
+  };
+
+  // Image upload functions
+  const handleImageUpload = async (files: File[]) => {
+    // Limit to 10 images total
+    const maxImages = 10;
+    const currentImageCount = selectedImages.length;
+    const availableSlots = maxImages - currentImageCount;
+    const filesToAdd = files.slice(0, availableSlots);
+
+    const newImages = [...selectedImages, ...filesToAdd];
+    setSelectedImages(newImages);
+
+    // Store actual File objects in form data
+    const existingImages = formData.images || [];
+    const allImages = [...existingImages, ...filesToAdd];
+    updateFormData({ images: allImages });
+  };
+
+  // Handle file input change
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const files = Array.from(e.target.files);
+      handleImageUpload(files);
+    }
+  };
+
+  // Handle drag and drop
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const files = Array.from(e.dataTransfer.files).filter((file) =>
+        file.type.startsWith("image/")
+      );
+      handleImageUpload(files);
+    }
+  };
+
+  // Remove image
+  const removeImage = (index: number) => {
+    const newImages = selectedImages.filter((_, i) => i !== index);
+    setSelectedImages(newImages);
+
+    // Update form data
+    const newFormImages = (formData.images || []).filter((_, i) => i !== index);
+    updateFormData({ images: newFormImages });
   };
 
   return (
@@ -418,22 +481,32 @@ const CompactFormContent: React.FC<{
                         label="Wastage Type"
                         options={[
                           { value: '', label: 'Select Type' },
-                          { value: 'percentage', label: 'Percentage (%)' },
-                          { value: 'flat', label: 'Flat Amount' }
+                          { value: 'per', label: 'Percentage (%)' },
+                          { value: 'fixed', label: 'Flat Amount' }
                         ]}
-                        value={formData.wastageType || ''}
-                        onChange={(e) => updateFormData({ wastageType: e.target.value as any })}
+                        value={formData.wastage?.type || ''}
+                        onChange={(e) => updateFormData({
+                          wastage: {
+                            type: e.target.value as "fixed" | "per",
+                            value: formData.wastage?.value || 0
+                          }
+                        })}
                       />
                     </div>
 
                     <div>
                       <InputField
-                        label={formData.wastageType === 'percentage' ? 'Percentage (%)' : 'Amount'}
+                        label={formData.wastage?.type === 'per' ? 'Percentage (%)' : 'Amount'}
                         type="number"
                         step="0.01"
                         placeholder="0.00"
-                        numberValue={formData.wastageValue || 0}
-                        onNumberChange={(value) => updateFormData({ wastageValue: value })}
+                        numberValue={formData.wastage?.value || 0}
+                        onNumberChange={(value) => updateFormData({
+                          wastage: {
+                            type: formData.wastage?.type || 'fixed',
+                            value: value
+                          }
+                        })}
                         allowNegative={false}
                         clearZeroOnFocus
                       />
@@ -717,13 +790,120 @@ const CompactFormContent: React.FC<{
 
               {/* Product Images - Show for all product types */}
               <FormSection title="Product Images" icon="material-symbols:image">
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <p className="text-xs text-gray-600">Upload product images (Max 10)</p>
-                  <div className="border-2 border-dashed border-gray-300 rounded p-4 text-center">
-                    <Icon icon="material-symbols:cloud-upload" className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                    <p className="text-xs text-gray-500">Drag and drop images or click to browse</p>
-                    <input type="file" multiple accept="image/*" className="hidden" />
+
+                  {/* Upload Area */}
+                  <div
+                    className={`border-2 border-dashed rounded p-4 text-center transition-colors cursor-pointer ${
+                      dragActive
+                        ? "border-[#DF8D28] bg-orange-50"
+                        : "border-gray-300 hover:border-[#DF8D28]"
+                    } ${selectedImages.length >= 10 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    onDragEnter={handleDrag}
+                    onDragLeave={handleDrag}
+                    onDragOver={handleDrag}
+                    onDrop={handleDrop}
+                    onClick={() => {
+                      if (selectedImages.length < 10) {
+                        document.getElementById('product-images')?.click();
+                      }
+                    }}
+                  >
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleFileInputChange}
+                      className="hidden"
+                      id="product-images"
+                      disabled={selectedImages.length >= 10}
+                    />
+
+                    <div className="flex flex-col items-center gap-2">
+                      <Icon
+                        icon="material-symbols:cloud-upload"
+                        className="w-8 h-8 text-gray-400"
+                      />
+                      <div>
+                        <p className="text-xs text-gray-500">
+                          {selectedImages.length >= 10
+                            ? 'Maximum 10 images reached'
+                            : 'Drag and drop images or click to browse'
+                          }
+                        </p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          {selectedImages.length}/10 images
+                        </p>
+                      </div>
+                    </div>
                   </div>
+
+                  {/* Image Preview Grid */}
+                  {selectedImages.length > 0 && (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                      {selectedImages.map((file, index) => (
+                        <div key={index} className="relative group">
+                          <div className="relative aspect-square">
+                            <img
+                              src={URL.createObjectURL(file)}
+                              alt={`Product ${index + 1}`}
+                              className="w-full h-full object-cover rounded border border-gray-200"
+                            />
+
+                            {/* Primary Image Badge */}
+                            {index === 0 && (
+                              <div className="absolute top-1 left-1 bg-[#DF8D28] text-white text-xs px-1.5 py-0.5 rounded font-medium">
+                                Primary
+                              </div>
+                            )}
+
+                            {/* Remove Button */}
+                            <button
+                              type="button"
+                              onClick={() => removeImage(index)}
+                              className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                              title="Remove image"
+                            >
+                              <Icon icon="material-symbols:close" className="w-3 h-3" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Existing Images (for edit mode) */}
+                  {!selectedImages.length && formData.existingImages && formData.existingImages.length > 0 && (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                      {formData.existingImages.map((imageUrl, index) => (
+                        <div key={index} className="relative group">
+                          <div className="relative aspect-square">
+                            <img
+                              src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${imageUrl}`}
+                              alt={`Existing Product ${index + 1}`}
+                              className="w-full h-full object-cover rounded border border-gray-200"
+                            />
+                            {index === 0 && (
+                              <div className="absolute top-1 left-1 bg-[#DF8D28] text-white text-xs px-1.5 py-0.5 rounded font-medium">
+                                Primary
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Info Message */}
+                  {selectedImages.length > 0 && (
+                    <div className="p-2 bg-blue-50 rounded border border-blue-200">
+                      <p className="text-xs text-blue-700 flex items-center gap-1">
+                        <Icon icon="material-symbols:info" className="w-3 h-3" />
+                        The first image will be used as the primary product image.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </FormSection>
 

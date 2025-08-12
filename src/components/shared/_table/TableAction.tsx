@@ -67,7 +67,7 @@ const TableAction: FC<TableActionProps> = ({
       )}
       {viewAction && (
         <div
-          className="p-1 text-xl text-black rounded cursor-pointer bg-primary-blue"
+          className="p-1 text-xl text-black rounded cursor-pointer  min-w-4 min-h-4 bg-primary-blue"
           onClick={() => viewAction(row)}
         >
           <Icon icon="mdi:eye-outline" fontSize={14} color="white" />
@@ -76,7 +76,7 @@ const TableAction: FC<TableActionProps> = ({
       {editAction && (
         <div
           key={`edit-${row._id || 'unknown'}`}
-          className="p-1 text-xl text-black rounded cursor-pointer bg-green"
+          className="p-1 text-xl text-black rounded cursor-pointer  min-w-4 min-h-4 bg-green"
           onClick={() => editAction(row)}
         >
           <Icon icon="lucide:pen-line" fontSize={14} color="white" />
@@ -85,7 +85,7 @@ const TableAction: FC<TableActionProps> = ({
       {returnAction && (
         <div
           key={`return-${row._id || 'unknown'}`}
-          className="text-xl text-black cursor-pointer bg-[#df8d29] rounded p-1"
+          className="text-xl text-black cursor-pointer bg-[#df8d29] rounded p-1  min-w-4 min-h-4"
           onClick={() => returnAction(row)}
         >
           <Icon icon="carbon:return" fontSize={14} className="text-white" />
@@ -94,7 +94,7 @@ const TableAction: FC<TableActionProps> = ({
       {printAction && (
         <div
           key={`print-${row._id || 'unknown'}`}
-          className="text-xl text-black cursor-pointer"
+          className="text-xl text-black cursor-pointer min-w-4 min-h-4"
           onClick={() => printAction(row)}
         >
           <Icon icon="material-symbols:print" fontSize={14} color="#FF4D4D" />
@@ -103,7 +103,7 @@ const TableAction: FC<TableActionProps> = ({
       {onDelete && (
         <div
           key={`delete-${row._id || 'unknown'}`}
-          className="p-1 text-base text-black rounded cursor-pointer bg-red"
+          className="p-1 text-base text-black rounded cursor-pointer  min-w-4 min-h-4 bg-red"
           onClick={() => setShowDialog(true)}
         >
           <Icon
