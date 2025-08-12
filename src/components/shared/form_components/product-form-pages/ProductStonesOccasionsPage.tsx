@@ -376,10 +376,9 @@
 // };
 import React from 'react'
 
-const ProductStonesOccasionsPage = () => {
+export const ProductStonesOccasionsPage = () => {
   return (
     <div>ProductStonesOccasionsPage</div>
   )
 }
 
-export default ProductStonesOccasionsPage
