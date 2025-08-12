@@ -1,33 +1,30 @@
-import { useEffect, useMemo, useState } from 'react';
+import { Icon } from '@iconify/react/dist/iconify.js';
 import { useForm, useStore } from '@tanstack/react-form';
-import { InputField } from '../../../../components/shared/form_components/InputField';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { DropdownField } from '../../../../components/shared/form_components/Dropdown';
-import { FieldError } from '../../../auth/LoginPage';
+import MultiImageUploader from '../../../../components/shared/form_components/FileDropInput';
+import { InputField } from '../../../../components/shared/form_components/InputField';
+import Header from '../../../../components/shared/table_heading/Header';
 import {
   useCreateProductsMutation,
   useGetAllProductCategoriesQuery,
   useGetAllProductClaspsQuery,
-  useGetAllProductSubCategoriesQuery,
   useGetAllProductOccasionsQuery,
+  useGetAllProductSubCategoriesQuery,
   useGetAllStonesQuery,
-  useUpdateProductsMutation,
-  useValidateSKUQuery,
+  useUpdateProductsMutation
 } from '../../../../server/api/productHooks';
-import { Icon } from '@iconify/react/dist/iconify.js';
-import { PriceInputField } from '../../../OrderManagement/Order/components/PriceInputField';
-import ChipInputInside from '../../ProductCategory/components/ChipInputInside';
-import { useNavigate, useParams } from 'react-router-dom';
-import Header from '../../../../components/shared/table_heading/Header';
 import { productStore } from '../../../../store/productStore';
-import {
-  generateProductDefaultValue,
-  type IProductFormValues,
-  productFormSchema,
-  type VisibilityType,
-} from '../../productObj';
-import MultiImageUploader from '../../../../components/shared/form_components/FileDropInput';
 import { cleanObject } from '../../../../utils/cleanObject';
 import { useClearableNumberInput } from '../../../../utils/numberInputHelpers';
+import { FieldError } from '../../../auth/LoginPage';
+import { PriceInputField } from '../../../OrderManagement/Order/components/PriceInputField';
+import ChipInputInside from '../../ProductCategory/components/ChipInputInside';
+import {
+  generateProductDefaultValue,
+  type IProductFormValues
+} from '../../productObj';
 
 const ProductForm = () => {
   const { id } = useParams();

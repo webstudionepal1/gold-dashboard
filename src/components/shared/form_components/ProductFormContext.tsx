@@ -16,11 +16,16 @@ export interface ProductVariant {
 
 // Product Stone Interface
 export interface ProductStone {
-  stone: string;
-  quantity: number;
-  totalPrice: number;
-  isOptional: boolean;
-  isDefault: boolean;
+  name: string;
+  weight: number; // in carats
+  price: number;
+  color: string;
+}
+
+// Other Charge Interface
+export interface OtherCharge {
+  name: string;
+  price: number;
 }
 
 // Product Form Data Interface
@@ -29,6 +34,7 @@ export interface ProductFormData {
   name: string;
   slug?: string;
   description: string;
+  productType?: "diamond" | "gold" | "silver";
   category: string;
   subCategory: string;
   existingImages?: string[];
@@ -46,12 +52,19 @@ export interface ProductFormData {
   gender?: "male" | "female" | "unisex";
   makingCharges: number;
 
+  // Wastage
+  wastageType?: "percentage" | "flat";
+  wastageValue?: number;
+
   // Page 3: Product Variants
   variants: ProductVariant[];
 
   // Page 4: Stones and Occasions
   stones?: ProductStone[];
   occasions?: string[];
+
+  // Other Charges
+  otherCharges?: OtherCharge[];
 
   // Page 5: Media Assets
   images: (string | File)[];
@@ -125,6 +138,7 @@ const defaultFormData: ProductFormData = {
   name: "",
   slug: "",
   description: "",
+  productType: undefined,
   category: "",
   subCategory: "",
 
@@ -140,6 +154,10 @@ const defaultFormData: ProductFormData = {
   dimension: 0,
   gender: undefined,
   makingCharges: 0,
+
+  // Wastage
+  wastageType: undefined,
+  wastageValue: 0,
 
   // Page 3: Product Variants
   variants: [
@@ -159,6 +177,9 @@ const defaultFormData: ProductFormData = {
   // Page 4: Stones and Occasions
   stones: [],
   occasions: [],
+
+  // Other Charges
+  otherCharges: [],
 
   // Page 5: Media Assets
   images: [],

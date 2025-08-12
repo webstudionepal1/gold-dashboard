@@ -24,7 +24,7 @@ const schema = z
       .max(500, '**Description must be less than 500 characters')
       .optional(),
     image: z.instanceof(File).nullable().optional(),
-    existingImage: z.string().optional(),
+    existingImage: z.string().optional().nullable(),
   })
   .refine(
     (_data) => {
@@ -42,7 +42,7 @@ interface ICategoryValue {
   name: string;
   description?: string;
   image?: File | null;
-  existingImage?: string;
+  existingImage?: string | null;
 }
 const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
   console.log(editData, 'editdata');
@@ -105,6 +105,7 @@ const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
       closeModal();
     }
   }, [createSuccess, updateSuccess]);
+  console.log('form', form.state.errors);
   return (
     <Modal classname="max-w-sm w-full" ref={modalRef}>
       <form
@@ -190,8 +191,8 @@ const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
                       form.setFieldValue('existingImage', undefined);
                     }
                   }}
-                  existingFile={form.getFieldValue('existingImage')}
-                  existingFileField="existingImage"
+                  existingFile={form.getFieldValue('existingImage') as string}
+                  existingFileField="existingImage" 
                   accept={{
                     'image/*': ['.png', '.jpg', '.jpeg', '.svg', '.webp'],
                   }}
