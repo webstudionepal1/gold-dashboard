@@ -5,7 +5,7 @@ import { IFetchProduct } from "@/server/api/productHooks";
 
 interface ProductImageProps {
   images: string[];
-  product: IFetchProduct;
+  product?: IFetchProduct;
 }
 
 export const ProductImage: React.FC<ProductImageProps> = ({
@@ -81,7 +81,7 @@ export const ProductImage: React.FC<ProductImageProps> = ({
       <div className="relative group">
         <div className="relative overflow-hidden bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
           {/* Premium Badge */}
-          {product.totalCarat && (
+          {product?.totalCarat && (
             <div className="absolute top-1 left-1 z-10">
               <div className="bg-gradient-to-r from-amber-400 to-amber-600 text-white px-3 py-1.5 text-xs rounded-3xl font-semibold shadow-lg backdrop-blur-sm">
                 <Icon icon="mdi:star" className="w-4 h-4 inline mr-1" />

@@ -1,22 +1,22 @@
 import React from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useProductForm } from "../ProductFormContext";
-
+import get from 'lodash/get'
 export const ProductInventoryStatusPage: React.FC = () => {
   const { formData, updateFormData, updateValidation, validationState } =
     useProductForm();
 
   // Calculate total inventory across all variants
   const totalStock = formData.variants.reduce(
-    (sum, variant) => sum + variant.totalStock,
+    (sum, variant) => sum + get(variant, "totalStock", 0),
     0
   );
   const totalUsedStock = formData.variants.reduce(
-    (sum, variant) => sum + variant.usedStock,
+    (sum, variant) => sum + get(variant, "usedStock", 0),
     0
   );
   const totalRemainingStock = formData.variants.reduce(
-    (sum, variant) => sum + variant.remainingStock,
+    (sum, variant) => sum + get(variant, "remainingStock", 0),
     0
   );
 
