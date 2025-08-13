@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, ReactNode } from 'react';
+import React, { useState, useEffect, useCallback, ReactNode, memo } from 'react';
 import { debounce } from 'lodash'; // Make sure this import is included
 import clsx from 'clsx';
 import TableAction from './_table/TableAction';
@@ -42,7 +42,7 @@ interface MasterTableProps {
   mainClassName?: string;
 }
 
-const MasterTable: React.FC<MasterTableProps> = ({
+const MasterTable: React.FC<MasterTableProps> = memo(({
   rows = [],
   columns = [],
   entriesPerPage = 10,
@@ -603,6 +603,6 @@ const MasterTable: React.FC<MasterTableProps> = ({
       </div>
     </div>
   );
-};
+});
 
 export default MasterTable;

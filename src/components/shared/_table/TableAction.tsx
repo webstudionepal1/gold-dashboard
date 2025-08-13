@@ -29,25 +29,19 @@ const TableAction: FC<TableActionProps> = ({
     <div className="flex items-center justify-center w-full gap-3">
       {toggleAction && (
         <div
-          key={`toggle-${row._id || 'unknown'}`}
+          key={`toggle-${row._id || 'TableAunknown'}`}
           className="flex text-black cursor-pointer"
           onClick={(e) => {
             e.stopPropagation();
             toggleAction(row);
           }}
         >
-          <label
-            htmlFor={`toggle-${row._id || 'unknown'}`}
-            className="relative flex cursor-pointer"
-          >
+          <div className="relative flex cursor-pointer">
             <input
               type="checkbox"
-              id={`toggle-${row._id || 'unknown'}`}
               className="sr-only"
               checked={row.isActive || false}
-              onChange={() => {
-                // Do nothing here - the click is handled by the parent div
-              }}
+              readOnly
             />
             <div
               className={`toggle-bg border-2 h-[18px] w-[36px] rounded-full transition-colors duration-200 ease-in-out ${
@@ -62,7 +56,7 @@ const TableAction: FC<TableActionProps> = ({
                 }`}
               />
             </div>
-          </label>
+          </div>
         </div>
       )}
       {viewAction && (

@@ -137,7 +137,7 @@ const ProductList: React.FC = () => {
             <img
               src={previewImage}
               alt="preview"
-              className="max-w-[80%] max-h-[80%] object-contain rounded-lg shadow-lg transform transition-transform duration-300 ease-out scale-95 hover:scale-100"
+              className="max-w-[60%] max-h-[60%] object-contain rounded-lg shadow-lg transform transition-transform duration-300 ease-out scale-95 hover:scale-100"
               onClick={(e) => e.stopPropagation()} // Don't close when clicking the image
             />
           </div>

@@ -218,7 +218,9 @@ export const useUpdateProductsMutation = () => {
       });
       return res?.data?.data;
     },
-
+    onMutate() {
+      toast.dismiss();
+    },
     onSuccess() {
       toast.success("Product updated successfully");
       queryClient.invalidateQueries({ queryKey: ["products"] });

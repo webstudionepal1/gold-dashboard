@@ -235,16 +235,12 @@ export const Table = <T extends Record<string, any>>({
                               className="flex text-black cursor-pointer"
                               onClick={() => handleToggle(row)}
                             >
-                              <label
-                                htmlFor={`toggle-${row._id}`}
-                                className="relative flex cursor-pointer"
-                              >
+                              <div className="relative flex cursor-pointer">
                                 <input
                                   type="checkbox"
-                                  id={`toggle-${row._id}`}
                                   className="sr-only"
                                   checked={row.isActive}
-                                  onChange={() => handleToggle(row)}
+                                  readOnly
                                 />
                                 <div
                                   className={`toggle-bg border-2 h-[18px] w-[36px] rounded-full transition-colors duration-200 ease-in-out ${
@@ -261,7 +257,7 @@ export const Table = <T extends Record<string, any>>({
                                     }`}
                                   />
                                 </div>
-                              </label>
+                              </div>
                             </div>
                           )}
 
