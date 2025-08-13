@@ -250,7 +250,7 @@ const CompactFormContent: React.FC<{
       }
 
       if (hasValidationErrors) {
-        alert("Please fix the validation errors before submitting.");
+        // alert("Please fix the validation errors before submitting.");
         return;
       }
 
