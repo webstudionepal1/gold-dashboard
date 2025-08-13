@@ -673,10 +673,8 @@ const BannerIndex: React.FC = () => {
     { key: "type", title: "Banner Type" },
     { key: "location", title: "Location" },
     { key: "image", title: "Web Image" },
-    { key: "mobImage", title: "Mobile Image" },
   ];
 
-  console.log("filteredBanners", filteredBanners);
   const tableRows = useMemo(
     () =>
       filteredBanners.map((banner) => ({
@@ -705,29 +703,6 @@ const BannerIndex: React.FC = () => {
                   handleImageClick(
                     `${import.meta.env.VITE_API_IMAGE_BASE_URL}${item}`,
                     "web"
-                  )
-                }
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="flex justify-center items-center p-2 text-gray-500">
-            No Image
-          </div>
-        ),
-        mobImage: banner.mobImage?.length ? (
-          <div className="flex justify-center items-center p-2">
-            {banner.mobImage.map((item, index) => (
-              <img
-                key={index}
-                src={`https://gold-api.webstudiomatrix.com/${item}`}
-                width={120}
-                className="rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
-                alt={banner.title}
-                onClick={() =>
-                  handleImageClick(
-                    `https://gold-api.webstudiomatrix.com/${item}`,
-                    "mobile"
                   )
                 }
               />

@@ -69,12 +69,105 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
   // Get stones data first
   const stones = get(product, 'stones', []);
 
-  // Check if product is gold/silver or gemstone
+  // Check product type
   const productType = get(product, 'productType', 'gold').toLowerCase();
+  const isNormalProduct = productType === 'normal';
   const isGoldOrSilver = productType === 'gold' || productType === 'silver';
   const hasGemstones = stones && stones.length > 0;
   const hasTotalCarat = get(product, 'totalCarat', 0) > 0;
   const isGemstoneProduct = hasGemstones || hasTotalCarat || get(product, 'color') || get(product, 'clarity');
+
+  // For normal products, show simplified view
+  if (isNormalProduct) {
+    return (
+      <div className="space-y-6 col-span-2">
+        {/* Simple Header for Normal Products */}
+        <div className="bg-gradient-to-r from-white via-gray-50 to-white border border-gray-200 rounded-xl p-6 shadow-sm">
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="text-2xl font-bold text-gray-800 leading-tight">
+                  {get(product, 'name', 'Untitled Product')}
+                </h1>
+                <span className={`px-3 py-1 text-xs font-medium rounded-full ${
+                  get(product, 'isActive', true)
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-red-100 text-red-800'
+                }`}>
+                  {get(product, 'isActive', true) ? 'Active' : 'Inactive'}
+                </span>
+              </div>
+              <div className="flex items-center gap-4 text-sm">
+                <span className="font-medium text-blue-600">
+                  <Icon icon="mdi:package-variant" className="w-4 h-4 inline mr-1" />
+                  Normal Product
+                </span>
+                <span className="text-gray-600">
+                  <Icon icon="mdi:tag" className="w-4 h-4 inline mr-1" />
+                  {get(product, 'category.name', 'Uncategorized')}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Description */}
+          {get(product, 'description') && (
+            <div className="mb-4">
+              <p className="text-sm text-gray-700 leading-relaxed">
+                {get(product, 'description')}
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Simple Price Display */}
+        {product.variants && product.variants.length > 0 && (
+          <div className="bg-gradient-to-r from-white to-gray-50 border border-gray-200 rounded-xl shadow-sm">
+            <div className="p-6 border-b border-gray-100">
+              <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-3">
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                Pricing
+                <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+                  {product.variants.length} variant{product.variants.length > 1 ? 's' : ''}
+                </span>
+              </h3>
+            </div>
+            <div className="p-6 space-y-4">
+              {product.variants.map((variant: ProductVariant, index: number) => (
+                <div
+                  key={index}
+                  className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md transition-all duration-200"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="bg-gradient-to-r from-green-100 to-green-50 text-green-800 px-6 py-3 rounded-lg text-xl font-bold border border-green-200">
+                        ₹{variant?.price?.toLocaleString() || 0}
+                      </div>
+                      {variant?.wt && (
+                        <div className="text-base font-semibold text-gray-900">
+                          {variant.wt}{' '}
+                          <span className="text-sm text-gray-600 font-normal">
+                            {variant?.unit || 'units'}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <span className={`px-3 py-1 text-xs font-medium rounded-full ${
+                      get(variant, 'isActive', true)
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {get(variant, 'isActive', true) ? 'Available' : 'Unavailable'}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   // Build specifications conditionally
   const specifications: { [key: string]: string } = {
