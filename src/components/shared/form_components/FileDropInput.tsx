@@ -6,7 +6,7 @@ interface SingleFileProps {
   multiple: false;
   value: File | null;
   onChange: (file: File | null) => void;
-  existingFile?: string;
+  existingFile?: string | null;
   existingFileField?: string;
   existingImageUrl?: string;
 }

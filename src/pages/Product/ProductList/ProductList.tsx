@@ -1,5 +1,6 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { get } from "lodash";
+import { X } from "lucide-react";
 import React, { useCallback, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import MasterTable from "../../../components/shared/MasterTable";
@@ -12,7 +13,6 @@ import {
 } from "../../../server/api/productHooks";
 import { updateProductState } from "../../../store/productStore";
 import { productListColumns } from "../productObj";
-import { X } from "lucide-react";
 
 const ProductList: React.FC = () => {
   const { data: productsList, isSuccess, isLoading } = useGetAllProductsQuery();
@@ -33,9 +33,6 @@ const ProductList: React.FC = () => {
         id: productId,
         body: formData,
       },
-      {
-        onError: (err) => console.error("Update failed:", err),
-      }
     );
   };
 

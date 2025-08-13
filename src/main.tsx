@@ -23,7 +23,7 @@ const renderRoutes = (routes: any[]) =>
   ));
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
+  // <StrictMode>
     <ReactQueryProvider>
       <NotificationProvider>
         <ErrorBoundary>
@@ -58,5 +58,5 @@ createRoot(document.getElementById("root")!).render(
         </ErrorBoundary>
       </NotificationProvider>
     </ReactQueryProvider>
-  </StrictMode>
+  // </StrictMode>
 );

@@ -506,11 +506,11 @@ import { updateBannerState } from "./Components/bannerStore";
 
 // Location labels mapping for better display
 const LOCATION_LABELS: Record<string, string> = {
-  "homepage": "Home Page",
+  homepage: "Home Page",
   "category-page": "Category Page",
   "product-page": "Product Page",
-  "marketing": "Marketing Section",
-  "advertisement": "Advertisement",
+  marketing: "Marketing Section",
+  advertisement: "Advertisement",
 };
 
 const filterOptions = [
@@ -554,17 +554,22 @@ const BannerIndex: React.FC = () => {
   // Dynamically generate location options from existing banners
   const locationOptions = useMemo(() => {
     const allLocations = new Set<string>();
-    banners.forEach(banner => {
-      banner.locations?.forEach(location => allLocations.add(location));
+    banners.forEach((banner) => {
+      banner.locations?.forEach((location) => allLocations.add(location));
     });
 
     const options = [{ value: "all", label: "All Locations" }];
-    Array.from(allLocations).sort().forEach(location => {
-      options.push({
-        value: location,
-        label: LOCATION_LABELS[location] || location.charAt(0).toUpperCase() + location.slice(1).replace(/-/g, ' ')
+    Array.from(allLocations)
+      .sort()
+      .forEach((location) => {
+        options.push({
+          value: location,
+          label:
+            LOCATION_LABELS[location] ||
+            location.charAt(0).toUpperCase() +
+              location.slice(1).replace(/-/g, " "),
+        });
       });
-    });
 
     return options;
   }, [banners]);
@@ -624,9 +629,10 @@ const BannerIndex: React.FC = () => {
   };
 
   const filteredBanners = useMemo(() => {
-    let result = selectedLocation === "all"
-      ? banners
-      : banners.filter((item) => item.locations?.includes(selectedLocation));
+    let result =
+      selectedLocation === "all"
+        ? banners
+        : banners.filter((item) => item.locations?.includes(selectedLocation));
 
     if (filterState.searchQuery) {
       const query = filterState.searchQuery.toLowerCase();
@@ -670,59 +676,71 @@ const BannerIndex: React.FC = () => {
     { key: "mobImage", title: "Mobile Image" },
   ];
 
-  const tableRows = useMemo(() =>
-    filteredBanners.map((banner) => ({
-      id: banner._id,
-      _id: banner._id,
-      title: banner.title,
-      type: banner.type,
-      location: banner.locations?.map(loc =>
-        LOCATION_LABELS[loc] || loc.charAt(0).toUpperCase() + loc.slice(1).replace(/-/g, ' ')
-      ).join(", ") || "No Location",
-      image: banner.image?.length ? (
-        <div className="flex justify-center items-center p-2">
-          {banner.image.map((item, index) => (
-            <img
-              key={index}
-              src={`https://gold-api.webstudiomatrix.com/${item}`}
-              width={120}
-              className="rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
-              alt={banner.title}
-              onClick={() =>
-                handleImageClick(
-                  `https://gold-api.webstudiomatrix.com/${item}`,
-                  "web"
-                )
-              }
-            />
-          ))}
-        </div>
-      ) : (
-        <div className="flex justify-center items-center p-2 text-gray-500">No Image</div>
-      ),
-      mobImage: banner.mobImage?.length ? (
-        <div className="flex justify-center items-center p-2">
-          {banner.mobImage.map((item, index) => (
-            <img
-              key={index}
-              src={`https://gold-api.webstudiomatrix.com/${item}`}
-              width={120}
-              className="rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
-              alt={banner.title}
-              onClick={() =>
-                handleImageClick(
-                  `https://gold-api.webstudiomatrix.com/${item}`,
-                  "mobile"
-                )
-              }
-            />
-          ))}
-        </div>
-      ) : (
-        <div className="flex justify-center items-center p-2 text-gray-500">No Image</div>
-      ),
-      original: banner,
-    })), [filteredBanners]
+  console.log("filteredBanners", filteredBanners);
+  const tableRows = useMemo(
+    () =>
+      filteredBanners.map((banner) => ({
+        id: banner._id,
+        _id: banner._id,
+        title: banner.title,
+        type: banner.type,
+        location:
+          banner.locations
+            ?.map(
+              (loc) =>
+                LOCATION_LABELS[loc] ||
+                loc.charAt(0).toUpperCase() + loc.slice(1).replace(/-/g, " ")
+            )
+            .join(", ") || "No Location",
+        image: banner.image?.length ? (
+          <div className="flex justify-center items-center size-5 mx-auto">
+            {banner.image.map((item, index) => (
+              <img
+                key={index}
+                src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${item}`}
+                width={120}
+                className="rounded-lg object-contain object-center  cursor-pointer hover:opacity-80 transition-opacity"
+                alt={banner.title}
+                onClick={() =>
+                  handleImageClick(
+                    `${import.meta.env.VITE_API_IMAGE_BASE_URL}${item}`,
+                    "web"
+                  )
+                }
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="flex justify-center items-center p-2 text-gray-500">
+            No Image
+          </div>
+        ),
+        mobImage: banner.mobImage?.length ? (
+          <div className="flex justify-center items-center p-2">
+            {banner.mobImage.map((item, index) => (
+              <img
+                key={index}
+                src={`https://gold-api.webstudiomatrix.com/${item}`}
+                width={120}
+                className="rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+                alt={banner.title}
+                onClick={() =>
+                  handleImageClick(
+                    `https://gold-api.webstudiomatrix.com/${item}`,
+                    "mobile"
+                  )
+                }
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="flex justify-center items-center p-2 text-gray-500">
+            No Image
+          </div>
+        ),
+        original: banner,
+      })),
+    [filteredBanners]
   );
 
   const handleEditItem = (row: { original: IFetchBanner }) => {
@@ -733,7 +751,10 @@ const BannerIndex: React.FC = () => {
   // Location dropdown component
   const LocationFilter = () => (
     <div className="flex items-center gap-2">
-      <label htmlFor="location-filter" className="text-sm font-medium text-gray-700">
+      <label
+        htmlFor="location-filter"
+        className="text-sm font-medium text-gray-700"
+      >
         Location:
       </label>
       <select

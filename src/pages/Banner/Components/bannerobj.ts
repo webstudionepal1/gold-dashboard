@@ -7,7 +7,7 @@ export interface IBannerFormData {
   subCategory: string;
   priority: number;
   image: File | null; // Changed to File | null for single file
-  existingImage?: string;
+  existingImage?: string | null;
   existingMobImage?: string;
   mobImage: File | null; // Changed to File | null for single file
   locations: string[];

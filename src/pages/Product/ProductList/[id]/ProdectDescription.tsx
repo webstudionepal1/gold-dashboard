@@ -31,7 +31,7 @@ const ProductDescription: React.FC = () => {
         {/* Product Image - Smaller and at the top */}
         <div className="flex justify-center">
           <div className="w-full max-w-md">
-            <ProductImage images={images} />
+            <ProductImage images={images} product={product} />
           </div>
         </div>
         {/* Product Details - Full width below image */}

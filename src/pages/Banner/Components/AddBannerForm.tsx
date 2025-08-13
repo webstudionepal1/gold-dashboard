@@ -1,12 +1,13 @@
-import { useEffect, useMemo } from 'react';
 import { useForm, useStore } from '@tanstack/react-form';
+import { useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import * as z from 'zod';
 
-import { InputField } from '../../../components/shared/form_components/InputField';
+import Breadcrumbs from '../../../components/shared/Breadcrumb';
 import { DropdownField } from '../../../components/shared/form_components/Dropdown';
 import { DropdownTagField } from '../../../components/shared/form_components/DropdownTags';
-import Breadcrumbs from '../../../components/shared/Breadcrumb';
+import MultiImageUploader from '../../../components/shared/form_components/FileDropInput';
+import { InputField } from '../../../components/shared/form_components/InputField';
 import Header from '../../../components/shared/table_heading/Header';
 import {
   useCreateBannerMutation,
@@ -17,10 +18,9 @@ import {
   useGetAllProductCategoriesQuery,
   useGetAllProductSubCategoriesQuery,
 } from '../../../server/api/productHooks';
+import { cleanObject } from '../../../utils/cleanObject';
 import { bannerStore } from './bannerStore';
 import { generateBannerFormDefaultValue } from './bannerobj';
-import MultiImageUploader from '../../../components/shared/form_components/FileDropInput';
-import { cleanObject } from '../../../utils/cleanObject';
 
 const AddBannerSchema = z
   .object({
@@ -32,7 +32,7 @@ const AddBannerSchema = z
     locations: z.array(z.string()).min(1, 'Location is required'),
     image: z.instanceof(File).nullable(),
     mobImage: z.instanceof(File).nullable(), // Mobile image is optional
-    existingImage: z.string().optional(), // Track existing image
+    existingImage: z.string().optional().nullable(), // Track existing image
     existingMobImage: z.string().optional(), // Track existing mobile image
   })
   .refine(
@@ -135,15 +135,6 @@ const AddBannerForm = () => {
           formData.append('mobImage', value.mobImage);
         }
 
-        // Handle existing images for edit mode
-        // if (id !== 'add') {
-        //   if (value.existingImage) {
-        //     formData.append('existingImage', value.existingImage);
-        //   }
-        //   if (value.existingMobImage) {
-        //     formData.append('existingMobImage', value.existingMobImage);
-        //   }
-        // }
 
         if (id === 'add') createBanner(formData);
         else updateBanner({ id: bannerData._id, body: formData });
@@ -184,6 +175,8 @@ const AddBannerForm = () => {
     }
   }, [bannerSuccess, bannerUpdateSuccess]);
 
+  console.log('formisks', form.state.errors)
+  console.log('values', form.state.values)
   return (
     <div className="">
       <div className="flex items-center justify-between">
@@ -362,43 +355,6 @@ const AddBannerForm = () => {
             </div>
           </div>
 
-          <div className="bg-[#ffffff] border-[#eeeeee] border-2 shadow-lg rounded-xl w-full">
-            <div className="mx-6 my-4">
-              <div>
-                <h1 className="text-xl font-semibold">
-                  Upload Mobile Image{' '}
-                  <span className="text-gray-500 text-sm">(Optional)</span>
-                </h1>
-                <div className="border-b border-[#dedde2] w-full my-2"></div>
-              </div>
-
-              <form.Field name="mobImage">
-                {(field) => (
-                  <div>
-                    <MultiImageUploader
-                      multiple={false}
-                      form={form}
-                      label=""
-                      value={field.state.value}
-                      existingFileField="existingMobImage"
-                      accept={{
-                        'image/*': ['.png', '.jpg', '.jpeg', '.svg', '.webp'],
-                      }}
-                      existingFile={form.getFieldValue("existingMobImage")}
-                      onChange={(file) => {
-                        field.handleChange(file);
-                        // When a new image is selected, clear the existing image
-                        if (file) {
-                          form.setFieldValue("existingMobImage", undefined);
-                        }
-                      }}
-                    />
-                    <FieldError field={field} />
-                  </div>
-                )}
-              </form.Field>
-            </div>
-          </div>
         </div>
       </div>
     </div>

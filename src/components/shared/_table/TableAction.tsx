@@ -45,9 +45,9 @@ const TableAction: FC<TableActionProps> = ({
               id={`toggle-${row._id || 'unknown'}`}
               className="sr-only"
               checked={row.isActive || false}
-              onChange={() => {
-                // Do nothing here - the click is handled by the parent div
-              }}
+              // onChange={() => {
+              //   // Do nothing here - the click is handled by the parent div
+              // }}
             />
             <div
               className={`toggle-bg border-2 h-[18px] w-[36px] rounded-full transition-colors duration-200 ease-in-out ${

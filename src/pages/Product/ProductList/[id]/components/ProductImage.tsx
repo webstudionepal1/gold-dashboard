@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react";
 import Slider from "react-slick";
 import { Icon } from "@iconify/react";
+import { IFetchProduct } from "@/server/api/productHooks";
 
 interface ProductImageProps {
   images: string[];
+  product: IFetchProduct;
 }
 
-export const ProductImage: React.FC<ProductImageProps> = ({ images }) => {
-  console.log('images', images)
+export const ProductImage: React.FC<ProductImageProps> = ({
+  images,
+  product,
+}) => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,16 +34,16 @@ export const ProductImage: React.FC<ProductImageProps> = ({ images }) => {
         settings: {
           slidesToShow: Math.min(4, images.length),
           slidesToScroll: 1,
-        }
+        },
       },
       {
         breakpoint: 480,
         settings: {
           slidesToShow: Math.min(3, images.length),
           slidesToScroll: 1,
-        }
-      }
-    ]
+        },
+      },
+    ],
   };
 
   const handleImageLoad = () => {
@@ -57,7 +61,8 @@ export const ProductImage: React.FC<ProductImageProps> = ({ images }) => {
   };
 
   const prevImage = () => {
-    const prevIndex = selectedImage === 0 ? images.length - 1 : selectedImage - 1;
+    const prevIndex =
+      selectedImage === 0 ? images.length - 1 : selectedImage - 1;
     handleImageChange(prevIndex);
   };
 
@@ -76,12 +81,14 @@ export const ProductImage: React.FC<ProductImageProps> = ({ images }) => {
       <div className="relative group">
         <div className="relative overflow-hidden bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
           {/* Premium Badge */}
-          <div className="absolute top-4 left-4 z-10">
-            <div className="bg-gradient-to-r from-amber-400 to-amber-600 text-white px-3 py-1.5 rounded-full text-sm font-semibold shadow-lg backdrop-blur-sm">
-              <Icon icon="mdi:star" className="w-4 h-4 inline mr-1" />
-              24 Carat
+          {product.totalCarat && (
+            <div className="absolute top-1 left-1 z-10">
+              <div className="bg-gradient-to-r from-amber-400 to-amber-600 text-white px-3 py-1.5 text-xs rounded-3xl font-semibold shadow-lg backdrop-blur-sm">
+                <Icon icon="mdi:star" className="w-4 h-4 inline mr-1" />
+                {product.totalCarat.toString().concat(" Karat")}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Navigation Arrows */}
           {images.length > 1 && (
@@ -106,7 +113,10 @@ export const ProductImage: React.FC<ProductImageProps> = ({ images }) => {
             onClick={() => setIsZoomed(!isZoomed)}
             className="absolute top-4 right-4 z-10 bg-white/80 hover:bg-white text-gray-700 p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm"
           >
-            <Icon icon={isZoomed ? "mdi:magnify-minus" : "mdi:magnify-plus"} className="w-5 h-5" />
+            <Icon
+              icon={isZoomed ? "mdi:magnify-minus" : "mdi:magnify-plus"}
+              className="w-5 h-5"
+            />
           </button>
 
           {/* Loading Spinner */}
@@ -117,13 +127,17 @@ export const ProductImage: React.FC<ProductImageProps> = ({ images }) => {
           )}
 
           {/* Main Image */}
-          <div className={`relative overflow-hidden transition-all duration-500 ${isZoomed ? 'cursor-zoom-out' : 'cursor-zoom-in'}`}>
+          <div
+            className={`relative overflow-hidden transition-all duration-500 ${
+              isZoomed ? "cursor-zoom-out" : "cursor-zoom-in"
+            }`}
+          >
             <img
               src={images[selectedImage]}
               alt={`Product image ${selectedImage + 1}`}
               className={`w-full h-auto object-cover transition-all duration-500 ${
-                isZoomed ? 'scale-150' : 'scale-100 hover:scale-105'
-              } ${isLoading ? 'opacity-0' : 'opacity-100'}`}
+                isZoomed ? "scale-150" : "scale-100 hover:scale-105"
+              } ${isLoading ? "opacity-0" : "opacity-100"}`}
               onLoad={handleImageLoad}
               onClick={() => setIsZoomed(!isZoomed)}
             />

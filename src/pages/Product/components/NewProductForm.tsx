@@ -47,41 +47,26 @@ const NewProductForm: React.FC = () => {
 
       // Specifications
       length: product.length || 0,
-      claspType:
-        typeof product.claspType === "object"
-          ? product.claspType._id
-          : product.claspType || "",
       rhodoumFinishes: product.rhodoumFinishes || false,
-      shape: product.shape || "",
-      quantity: product.quantity || 0,
       totalCarat: product.totalCarat || 0,
       color: product.color || "",
       clarity: product.clarity || "",
-      dimension: product.dimension || 0,
       gender: product.gender as "male" | "female" | "unisex" | undefined,
       makingCharges: product.makingCharges || 0,
 
-      // Wastage
       wastage: get(product, "wastage", undefined), // Will be set by user
 
-      // Variants
       variants: get(product, "variant", [
         {
-          sku: "",
           price: 0,
           wt: 0,
           unit: "grams" as "grams" | "kg" | "pieces" | "carats",
-          totalStock: 0,
-          usedStock: 0,
-          remainingStock: 0,
-          reorderPoint: 10,
           isActive: true,
         },
       ]),
 
       // Stones and Occasions
       stones: get(product, "stones",[]),
-      occasions: [],
       otherCharges: get(product, "others", []).map(
         (item: { name: string; value: number }) => ({
           name: item.name,
@@ -93,7 +78,6 @@ const NewProductForm: React.FC = () => {
       images: [],
 
       // SEO & Marketing
-      tags: product.tags || [],
       visibleAs:
         (product.visibleAs as
           | "featured"

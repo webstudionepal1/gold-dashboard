@@ -6,10 +6,10 @@ export interface ProductVariant {
   price: number;
   wt: number;
   unit: "grams" | "kg" | "pieces" | "carats";
-  totalStock: number;
-  usedStock: number;
-  remainingStock: number;
-  reorderPoint: number;
+  totalStock?: number;
+  usedStock?: number;
+  remainingStock?: number;
+  reorderPoint?: number;
   costPrice?: number;
   isActive: boolean;
 }
