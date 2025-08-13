@@ -344,33 +344,54 @@ export const conditionalProductFormSchema = z
   )
   .refine(
     (data) => {
-      // For gold or silver products: require wastage, productType, product name, category, subCategory, totalCarat, minimum one variant
+      // For gold or silver products: require wastage
       if (data.productType === "gold" || data.productType === "silver") {
-        const errors: string[] = [];
-
-        if (!data.wastage) {
-          errors.push("Wastage is required for gold/silver products");
-        }
-
-        if (!data.category || data.category.trim() === "") {
-          errors.push("Category is required for gold/silver products");
-        }
-
-        if (!data.subCategory || data.subCategory.trim() === "") {
-          errors.push("Sub-category is required for gold/silver products");
-        }
-
-        if (!data.totalCarat || data.totalCarat <= 0) {
-          errors.push("Total carat is required for gold/silver products");
-        }
-
-        return errors.length === 0;
+        return !!data.wastage;
       }
       return true;
     },
     {
-      message: "Gold/Silver products require wastage, category, sub-category, and total carat",
-      path: ["productType"],
+      message: "Wastage is required for gold/silver products",
+      path: ["wastage"],
+    }
+  )
+  .refine(
+    (data) => {
+      // For gold or silver products: require category
+      if (data.productType === "gold" || data.productType === "silver") {
+        return !!(data.category && data.category.trim() !== "");
+      }
+      return true;
+    },
+    {
+      message: "Category is required for gold/silver products",
+      path: ["category"],
+    }
+  )
+  .refine(
+    (data) => {
+      // For gold or silver products: require subCategory
+      if (data.productType === "gold" || data.productType === "silver") {
+        return !!(data.subCategory && data.subCategory.trim() !== "");
+      }
+      return true;
+    },
+    {
+      message: "Sub-category is required for gold/silver products",
+      path: ["subCategory"],
+    }
+  )
+  .refine(
+    (data) => {
+      // For gold or silver products: require totalCarat
+      if (data.productType === "gold" || data.productType === "silver") {
+        return !!(data.totalCarat && data.totalCarat > 0);
+      }
+      return true;
+    },
+    {
+      message: "Total carat is required for gold/silver products",
+      path: ["totalCarat"],
     }
   );
 

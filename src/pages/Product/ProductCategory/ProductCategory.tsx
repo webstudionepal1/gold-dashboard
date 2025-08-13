@@ -117,10 +117,10 @@ const ProductCategory: React.FC = () => {
             setIsViewModalOpen({ state: true, viewData: row })
           }
           showAction
-          toggleAction={(row) => {
-            console.log(row, 'category row');
-            handleStatusToggle(row._id, !row.isActive);
-          }}
+          // toggleAction={(row) => {
+          //   console.log(row, 'category row');
+          //   handleStatusToggle(row._id, !row.isActive);
+          // }}
         />
       </div>
       {isModalOpen.state && (

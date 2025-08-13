@@ -1,23 +1,19 @@
 /**
- * CompactProductForm - A single-page product form with modern UI
+ * CompactProductForm - A single-page product form with modern UI using Formik
  *
  * DRY Principles Applied:
  * 1. FormSection component - Reusable section wrapper with consistent styling
  * 2. FieldGroup component - Responsive grid layout for form fields
  * 3. ErrorDisplay component - Consistent error message display
- * 4. Validation helper functions - Centralized validation logic
+ * 4. Validation using Zod schema with Formik
  * 5. Shared form components - InputField, DropdownField, TextareaField
  * 6. Consistent styling patterns using Tailwind CSS classes
  * 7. Reusable event handlers for form updates
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import {
-  ProductFormProvider,
-  useProductForm,
-  ProductFormData,
-} from "../../../components/shared/form_components/ProductFormContext";
+import { ProductFormData } from "../../../components/shared/form_components/ProductFormContext";
 import { InputField } from "../../../components/shared/form_components/InputField";
 import { DropdownField } from "../../../components/shared/form_components/Dropdown";
 import { TextareaField } from "../../../components/shared/form_components/TextArea";
@@ -26,6 +22,75 @@ import {
   useGetAllProductSubCategoriesQuery,
 } from "../../../server/api/productHooks";
 import { mainProductFormSchema } from "../../../components/shared/form_components/validation/ProductFormValidation";
+import { Form, FormikProvider, useFormik } from "formik";
+
+// Default Form Data
+const defaultFormData: ProductFormData = {
+  // Basic Information
+  name: "",
+  slug: "",
+  description: "",
+  productType: "gold",
+  category: "",
+  subCategory: "",
+
+  // Product Specifications
+  length: 0,
+  claspType: "",
+  rhodoumFinishes: false,
+  shape: "",
+  quantity: 0,
+  totalCarat: 0,
+  color: "",
+  clarity: "",
+  dimension: 0,
+  gender: undefined,
+  makingCharges: 0,
+
+  // Wastage
+  wastage: undefined,
+
+  // Product Variants
+  variants: [
+    {
+      sku: "",
+      price: 0,
+      wt: 0,
+      unit: "grams",
+      totalStock: 0,
+      usedStock: 0,
+      remainingStock: 0,
+      reorderPoint: 10,
+      isActive: true,
+    },
+  ],
+
+  // Stones and Occasions
+  stones: [],
+  occasions: [],
+
+  // Other Charges
+  otherCharges: [],
+
+  // Media Assets
+  images: [],
+
+  // SEO & Marketing
+  tags: [],
+  visibleAs: "normal",
+  metadata: {
+    seoTitle: "",
+    seoDescription: "",
+    keywords: [],
+    vendor: "",
+    barcode: "",
+    compareAtPrice: 0,
+  },
+
+  // Inventory & Status
+  isActive: true,
+  isFeatured: false,
+};
 
 // Form Section Component for DRY principle
 interface FormSectionProps {
@@ -89,10 +154,7 @@ interface ErrorDisplayProps {
 const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ errors }) => (
   <>
     {errors.map((error, index) => (
-      <p
-        key={index}
-        className="text-red text-sm flex items-center gap-1 mt-1"
-      >
+      <p key={index} className="text-red text-sm flex items-center gap-1 mt-1">
         <Icon icon="material-symbols:error" className="w-4 h-4" />
         {error}
       </p>
@@ -103,90 +165,43 @@ const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ errors }) => (
 // Main Form Content Component
 const CompactFormContent: React.FC<{
   onSubmit: (data: ProductFormData) => void;
-  isLoading:boolean;
+  isLoading: boolean;
   onCancel?: () => void;
   isEdit?: boolean;
-}> = ({ onSubmit, onCancel, isEdit = false, isLoading }) => {
-  const { formData, updateFormData, validationState, updateValidation, setIsLoading } =
-    useProductForm();
+  initialData?: Partial<ProductFormData>;
+}> = ({ onSubmit, onCancel, isEdit = false, isLoading, initialData }) => {
+  const formik = useFormik<ProductFormData>({
+    initialValues: { ...defaultFormData, ...initialData },
+    enableReinitialize: true,
+    validate: (values) => {
+      const result = mainProductFormSchema.safeParse(values);
+      if (!result.success) {
+        const errors: any = {};
+        result.error.errors.forEach((error) => {
+          const path = error.path.join(".");
+          errors[path] = error.message;
+        });
+        return errors;
+      }
+      return {};
+    },
+    onSubmit: (values) => {
+      onSubmit(values);
+    },
+  });
 
   // Image upload state
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [dragActive, setDragActive] = useState(false);
 
-  // Validation helper functions
-  const validateRequiredField = (fieldName: string, value: any, errorMessage: string) => {
-    if (!value || (typeof value === 'string' && value.trim() === '') || (typeof value === 'number' && value <= 0)) {
-      updateValidation(fieldName, false, [errorMessage], true);
-      return false;
-    } else {
-      updateValidation(fieldName, true, [], true);
-      return true;
-    }
-  };
-
-  const validateConditionalFields = (productType?: string) => {
-    // Use the passed productType or current formData.productType
-    const currentProductType = productType || formData.productType;
-
-    // Validate based on product type
-    if (currentProductType === "gold" || currentProductType === "silver") {
-      // Validate category
-      if (!formData.category || formData.category.trim() === "") {
-        updateValidation("category", false, ["Category is required for gold/silver products"], true);
-      } else {
-        updateValidation("category", true, [], true);
-      }
-
-      // Validate subCategory
-      if (!formData.subCategory || formData.subCategory.trim() === "") {
-        updateValidation("subCategory", false, ["Sub-category is required for gold/silver products"], true);
-      } else {
-        updateValidation("subCategory", true, [], true);
-      }
-
-      // Validate totalCarat
-      if (!formData.totalCarat || formData.totalCarat <= 0) {
-        updateValidation("totalCarat", false, ["Total carat is required for gold/silver products"], true);
-      } else {
-        updateValidation("totalCarat", true, [], true);
-      }
-
-      // Validate wastage
-      if (!formData.wastage || !formData.wastage.type || formData.wastage.value <= 0) {
-        updateValidation("wastage", false, ["Wastage is required for gold/silver products"], true);
-      } else {
-        updateValidation("wastage", true, [], true);
-      }
-    } else {
-      // Clear validation errors for fields not required for normal products
-      updateValidation("category", true, [], true);
-      updateValidation("subCategory", true, [], true);
-      updateValidation("totalCarat", true, [], true);
-      updateValidation("wastage", true, [], true);
-    }
-  };
-
   // API hooks
   const { data: categories } = useGetAllProductCategoriesQuery();
-  const { data: subCategories } = useGetAllProductSubCategoriesQuery();
-
-  // Effect to trigger validation when product type changes
-  useEffect(() => {
-    if (formData.productType) {
-      validateConditionalFields(formData.productType);
-    }
-  }, [formData.productType]);
-
-  // Effect to trigger initial validation on mount
-  useEffect(() => {
-    if (formData.productType) {
-      // Small delay to ensure form data is fully loaded
-      setTimeout(() => {
-        validateConditionalFields(formData.productType);
-      }, 100);
-    }
-  }, []); // Run only on mount
+  const { data: subCategories } = useGetAllProductSubCategoriesQuery(
+    {
+      category: formik.values.category,
+    },
+    { enabled: !!formik.values.category }
+  );
 
   // Transform data for dropdowns
   const categoryOptions =
@@ -194,99 +209,6 @@ const CompactFormContent: React.FC<{
   const subCategoryOptions =
     subCategories?.map((sub: any) => ({ value: sub._id, label: sub.name })) ||
     [];
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      // First, run manual validation for conditional fields
-      let hasValidationErrors = false;
-
-      // Manual validation for gold/silver products
-      if (formData.productType === "gold" || formData.productType === "silver") {
-        if (!formData.category || formData.category.trim() === "") {
-          updateValidation("category", false, ["Category is required for gold/silver products"], true);
-          hasValidationErrors = true;
-        }
-
-        if (!formData.subCategory || formData.subCategory.trim() === "") {
-          updateValidation("subCategory", false, ["Sub-category is required for gold/silver products"], true);
-          hasValidationErrors = true;
-        }
-
-        if (!formData.totalCarat || formData.totalCarat <= 0) {
-          updateValidation("totalCarat", false, ["Total carat is required for gold/silver products"], true);
-          hasValidationErrors = true;
-        }
-
-        if (!formData.wastage || !formData.wastage.type || formData.wastage.value <= 0) {
-          updateValidation("wastage", false, ["Wastage is required for gold/silver products"], true);
-          hasValidationErrors = true;
-        }
-      }
-
-      // Validate product name and description for all products
-      if (!formData.name || formData.name.trim() === "") {
-        updateValidation("name", false, ["Product name is required"], true);
-        hasValidationErrors = true;
-      }
-
-      if (!formData.description || formData.description.trim() === "") {
-        updateValidation("description", false, ["Description is required"], true);
-        hasValidationErrors = true;
-      }
-
-      // Validate variants and prices
-      if (!formData.variants || formData.variants.length === 0) {
-        hasValidationErrors = true;
-      } else {
-        formData.variants.forEach((variant, index) => {
-          if (!variant.price || variant.price <= 0) {
-            updateValidation(`variants.${index}.price`, false, ["Price is required and must be greater than 0"], true);
-            hasValidationErrors = true;
-          }
-        });
-      }
-
-      if (hasValidationErrors) {
-        // alert("Please fix the validation errors before submitting.");
-        return;
-      }
-
-      // Also run the schema validation as a backup
-      const validationResult = mainProductFormSchema.safeParse(formData);
-
-      if (!validationResult.success) {
-        // Handle validation errors
-        const errors = validationResult.error.errors;
-        console.error("Validation errors:", errors);
-
-        // Update validation state for each field with errors
-        errors.forEach((error) => {
-          const fieldPath = error.path.join('.');
-          updateValidation(fieldPath, false, [error.message], true);
-        });
-
-        // Show a general error message
-        alert("Please fix the validation errors before submitting.");
-        return;
-      }
-
-      // Clear any previous validation errors
-      Object.keys(validationState).forEach((field) => {
-        updateValidation(field, true, [], true);
-      });
-
-      // If validation passes, submit the form
-      onSubmit(formData);
-    } catch (error) {
-      console.error("Form submission error:", error);
-      alert("An error occurred while submitting the form. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const addVariant = () => {
     const newVariant = {
@@ -300,29 +222,20 @@ const CompactFormContent: React.FC<{
       reorderPoint: 10,
       isActive: true,
     };
-    updateFormData({ variants: [...formData.variants, newVariant] });
+    formik.setFieldValue("variants", [...formik.values.variants, newVariant]);
   };
 
   const removeVariant = (index: number) => {
-    if (formData.variants.length > 1) {
-      const newVariants = formData.variants.filter((_, i) => i !== index);
-      updateFormData({ variants: newVariants });
+    if (formik.values.variants.length > 1) {
+      const newVariants = formik.values.variants.filter((_, i) => i !== index);
+      formik.setFieldValue("variants", newVariants);
     }
   };
 
   const updateVariant = (index: number, field: string, value: any) => {
-    const newVariants = [...formData.variants];
+    const newVariants = [...formik.values.variants];
     newVariants[index] = { ...newVariants[index], [field]: value };
-    updateFormData({ variants: newVariants });
-
-    // Validate price field for all product types
-    if (field === "price") {
-      if (value <= 0) {
-        updateValidation(`variants.${index}.price`, false, ["Price is required and must be greater than 0"], true);
-      } else {
-        updateValidation(`variants.${index}.price`, true, [], true);
-      }
-    }
+    formik.setFieldValue("variants", newVariants);
   };
 
   // Stone management functions
@@ -333,23 +246,23 @@ const CompactFormContent: React.FC<{
       price: 0,
       color: "",
     };
-    const currentStones = formData.stones || [];
-    updateFormData({ stones: [...currentStones, newStone] });
+    const currentStones = formik.values.stones || [];
+    formik.setFieldValue("stones", [...currentStones, newStone]);
   };
 
   const removeStone = (index: number) => {
-    const currentStones = formData.stones || [];
+    const currentStones = formik.values.stones || [];
     if (currentStones.length > 0) {
       const newStones = currentStones.filter((_, i) => i !== index);
-      updateFormData({ stones: newStones });
+      formik.setFieldValue("stones", newStones);
     }
   };
 
   const updateStone = (index: number, field: string, value: any) => {
-    const currentStones = formData.stones || [];
+    const currentStones = formik.values.stones || [];
     const newStones = [...currentStones];
     newStones[index] = { ...newStones[index], [field]: value };
-    updateFormData({ stones: newStones });
+    formik.setFieldValue("stones", newStones);
   };
 
   // Other charges management functions
@@ -358,23 +271,23 @@ const CompactFormContent: React.FC<{
       name: "",
       price: 0,
     };
-    const currentCharges = formData.otherCharges || [];
-    updateFormData({ otherCharges: [...currentCharges, newCharge] });
+    const currentCharges = formik.values.otherCharges || [];
+    formik.setFieldValue("otherCharges", [...currentCharges, newCharge]);
   };
 
   const removeOtherCharge = (index: number) => {
-    const currentCharges = formData.otherCharges || [];
+    const currentCharges = formik.values.otherCharges || [];
     if (currentCharges.length > 0) {
       const newCharges = currentCharges.filter((_, i) => i !== index);
-      updateFormData({ otherCharges: newCharges });
+      formik.setFieldValue("otherCharges", newCharges);
     }
   };
 
   const updateOtherCharge = (index: number, field: string, value: any) => {
-    const currentCharges = formData.otherCharges || [];
+    const currentCharges = formik.values.otherCharges || [];
     const newCharges = [...currentCharges];
     newCharges[index] = { ...newCharges[index], [field]: value };
-    updateFormData({ otherCharges: newCharges });
+    formik.setFieldValue("otherCharges", newCharges);
   };
 
   // Image upload functions
@@ -389,9 +302,9 @@ const CompactFormContent: React.FC<{
     setSelectedImages(newImages);
 
     // Store actual File objects in form data
-    const existingImages = formData.images || [];
+    const existingImages = formik.values.images || [];
     const allImages = [...existingImages, ...filesToAdd];
-    updateFormData({ images: allImages });
+    formik.setFieldValue("images", allImages);
   };
 
   // Handle file input change
@@ -432,8 +345,10 @@ const CompactFormContent: React.FC<{
     setSelectedImages(newImages);
 
     // Update form data
-    const newFormImages = (formData.images || []).filter((_, i) => i !== index);
-    updateFormData({ images: newFormImages });
+    const newFormImages = (formik.values.images || []).filter(
+      (_, i) => i !== index
+    );
+    formik.setFieldValue("images", newFormImages);
   };
 
   return (
@@ -478,799 +393,728 @@ const CompactFormContent: React.FC<{
         </div>
       </div>
 
-      <form
-        onSubmit={handleSubmit}
-        className="max-w-7xl mx-auto md:px-0 px-2 py-2"
-      >
-        <div className="space-y-4 pb-16">
-          {/* Basic Information */}
-          <FormSection title="Basic Information" icon="material-symbols:info">
-            <FieldGroup columns={3}>
-              <div>
-                <InputField
-                  label="Product Name"
-                  placeholder="Enter product name"
-                  required
-                  value={formData.name}
-                  onChange={(e) => {
-                    const newName = e.target.value;
-                    updateFormData({ name: newName });
-
-                    // Validate product name (required for all product types)
-                    validateRequiredField("name", newName, "Product name is required");
-                  }}
-                />
-                <ErrorDisplay errors={validationState.name?.errors || []} />
-              </div>
-              <div>
-                <DropdownField
-                  label="Product Type"
-                  required
-                  options={[
-                    { value: "", label: "Select Product Type" },
-                    { value: "normal", label: "Normal" },
-                    // { value: 'diamond', label: 'Diamond' },
-                    { value: "gold", label: "Gold" },
-                    { value: "silver", label: "Silver" },
-                  ]}
-                  value={formData.productType || ""}
-                  onChange={(e) => {
-                    const newProductType = e.target.value as any;
-                    updateFormData({ productType: newProductType });
-
-                    // Trigger conditional validation immediately with the new product type
-                    validateConditionalFields(newProductType);
-                  }}
-                />
-                <ErrorDisplay
-                  errors={validationState.productType?.errors || []}
-                />
-              </div>
-
-              {/* Show additional fields only if product type is not 'normal' */}
-              {formData.productType !== "normal" && (
-                <>
-                  <div>
-                    <DropdownField
-                      label="Category"
-                      required
-                      options={[
-                        { value: "", label: "Select Category" },
-                        ...categoryOptions,
-                      ]}
-                      value={formData.category}
-                      onChange={(e) => {
-                        const newCategory = e.target.value;
-                        updateFormData({ category: newCategory });
-
-                        // Validate category if it's required for current product type
-                        if (formData.productType === "gold" || formData.productType === "silver") {
-                          if (!newCategory || newCategory.trim() === "") {
-                            updateValidation("category", false, ["Category is required for gold/silver products"], true);
-                          } else {
-                            updateValidation("category", true, [], true);
-                          }
-                        }
-                      }}
-                    />
-                    <ErrorDisplay
-                      errors={validationState.category?.errors || []}
-                    />
-                  </div>
-
-                  <div>
-                    <DropdownField
-                      label="Sub Category"
-                      required
-                      options={[
-                        { value: "", label: "Select Sub Category" },
-                        ...subCategoryOptions,
-                      ]}
-                      value={formData.subCategory}
-                      onChange={(e) => {
-                        const newSubCategory = e.target.value;
-                        updateFormData({ subCategory: newSubCategory });
-
-                        // Validate sub-category if it's required for current product type
-                        if (formData.productType === "gold" || formData.productType === "silver") {
-                          if (!newSubCategory || newSubCategory.trim() === "") {
-                            updateValidation("subCategory", false, ["Sub-category is required for gold/silver products"], true);
-                          } else {
-                            updateValidation("subCategory", true, [], true);
-                          }
-                        }
-                      }}
-                    />
-                    <ErrorDisplay
-                      errors={validationState.subCategory?.errors || []}
-                    />
-                  </div>
-
-                  <div>
-                    <DropdownField
-                      label="Gender"
-                      options={[
-                        { value: "", label: "Select Gender" },
-                        { value: "male", label: "Male" },
-                        { value: "female", label: "Female" },
-                        { value: "unisex", label: "Unisex" },
-                      ]}
-                      value={formData.gender || ""}
-                      onChange={(e) =>
-                        updateFormData({ gender: e.target.value as any })
-                      }
-                    />
-                  </div>
-                </>
-              )}
-            </FieldGroup>
-
-            <div className="mt-3">
-              <TextareaField
-                label="Description"
-                placeholder="Enter product description"
-                required
-                rows={2}
-                value={formData.description}
-                onChange={(e) => {
-                  const newDescription = e.target.value;
-                  updateFormData({ description: newDescription });
-
-                  // Validate description (required for all product types)
-                  validateRequiredField("description", newDescription, "Description is required");
-                }}
-                showCharCount
-                maxLength={2000}
-              />
-              <ErrorDisplay
-                errors={validationState.description?.errors || []}
-              />
-            </div>
-          </FormSection>
-
-          {/* Product Specifications - Hide for normal products */}
-          {formData.productType !== "normal" && (
-            <FormSection
-              title="Specifications"
-              icon="material-symbols:straighten"
-            >
+      <FormikProvider value={formik}>
+        <Form
+          onSubmit={formik.handleSubmit}
+          className="max-w-7xl mx-auto md:px-0 px-2 py-2"
+        >
+          <div className="space-y-4 pb-16">
+            {/* Basic Information */}
+            <FormSection title="Basic Information" icon="material-symbols:info">
               <FieldGroup columns={3}>
                 <div>
                   <InputField
-                    label="Length (mm)"
-                    type="number"
-                    step="0.1"
-                    placeholder="0.0"
-                    numberValue={formData.length || 0}
-                    onNumberChange={(value) =>
-                      updateFormData({ length: value })
-                    }
-                    allowNegative={false}
-                    clearZeroOnFocus
-                  />
-                  <ErrorDisplay errors={validationState.length?.errors || []} />
-                </div>
-
-                <div>
-                  <InputField
-                    label="Width/Diameter (mm)"
-                    type="number"
-                    step="0.1"
-                    placeholder="0.0"
-                    numberValue={formData.dimension || 0}
-                    onNumberChange={(value) =>
-                      updateFormData({ dimension: value })
-                    }
-                    allowNegative={false}
-                    clearZeroOnFocus
-                  />
-                  <ErrorDisplay
-                    errors={validationState.dimension?.errors || []}
-                  />
-                </div>
-
-                <div>
-                  <InputField
-                    label="Making Charges"
-                    type="number"
-                    step="0.01"
-                    placeholder="0.00"
-                    numberValue={formData.makingCharges || 0}
-                    onNumberChange={(value) =>
-                      updateFormData({ makingCharges: value })
-                    }
-                    allowNegative={false}
-                    clearZeroOnFocus
-                  />
-                </div>
-
-                <div>
-                  <InputField
-                    label="Color"
-                    placeholder="Enter color"
-                    value={formData.color || ""}
-                    onChange={(e) => updateFormData({ color: e.target.value })}
-                  />
-                </div>
-
-                {/* Show clarity only for diamond products */}
-                {formData.productType === "diamond" && (
-                  <div>
-                    <InputField
-                      label="Clarity"
-                      placeholder="Enter clarity"
-                      value={formData.clarity}
-                      onChange={(e) =>
-                        updateFormData({ clarity: e.target.value })
-                      }
-                    />
-                  </div>
-                )}
-
-                <div>
-                  <InputField
-                    label="Total Karat"
-                    type="number"
-                    step="0.01"
-                    placeholder="0.00"
-                    numberValue={formData.totalCarat || 0}
-                    onNumberChange={(value) => {
-                      updateFormData({ totalCarat: value });
-
-                      // Validate total carat if it's required for current product type
-                      if (formData.productType === "gold" || formData.productType === "silver") {
-                        validateRequiredField("totalCarat", value, "Total carat is required for gold/silver products");
-                      }
+                    label="Product Name"
+                    placeholder="Enter product name"
+                    required
+                    value={formik.values.name}
+                    onChange={(e) => {
+                      formik.setFieldValue("name", e.target.value);
                     }}
-                    allowNegative={false}
-                    clearZeroOnFocus
                   />
-                  <ErrorDisplay
-                    errors={validationState.totalCarat?.errors || []}
+                  {formik.errors.name && formik.touched.name && (
+                    <ErrorDisplay errors={[formik.errors.name as string]} />
+                  )}
+                </div>
+                <div>
+                  <DropdownField
+                    label="Product Type"
+                    required
+                    options={[
+                      { value: "", label: "Select Product Type" },
+                      { value: "normal", label: "Normal" },
+                      { value: "gold", label: "Gold" },
+                      { value: "silver", label: "Silver" },
+                    ]}
+                    value={formik.values.productType || ""}
+                    onChange={(e) => {
+                      formik.setFieldValue("productType", e.target.value);
+                    }}
                   />
+                  {formik.errors.productType && formik.touched.productType && (
+                    <ErrorDisplay
+                      errors={[formik.errors.productType as string]}
+                    />
+                  )}
                 </div>
 
-                <div className="flex items-center pt-6">
-                  <label className="flex items-center gap-1 text-xs font-medium text-gray-700">
-                    <input
-                      type="checkbox"
-                      checked={formData.rhodoumFinishes}
-                      onChange={(e) =>
-                        updateFormData({ rhodoumFinishes: e.target.checked })
-                      }
-                      className="rounded border-gray-300 text-[#DF8D28] focus:ring-[#DF8D28] w-3 h-3"
-                    />
-                    Rhodium Finishes
-                  </label>
-                </div>
+                {/* Show additional fields only if product type is not 'normal' */}
+                {formik.values.productType !== "normal" && (
+                  <>
+                    <div>
+                      <DropdownField
+                        label="Category"
+                        required
+                        options={[
+                          { value: "", label: "Select Category" },
+                          ...categoryOptions,
+                        ]}
+                        value={formik.values.category}
+                        onChange={(e) => {
+                          formik.setFieldValue("category", e.target.value);
+                        }}
+                      />
+                      {formik.errors.category && formik.touched.category && (
+                        <ErrorDisplay
+                          errors={[formik.errors.category as string]}
+                        />
+                      )}
+                    </div>
+
+                    <div>
+                      <DropdownField
+                        label="Sub Category"
+                        required
+                        options={[
+                          { value: "", label: "Select Sub Category" },
+                          ...subCategoryOptions,
+                        ]}
+                        value={formik.values.subCategory}
+                        onChange={(e) => {
+                          formik.setFieldValue("subCategory", e.target.value);
+                        }}
+                      />
+                      {formik.errors.subCategory &&
+                        formik.touched.subCategory && (
+                          <ErrorDisplay
+                            errors={[formik.errors.subCategory as string]}
+                          />
+                        )}
+                    </div>
+
+                    <div>
+                      <DropdownField
+                        label="Gender"
+                        options={[
+                          { value: "", label: "Select Gender" },
+                          { value: "male", label: "Male" },
+                          { value: "female", label: "Female" },
+                          { value: "unisex", label: "Unisex" },
+                        ]}
+                        value={formik.values.gender || ""}
+                        onChange={(e) =>
+                          formik.setFieldValue("gender", e.target.value)
+                        }
+                      />
+                    </div>
+                  </>
+                )}
               </FieldGroup>
 
-              {/* Wastage Section */}
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <h4 className="text-sm font-medium text-gray-900 mb-3">
-                  Wastage
-                </h4>
-                <FieldGroup columns={2}>
-                  <div>
-                    <DropdownField
-                      label="Wastage Type"
-                      options={[
-                        { value: "", label: "Select Type" },
-                        { value: "per", label: "Percentage (%)" },
-                        { value: "fixed", label: "Flat Amount" },
-                      ]}
-                      value={formData.wastage?.type || ""}
-                      onChange={(e) => {
-                        const newWastage = {
-                          type: e.target.value as "fixed" | "per",
-                          value: formData.wastage?.value || 0,
-                        };
-                        updateFormData({ wastage: newWastage });
-
-                        // Validate wastage if it's required for current product type
-                        if (formData.productType === "gold" || formData.productType === "silver") {
-                          if (newWastage.type && newWastage.value > 0) {
-                            updateValidation("wastage", true, [], true);
-                          } else {
-                            updateValidation("wastage", false, ["Wastage is required for gold/silver products"], true);
-                          }
-                        }
-                      }}
-                    />
-                  </div>
-
-                  <div>
-                    <InputField
-                      label={
-                        formData.wastage?.type === "per"
-                          ? "Percentage (%)"
-                          : "Amount"
-                      }
-                      type="number"
-                      step="0.01"
-                      placeholder="0.00"
-                      numberValue={formData.wastage?.value || 0}
-                      onNumberChange={(value) => {
-                        const newWastage = {
-                          type: formData.wastage?.type || "fixed",
-                          value: value,
-                        };
-                        updateFormData({ wastage: newWastage });
-
-                        // Validate wastage if it's required for current product type
-                        if (formData.productType === "gold" || formData.productType === "silver") {
-                          if (newWastage.type && newWastage.value > 0) {
-                            updateValidation("wastage", true, [], true);
-                          } else {
-                            updateValidation("wastage", false, ["Wastage is required for gold/silver products"], true);
-                          }
-                        }
-                      }}
-                      allowNegative={false}
-                      clearZeroOnFocus
-                    />
-                  </div>
-                </FieldGroup>
-                <ErrorDisplay
-                  errors={validationState.wastage?.errors || []}
+              <div className="mt-3">
+                <TextareaField
+                  label="Description"
+                  placeholder="Enter product description"
+                  required
+                  rows={2}
+                  value={formik.values.description}
+                  onChange={(e) => {
+                    formik.setFieldValue("description", e.target.value);
+                  }}
+                  showCharCount
+                  maxLength={2000}
                 />
+                {formik.errors.description && formik.touched.description && (
+                  <ErrorDisplay
+                    errors={[formik.errors.description as string]}
+                  />
+                )}
               </div>
             </FormSection>
-          )}
 
-          {/* Product Variants - Show simplified version for normal products */}
-          <FormSection
-            title={
-              formData.productType === "normal"
-                ? "Pricing"
-                : "Variants & Pricing"
-            }
-            icon="material-symbols:inventory"
-          >
-            {formData.productType === "normal" ? (
-              // Simplified pricing for normal products
-              <div className="space-y-3">
-                <div className="bg-gray-50 rounded p-3 border border-gray-200">
-                  <h4 className="text-sm font-medium text-gray-900 mb-3">
-                    Product Price
-                  </h4>
-                  <div className="max-w-xs">
+            {/* Product Specifications - Hide for normal products */}
+            {formik.values.productType !== "normal" && (
+              <FormSection
+                title="Specifications"
+                icon="material-symbols:straighten"
+              >
+                <FieldGroup columns={3}>
+                  <div>
                     <InputField
-                      label="Price"
+                      label="Length (mm)"
                       type="number"
-                      step="0.01"
-                      placeholder="0.00"
-                      numberValue={formData.variants[0]?.price || 0}
+                      step="0.1"
+                      placeholder="0.0"
+                      numberValue={formik.values.length || 0}
                       onNumberChange={(value) =>
-                        updateVariant(0, "price", value)
+                        formik.setFieldValue("length", value)
                       }
                       allowNegative={false}
                       clearZeroOnFocus
                     />
-                    <ErrorDisplay
-                      errors={validationState["variants.0.price"]?.errors || []}
+                  </div>
+
+                  <div>
+                    <InputField
+                      label="Width/Diameter (mm)"
+                      type="number"
+                      step="0.1"
+                      placeholder="0.0"
+                      numberValue={formik.values.dimension || 0}
+                      onNumberChange={(value) =>
+                        formik.setFieldValue("dimension", value)
+                      }
+                      allowNegative={false}
+                      clearZeroOnFocus
                     />
                   </div>
-                </div>
-              </div>
-            ) : (
-              // Full variants for other product types
-              <>
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
-                  <div>
-                    <p className="text-xs text-gray-600">
-                      Configure variants with pricing and inventory
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {formData.variants.length} variant
-                      {formData.variants.length !== 1 ? "s" : ""}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={addVariant}
-                    className="flex items-center gap-1 px-3 py-1.5 bg-[#DF8D28] text-white rounded text-xs font-medium hover:bg-[#B8691A] transition-colors"
-                  >
-                    <Icon icon="material-symbols:add" className="w-3 h-3" />
-                    Add
-                  </button>
-                </div>
 
+                  <div>
+                    <InputField
+                      label="Making Charges"
+                      type="number"
+                      step="0.01"
+                      placeholder="0.00"
+                      numberValue={formik.values.makingCharges || 0}
+                      onNumberChange={(value) =>
+                        formik.setFieldValue("makingCharges", value)
+                      }
+                      allowNegative={false}
+                      clearZeroOnFocus
+                    />
+                  </div>
+
+                  <div>
+                    <InputField
+                      label="Color"
+                      placeholder="Enter color"
+                      value={formik.values.color || ""}
+                      onChange={(e) =>
+                        formik.setFieldValue("color", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  {/* Show clarity only for diamond products */}
+                  {formik.values.productType === "diamond" && (
+                    <div>
+                      <InputField
+                        label="Clarity"
+                        placeholder="Enter clarity"
+                        value={formik.values.clarity}
+                        onChange={(e) =>
+                          formik.setFieldValue("clarity", e.target.value)
+                        }
+                      />
+                    </div>
+                  )}
+
+                  <div>
+                    <InputField
+                      label="Total Karat"
+                      type="number"
+                      step="0.01"
+                      placeholder="0.00"
+                      numberValue={formik.values.totalCarat || 0}
+                      onNumberChange={(value) => {
+                        formik.setFieldValue("totalCarat", value);
+                      }}
+                      allowNegative={false}
+                      clearZeroOnFocus
+                    />
+                    {formik.errors.totalCarat && formik.touched.totalCarat && (
+                      <ErrorDisplay
+                        errors={[formik.errors.totalCarat as string]}
+                      />
+                    )}
+                  </div>
+
+                  <div className="flex items-center pt-6">
+                    <label className="flex items-center gap-1 text-xs font-medium text-gray-700">
+                      <input
+                        type="checkbox"
+                        checked={formik.values.rhodoumFinishes}
+                        onChange={(e) =>
+                          formik.setFieldValue(
+                            "rhodoumFinishes",
+                            e.target.checked
+                          )
+                        }
+                        className="rounded border-gray-300 text-[#DF8D28] focus:ring-[#DF8D28] w-3 h-3"
+                      />
+                      Rhodium Finishes
+                    </label>
+                  </div>
+                </FieldGroup>
+
+                {/* Wastage Section */}
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <h4 className="text-sm font-medium text-gray-900 mb-3">
+                    Wastage
+                  </h4>
+                  <FieldGroup columns={2}>
+                    <div>
+                      <DropdownField
+                        label="Wastage Type"
+                        options={[
+                          { value: "", label: "Select Type" },
+                          { value: "per", label: "Percentage (%)" },
+                          { value: "fixed", label: "Flat Amount" },
+                        ]}
+                        value={formik.values.wastage?.type || ""}
+                        onChange={(e) => {
+                          const newWastage = {
+                            type: e.target.value as "fixed" | "per",
+                            value: formik.values.wastage?.value || 0,
+                          };
+                          formik.setFieldValue("wastage", newWastage);
+                        }}
+                      />
+                    </div>
+
+                    <div>
+                      <InputField
+                        label={
+                          formik.values.wastage?.type === "per"
+                            ? "Percentage (%)"
+                            : "Amount"
+                        }
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        numberValue={formik.values.wastage?.value || 0}
+                        onNumberChange={(value) => {
+                          const newWastage = {
+                            type: formik.values.wastage?.type || "fixed",
+                            value: value,
+                          };
+                          formik.setFieldValue("wastage", newWastage);
+                        }}
+                        allowNegative={false}
+                        clearZeroOnFocus
+                      />
+                    </div>
+                  </FieldGroup>
+                  {formik.errors.wastage && formik.touched.wastage && (
+                    <ErrorDisplay errors={[formik.errors.wastage as string]} />
+                  )}
+                </div>
+              </FormSection>
+            )}
+
+            {/* Product Variants - Show simplified version for normal products */}
+            <FormSection
+              title={
+                formik.values.productType === "normal"
+                  ? "Pricing"
+                  : "Variants & Pricing"
+              }
+              icon="material-symbols:inventory"
+            >
+              {formik.values.productType === "normal" ? (
+                // Simplified pricing for normal products
                 <div className="space-y-3">
-                  {formData.variants.map((variant, index) => (
-                    <div
-                      key={index}
-                      className="bg-gray-50 rounded p-3 border border-gray-200"
+                  <div className="bg-gray-50 rounded p-3 border border-gray-200">
+                    <h4 className="text-sm font-medium text-gray-900 mb-3">
+                      Product Price
+                    </h4>
+                    <div className="max-w-xs">
+                      <InputField
+                        label="Price"
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        numberValue={formik.values.variants[0]?.price || 0}
+                        onNumberChange={(value) =>
+                          updateVariant(0, "price", value)
+                        }
+                        allowNegative={false}
+                        clearZeroOnFocus
+                      />
+                      {(formik.errors as any)["variants.0.price"] &&
+                        formik.touched.variants?.[0]?.price && (
+                          <ErrorDisplay
+                            errors={[
+                              (formik.errors as any)[
+                                "variants.0.price"
+                              ] as string,
+                            ]}
+                          />
+                        )}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                // Full variants for other product types
+                <>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+                    <div>
+                      <p className="text-xs text-gray-600">
+                        Configure variants with pricing and inventory
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {formik.values.variants.length} variant
+                        {formik.values.variants.length !== 1 ? "s" : ""}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={addVariant}
+                      className="flex items-center gap-1 px-3 py-1.5 bg-[#DF8D28] text-white rounded text-xs font-medium hover:bg-[#B8691A] transition-colors"
                     >
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 bg-[#DF8D28] text-white rounded-full flex items-center justify-center text-xs font-medium">
-                            {index + 1}
+                      <Icon icon="material-symbols:add" className="w-3 h-3" />
+                      Add
+                    </button>
+                  </div>
+
+                  <div className="space-y-3">
+                    {formik.values.variants.map((variant, index) => (
+                      <div
+                        key={index}
+                        className="bg-gray-50 rounded p-3 border border-gray-200"
+                      >
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <div className="w-6 h-6 bg-[#DF8D28] text-white rounded-full flex items-center justify-center text-xs font-medium">
+                              {index + 1}
+                            </div>
+                            <div>
+                              <h4 className="text-sm font-medium text-gray-900">
+                                Variant {index + 1}
+                              </h4>
+                              <p className="text-xs text-gray-500">
+                                {variant.price > 0
+                                  ? `₹${variant.price}`
+                                  : "No price"}{" "}
+                                •{" "}
+                                {variant.wt > 0
+                                  ? `${variant.wt} ${variant.unit}`
+                                  : "No weight"}
+                              </p>
+                            </div>
                           </div>
-                          <div>
-                            <h4 className="text-sm font-medium text-gray-900">
-                              Variant {index + 1}
-                            </h4>
-                            <p className="text-xs text-gray-500">
-                              {variant.price > 0
-                                ? `₹${variant.price}`
-                                : "No price"}{" "}
-                              •{" "}
-                              {variant.wt > 0
-                                ? `${variant.wt} ${variant.unit}`
-                                : "No weight"}
-                            </p>
-                          </div>
+                          {formik.values.variants.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => removeVariant(index)}
+                              className="text-red hover:text-red-700 p-1 rounded hover:bg-red-50 transition-colors"
+                              title="Remove variant"
+                            >
+                              <Icon
+                                icon="material-symbols:delete"
+                                className="w-3 h-3"
+                              />
+                            </button>
+                          )}
                         </div>
-                        {formData.variants.length > 1 && (
+
+                        <FieldGroup columns={3}>
+                          <div>
+                            <InputField
+                              label="Price"
+                              type="number"
+                              step="0.01"
+                              placeholder="0.00"
+                              numberValue={variant.price}
+                              onNumberChange={(value) =>
+                                updateVariant(index, "price", value)
+                              }
+                              allowNegative={false}
+                              clearZeroOnFocus
+                            />
+                            {(formik.errors as any)[
+                              `variants.${index}.price`
+                            ] &&
+                              formik.touched.variants?.[index]?.price && (
+                                <ErrorDisplay
+                                  errors={[
+                                    (formik.errors as any)[
+                                      `variants.${index}.price`
+                                    ] as string,
+                                  ]}
+                                />
+                              )}
+                          </div>
+
+                          <div>
+                            <InputField
+                              label="Weight"
+                              type="number"
+                              step="0.01"
+                              placeholder="0.00"
+                              numberValue={variant.wt}
+                              onNumberChange={(value) =>
+                                updateVariant(index, "wt", value)
+                              }
+                              allowNegative={false}
+                              clearZeroOnFocus
+                            />
+                          </div>
+
+                          <div>
+                            <DropdownField
+                              label="Unit"
+                              options={[
+                                { value: "grams", label: "Grams" },
+                                { value: "kg", label: "Kilograms" },
+                                { value: "pieces", label: "Pieces" },
+                                { value: "carats", label: "Carats" },
+                              ]}
+                              value={variant.unit}
+                              onChange={(e) =>
+                                updateVariant(index, "unit", e.target.value)
+                              }
+                            />
+                          </div>
+                        </FieldGroup>
+
+                        <div className="mt-2 flex items-center">
+                          <label className="flex items-center gap-1 text-xs font-medium text-gray-700">
+                            <input
+                              type="checkbox"
+                              checked={variant.isActive}
+                              onChange={(e) =>
+                                updateVariant(
+                                  index,
+                                  "isActive",
+                                  e.target.checked
+                                )
+                              }
+                              className="rounded border-gray-300 text-[#DF8D28] focus:ring-[#DF8D28] w-3 h-3"
+                            />
+                            Active
+                          </label>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </FormSection>
+
+            {/* Gemstones - Hide for normal products */}
+            {formik.values.productType !== "normal" && (
+              <FormSection title="Gemstones" icon="material-symbols:diamond">
+                <div className="space-y-3">
+                  {formik.values.stones && formik.values.stones.length > 0 ? (
+                    formik.values.stones.map((stone, index) => (
+                      <div
+                        key={index}
+                        className="bg-gray-50 rounded p-3 border border-gray-200"
+                      >
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-sm font-medium text-gray-900">
+                            Stone {index + 1}
+                          </h4>
                           <button
                             type="button"
-                            onClick={() => removeVariant(index)}
+                            onClick={() => removeStone(index)}
                             className="text-red hover:text-red-700 p-1 rounded hover:bg-red-50 transition-colors"
-                            title="Remove variant"
+                            title="Remove stone"
                           >
                             <Icon
                               icon="material-symbols:delete"
                               className="w-3 h-3"
                             />
                           </button>
-                        )}
+                        </div>
+
+                        <FieldGroup columns={4}>
+                          <div>
+                            <InputField
+                              label="Stone Name"
+                              placeholder="Enter stone name"
+                              value={stone.name || ""}
+                              onChange={(e) =>
+                                updateStone(index, "name", e.target.value)
+                              }
+                            />
+                          </div>
+
+                          <div>
+                            <InputField
+                              label="Weight (Carats)"
+                              type="number"
+                              step="0.01"
+                              placeholder="0.00"
+                              numberValue={stone.weight || 0}
+                              onNumberChange={(value) =>
+                                updateStone(index, "weight", value)
+                              }
+                              allowNegative={false}
+                              clearZeroOnFocus
+                            />
+                          </div>
+
+                          <div>
+                            <InputField
+                              label="Price"
+                              type="number"
+                              step="0.01"
+                              placeholder="0.00"
+                              numberValue={stone.price || 0}
+                              onNumberChange={(value) =>
+                                updateStone(index, "price", value)
+                              }
+                              allowNegative={false}
+                              clearZeroOnFocus
+                            />
+                          </div>
+
+                          <div>
+                            <InputField
+                              label="Color"
+                              placeholder="Enter color"
+                              value={stone.color || ""}
+                              onChange={(e) =>
+                                updateStone(index, "color", e.target.value)
+                              }
+                            />
+                          </div>
+                        </FieldGroup>
                       </div>
+                    ))
+                  ) : (
+                    <p className="text-xs text-gray-500 text-center py-4">
+                      No gemstones added yet
+                    </p>
+                  )}
 
-                      <FieldGroup columns={3}>
-                        <div>
-                          <InputField
-                            label="Price"
-                            type="number"
-                            step="0.01"
-                            placeholder="0.00"
-                            numberValue={variant.price}
-                            onNumberChange={(value) =>
-                              updateVariant(index, "price", value)
-                            }
-                            allowNegative={false}
-                            clearZeroOnFocus
-                          />
-                          <ErrorDisplay
-                            errors={validationState[`variants.${index}.price`]?.errors || []}
-                          />
-                        </div>
-
-                        <div>
-                          <InputField
-                            label="Weight"
-                            type="number"
-                            step="0.01"
-                            placeholder="0.00"
-                            numberValue={variant.wt}
-                            onNumberChange={(value) =>
-                              updateVariant(index, "wt", value)
-                            }
-                            allowNegative={false}
-                            clearZeroOnFocus
-                          />
-                        </div>
-
-                        <div>
-                          <DropdownField
-                            label="Unit"
-                            options={[
-                              { value: "grams", label: "Grams" },
-                              { value: "kg", label: "Kilograms" },
-                              { value: "pieces", label: "Pieces" },
-                              { value: "carats", label: "Carats" },
-                            ]}
-                            value={variant.unit}
-                            onChange={(e) =>
-                              updateVariant(index, "unit", e.target.value)
-                            }
-                          />
-                        </div>
-                      </FieldGroup>
-
-                      <div className="mt-2 flex items-center">
-                        <label className="flex items-center gap-1 text-xs font-medium text-gray-700">
-                          <input
-                            type="checkbox"
-                            checked={variant.isActive}
-                            onChange={(e) =>
-                              updateVariant(index, "isActive", e.target.checked)
-                            }
-                            className="rounded border-gray-300 text-[#DF8D28] focus:ring-[#DF8D28] w-3 h-3"
-                          />
-                          Active
-                        </label>
-                      </div>
-                    </div>
-                  ))}
+                  <button
+                    type="button"
+                    onClick={addStone}
+                    className="flex items-center gap-1 px-3 py-1.5 bg-[#DF8D28] text-white rounded text-xs font-medium hover:bg-[#B8691A] transition-colors w-full justify-center"
+                  >
+                    <Icon icon="material-symbols:add" className="w-3 h-3" />
+                    Add Gemstone
+                  </button>
                 </div>
-              </>
+              </FormSection>
             )}
-          </FormSection>
 
-          {/* Gemstones - Hide for normal products */}
-          {formData.productType !== "normal" && (
-            <FormSection title="Gemstones" icon="material-symbols:diamond">
-              <div className="space-y-3">
-                {formData.stones && formData.stones.length > 0 ? (
-                  formData.stones.map((stone, index) => (
-                    <div
-                      key={index}
-                      className="bg-gray-50 rounded p-3 border border-gray-200"
-                    >
-                      <div className="flex items-center justify-between mb-3">
-                        <h4 className="text-sm font-medium text-gray-900">
-                          Stone {index + 1}
-                        </h4>
-                        <button
-                          type="button"
-                          onClick={() => removeStone(index)}
-                          className="text-red hover:text-red-700 p-1 rounded hover:bg-red-50 transition-colors"
-                          title="Remove stone"
-                        >
-                          <Icon
-                            icon="material-symbols:delete"
-                            className="w-3 h-3"
-                          />
-                        </button>
-                      </div>
-
-                      <FieldGroup columns={4}>
-                        <div>
-                          <InputField
-                            label="Stone Name"
-                            placeholder="Enter stone name"
-                            value={stone.name || ""}
-                            onChange={(e) =>
-                              updateStone(index, "name", e.target.value)
-                            }
-                          />
-                        </div>
-
-                        <div>
-                          <InputField
-                            label="Weight (Carats)"
-                            type="number"
-                            step="0.01"
-                            placeholder="0.00"
-                            numberValue={stone.weight || 0}
-                            onNumberChange={(value) =>
-                              updateStone(index, "weight", value)
-                            }
-                            allowNegative={false}
-                            clearZeroOnFocus
-                          />
-                        </div>
-
-                        <div>
-                          <InputField
-                            label="Price"
-                            type="number"
-                            step="0.01"
-                            placeholder="0.00"
-                            numberValue={stone.price || 0}
-                            onNumberChange={(value) =>
-                              updateStone(index, "price", value)
-                            }
-                            allowNegative={false}
-                            clearZeroOnFocus
-                          />
-                        </div>
-
-                        <div>
-                          <InputField
-                            label="Color"
-                            placeholder="Enter color"
-                            value={stone.color || ""}
-                            onChange={(e) =>
-                              updateStone(index, "color", e.target.value)
-                            }
-                          />
-                        </div>
-                      </FieldGroup>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-xs text-gray-500 text-center py-4">
-                    No gemstones added yet
-                  </p>
-                )}
-
-                <button
-                  type="button"
-                  onClick={addStone}
-                  className="flex items-center gap-1 px-3 py-1.5 bg-[#DF8D28] text-white rounded text-xs font-medium hover:bg-[#B8691A] transition-colors w-full justify-center"
-                >
-                  <Icon icon="material-symbols:add" className="w-3 h-3" />
-                  Add Gemstone
-                </button>
-              </div>
-            </FormSection>
-          )}
-
-          {/* Other Charges - Hide for normal products */}
-          {formData.productType !== "normal" && (
-            <FormSection
-              title="Other Charges"
-              icon="material-symbols:receipt-long"
-            >
-              <div className="space-y-3">
-                {formData.otherCharges && formData.otherCharges.length > 0 ? (
-                  formData.otherCharges.map((charge, index) => (
-                    <div
-                      key={index}
-                      className="bg-gray-50 rounded p-3 border border-gray-200"
-                    >
-                      <div className="flex items-center justify-between mb-3">
-                        <h4 className="text-sm font-medium text-gray-900">
-                          Charge {index + 1}
-                        </h4>
-                        <button
-                          type="button"
-                          onClick={() => removeOtherCharge(index)}
-                          className="text-red hover:text-red-700 p-1 rounded hover:bg-red-50 transition-colors"
-                          title="Remove charge"
-                        >
-                          <Icon
-                            icon="material-symbols:delete"
-                            className="w-3 h-3"
-                          />
-                        </button>
-                      </div>
-
-                      <FieldGroup columns={2}>
-                        <div>
-                          <InputField
-                            label="Charge Name"
-                            placeholder="Enter charge name"
-                            value={charge.name || ""}
-                            onChange={(e) =>
-                              updateOtherCharge(index, "name", e.target.value)
-                            }
-                          />
-                        </div>
-
-                        <div>
-                          <InputField
-                            label="Price"
-                            type="number"
-                            step="0.01"
-                            placeholder="0.00"
-                            numberValue={charge.price || 0}
-                            onNumberChange={(value) =>
-                              updateOtherCharge(index, "price", value)
-                            }
-                            allowNegative={false}
-                            clearZeroOnFocus
-                          />
-                        </div>
-                      </FieldGroup>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-xs text-gray-500 text-center py-4">
-                    No additional charges added yet
-                  </p>
-                )}
-
-                <button
-                  type="button"
-                  onClick={addOtherCharge}
-                  className="flex items-center gap-1 px-3 py-1.5 bg-[#DF8D28] text-white rounded text-xs font-medium hover:bg-[#B8691A] transition-colors w-full justify-center"
-                >
-                  <Icon icon="material-symbols:add" className="w-3 h-3" />
-                  Add Other Charge
-                </button>
-              </div>
-            </FormSection>
-          )}
-
-          {/* Product Images - Show for all product types */}
-          <FormSection title="Product Images" icon="material-symbols:image">
-            <div className="space-y-3">
-              <p className="text-xs text-gray-600">
-                Upload product images (Max 10)
-              </p>
-
-              {/* Upload Area */}
-              <div
-                className={`border-2 border-dashed rounded p-4 text-center transition-colors cursor-pointer ${
-                  dragActive
-                    ? "border-[#DF8D28] bg-orange-50"
-                    : "border-gray-300 hover:border-[#DF8D28]"
-                } ${
-                  selectedImages.length >= 10
-                    ? "opacity-50 cursor-not-allowed"
-                    : ""
-                }`}
-                onDragEnter={handleDrag}
-                onDragLeave={handleDrag}
-                onDragOver={handleDrag}
-                onDrop={handleDrop}
-                onClick={() => {
-                  if (selectedImages.length < 10) {
-                    document.getElementById("product-images")?.click();
-                  }
-                }}
+            {/* Other Charges - Hide for normal products */}
+            {formik.values.productType !== "normal" && (
+              <FormSection
+                title="Other Charges"
+                icon="material-symbols:receipt-long"
               >
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={handleFileInputChange}
-                  className="hidden"
-                  id="product-images"
-                  disabled={selectedImages.length >= 10}
-                />
+                <div className="space-y-3">
+                  {formik.values.otherCharges &&
+                  formik.values.otherCharges.length > 0 ? (
+                    formik.values.otherCharges.map((charge, index) => (
+                      <div
+                        key={index}
+                        className="bg-gray-50 rounded p-3 border border-gray-200"
+                      >
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-sm font-medium text-gray-900">
+                            Charge {index + 1}
+                          </h4>
+                          <button
+                            type="button"
+                            onClick={() => removeOtherCharge(index)}
+                            className="text-red hover:text-red-700 p-1 rounded hover:bg-red-50 transition-colors"
+                            title="Remove charge"
+                          >
+                            <Icon
+                              icon="material-symbols:delete"
+                              className="w-3 h-3"
+                            />
+                          </button>
+                        </div>
 
-                <div className="flex flex-col items-center gap-2">
-                  <Icon
-                    icon="material-symbols:cloud-upload"
-                    className="w-8 h-8 text-gray-400"
+                        <FieldGroup columns={2}>
+                          <div>
+                            <InputField
+                              label="Charge Name"
+                              placeholder="Enter charge name"
+                              value={charge.name || ""}
+                              onChange={(e) =>
+                                updateOtherCharge(index, "name", e.target.value)
+                              }
+                            />
+                          </div>
+
+                          <div>
+                            <InputField
+                              label="Price"
+                              type="number"
+                              step="0.01"
+                              placeholder="0.00"
+                              numberValue={charge.price || 0}
+                              onNumberChange={(value) =>
+                                updateOtherCharge(index, "price", value)
+                              }
+                              allowNegative={false}
+                              clearZeroOnFocus
+                            />
+                          </div>
+                        </FieldGroup>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-xs text-gray-500 text-center py-4">
+                      No additional charges added yet
+                    </p>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={addOtherCharge}
+                    className="flex items-center gap-1 px-3 py-1.5 bg-[#DF8D28] text-white rounded text-xs font-medium hover:bg-[#B8691A] transition-colors w-full justify-center"
+                  >
+                    <Icon icon="material-symbols:add" className="w-3 h-3" />
+                    Add Other Charge
+                  </button>
+                </div>
+              </FormSection>
+            )}
+
+            {/* Product Images - Show for all product types */}
+            <FormSection title="Product Images" icon="material-symbols:image">
+              <div className="space-y-3">
+                <p className="text-xs text-gray-600">
+                  Upload product images (Max 10)
+                </p>
+
+                {/* Upload Area */}
+                <div
+                  className={`border-2 border-dashed rounded p-4 text-center transition-colors cursor-pointer ${
+                    dragActive
+                      ? "border-[#DF8D28] bg-[#DF8D28]/5"
+                      : "border-gray-300 hover:border-[#DF8D28] hover:bg-gray-50"
+                  }`}
+                  onDragEnter={handleDrag}
+                  onDragLeave={handleDrag}
+                  onDragOver={handleDrag}
+                  onDrop={handleDrop}
+                  onClick={() =>
+                    document.getElementById("file-upload")?.click()
+                  }
+                >
+                  <input
+                    id="file-upload"
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={handleFileInputChange}
+                    className="hidden"
                   />
-                  <div>
-                    <p className="text-xs text-gray-500">
-                      {selectedImages.length >= 10
-                        ? "Maximum 10 images reached"
-                        : "Drag and drop images or click to browse"}
-                    </p>
-                    <p className="text-xs text-gray-400 mt-1">
-                      {selectedImages.length}/10 images
-                    </p>
+                  <div className="flex flex-col items-center gap-2">
+                    <Icon
+                      icon="material-symbols:cloud-upload"
+                      className="w-8 h-8 text-gray-400"
+                    />
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">
+                        Click to upload or drag and drop
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        PNG, JPG, GIF up to 10MB each
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Image Preview Grid */}
-              {selectedImages.length > 0 && (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                  {selectedImages.map((file, index) => (
-                    <div key={index} className="relative group">
-                      <div className="relative aspect-square">
-                        <img
-                          src={URL.createObjectURL(file)}
-                          alt={`Product ${index + 1}`}
-                          className="w-full h-full object-cover rounded border border-gray-200"
-                        />
-
-                        {/* Primary Image Badge */}
-                        {index === 0 && (
-                          <div className="absolute top-1 left-1 bg-[#DF8D28] text-white text-xs px-1.5 py-0.5 rounded font-medium">
-                            Primary
-                          </div>
-                        )}
-
-                        {/* Remove Button */}
-                        <button
-                          type="button"
-                          onClick={() => removeImage(index)}
-                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
-                          title="Remove image"
-                        >
-                          <Icon
-                            icon="material-symbols:close"
-                            className="w-3 h-3"
-                          />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Existing Images (for edit mode) */}
-              {!selectedImages.length &&
-                formData.existingImages &&
-                formData.existingImages.length > 0 && (
+                {/* Selected Images Preview */}
+                {selectedImages.length > 0 && (
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                    {formData.existingImages.map((imageUrl, index) => (
+                    {selectedImages.map((file, index) => (
                       <div key={index} className="relative group">
                         <div className="relative aspect-square">
                           <img
-                            src={`${
-                              import.meta.env.VITE_API_IMAGE_BASE_URL
-                            }${imageUrl}`}
-                            alt={`Existing Product ${index + 1}`}
+                            src={URL.createObjectURL(file)}
+                            alt={`Preview ${index + 1}`}
                             className="w-full h-full object-cover rounded border border-gray-200"
                           />
                           {index === 0 && (
@@ -1278,122 +1122,155 @@ const CompactFormContent: React.FC<{
                               Primary
                             </div>
                           )}
+                          <button
+                            type="button"
+                            onClick={() => removeImage(index)}
+                            className="absolute top-1 right-1 bg-red text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                            title="Remove image"
+                          >
+                            <Icon
+                              icon="material-symbols:close"
+                              className="w-3 h-3"
+                            />
+                          </button>
                         </div>
                       </div>
                     ))}
                   </div>
                 )}
 
-              {/* Info Message */}
-              {selectedImages.length > 0 && (
-                <div className="p-2 bg-blue-50 rounded border border-blue-200">
-                  <p className="text-xs text-blue-700 flex items-center gap-1">
-                    <Icon icon="material-symbols:info" className="w-3 h-3" />
-                    The first image will be used as the primary product image.
-                  </p>
-                </div>
-              )}
-            </div>
-          </FormSection>
-
-          {/* Status & Visibility Settings - Hide for normal products */}
-          {formData.productType !== "normal" && (
-            <FormSection
-              title="Status & Visibility"
-              icon="material-symbols:settings"
-            >
-              <FieldGroup columns={3}>
-                <div>
-                  <DropdownField
-                    label="Visibility"
-                    options={[
-                      { value: "normal", label: "Normal" },
-                      { value: "featured", label: "Featured" },
-                      { value: "bestSellers", label: "Best Sellers" },
-                      { value: "newArrivals", label: "New Arrivals" },
-                    ]}
-                    value={formData.visibleAs}
-                    onChange={(e) =>
-                      updateFormData({ visibleAs: e.target.value as any })
-                    }
-                  />
-                </div>
-
-                <div className="flex items-center pt-6">
-                  <label className="flex items-center gap-1 text-xs font-medium text-gray-700">
-                    <input
-                      type="checkbox"
-                      checked={formData.isActive}
-                      onChange={(e) =>
-                        updateFormData({ isActive: e.target.checked })
-                      }
-                      className="rounded border-gray-300 text-[#DF8D28] focus:ring-[#DF8D28] w-3 h-3"
-                    />
-                    Product Active
-                  </label>
-                </div>
-
-                <div className="flex items-center pt-6">
-                  <label className="flex items-center gap-1 text-xs font-medium text-gray-700">
-                    <input
-                      type="checkbox"
-                      checked={formData.isFeatured}
-                      onChange={(e) =>
-                        updateFormData({ isFeatured: e.target.checked })
-                      }
-                      className="rounded border-gray-300 text-[#DF8D28] focus:ring-[#DF8D28] w-3 h-3"
-                    />
-                    Featured Product
-                  </label>
-                </div>
-              </FieldGroup>
+                {/* Existing Images (for edit mode) */}
+                {!selectedImages.length &&
+                  formik.values.existingImages &&
+                  formik.values.existingImages.length > 0 && (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                      {formik.values.existingImages.map((imageUrl, index) => (
+                        <div key={index} className="relative group">
+                          <div className="relative aspect-square">
+                            <img
+                              src={`${
+                                import.meta.env.VITE_API_IMAGE_BASE_URL
+                              }${imageUrl}`}
+                              alt={`Existing Product ${index + 1}`}
+                              className="w-full h-full object-cover rounded border border-gray-200"
+                            />
+                            {index === 0 && (
+                              <div className="absolute top-1 left-1 bg-[#DF8D28] text-white text-xs px-1.5 py-0.5 rounded font-medium">
+                                Primary
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+              </div>
             </FormSection>
-          )}
 
-          {/* Form Actions */}
-          <div className="bg-white rounded-md border border-gray-200 shadow-sm sticky bottom-2">
-            <div className="p-3">
-              <div className="flex items-center justify-between gap-3">
-                <div className="text-xs text-gray-600">
-                  <p>Fill required fields before saving</p>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={onCancel}
-                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded text-sm hover:bg-gray-50 transition-colors"
-                  >
-                    Cancel
-                  </button>
-
-                  <button
-                    type="submit"
-                    disabled={isLoading}
-                    className="px-6 py-2 bg-[#DF8D28] text-white rounded hover:bg-[#B8691A] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1 text-sm font-medium"
-                  >
-                    {isLoading && (
-                      <Icon
-                        icon="material-symbols:refresh"
-                        className="w-3 h-3 animate-spin"
-                      />
-                    )}
-                    <Icon
-                      icon={
-                        isEdit
-                          ? "material-symbols:edit"
-                          : "material-symbols:add"
+            {/* Status & Visibility Settings - Hide for normal products */}
+            {formik.values.productType !== "normal" && (
+              <FormSection
+                title="Status & Visibility"
+                icon="material-symbols:settings"
+              >
+                <FieldGroup columns={3}>
+                  <div>
+                    <DropdownField
+                      label="Visible As"
+                      options={[
+                        { value: "normal", label: "Normal" },
+                        { value: "featured", label: "Featured" },
+                        { value: "bestSellers", label: "Best Sellers" },
+                        { value: "newArrivals", label: "New Arrivals" },
+                      ]}
+                      value={formik.values.visibleAs}
+                      onChange={(e) =>
+                        formik.setFieldValue("visibleAs", e.target.value)
                       }
-                      className="w-3 h-3"
                     />
-                    {isEdit ? "Update" : "Create"}
-                  </button>
+                  </div>
+
+                  <div className="flex items-center pt-6">
+                    <label className="flex items-center gap-1 text-xs font-medium text-gray-700">
+                      <input
+                        type="checkbox"
+                        checked={formik.values.isActive}
+                        onChange={(e) =>
+                          formik.setFieldValue("isActive", e.target.checked)
+                        }
+                        className="rounded border-gray-300 text-[#DF8D28] focus:ring-[#DF8D28] w-3 h-3"
+                      />
+                      Active
+                    </label>
+                  </div>
+
+                  <div className="flex items-center pt-6">
+                    <label className="flex items-center gap-1 text-xs font-medium text-gray-700">
+                      <input
+                        type="checkbox"
+                        checked={formik.values.isFeatured}
+                        onChange={(e) =>
+                          formik.setFieldValue("isFeatured", e.target.checked)
+                        }
+                        className="rounded border-gray-300 text-[#DF8D28] focus:ring-[#DF8D28] w-3 h-3"
+                      />
+                      Featured
+                    </label>
+                  </div>
+                </FieldGroup>
+              </FormSection>
+            )}
+
+            {/* Submit Section */}
+            <div className="bg-white rounded-md border border-gray-200 shadow-sm">
+              <div className="p-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">
+                      Ready to {isEdit ? "update" : "create"} product?
+                    </p>
+                    <p className="text-xs text-gray-600">
+                      Review all information before submitting
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={onCancel}
+                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded text-sm hover:bg-gray-50 transition-colors"
+                    >
+                      Cancel
+                    </button>
+
+                    <button
+                      type="submit"
+                      disabled={isLoading}
+                      className="px-6 py-2 bg-[#DF8D28] text-white rounded hover:bg-[#B8691A] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1 text-sm font-medium"
+                    >
+                      {isLoading && (
+                        <Icon
+                          icon="material-symbols:refresh"
+                          className="w-3 h-3 animate-spin"
+                        />
+                      )}
+                      <Icon
+                        icon={
+                          isEdit
+                            ? "material-symbols:edit"
+                            : "material-symbols:add"
+                        }
+                        className="w-3 h-3"
+                      />
+                      {isEdit ? "Update" : "Create"}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </form>
+        </Form>
+      </FormikProvider>
     </div>
   );
 };
@@ -1415,13 +1292,12 @@ export const CompactProductForm: React.FC<CompactProductFormProps> = ({
   isEdit = false,
 }) => {
   return (
-    <ProductFormProvider initialData={initialData} totalSteps={1}>
-      <CompactFormContent
-        isLoading={isLoading}
-        onSubmit={onSubmit}
-        onCancel={onCancel}
-        isEdit={isEdit}
-      />
-    </ProductFormProvider>
+    <CompactFormContent
+      isLoading={isLoading}
+      onSubmit={onSubmit}
+      onCancel={onCancel}
+      isEdit={isEdit}
+      initialData={initialData}
+    />
   );
 };

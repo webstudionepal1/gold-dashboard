@@ -72,7 +72,7 @@ const Productsubcategory: React.FC = () => {
               </p>
             ),
             rawDescription: get(item, 'description', ''),
-            totalProducts: get(item, 'totalProducts', 'N/A'),
+            totalProducts: get(item, 'totalProducts', '0'),
             status: (
               <span
                 className={`px-2 py-1 text-xs font-medium rounded-full ${
@@ -117,10 +117,6 @@ const Productsubcategory: React.FC = () => {
           viewAction={(row) =>
             setIsViewModalOpen({ state: true, viewData: row })
           }
-          toggleAction={(row) => {
-            console.log(row, 'subcategory row');
-            handleStatusToggle(row._id, !row.isActive);
-          }}
         />
       </div>
       {isModalOpen.state && (

@@ -196,7 +196,7 @@ export const useCreateProductsMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
     onError(err: any) {
-      toast.error(capitalize(err || 'Error Creating Product'));
+      toast.error(capitalize(err || "Error Creating Product"));
     },
   });
 };
@@ -333,9 +333,13 @@ export const useDeleteProductCategoriesMutation = () => {
 };
 
 // Product sub category
-export const useGetAllProductSubCategoriesQuery = (params: IParams = {}) => {
+export const useGetAllProductSubCategoriesQuery = (
+  params: IParams = {},
+  options = { enabled: true }
+) => {
+  const stableQueryKey = params && JSON.stringify(params);
   return useQuery({
-    queryKey: ["subcategory"],
+    queryKey: ["subcategory", stableQueryKey],
     queryFn: async () => {
       const res = await apiClient.get<{ data: IFetchSubCategory[] }>(
         "subcategory",
@@ -343,6 +347,7 @@ export const useGetAllProductSubCategoriesQuery = (params: IParams = {}) => {
       );
       return res?.data?.data;
     },
+    enabled: options.enabled,
   });
 };
 
