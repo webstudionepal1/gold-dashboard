@@ -11,16 +11,21 @@
  * 7. Reusable event handlers for form updates
  */
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { ProductFormProvider, useProductForm, ProductFormData } from "../../../components/shared/form_components/ProductFormContext";
+import {
+  ProductFormProvider,
+  useProductForm,
+  ProductFormData,
+} from "../../../components/shared/form_components/ProductFormContext";
 import { InputField } from "../../../components/shared/form_components/InputField";
 import { DropdownField } from "../../../components/shared/form_components/Dropdown";
 import { TextareaField } from "../../../components/shared/form_components/TextArea";
 import {
   useGetAllProductCategoriesQuery,
-  useGetAllProductSubCategoriesQuery
+  useGetAllProductSubCategoriesQuery,
 } from "../../../server/api/productHooks";
+import { mainProductFormSchema } from "../../../components/shared/form_components/validation/ProductFormValidation";
 
 // Form Section Component for DRY principle
 interface FormSectionProps {
@@ -30,8 +35,15 @@ interface FormSectionProps {
   className?: string;
 }
 
-const FormSection: React.FC<FormSectionProps> = ({ title, icon, children, className = "" }) => (
-  <div className={`bg-white rounded-md border border-gray-200 shadow-sm ${className}`}>
+const FormSection: React.FC<FormSectionProps> = ({
+  title,
+  icon,
+  children,
+  className = "",
+}) => (
+  <div
+    className={`bg-white rounded-md border border-gray-200 shadow-sm ${className}`}
+  >
     <div className="px-4 py-2 border-b border-gray-100 bg-gray-50 rounded-t-md">
       <div className="flex items-center gap-2">
         <div className="p-1 bg-[#DF8D28]/10 rounded">
@@ -40,9 +52,7 @@ const FormSection: React.FC<FormSectionProps> = ({ title, icon, children, classN
         <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
       </div>
     </div>
-    <div className="p-4">
-      {children}
-    </div>
+    <div className="p-4">{children}</div>
   </div>
 );
 
@@ -55,19 +65,20 @@ interface FieldGroupProps {
 const FieldGroup: React.FC<FieldGroupProps> = ({ children, columns = 2 }) => {
   const getGridClasses = () => {
     switch (columns) {
-      case 1: return 'grid-cols-1';
-      case 2: return 'grid-cols-1 md:grid-cols-2';
-      case 3: return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
-      case 4: return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4';
-      default: return 'grid-cols-1 md:grid-cols-2';
+      case 1:
+        return "grid-cols-1";
+      case 2:
+        return "grid-cols-1 md:grid-cols-2";
+      case 3:
+        return "grid-cols-1 md:grid-cols-2 lg:grid-cols-3";
+      case 4:
+        return "grid-cols-1 md:grid-cols-2 lg:grid-cols-4";
+      default:
+        return "grid-cols-1 md:grid-cols-2";
     }
   };
 
-  return (
-    <div className={`grid ${getGridClasses()} gap-3`}>
-      {children}
-    </div>
-  );
+  return <div className={`grid ${getGridClasses()} gap-3`}>{children}</div>;
 };
 
 // Error Display Component
@@ -78,7 +89,10 @@ interface ErrorDisplayProps {
 const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ errors }) => (
   <>
     {errors.map((error, index) => (
-      <p key={index} className="text-red-500 text-sm flex items-center gap-1 mt-1">
+      <p
+        key={index}
+        className="text-red text-sm flex items-center gap-1 mt-1"
+      >
         <Icon icon="material-symbols:error" className="w-4 h-4" />
         {error}
       </p>
@@ -89,28 +103,186 @@ const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ errors }) => (
 // Main Form Content Component
 const CompactFormContent: React.FC<{
   onSubmit: (data: ProductFormData) => void;
+  isLoading:boolean;
   onCancel?: () => void;
   isEdit?: boolean;
-}> = ({ onSubmit, onCancel, isEdit = false }) => {
-  const { formData, updateFormData, validationState, isLoading, setIsLoading } = useProductForm();
+}> = ({ onSubmit, onCancel, isEdit = false, isLoading }) => {
+  const { formData, updateFormData, validationState, updateValidation, setIsLoading } =
+    useProductForm();
 
   // Image upload state
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [dragActive, setDragActive] = useState(false);
 
+  // Validation helper functions
+  const validateRequiredField = (fieldName: string, value: any, errorMessage: string) => {
+    if (!value || (typeof value === 'string' && value.trim() === '') || (typeof value === 'number' && value <= 0)) {
+      updateValidation(fieldName, false, [errorMessage], true);
+      return false;
+    } else {
+      updateValidation(fieldName, true, [], true);
+      return true;
+    }
+  };
+
+  const validateConditionalFields = (productType?: string) => {
+    // Use the passed productType or current formData.productType
+    const currentProductType = productType || formData.productType;
+
+    // Validate based on product type
+    if (currentProductType === "gold" || currentProductType === "silver") {
+      // Validate category
+      if (!formData.category || formData.category.trim() === "") {
+        updateValidation("category", false, ["Category is required for gold/silver products"], true);
+      } else {
+        updateValidation("category", true, [], true);
+      }
+
+      // Validate subCategory
+      if (!formData.subCategory || formData.subCategory.trim() === "") {
+        updateValidation("subCategory", false, ["Sub-category is required for gold/silver products"], true);
+      } else {
+        updateValidation("subCategory", true, [], true);
+      }
+
+      // Validate totalCarat
+      if (!formData.totalCarat || formData.totalCarat <= 0) {
+        updateValidation("totalCarat", false, ["Total carat is required for gold/silver products"], true);
+      } else {
+        updateValidation("totalCarat", true, [], true);
+      }
+
+      // Validate wastage
+      if (!formData.wastage || !formData.wastage.type || formData.wastage.value <= 0) {
+        updateValidation("wastage", false, ["Wastage is required for gold/silver products"], true);
+      } else {
+        updateValidation("wastage", true, [], true);
+      }
+    } else {
+      // Clear validation errors for fields not required for normal products
+      updateValidation("category", true, [], true);
+      updateValidation("subCategory", true, [], true);
+      updateValidation("totalCarat", true, [], true);
+      updateValidation("wastage", true, [], true);
+    }
+  };
+
   // API hooks
   const { data: categories } = useGetAllProductCategoriesQuery();
   const { data: subCategories } = useGetAllProductSubCategoriesQuery();
 
+  // Effect to trigger validation when product type changes
+  useEffect(() => {
+    if (formData.productType) {
+      validateConditionalFields(formData.productType);
+    }
+  }, [formData.productType]);
+
+  // Effect to trigger initial validation on mount
+  useEffect(() => {
+    if (formData.productType) {
+      // Small delay to ensure form data is fully loaded
+      setTimeout(() => {
+        validateConditionalFields(formData.productType);
+      }, 100);
+    }
+  }, []); // Run only on mount
+
   // Transform data for dropdowns
-  const categoryOptions = categories?.map((cat: any) => ({ value: cat._id, label: cat.name })) || [];
-  const subCategoryOptions = subCategories?.map((sub: any) => ({ value: sub._id, label: sub.name })) || [];
+  const categoryOptions =
+    categories?.map((cat: any) => ({ value: cat._id, label: cat.name })) || [];
+  const subCategoryOptions =
+    subCategories?.map((sub: any) => ({ value: sub._id, label: sub.name })) ||
+    [];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+
     try {
+      // First, run manual validation for conditional fields
+      let hasValidationErrors = false;
+
+      // Manual validation for gold/silver products
+      if (formData.productType === "gold" || formData.productType === "silver") {
+        if (!formData.category || formData.category.trim() === "") {
+          updateValidation("category", false, ["Category is required for gold/silver products"], true);
+          hasValidationErrors = true;
+        }
+
+        if (!formData.subCategory || formData.subCategory.trim() === "") {
+          updateValidation("subCategory", false, ["Sub-category is required for gold/silver products"], true);
+          hasValidationErrors = true;
+        }
+
+        if (!formData.totalCarat || formData.totalCarat <= 0) {
+          updateValidation("totalCarat", false, ["Total carat is required for gold/silver products"], true);
+          hasValidationErrors = true;
+        }
+
+        if (!formData.wastage || !formData.wastage.type || formData.wastage.value <= 0) {
+          updateValidation("wastage", false, ["Wastage is required for gold/silver products"], true);
+          hasValidationErrors = true;
+        }
+      }
+
+      // Validate product name and description for all products
+      if (!formData.name || formData.name.trim() === "") {
+        updateValidation("name", false, ["Product name is required"], true);
+        hasValidationErrors = true;
+      }
+
+      if (!formData.description || formData.description.trim() === "") {
+        updateValidation("description", false, ["Description is required"], true);
+        hasValidationErrors = true;
+      }
+
+      // Validate variants and prices
+      if (!formData.variants || formData.variants.length === 0) {
+        hasValidationErrors = true;
+      } else {
+        formData.variants.forEach((variant, index) => {
+          if (!variant.price || variant.price <= 0) {
+            updateValidation(`variants.${index}.price`, false, ["Price is required and must be greater than 0"], true);
+            hasValidationErrors = true;
+          }
+        });
+      }
+
+      if (hasValidationErrors) {
+        alert("Please fix the validation errors before submitting.");
+        return;
+      }
+
+      // Also run the schema validation as a backup
+      const validationResult = mainProductFormSchema.safeParse(formData);
+
+      if (!validationResult.success) {
+        // Handle validation errors
+        const errors = validationResult.error.errors;
+        console.error("Validation errors:", errors);
+
+        // Update validation state for each field with errors
+        errors.forEach((error) => {
+          const fieldPath = error.path.join('.');
+          updateValidation(fieldPath, false, [error.message], true);
+        });
+
+        // Show a general error message
+        alert("Please fix the validation errors before submitting.");
+        return;
+      }
+
+      // Clear any previous validation errors
+      Object.keys(validationState).forEach((field) => {
+        updateValidation(field, true, [], true);
+      });
+
+      // If validation passes, submit the form
       onSubmit(formData);
+    } catch (error) {
+      console.error("Form submission error:", error);
+      alert("An error occurred while submitting the form. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -142,6 +314,15 @@ const CompactFormContent: React.FC<{
     const newVariants = [...formData.variants];
     newVariants[index] = { ...newVariants[index], [field]: value };
     updateFormData({ variants: newVariants });
+
+    // Validate price field for all product types
+    if (field === "price") {
+      if (value <= 0) {
+        updateValidation(`variants.${index}.price`, false, ["Price is required and must be greater than 0"], true);
+      } else {
+        updateValidation(`variants.${index}.price`, true, [], true);
+      }
+    }
   };
 
   // Stone management functions
@@ -262,9 +443,12 @@ const CompactFormContent: React.FC<{
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
           <div className="bg-white rounded-lg p-6 shadow-xl">
             <div className="flex items-center gap-3">
-              <Icon icon="material-symbols:refresh" className="w-6 h-6 text-[#DF8D28] animate-spin" />
+              <Icon
+                icon="material-symbols:refresh"
+                className="w-6 h-6 text-[#DF8D28] animate-spin"
+              />
               <p className="text-gray-900 font-medium">
-                {isEdit ? 'Updating product...' : 'Creating product...'}
+                {isEdit ? "Updating product..." : "Creating product..."}
               </p>
             </div>
           </div>
@@ -276,11 +460,14 @@ const CompactFormContent: React.FC<{
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="flex items-center gap-2">
               <div className="p-1.5 bg-[#DF8D28]/10 rounded">
-                <Icon icon="material-symbols:inventory" className="w-5 h-5 text-[#DF8D28]" />
+                <Icon
+                  icon="material-symbols:inventory"
+                  className="w-5 h-5 text-[#DF8D28]"
+                />
               </div>
               <div>
                 <h1 className="text-lg font-bold text-gray-900">
-                  {isEdit ? 'Edit Product' : 'Create New Product'}
+                  {isEdit ? "Edit Product" : "Create New Product"}
                 </h1>
                 <p className="text-xs text-gray-600">
                   Complete product information form
@@ -291,666 +478,877 @@ const CompactFormContent: React.FC<{
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="max-w-7xl mx-auto md:px-0 px-2 py-2">
+      <form
+        onSubmit={handleSubmit}
+        className="max-w-7xl mx-auto md:px-0 px-2 py-2"
+      >
         <div className="space-y-4 pb-16">
           {/* Basic Information */}
           <FormSection title="Basic Information" icon="material-symbols:info">
-                <FieldGroup columns={3}>
-                  <div>
-                    <InputField
-                      label="Product Name"
-                      placeholder="Enter product name"
-                      required
-                      value={formData.name}
-                      onChange={(e) => updateFormData({ name: e.target.value })}
-                    />
-                    <ErrorDisplay errors={validationState.name?.errors || []} />
-                  </div>
+            <FieldGroup columns={3}>
+              <div>
+                <InputField
+                  label="Product Name"
+                  placeholder="Enter product name"
+                  required
+                  value={formData.name}
+                  onChange={(e) => {
+                    const newName = e.target.value;
+                    updateFormData({ name: newName });
+
+                    // Validate product name (required for all product types)
+                    validateRequiredField("name", newName, "Product name is required");
+                  }}
+                />
+                <ErrorDisplay errors={validationState.name?.errors || []} />
+              </div>
+              <div>
+                <DropdownField
+                  label="Product Type"
+                  required
+                  options={[
+                    { value: "", label: "Select Product Type" },
+                    { value: "normal", label: "Normal" },
+                    // { value: 'diamond', label: 'Diamond' },
+                    { value: "gold", label: "Gold" },
+                    { value: "silver", label: "Silver" },
+                  ]}
+                  value={formData.productType || ""}
+                  onChange={(e) => {
+                    const newProductType = e.target.value as any;
+                    updateFormData({ productType: newProductType });
+
+                    // Trigger conditional validation immediately with the new product type
+                    validateConditionalFields(newProductType);
+                  }}
+                />
+                <ErrorDisplay
+                  errors={validationState.productType?.errors || []}
+                />
+              </div>
+
+              {/* Show additional fields only if product type is not 'normal' */}
+              {formData.productType !== "normal" && (
+                <>
                   <div>
                     <DropdownField
-                      label="Product Type"
+                      label="Category"
                       required
                       options={[
-                        { value: '', label: 'Select Product Type' },
-                        { value: 'normal', label: 'Normal' },
-                        // { value: 'diamond', label: 'Diamond' },
-                        { value: 'gold', label: 'Gold' },
-                        { value: 'silver', label: 'Silver' }
+                        { value: "", label: "Select Category" },
+                        ...categoryOptions,
                       ]}
-                      value={formData.productType || ''}
-                      onChange={(e) => updateFormData({ productType: e.target.value as any })}
+                      value={formData.category}
+                      onChange={(e) => {
+                        const newCategory = e.target.value;
+                        updateFormData({ category: newCategory });
+
+                        // Validate category if it's required for current product type
+                        if (formData.productType === "gold" || formData.productType === "silver") {
+                          if (!newCategory || newCategory.trim() === "") {
+                            updateValidation("category", false, ["Category is required for gold/silver products"], true);
+                          } else {
+                            updateValidation("category", true, [], true);
+                          }
+                        }
+                      }}
                     />
-                    <ErrorDisplay errors={validationState.productType?.errors || []} />
+                    <ErrorDisplay
+                      errors={validationState.category?.errors || []}
+                    />
                   </div>
 
-                  {/* Show additional fields only if product type is not 'normal' */}
-                  {formData.productType !== 'normal' && (
-                    <>
-                      <div>
-                        <DropdownField
-                          label="Category"
-                          required
-                          options={[{ value: '', label: 'Select Category' }, ...categoryOptions]}
-                          value={formData.category}
-                          onChange={(e) => updateFormData({ category: e.target.value })}
-                        />
-                        <ErrorDisplay errors={validationState.category?.errors || []} />
-                      </div>
+                  <div>
+                    <DropdownField
+                      label="Sub Category"
+                      required
+                      options={[
+                        { value: "", label: "Select Sub Category" },
+                        ...subCategoryOptions,
+                      ]}
+                      value={formData.subCategory}
+                      onChange={(e) => {
+                        const newSubCategory = e.target.value;
+                        updateFormData({ subCategory: newSubCategory });
 
-                      <div>
-                        <DropdownField
-                          label="Sub Category"
-                          required
-                          options={[{ value: '', label: 'Select Sub Category' }, ...subCategoryOptions]}
-                          value={formData.subCategory}
-                          onChange={(e) => updateFormData({ subCategory: e.target.value })}
-                        />
-                        <ErrorDisplay errors={validationState.subCategory?.errors || []} />
-                      </div>
+                        // Validate sub-category if it's required for current product type
+                        if (formData.productType === "gold" || formData.productType === "silver") {
+                          if (!newSubCategory || newSubCategory.trim() === "") {
+                            updateValidation("subCategory", false, ["Sub-category is required for gold/silver products"], true);
+                          } else {
+                            updateValidation("subCategory", true, [], true);
+                          }
+                        }
+                      }}
+                    />
+                    <ErrorDisplay
+                      errors={validationState.subCategory?.errors || []}
+                    />
+                  </div>
 
-                      <div>
-                        <DropdownField
-                          label="Gender"
-                          options={[
-                            { value: '', label: 'Select Gender' },
-                            { value: 'male', label: 'Male' },
-                            { value: 'female', label: 'Female' },
-                            { value: 'unisex', label: 'Unisex' }
-                          ]}
-                          value={formData.gender || ''}
-                          onChange={(e) => updateFormData({ gender: e.target.value as any })}
-                        />
-                      </div>
-                    </>
-                  )}
-                </FieldGroup>
-                
-                <div className="mt-3">
-                  <TextareaField
-                    label="Description"
-                    placeholder="Enter product description"
-                    required
-                    rows={2}
-                    value={formData.description}
-                    onChange={(e) => updateFormData({ description: e.target.value })}
-                    showCharCount
-                    maxLength={2000}
+                  <div>
+                    <DropdownField
+                      label="Gender"
+                      options={[
+                        { value: "", label: "Select Gender" },
+                        { value: "male", label: "Male" },
+                        { value: "female", label: "Female" },
+                        { value: "unisex", label: "Unisex" },
+                      ]}
+                      value={formData.gender || ""}
+                      onChange={(e) =>
+                        updateFormData({ gender: e.target.value as any })
+                      }
+                    />
+                  </div>
+                </>
+              )}
+            </FieldGroup>
+
+            <div className="mt-3">
+              <TextareaField
+                label="Description"
+                placeholder="Enter product description"
+                required
+                rows={2}
+                value={formData.description}
+                onChange={(e) => {
+                  const newDescription = e.target.value;
+                  updateFormData({ description: newDescription });
+
+                  // Validate description (required for all product types)
+                  validateRequiredField("description", newDescription, "Description is required");
+                }}
+                showCharCount
+                maxLength={2000}
+              />
+              <ErrorDisplay
+                errors={validationState.description?.errors || []}
+              />
+            </div>
+          </FormSection>
+
+          {/* Product Specifications - Hide for normal products */}
+          {formData.productType !== "normal" && (
+            <FormSection
+              title="Specifications"
+              icon="material-symbols:straighten"
+            >
+              <FieldGroup columns={3}>
+                <div>
+                  <InputField
+                    label="Length (mm)"
+                    type="number"
+                    step="0.1"
+                    placeholder="0.0"
+                    numberValue={formData.length || 0}
+                    onNumberChange={(value) =>
+                      updateFormData({ length: value })
+                    }
+                    allowNegative={false}
+                    clearZeroOnFocus
                   />
-                  <ErrorDisplay errors={validationState.description?.errors || []} />
+                  <ErrorDisplay errors={validationState.length?.errors || []} />
                 </div>
-              </FormSection>
 
-              {/* Product Specifications - Hide for normal products */}
-              {formData.productType !== 'normal' && (
-                <FormSection title="Specifications" icon="material-symbols:straighten">
-                <FieldGroup columns={3}>
-                  <div>
-                    <InputField
-                      label="Length (mm)"
-                      type="number"
-                      step="0.1"
-                      placeholder="0.0"
-                      numberValue={formData.length || 0}
-                      onNumberChange={(value) => updateFormData({ length: value })}
-                      allowNegative={false}
-                      clearZeroOnFocus
-                    />
-                    <ErrorDisplay errors={validationState.length?.errors || []} />
-                  </div>
-
-                  <div>
-                    <InputField
-                      label="Width/Diameter (mm)"
-                      type="number"
-                      step="0.1"
-                      placeholder="0.0"
-                      numberValue={formData.dimension || 0}
-                      onNumberChange={(value) => updateFormData({ dimension: value })}
-                      allowNegative={false}
-                      clearZeroOnFocus
-                    />
-                    <ErrorDisplay errors={validationState.dimension?.errors || []} />
-                  </div>
-
-                  <div>
-                    <InputField
-                      label="Making Charges"
-                      type="number"
-                      step="0.01"
-                      placeholder="0.00"
-                      numberValue={formData.makingCharges || 0}
-                      onNumberChange={(value) => updateFormData({ makingCharges: value })}
-                      allowNegative={false}
-                      clearZeroOnFocus
-                    />
-                  </div>
-
-                  <div>
-                    <InputField
-                      label="Color"
-                      placeholder="Enter color"
-                      value={formData.color || ''}
-                      onChange={(e) => updateFormData({ color: e.target.value })}
-                    />
-                  </div>
-
-                  {/* Show clarity only for diamond products */}
-                  {formData.productType === 'diamond' && (
-                    <div>
-                      <InputField
-                        label="Clarity"
-                        placeholder="Enter clarity"
-                        value={formData.clarity}
-                        onChange={(e) => updateFormData({ clarity: e.target.value })}
-                      />
-                    </div>
-                  )}
-
-                  <div>
-                    <InputField
-                      label="Total Karat"
-                      type="number"
-                      step="0.01"
-                      placeholder="0.00"
-                      numberValue={formData.totalCarat || 0}
-                      onNumberChange={(value) => updateFormData({ totalCarat: value })}
-                      allowNegative={false}
-                      clearZeroOnFocus
-                    />
-                  </div>
-
-                  <div className="flex items-center pt-6">
-                    <label className="flex items-center gap-1 text-xs font-medium text-gray-700">
-                      <input
-                        type="checkbox"
-                        checked={formData.rhodoumFinishes}
-                        onChange={(e) => updateFormData({ rhodoumFinishes: e.target.checked })}
-                        className="rounded border-gray-300 text-[#DF8D28] focus:ring-[#DF8D28] w-3 h-3"
-                      />
-                      Rhodium Finishes
-                    </label>
-                  </div>
-                </FieldGroup>
-
-                {/* Wastage Section */}
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <h4 className="text-sm font-medium text-gray-900 mb-3">Wastage</h4>
-                  <FieldGroup columns={2}>
-                    <div>
-                      <DropdownField
-                        label="Wastage Type"
-                        options={[
-                          { value: '', label: 'Select Type' },
-                          { value: 'per', label: 'Percentage (%)' },
-                          { value: 'fixed', label: 'Flat Amount' }
-                        ]}
-                        value={formData.wastage?.type || ''}
-                        onChange={(e) => updateFormData({
-                          wastage: {
-                            type: e.target.value as "fixed" | "per",
-                            value: formData.wastage?.value || 0
-                          }
-                        })}
-                      />
-                    </div>
-
-                    <div>
-                      <InputField
-                        label={formData.wastage?.type === 'per' ? 'Percentage (%)' : 'Amount'}
-                        type="number"
-                        step="0.01"
-                        placeholder="0.00"
-                        numberValue={formData.wastage?.value || 0}
-                        onNumberChange={(value) => updateFormData({
-                          wastage: {
-                            type: formData.wastage?.type || 'fixed',
-                            value: value
-                          }
-                        })}
-                        allowNegative={false}
-                        clearZeroOnFocus
-                      />
-                    </div>
-                  </FieldGroup>
+                <div>
+                  <InputField
+                    label="Width/Diameter (mm)"
+                    type="number"
+                    step="0.1"
+                    placeholder="0.0"
+                    numberValue={formData.dimension || 0}
+                    onNumberChange={(value) =>
+                      updateFormData({ dimension: value })
+                    }
+                    allowNegative={false}
+                    clearZeroOnFocus
+                  />
+                  <ErrorDisplay
+                    errors={validationState.dimension?.errors || []}
+                  />
                 </div>
-              </FormSection>
-              )}
 
-              {/* Product Variants - Show simplified version for normal products */}
-              <FormSection title={formData.productType === 'normal' ? 'Pricing' : 'Variants & Pricing'} icon="material-symbols:inventory">
-                {formData.productType === 'normal' ? (
-                  // Simplified pricing for normal products
-                  <div className="space-y-3">
-                    <div className="bg-gray-50 rounded p-3 border border-gray-200">
-                      <h4 className="text-sm font-medium text-gray-900 mb-3">Product Price</h4>
-                      <div className="max-w-xs">
-                        <InputField
-                          label="Price"
-                          type="number"
-                          step="0.01"
-                          placeholder="0.00"
-                          numberValue={formData.variants[0]?.price || 0}
-                          onNumberChange={(value) => updateVariant(0, 'price', value)}
-                          allowNegative={false}
-                          clearZeroOnFocus
-                        />
-                      </div>
-                    </div>
+                <div>
+                  <InputField
+                    label="Making Charges"
+                    type="number"
+                    step="0.01"
+                    placeholder="0.00"
+                    numberValue={formData.makingCharges || 0}
+                    onNumberChange={(value) =>
+                      updateFormData({ makingCharges: value })
+                    }
+                    allowNegative={false}
+                    clearZeroOnFocus
+                  />
+                </div>
+
+                <div>
+                  <InputField
+                    label="Color"
+                    placeholder="Enter color"
+                    value={formData.color || ""}
+                    onChange={(e) => updateFormData({ color: e.target.value })}
+                  />
+                </div>
+
+                {/* Show clarity only for diamond products */}
+                {formData.productType === "diamond" && (
+                  <div>
+                    <InputField
+                      label="Clarity"
+                      placeholder="Enter clarity"
+                      value={formData.clarity}
+                      onChange={(e) =>
+                        updateFormData({ clarity: e.target.value })
+                      }
+                    />
                   </div>
-                ) : (
-                  // Full variants for other product types
-                  <>
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
-                      <div>
-                        <p className="text-xs text-gray-600">Configure variants with pricing and inventory</p>
-                        <p className="text-xs text-gray-500">
-                          {formData.variants.length} variant{formData.variants.length !== 1 ? 's' : ''}
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={addVariant}
-                        className="flex items-center gap-1 px-3 py-1.5 bg-[#DF8D28] text-white rounded text-xs font-medium hover:bg-[#B8691A] transition-colors"
-                      >
-                        <Icon icon="material-symbols:add" className="w-3 h-3" />
-                        Add
-                      </button>
-                    </div>
-
-                    <div className="space-y-3">
-                      {formData.variants.map((variant, index) => (
-                        <div key={index} className="bg-gray-50 rounded p-3 border border-gray-200">
-                          <div className="flex items-center justify-between mb-3">
-                            <div className="flex items-center gap-2">
-                              <div className="w-6 h-6 bg-[#DF8D28] text-white rounded-full flex items-center justify-center text-xs font-medium">
-                                {index + 1}
-                              </div>
-                              <div>
-                                <h4 className="text-sm font-medium text-gray-900">Variant {index + 1}</h4>
-                                <p className="text-xs text-gray-500">
-                                  {variant.price > 0 ? `₹${variant.price}` : 'No price'} • {variant.wt > 0 ? `${variant.wt} ${variant.unit}` : 'No weight'}
-                                </p>
-                              </div>
-                            </div>
-                            {formData.variants.length > 1 && (
-                              <button
-                                type="button"
-                                onClick={() => removeVariant(index)}
-                                className="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50 transition-colors"
-                                title="Remove variant"
-                              >
-                                <Icon icon="material-symbols:delete" className="w-3 h-3" />
-                              </button>
-                            )}
-                          </div>
-
-                          <FieldGroup columns={3}>
-                            <div>
-                              <InputField
-                                label="Price"
-                                type="number"
-                                step="0.01"
-                                placeholder="0.00"
-                                numberValue={variant.price}
-                                onNumberChange={(value) => updateVariant(index, 'price', value)}
-                                allowNegative={false}
-                                clearZeroOnFocus
-                              />
-                            </div>
-
-                            <div>
-                              <InputField
-                                label="Weight"
-                                type="number"
-                                step="0.01"
-                                placeholder="0.00"
-                                numberValue={variant.wt}
-                                onNumberChange={(value) => updateVariant(index, 'wt', value)}
-                                allowNegative={false}
-                                clearZeroOnFocus
-                              />
-                            </div>
-
-                            <div>
-                              <DropdownField
-                                label="Unit"
-                                options={[
-                                  { value: 'grams', label: 'Grams' },
-                                  { value: 'kg', label: 'Kilograms' },
-                                  { value: 'pieces', label: 'Pieces' },
-                                  { value: 'carats', label: 'Carats' }
-                                ]}
-                                value={variant.unit}
-                                onChange={(e) => updateVariant(index, 'unit', e.target.value)}
-                              />
-                            </div>
-                          </FieldGroup>
-
-                          <div className="mt-2 flex items-center">
-                            <label className="flex items-center gap-1 text-xs font-medium text-gray-700">
-                              <input
-                                type="checkbox"
-                                checked={variant.isActive}
-                                onChange={(e) => updateVariant(index, 'isActive', e.target.checked)}
-                                className="rounded border-gray-300 text-[#DF8D28] focus:ring-[#DF8D28] w-3 h-3"
-                              />
-                              Active
-                            </label>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </>
                 )}
-              </FormSection>
 
-              {/* Gemstones - Hide for normal products */}
-              {formData.productType !== 'normal' && (
-                <FormSection title="Gemstones" icon="material-symbols:diamond">
-                <div className="space-y-3">
-                  {formData.stones && formData.stones.length > 0 ? (
-                    formData.stones.map((stone, index) => (
-                      <div key={index} className="bg-gray-50 rounded p-3 border border-gray-200">
-                        <div className="flex items-center justify-between mb-3">
-                          <h4 className="text-sm font-medium text-gray-900">Stone {index + 1}</h4>
-                          <button
-                            type="button"
-                            onClick={() => removeStone(index)}
-                            className="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50 transition-colors"
-                            title="Remove stone"
-                          >
-                            <Icon icon="material-symbols:delete" className="w-3 h-3" />
-                          </button>
-                        </div>
+                <div>
+                  <InputField
+                    label="Total Karat"
+                    type="number"
+                    step="0.01"
+                    placeholder="0.00"
+                    numberValue={formData.totalCarat || 0}
+                    onNumberChange={(value) => {
+                      updateFormData({ totalCarat: value });
 
-                        <FieldGroup columns={4}>
-                          <div>
-                            <InputField
-                              label="Stone Name"
-                              placeholder="Enter stone name"
-                              value={stone.name || ''}
-                              onChange={(e) => updateStone(index, 'name', e.target.value)}
-                            />
-                          </div>
-
-                          <div>
-                            <InputField
-                              label="Weight (Carats)"
-                              type="number"
-                              step="0.01"
-                              placeholder="0.00"
-                              numberValue={stone.weight || 0}
-                              onNumberChange={(value) => updateStone(index, 'weight', value)}
-                              allowNegative={false}
-                              clearZeroOnFocus
-                            />
-                          </div>
-
-                          <div>
-                            <InputField
-                              label="Price"
-                              type="number"
-                              step="0.01"
-                              placeholder="0.00"
-                              numberValue={stone.price || 0}
-                              onNumberChange={(value) => updateStone(index, 'price', value)}
-                              allowNegative={false}
-                              clearZeroOnFocus
-                            />
-                          </div>
-
-                          <div>
-                            <InputField
-                              label="Color"
-                              placeholder="Enter color"
-                              value={stone.color || ''}
-                              onChange={(e) => updateStone(index, 'color', e.target.value)}
-                            />
-                          </div>
-                        </FieldGroup>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-xs text-gray-500 text-center py-4">No gemstones added yet</p>
-                  )}
-
-                  <button
-                    type="button"
-                    onClick={addStone}
-                    className="flex items-center gap-1 px-3 py-1.5 bg-[#DF8D28] text-white rounded text-xs font-medium hover:bg-[#B8691A] transition-colors w-full justify-center"
-                  >
-                    <Icon icon="material-symbols:add" className="w-3 h-3" />
-                    Add Gemstone
-                  </button>
-                </div>
-              </FormSection>
-              )}
-
-              {/* Other Charges - Hide for normal products */}
-              {formData.productType !== 'normal' && (
-                <FormSection title="Other Charges" icon="material-symbols:receipt-long">
-                <div className="space-y-3">
-                  {formData.otherCharges && formData.otherCharges.length > 0 ? (
-                    formData.otherCharges.map((charge, index) => (
-                      <div key={index} className="bg-gray-50 rounded p-3 border border-gray-200">
-                        <div className="flex items-center justify-between mb-3">
-                          <h4 className="text-sm font-medium text-gray-900">Charge {index + 1}</h4>
-                          <button
-                            type="button"
-                            onClick={() => removeOtherCharge(index)}
-                            className="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50 transition-colors"
-                            title="Remove charge"
-                          >
-                            <Icon icon="material-symbols:delete" className="w-3 h-3" />
-                          </button>
-                        </div>
-
-                        <FieldGroup columns={2}>
-                          <div>
-                            <InputField
-                              label="Charge Name"
-                              placeholder="Enter charge name"
-                              value={charge.name || ''}
-                              onChange={(e) => updateOtherCharge(index, 'name', e.target.value)}
-                            />
-                          </div>
-
-                          <div>
-                            <InputField
-                              label="Price"
-                              type="number"
-                              step="0.01"
-                              placeholder="0.00"
-                              numberValue={charge.price || 0}
-                              onNumberChange={(value) => updateOtherCharge(index, 'price', value)}
-                              allowNegative={false}
-                              clearZeroOnFocus
-                            />
-                          </div>
-                        </FieldGroup>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-xs text-gray-500 text-center py-4">No additional charges added yet</p>
-                  )}
-
-                  <button
-                    type="button"
-                    onClick={addOtherCharge}
-                    className="flex items-center gap-1 px-3 py-1.5 bg-[#DF8D28] text-white rounded text-xs font-medium hover:bg-[#B8691A] transition-colors w-full justify-center"
-                  >
-                    <Icon icon="material-symbols:add" className="w-3 h-3" />
-                    Add Other Charge
-                  </button>
-                </div>
-              </FormSection>
-              )}
-
-
-
-              {/* Product Images - Show for all product types */}
-              <FormSection title="Product Images" icon="material-symbols:image">
-                <div className="space-y-3">
-                  <p className="text-xs text-gray-600">Upload product images (Max 10)</p>
-
-                  {/* Upload Area */}
-                  <div
-                    className={`border-2 border-dashed rounded p-4 text-center transition-colors cursor-pointer ${
-                      dragActive
-                        ? "border-[#DF8D28] bg-orange-50"
-                        : "border-gray-300 hover:border-[#DF8D28]"
-                    } ${selectedImages.length >= 10 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    onDragEnter={handleDrag}
-                    onDragLeave={handleDrag}
-                    onDragOver={handleDrag}
-                    onDrop={handleDrop}
-                    onClick={() => {
-                      if (selectedImages.length < 10) {
-                        document.getElementById('product-images')?.click();
+                      // Validate total carat if it's required for current product type
+                      if (formData.productType === "gold" || formData.productType === "silver") {
+                        validateRequiredField("totalCarat", value, "Total carat is required for gold/silver products");
                       }
                     }}
-                  >
-                    <input
-                      type="file"
-                      multiple
-                      accept="image/*"
-                      onChange={handleFileInputChange}
-                      className="hidden"
-                      id="product-images"
-                      disabled={selectedImages.length >= 10}
-                    />
-
-                    <div className="flex flex-col items-center gap-2">
-                      <Icon
-                        icon="material-symbols:cloud-upload"
-                        className="w-8 h-8 text-gray-400"
-                      />
-                      <div>
-                        <p className="text-xs text-gray-500">
-                          {selectedImages.length >= 10
-                            ? 'Maximum 10 images reached'
-                            : 'Drag and drop images or click to browse'
-                          }
-                        </p>
-                        <p className="text-xs text-gray-400 mt-1">
-                          {selectedImages.length}/10 images
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Image Preview Grid */}
-                  {selectedImages.length > 0 && (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                      {selectedImages.map((file, index) => (
-                        <div key={index} className="relative group">
-                          <div className="relative aspect-square">
-                            <img
-                              src={URL.createObjectURL(file)}
-                              alt={`Product ${index + 1}`}
-                              className="w-full h-full object-cover rounded border border-gray-200"
-                            />
-
-                            {/* Primary Image Badge */}
-                            {index === 0 && (
-                              <div className="absolute top-1 left-1 bg-[#DF8D28] text-white text-xs px-1.5 py-0.5 rounded font-medium">
-                                Primary
-                              </div>
-                            )}
-
-                            {/* Remove Button */}
-                            <button
-                              type="button"
-                              onClick={() => removeImage(index)}
-                              className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
-                              title="Remove image"
-                            >
-                              <Icon icon="material-symbols:close" className="w-3 h-3" />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Existing Images (for edit mode) */}
-                  {!selectedImages.length && formData.existingImages && formData.existingImages.length > 0 && (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                      {formData.existingImages.map((imageUrl, index) => (
-                        <div key={index} className="relative group">
-                          <div className="relative aspect-square">
-                            <img
-                              src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${imageUrl}`}
-                              alt={`Existing Product ${index + 1}`}
-                              className="w-full h-full object-cover rounded border border-gray-200"
-                            />
-                            {index === 0 && (
-                              <div className="absolute top-1 left-1 bg-[#DF8D28] text-white text-xs px-1.5 py-0.5 rounded font-medium">
-                                Primary
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Info Message */}
-                  {selectedImages.length > 0 && (
-                    <div className="p-2 bg-blue-50 rounded border border-blue-200">
-                      <p className="text-xs text-blue-700 flex items-center gap-1">
-                        <Icon icon="material-symbols:info" className="w-3 h-3" />
-                        The first image will be used as the primary product image.
-                      </p>
-                    </div>
-                  )}
+                    allowNegative={false}
+                    clearZeroOnFocus
+                  />
+                  <ErrorDisplay
+                    errors={validationState.totalCarat?.errors || []}
+                  />
                 </div>
-              </FormSection>
 
-              {/* Status & Visibility Settings - Hide for normal products */}
-              {formData.productType !== 'normal' && (
-                <FormSection title="Status & Visibility" icon="material-symbols:settings">
-                <FieldGroup columns={3}>
+                <div className="flex items-center pt-6">
+                  <label className="flex items-center gap-1 text-xs font-medium text-gray-700">
+                    <input
+                      type="checkbox"
+                      checked={formData.rhodoumFinishes}
+                      onChange={(e) =>
+                        updateFormData({ rhodoumFinishes: e.target.checked })
+                      }
+                      className="rounded border-gray-300 text-[#DF8D28] focus:ring-[#DF8D28] w-3 h-3"
+                    />
+                    Rhodium Finishes
+                  </label>
+                </div>
+              </FieldGroup>
+
+              {/* Wastage Section */}
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <h4 className="text-sm font-medium text-gray-900 mb-3">
+                  Wastage
+                </h4>
+                <FieldGroup columns={2}>
                   <div>
                     <DropdownField
-                      label="Visibility"
+                      label="Wastage Type"
                       options={[
-                        { value: 'normal', label: 'Normal' },
-                        { value: 'featured', label: 'Featured' },
-                        { value: 'bestSellers', label: 'Best Sellers' },
-                        { value: 'newArrivals', label: 'New Arrivals' }
+                        { value: "", label: "Select Type" },
+                        { value: "per", label: "Percentage (%)" },
+                        { value: "fixed", label: "Flat Amount" },
                       ]}
-                      value={formData.visibleAs}
-                      onChange={(e) => updateFormData({ visibleAs: e.target.value as any })}
+                      value={formData.wastage?.type || ""}
+                      onChange={(e) => {
+                        const newWastage = {
+                          type: e.target.value as "fixed" | "per",
+                          value: formData.wastage?.value || 0,
+                        };
+                        updateFormData({ wastage: newWastage });
+
+                        // Validate wastage if it's required for current product type
+                        if (formData.productType === "gold" || formData.productType === "silver") {
+                          if (newWastage.type && newWastage.value > 0) {
+                            updateValidation("wastage", true, [], true);
+                          } else {
+                            updateValidation("wastage", false, ["Wastage is required for gold/silver products"], true);
+                          }
+                        }
+                      }}
                     />
                   </div>
 
-                  <div className="flex items-center pt-6">
-                    <label className="flex items-center gap-1 text-xs font-medium text-gray-700">
-                      <input
-                        type="checkbox"
-                        checked={formData.isActive}
-                        onChange={(e) => updateFormData({ isActive: e.target.checked })}
-                        className="rounded border-gray-300 text-[#DF8D28] focus:ring-[#DF8D28] w-3 h-3"
-                      />
-                      Product Active
-                    </label>
-                  </div>
+                  <div>
+                    <InputField
+                      label={
+                        formData.wastage?.type === "per"
+                          ? "Percentage (%)"
+                          : "Amount"
+                      }
+                      type="number"
+                      step="0.01"
+                      placeholder="0.00"
+                      numberValue={formData.wastage?.value || 0}
+                      onNumberChange={(value) => {
+                        const newWastage = {
+                          type: formData.wastage?.type || "fixed",
+                          value: value,
+                        };
+                        updateFormData({ wastage: newWastage });
 
-                  <div className="flex items-center pt-6">
-                    <label className="flex items-center gap-1 text-xs font-medium text-gray-700">
-                      <input
-                        type="checkbox"
-                        checked={formData.isFeatured}
-                        onChange={(e) => updateFormData({ isFeatured: e.target.checked })}
-                        className="rounded border-gray-300 text-[#DF8D28] focus:ring-[#DF8D28] w-3 h-3"
-                      />
-                      Featured Product
-                    </label>
+                        // Validate wastage if it's required for current product type
+                        if (formData.productType === "gold" || formData.productType === "silver") {
+                          if (newWastage.type && newWastage.value > 0) {
+                            updateValidation("wastage", true, [], true);
+                          } else {
+                            updateValidation("wastage", false, ["Wastage is required for gold/silver products"], true);
+                          }
+                        }
+                      }}
+                      allowNegative={false}
+                      clearZeroOnFocus
+                    />
                   </div>
                 </FieldGroup>
-              </FormSection>
+                <ErrorDisplay
+                  errors={validationState.wastage?.errors || []}
+                />
+              </div>
+            </FormSection>
+          )}
+
+          {/* Product Variants - Show simplified version for normal products */}
+          <FormSection
+            title={
+              formData.productType === "normal"
+                ? "Pricing"
+                : "Variants & Pricing"
+            }
+            icon="material-symbols:inventory"
+          >
+            {formData.productType === "normal" ? (
+              // Simplified pricing for normal products
+              <div className="space-y-3">
+                <div className="bg-gray-50 rounded p-3 border border-gray-200">
+                  <h4 className="text-sm font-medium text-gray-900 mb-3">
+                    Product Price
+                  </h4>
+                  <div className="max-w-xs">
+                    <InputField
+                      label="Price"
+                      type="number"
+                      step="0.01"
+                      placeholder="0.00"
+                      numberValue={formData.variants[0]?.price || 0}
+                      onNumberChange={(value) =>
+                        updateVariant(0, "price", value)
+                      }
+                      allowNegative={false}
+                      clearZeroOnFocus
+                    />
+                    <ErrorDisplay
+                      errors={validationState["variants.0.price"]?.errors || []}
+                    />
+                  </div>
+                </div>
+              </div>
+            ) : (
+              // Full variants for other product types
+              <>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+                  <div>
+                    <p className="text-xs text-gray-600">
+                      Configure variants with pricing and inventory
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {formData.variants.length} variant
+                      {formData.variants.length !== 1 ? "s" : ""}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={addVariant}
+                    className="flex items-center gap-1 px-3 py-1.5 bg-[#DF8D28] text-white rounded text-xs font-medium hover:bg-[#B8691A] transition-colors"
+                  >
+                    <Icon icon="material-symbols:add" className="w-3 h-3" />
+                    Add
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  {formData.variants.map((variant, index) => (
+                    <div
+                      key={index}
+                      className="bg-gray-50 rounded p-3 border border-gray-200"
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 bg-[#DF8D28] text-white rounded-full flex items-center justify-center text-xs font-medium">
+                            {index + 1}
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-medium text-gray-900">
+                              Variant {index + 1}
+                            </h4>
+                            <p className="text-xs text-gray-500">
+                              {variant.price > 0
+                                ? `₹${variant.price}`
+                                : "No price"}{" "}
+                              •{" "}
+                              {variant.wt > 0
+                                ? `${variant.wt} ${variant.unit}`
+                                : "No weight"}
+                            </p>
+                          </div>
+                        </div>
+                        {formData.variants.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeVariant(index)}
+                            className="text-red hover:text-red-700 p-1 rounded hover:bg-red-50 transition-colors"
+                            title="Remove variant"
+                          >
+                            <Icon
+                              icon="material-symbols:delete"
+                              className="w-3 h-3"
+                            />
+                          </button>
+                        )}
+                      </div>
+
+                      <FieldGroup columns={3}>
+                        <div>
+                          <InputField
+                            label="Price"
+                            type="number"
+                            step="0.01"
+                            placeholder="0.00"
+                            numberValue={variant.price}
+                            onNumberChange={(value) =>
+                              updateVariant(index, "price", value)
+                            }
+                            allowNegative={false}
+                            clearZeroOnFocus
+                          />
+                          <ErrorDisplay
+                            errors={validationState[`variants.${index}.price`]?.errors || []}
+                          />
+                        </div>
+
+                        <div>
+                          <InputField
+                            label="Weight"
+                            type="number"
+                            step="0.01"
+                            placeholder="0.00"
+                            numberValue={variant.wt}
+                            onNumberChange={(value) =>
+                              updateVariant(index, "wt", value)
+                            }
+                            allowNegative={false}
+                            clearZeroOnFocus
+                          />
+                        </div>
+
+                        <div>
+                          <DropdownField
+                            label="Unit"
+                            options={[
+                              { value: "grams", label: "Grams" },
+                              { value: "kg", label: "Kilograms" },
+                              { value: "pieces", label: "Pieces" },
+                              { value: "carats", label: "Carats" },
+                            ]}
+                            value={variant.unit}
+                            onChange={(e) =>
+                              updateVariant(index, "unit", e.target.value)
+                            }
+                          />
+                        </div>
+                      </FieldGroup>
+
+                      <div className="mt-2 flex items-center">
+                        <label className="flex items-center gap-1 text-xs font-medium text-gray-700">
+                          <input
+                            type="checkbox"
+                            checked={variant.isActive}
+                            onChange={(e) =>
+                              updateVariant(index, "isActive", e.target.checked)
+                            }
+                            className="rounded border-gray-300 text-[#DF8D28] focus:ring-[#DF8D28] w-3 h-3"
+                          />
+                          Active
+                        </label>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </FormSection>
+
+          {/* Gemstones - Hide for normal products */}
+          {formData.productType !== "normal" && (
+            <FormSection title="Gemstones" icon="material-symbols:diamond">
+              <div className="space-y-3">
+                {formData.stones && formData.stones.length > 0 ? (
+                  formData.stones.map((stone, index) => (
+                    <div
+                      key={index}
+                      className="bg-gray-50 rounded p-3 border border-gray-200"
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="text-sm font-medium text-gray-900">
+                          Stone {index + 1}
+                        </h4>
+                        <button
+                          type="button"
+                          onClick={() => removeStone(index)}
+                          className="text-red hover:text-red-700 p-1 rounded hover:bg-red-50 transition-colors"
+                          title="Remove stone"
+                        >
+                          <Icon
+                            icon="material-symbols:delete"
+                            className="w-3 h-3"
+                          />
+                        </button>
+                      </div>
+
+                      <FieldGroup columns={4}>
+                        <div>
+                          <InputField
+                            label="Stone Name"
+                            placeholder="Enter stone name"
+                            value={stone.name || ""}
+                            onChange={(e) =>
+                              updateStone(index, "name", e.target.value)
+                            }
+                          />
+                        </div>
+
+                        <div>
+                          <InputField
+                            label="Weight (Carats)"
+                            type="number"
+                            step="0.01"
+                            placeholder="0.00"
+                            numberValue={stone.weight || 0}
+                            onNumberChange={(value) =>
+                              updateStone(index, "weight", value)
+                            }
+                            allowNegative={false}
+                            clearZeroOnFocus
+                          />
+                        </div>
+
+                        <div>
+                          <InputField
+                            label="Price"
+                            type="number"
+                            step="0.01"
+                            placeholder="0.00"
+                            numberValue={stone.price || 0}
+                            onNumberChange={(value) =>
+                              updateStone(index, "price", value)
+                            }
+                            allowNegative={false}
+                            clearZeroOnFocus
+                          />
+                        </div>
+
+                        <div>
+                          <InputField
+                            label="Color"
+                            placeholder="Enter color"
+                            value={stone.color || ""}
+                            onChange={(e) =>
+                              updateStone(index, "color", e.target.value)
+                            }
+                          />
+                        </div>
+                      </FieldGroup>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-xs text-gray-500 text-center py-4">
+                    No gemstones added yet
+                  </p>
+                )}
+
+                <button
+                  type="button"
+                  onClick={addStone}
+                  className="flex items-center gap-1 px-3 py-1.5 bg-[#DF8D28] text-white rounded text-xs font-medium hover:bg-[#B8691A] transition-colors w-full justify-center"
+                >
+                  <Icon icon="material-symbols:add" className="w-3 h-3" />
+                  Add Gemstone
+                </button>
+              </div>
+            </FormSection>
+          )}
+
+          {/* Other Charges - Hide for normal products */}
+          {formData.productType !== "normal" && (
+            <FormSection
+              title="Other Charges"
+              icon="material-symbols:receipt-long"
+            >
+              <div className="space-y-3">
+                {formData.otherCharges && formData.otherCharges.length > 0 ? (
+                  formData.otherCharges.map((charge, index) => (
+                    <div
+                      key={index}
+                      className="bg-gray-50 rounded p-3 border border-gray-200"
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="text-sm font-medium text-gray-900">
+                          Charge {index + 1}
+                        </h4>
+                        <button
+                          type="button"
+                          onClick={() => removeOtherCharge(index)}
+                          className="text-red hover:text-red-700 p-1 rounded hover:bg-red-50 transition-colors"
+                          title="Remove charge"
+                        >
+                          <Icon
+                            icon="material-symbols:delete"
+                            className="w-3 h-3"
+                          />
+                        </button>
+                      </div>
+
+                      <FieldGroup columns={2}>
+                        <div>
+                          <InputField
+                            label="Charge Name"
+                            placeholder="Enter charge name"
+                            value={charge.name || ""}
+                            onChange={(e) =>
+                              updateOtherCharge(index, "name", e.target.value)
+                            }
+                          />
+                        </div>
+
+                        <div>
+                          <InputField
+                            label="Price"
+                            type="number"
+                            step="0.01"
+                            placeholder="0.00"
+                            numberValue={charge.price || 0}
+                            onNumberChange={(value) =>
+                              updateOtherCharge(index, "price", value)
+                            }
+                            allowNegative={false}
+                            clearZeroOnFocus
+                          />
+                        </div>
+                      </FieldGroup>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-xs text-gray-500 text-center py-4">
+                    No additional charges added yet
+                  </p>
+                )}
+
+                <button
+                  type="button"
+                  onClick={addOtherCharge}
+                  className="flex items-center gap-1 px-3 py-1.5 bg-[#DF8D28] text-white rounded text-xs font-medium hover:bg-[#B8691A] transition-colors w-full justify-center"
+                >
+                  <Icon icon="material-symbols:add" className="w-3 h-3" />
+                  Add Other Charge
+                </button>
+              </div>
+            </FormSection>
+          )}
+
+          {/* Product Images - Show for all product types */}
+          <FormSection title="Product Images" icon="material-symbols:image">
+            <div className="space-y-3">
+              <p className="text-xs text-gray-600">
+                Upload product images (Max 10)
+              </p>
+
+              {/* Upload Area */}
+              <div
+                className={`border-2 border-dashed rounded p-4 text-center transition-colors cursor-pointer ${
+                  dragActive
+                    ? "border-[#DF8D28] bg-orange-50"
+                    : "border-gray-300 hover:border-[#DF8D28]"
+                } ${
+                  selectedImages.length >= 10
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }`}
+                onDragEnter={handleDrag}
+                onDragLeave={handleDrag}
+                onDragOver={handleDrag}
+                onDrop={handleDrop}
+                onClick={() => {
+                  if (selectedImages.length < 10) {
+                    document.getElementById("product-images")?.click();
+                  }
+                }}
+              >
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleFileInputChange}
+                  className="hidden"
+                  id="product-images"
+                  disabled={selectedImages.length >= 10}
+                />
+
+                <div className="flex flex-col items-center gap-2">
+                  <Icon
+                    icon="material-symbols:cloud-upload"
+                    className="w-8 h-8 text-gray-400"
+                  />
+                  <div>
+                    <p className="text-xs text-gray-500">
+                      {selectedImages.length >= 10
+                        ? "Maximum 10 images reached"
+                        : "Drag and drop images or click to browse"}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      {selectedImages.length}/10 images
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Image Preview Grid */}
+              {selectedImages.length > 0 && (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {selectedImages.map((file, index) => (
+                    <div key={index} className="relative group">
+                      <div className="relative aspect-square">
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt={`Product ${index + 1}`}
+                          className="w-full h-full object-cover rounded border border-gray-200"
+                        />
+
+                        {/* Primary Image Badge */}
+                        {index === 0 && (
+                          <div className="absolute top-1 left-1 bg-[#DF8D28] text-white text-xs px-1.5 py-0.5 rounded font-medium">
+                            Primary
+                          </div>
+                        )}
+
+                        {/* Remove Button */}
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                          title="Remove image"
+                        >
+                          <Icon
+                            icon="material-symbols:close"
+                            className="w-3 h-3"
+                          />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               )}
+
+              {/* Existing Images (for edit mode) */}
+              {!selectedImages.length &&
+                formData.existingImages &&
+                formData.existingImages.length > 0 && (
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                    {formData.existingImages.map((imageUrl, index) => (
+                      <div key={index} className="relative group">
+                        <div className="relative aspect-square">
+                          <img
+                            src={`${
+                              import.meta.env.VITE_API_IMAGE_BASE_URL
+                            }${imageUrl}`}
+                            alt={`Existing Product ${index + 1}`}
+                            className="w-full h-full object-cover rounded border border-gray-200"
+                          />
+                          {index === 0 && (
+                            <div className="absolute top-1 left-1 bg-[#DF8D28] text-white text-xs px-1.5 py-0.5 rounded font-medium">
+                              Primary
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+              {/* Info Message */}
+              {selectedImages.length > 0 && (
+                <div className="p-2 bg-blue-50 rounded border border-blue-200">
+                  <p className="text-xs text-blue-700 flex items-center gap-1">
+                    <Icon icon="material-symbols:info" className="w-3 h-3" />
+                    The first image will be used as the primary product image.
+                  </p>
+                </div>
+              )}
+            </div>
+          </FormSection>
+
+          {/* Status & Visibility Settings - Hide for normal products */}
+          {formData.productType !== "normal" && (
+            <FormSection
+              title="Status & Visibility"
+              icon="material-symbols:settings"
+            >
+              <FieldGroup columns={3}>
+                <div>
+                  <DropdownField
+                    label="Visibility"
+                    options={[
+                      { value: "normal", label: "Normal" },
+                      { value: "featured", label: "Featured" },
+                      { value: "bestSellers", label: "Best Sellers" },
+                      { value: "newArrivals", label: "New Arrivals" },
+                    ]}
+                    value={formData.visibleAs}
+                    onChange={(e) =>
+                      updateFormData({ visibleAs: e.target.value as any })
+                    }
+                  />
+                </div>
+
+                <div className="flex items-center pt-6">
+                  <label className="flex items-center gap-1 text-xs font-medium text-gray-700">
+                    <input
+                      type="checkbox"
+                      checked={formData.isActive}
+                      onChange={(e) =>
+                        updateFormData({ isActive: e.target.checked })
+                      }
+                      className="rounded border-gray-300 text-[#DF8D28] focus:ring-[#DF8D28] w-3 h-3"
+                    />
+                    Product Active
+                  </label>
+                </div>
+
+                <div className="flex items-center pt-6">
+                  <label className="flex items-center gap-1 text-xs font-medium text-gray-700">
+                    <input
+                      type="checkbox"
+                      checked={formData.isFeatured}
+                      onChange={(e) =>
+                        updateFormData({ isFeatured: e.target.checked })
+                      }
+                      className="rounded border-gray-300 text-[#DF8D28] focus:ring-[#DF8D28] w-3 h-3"
+                    />
+                    Featured Product
+                  </label>
+                </div>
+              </FieldGroup>
+            </FormSection>
+          )}
 
           {/* Form Actions */}
           <div className="bg-white rounded-md border border-gray-200 shadow-sm sticky bottom-2">
@@ -974,9 +1372,21 @@ const CompactFormContent: React.FC<{
                     disabled={isLoading}
                     className="px-6 py-2 bg-[#DF8D28] text-white rounded hover:bg-[#B8691A] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1 text-sm font-medium"
                   >
-                    {isLoading && <Icon icon="material-symbols:refresh" className="w-3 h-3 animate-spin" />}
-                    <Icon icon={isEdit ? "material-symbols:edit" : "material-symbols:add"} className="w-3 h-3" />
-                    {isEdit ? 'Update' : 'Create'}
+                    {isLoading && (
+                      <Icon
+                        icon="material-symbols:refresh"
+                        className="w-3 h-3 animate-spin"
+                      />
+                    )}
+                    <Icon
+                      icon={
+                        isEdit
+                          ? "material-symbols:edit"
+                          : "material-symbols:add"
+                      }
+                      className="w-3 h-3"
+                    />
+                    {isEdit ? "Update" : "Create"}
                   </button>
                 </div>
               </div>
@@ -990,6 +1400,7 @@ const CompactFormContent: React.FC<{
 
 // Main Component with Provider
 interface CompactProductFormProps {
+  isLoading: boolean;
   onSubmit: (data: ProductFormData) => void;
   onCancel?: () => void;
   initialData?: Partial<ProductFormData>;
@@ -997,6 +1408,7 @@ interface CompactProductFormProps {
 }
 
 export const CompactProductForm: React.FC<CompactProductFormProps> = ({
+  isLoading,
   onSubmit,
   onCancel,
   initialData,
@@ -1004,7 +1416,12 @@ export const CompactProductForm: React.FC<CompactProductFormProps> = ({
 }) => {
   return (
     <ProductFormProvider initialData={initialData} totalSteps={1}>
-      <CompactFormContent onSubmit={onSubmit} onCancel={onCancel} isEdit={isEdit} />
+      <CompactFormContent
+        isLoading={isLoading}
+        onSubmit={onSubmit}
+        onCancel={onCancel}
+        isEdit={isEdit}
+      />
     </ProductFormProvider>
   );
 };

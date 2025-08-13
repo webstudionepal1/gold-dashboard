@@ -2,7 +2,13 @@ import * as z from "zod";
 
 // Validation schemas for each form page
 
-// Page 1: Basic Information Schema
+// Wastage Schema
+export const wastageSchema = z.object({
+  type: z.enum(["fixed", "per"], { required_error: "Wastage type is required" }),
+  value: z.number().min(0, "Wastage value cannot be negative"),
+});
+
+// Page 1: Basic Information Schema - Dynamic based on product type
 export const basicProductInformationSchema = z.object({
   name: z
     .string()
@@ -23,8 +29,11 @@ export const basicProductInformationSchema = z.object({
     .min(1, "Description is required")
     .max(2000, "Description cannot exceed 2000 characters")
     .trim(),
-  category: z.string().min(1, "Category is required"),
-  subCategory: z.string().min(1, "Sub-category is required"),
+  productType: z.enum(["normal", "gold", "silver"], {
+    required_error: "Product type is required"
+  }),
+  category: z.string().optional(),
+  subCategory: z.string().optional(),
 });
 
 // Page 2: Product Specifications Schema
@@ -44,7 +53,7 @@ export const productSpecificationsSchema = z.object({
 // Product Variant Schema
 export const productVariantSchema = z.object({
   sku: z.string().optional(),
-  price: z.number().min(0, "Price cannot be negative"),
+  price: z.number().min(0.01, "Price is required and must be greater than 0"),
   wt: z.number().min(0, "Weight cannot be negative"),
   unit: z.enum(["grams", "kg", "pieces", "carats"]),
   totalStock: z.number().min(0, "Total stock cannot be negative"),
@@ -290,3 +299,80 @@ export const getStepInfo = (step: number) => {
 
   return stepInfo[step as keyof typeof stepInfo] || { title: "", description: "" };
 };
+
+// Conditional validation schema based on product type requirements
+export const conditionalProductFormSchema = z
+  .object({
+    // Basic fields that are always present
+    name: z
+      .string()
+      .min(1, "Product name is required")
+      .max(200, "Product name cannot exceed 200 characters")
+      .trim(),
+    productType: z.enum(["normal", "gold", "silver"], {
+      required_error: "Product type is required"
+    }),
+    description: z
+      .string()
+      .min(1, "Description is required")
+      .max(2000, "Description cannot exceed 2000 characters")
+      .trim(),
+
+    // Optional fields that may be required based on product type
+    category: z.string().optional(),
+    subCategory: z.string().optional(),
+    totalCarat: z.number().min(0, "Total carat cannot be negative").optional(),
+    wastage: wastageSchema.optional(),
+
+    // Variants array
+    variants: z
+      .array(productVariantSchema)
+      .min(1, "At least one variant is required"),
+  })
+  .refine(
+    (data) => {
+      // For normal products: require price and product name (already covered above)
+      if (data.productType === "normal") {
+        return true; // Basic validation already covers name and price in variants
+      }
+      return true;
+    },
+    {
+      message: "Normal products require product name and price",
+      path: ["productType"],
+    }
+  )
+  .refine(
+    (data) => {
+      // For gold or silver products: require wastage, productType, product name, category, subCategory, totalCarat, minimum one variant
+      if (data.productType === "gold" || data.productType === "silver") {
+        const errors: string[] = [];
+
+        if (!data.wastage) {
+          errors.push("Wastage is required for gold/silver products");
+        }
+
+        if (!data.category || data.category.trim() === "") {
+          errors.push("Category is required for gold/silver products");
+        }
+
+        if (!data.subCategory || data.subCategory.trim() === "") {
+          errors.push("Sub-category is required for gold/silver products");
+        }
+
+        if (!data.totalCarat || data.totalCarat <= 0) {
+          errors.push("Total carat is required for gold/silver products");
+        }
+
+        return errors.length === 0;
+      }
+      return true;
+    },
+    {
+      message: "Gold/Silver products require wastage, category, sub-category, and total carat",
+      path: ["productType"],
+    }
+  );
+
+// Export the conditional schema as the main validation schema
+export const mainProductFormSchema = conditionalProductFormSchema;

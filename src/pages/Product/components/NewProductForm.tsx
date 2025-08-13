@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { CompactProductForm } from "./CompactProductForm";
 import get from "lodash/get";
@@ -15,8 +15,10 @@ const NewProductForm: React.FC = () => {
   const isEdit = Boolean(id);
 
   // API hooks
-  const createProductMutation = useCreateProductsMutation();
-  const updateProductMutation = useUpdateProductsMutation();
+  const { mutateAsync: createProductMutation, isPending: createPending } =
+    useCreateProductsMutation();
+  const { mutateAsync: updateProductMutation, isPending } =
+    useUpdateProductsMutation();
   const { data: existingProduct, isLoading: isLoadingProduct } =
     useGetProductByIdQuery(id || "", { enabled: isEdit });
 
@@ -33,7 +35,7 @@ const NewProductForm: React.FC = () => {
       name: product.name || "",
       slug: "",
       description: product.description || "",
-      productType: undefined, // Will be set by user in form
+      productType: get(product, 'productType','gold'), 
       category:
         typeof product.category === "object"
           ? product.category._id
@@ -78,9 +80,14 @@ const NewProductForm: React.FC = () => {
       ]),
 
       // Stones and Occasions
-      stones: get(product, "st"),
+      stones: get(product, "stones",[]),
       occasions: [],
-      otherCharges: get(product, "others", []),
+      otherCharges: get(product, "others", []).map(
+        (item: { name: string; value: number }) => ({
+          name: item.name,
+          price: item.value,
+        })
+      ),
       existingImages: product.images || [],
       // Media
       images: [],
@@ -93,7 +100,7 @@ const NewProductForm: React.FC = () => {
           | "bestSellers"
           | "newArrivals"
           | "normal") || "normal",
-   
+
       // Status
       isActive: get(product, "isActive", true),
       isFeatured: get(product, "isFeatured", false),
@@ -107,12 +114,12 @@ const NewProductForm: React.FC = () => {
       const apiData = transformFormDataToAPI(formData);
 
       if (isEdit && id) {
-        await updateProductMutation.mutateAsync({
+        await updateProductMutation({
           id,
           body: apiData,
         });
       } else {
-        await createProductMutation.mutateAsync(apiData);
+        await createProductMutation(apiData);
       }
 
       // Navigate back to products list on success
@@ -192,11 +199,8 @@ const NewProductForm: React.FC = () => {
     // Other Charges - Only for non-normal products
     if (formData.productType !== "normal" && formData.otherCharges) {
       formData.otherCharges.forEach((charge, index) => {
-        formDataObj.append(`otherCharges[${index}][name]`, charge.name);
-        formDataObj.append(
-          `otherCharges[${index}][price]`,
-          charge.price.toString()
-        );
+        formDataObj.append(`others[${index}][name]`, charge.name);
+        formDataObj.append(`others[${index}][value]`, charge.price.toString());
       });
     }
 
@@ -244,6 +248,7 @@ const NewProductForm: React.FC = () => {
 
   return (
     <CompactProductForm
+      isLoading={createPending || isPending}
       onSubmit={handleFormSubmit}
       onCancel={handleFormCancel}
       initialData={getInitialData()}

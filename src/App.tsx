@@ -24,7 +24,7 @@ export default function App() {
     <SidebarProvider>
       <div className="flex max-h-screen h-full overflow-y-auto">
         <Sidebar config={SidebarConfig} />
-        <SidebarInset className="max-h-screen p-2 space-y-2 overflow-y-auto bg-gray-50">
+        <SidebarInset className="max-h-screen px-2 space-y-2 overflow-y-auto bg-gray-50">
           {/* Critical Notification Banner - Re-enabled after fixing infinite loop issues */}
           <CriticalNotificationBanner />
 
