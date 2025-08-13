@@ -57,10 +57,6 @@ const defaultFormData: ProductFormData = {
       price: 0,
       wt: 0,
       unit: "grams",
-      totalStock: 0,
-      usedStock: 0,
-      remainingStock: 0,
-      reorderPoint: 10,
       isActive: true,
     },
   ],
@@ -216,10 +212,6 @@ const CompactFormContent: React.FC<{
       price: 0,
       wt: 0,
       unit: "grams" as const,
-      totalStock: 0,
-      usedStock: 0,
-      remainingStock: 0,
-      reorderPoint: 10,
       isActive: true,
     };
     formik.setFieldValue("variants", [...formik.values.variants, newVariant]);
@@ -350,6 +342,7 @@ const CompactFormContent: React.FC<{
     );
     formik.setFieldValue("images", newFormImages);
   };
+  console.log('errors', formik.errors)
 
   return (
     <div className="min-h-screen bg-gray-50 relative">

@@ -56,47 +56,47 @@ export const SidebarConfig = {
         //   // icon: "material-symbols:collections",
         //   icon: "bi:collection",
         // },
-        {
-          id: 3,
-          path: "#",
-          title: "Order",
-          icon: "lets-icons:order",
-          children: [
-            {
-              id: 34,
-              path: FrontendRoutes.ORDER,
-              title: "Orders",
-            },
+        // {
+        //   id: 3,
+        //   path: "#",
+        //   title: "Order",
+        //   icon: "lets-icons:order",
+        //   children: [
+        //     {
+        //       id: 34,
+        //       path: FrontendRoutes.ORDER,
+        //       title: "Orders",
+        //     },
 
-            {
-              id: 38,
-              path: FrontendRoutes.CONFIRMEDORDER,
-              title: "Confirmed Order",
-            },
-            {
-              id: 30,
-              path: FrontendRoutes.ASSIGNEDORDER,
-              title: "Assigned Order",
-              icon: "",
-            },
-            {
-              id: 32,
-              path: FrontendRoutes.COMPLETEDORDER,
-              title: "Completed Order",
-            },
-            {
-              id: 33,
-              path: FrontendRoutes.CANCELLEDORDER,
-              title: "Cancelled Order",
-            },
-          ],
-        },
-        {
-          id: 4,
-          path: FrontendRoutes.CUSTOMER,
-          title: "Customer",
-          icon: "line-md:account-small",
-        },
+        //     {
+        //       id: 38,
+        //       path: FrontendRoutes.CONFIRMEDORDER,
+        //       title: "Confirmed Order",
+        //     },
+        //     {
+        //       id: 30,
+        //       path: FrontendRoutes.ASSIGNEDORDER,
+        //       title: "Assigned Order",
+        //       icon: "",
+        //     },
+        //     {
+        //       id: 32,
+        //       path: FrontendRoutes.COMPLETEDORDER,
+        //       title: "Completed Order",
+        //     },
+        //     {
+        //       id: 33,
+        //       path: FrontendRoutes.CANCELLEDORDER,
+        //       title: "Cancelled Order",
+        //     },
+        //   ],
+        // },
+        // {
+        //   id: 4,
+        //   path: FrontendRoutes.CUSTOMER,
+        //   title: "Customer",
+        //   icon: "line-md:account-small",
+        // },
         // {
         //   id: 5,
         //   path: "#",

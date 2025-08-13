@@ -1,15 +1,11 @@
 import React, { createContext, useContext, useState, useCallback } from "react";
 
-// Product Variant Interface
+// Product Variant Interface - Stock fields removed as they're not needed
 export interface ProductVariant {
   sku?: string;
   price: number;
   wt: number;
   unit: "grams" | "kg" | "pieces" | "carats";
-  totalStock?: number;
-  usedStock?: number;
-  remainingStock?: number;
-  reorderPoint?: number;
   costPrice?: number;
   isActive: boolean;
 }
@@ -167,10 +163,6 @@ const defaultFormData: ProductFormData = {
       price: 0,
       wt: 0,
       unit: "grams",
-      totalStock: 0,
-      usedStock: 0,
-      remainingStock: 0,
-      reorderPoint: 10,
       isActive: true,
     },
   ],

@@ -50,16 +50,12 @@ export const productSpecificationsSchema = z.object({
   makingCharges: z.number().min(0, "Making charges cannot be negative"),
 });
 
-// Product Variant Schema
+// Product Variant Schema - Stock fields removed as they're not needed
 export const productVariantSchema = z.object({
   sku: z.string().optional(),
   price: z.number().min(0.01, "Price is required and must be greater than 0"),
   wt: z.number().min(0, "Weight cannot be negative"),
   unit: z.enum(["grams", "kg", "pieces", "carats"]),
-  totalStock: z.number().min(0, "Total stock cannot be negative"),
-  usedStock: z.number().min(0, "Used stock cannot be negative"),
-  remainingStock: z.number().min(0, "Remaining stock cannot be negative"),
-  reorderPoint: z.number().min(0, "Reorder point cannot be negative"),
   costPrice: z.number().min(0, "Cost price cannot be negative").optional(),
   isActive: z.boolean(),
 });
@@ -80,19 +76,6 @@ export const productVariantsSchema = z.object({
       },
       {
         message: "SKUs must be unique across all variants",
-        path: ["variants"],
-      }
-    )
-    .refine(
-      (variants) => {
-        // Validate stock calculations
-        return variants.every(
-          (variant) =>
-            variant.remainingStock === variant.totalStock - variant.usedStock
-        );
-      },
-      {
-        message: "Remaining stock must equal total stock minus used stock",
         path: ["variants"],
       }
     ),

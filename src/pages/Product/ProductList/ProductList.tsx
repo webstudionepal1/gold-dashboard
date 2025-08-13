@@ -1,6 +1,5 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { get } from "lodash";
-import { X } from "lucide-react";
 import React, { useCallback, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import MasterTable from "../../../components/shared/MasterTable";
@@ -23,17 +22,14 @@ const ProductList: React.FC = () => {
   const { mutate: deleteProduct } = useDeleteProductsMutation();
   const { mutate: updateProduct } = useUpdateProductsMutation();
   const navigate = useNavigate();
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const handleStatusToggle = async (productId: string, newStatus: boolean) => {
     const formData = new FormData();
     formData.append("isActive", newStatus.toString());
-    updateProduct(
-      {
-        id: productId,
-        body: formData,
-      },
-    );
+    updateProduct({
+      id: productId,
+      body: formData,
+    });
   };
 
   const viewAction = useCallback((row: IFetchProduct) => {
@@ -49,37 +45,60 @@ const ProductList: React.FC = () => {
     sn: index + 1,
 
     image: (
-      <div
-        onMouseEnter={() =>
-          setPreviewImage(
-            product.images && product.images.length > 0
-              ? `${import.meta.env.VITE_API_IMAGE_BASE_URL}${product.images[0]}`
-              : "/no-image.png"
-          )
-        }
-        // onMouseLeave={() => setPreviewImage(null)}
-        className="size-6 text-center mx-auto"
-      >
+      <div className="size-12 text-center group cursor-pointer relative">
         {product.images && product.images.length > 0 ? (
-          <img
-            src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${
-              product.images[0]
-            }`}
-            alt={"product image"}
-            className="w-full h-full rounded-sm object fite aspect-square"
-          />
+          <>
+            <img
+              src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${
+                product.images[0]
+              }`}
+              alt="product image"
+              className="w-full h-full rounded-sm object-cover aspect-square transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:rounded-md"
+            />
+            {/* Large preview on hover */}
+            <div className="fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[100] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+              <div className="bg-transparent rounded-lg overflow-hidden">
+                <img
+                  src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${
+                    product.images[0]
+                  }`}
+                  alt="product image preview"
+                  className="h-48 object-contain"
+                  style={{ width: "500px" }}
+                />
+              </div>
+            </div>
+          </>
         ) : (
-          <img
-            src={"/no-image.png"}
-            alt={"product image"}
-            className="w-full h-full rounded-sm object fite aspect-square"
-          />
+          <>
+            <img
+              src="/no-image.png"
+              alt="product image"
+              className="w-full h-full rounded-sm object-cover aspect-square transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:rounded-md opacity-60"
+            />
+            {/* No image preview */}
+            <div className="fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[100] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+              <div className="bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+                <div
+                  className="h-48 bg-gray-100 flex items-center justify-center"
+                  style={{ width: "500px" }}
+                >
+                  <span className="text-gray-400 text-sm">
+                    No image available
+                  </span>
+                </div>
+                <div className="p-2 text-xs text-gray-600 bg-gray-50">
+                  {product.name}
+                </div>
+              </div>
+            </div>
+          </>
         )}
       </div>
     ),
     product: get(product, "name", ""),
-    categ: get(product, "category.name", ""),
-    subCate: get(product, "subCategory.name", ""),
+    categ: get(product, "category.name", "-"),
+    subCate: get(product, "subCategory.name", "-"),
     price: get(product, "price", 0),
     stock: get(product, "variant[0].remainingStock", 0),
     sold: get(product, "variant[0].usedStock", 0),
@@ -119,29 +138,6 @@ const ProductList: React.FC = () => {
           }}
           rows={tableData}
         />
-        {previewImage && (
-          <div
-            className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 animate-fadeIn"
-            onClick={() => setPreviewImage(null)} 
-          >
-            <button
-              className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors duration-200"
-              onClick={(e) => {
-                e.stopPropagation();
-                setPreviewImage(null);
-              }}
-            >
-              <X size={24} />
-            </button>
-
-            <img
-              src={previewImage}
-              alt="preview"
-              className="max-w-[60%] max-h-[60%] object-contain rounded-lg shadow-lg transform transition-transform duration-300 ease-out scale-95 hover:scale-100"
-              onClick={(e) => e.stopPropagation()} // Don't close when clicking the image
-            />
-          </div>
-        )}
       </div>
     </div>
   );

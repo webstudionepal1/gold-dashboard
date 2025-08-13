@@ -4,9 +4,6 @@ import { DashboardPage } from "../pages/Dashboard/Dashboard";
 // import PurchaseReturn from "../pages/Inventory/PurchaseManagement/PurchaseReturn";
 // import Suppliers from "../pages/Inventory/PurchaseManagement/Suppliers";
 import { NotFoundPage } from "../pages/NotFound/NotFound";
-import AssignedOrders from "../pages/OrderManagement/AssignedOrder/AssignedOrder";
-import CancelledOrder from "../pages/OrderManagement/CancelledOrder/CancelledOrder";
-import CompletedOrder from "../pages/OrderManagement/CompletedOrder/CompletedOrder";
 import ProductCategory from "../pages/Product/ProductCategory/ProductCategory";
 import ProductDescription from "../pages/Product/ProductList/[id]/ProdectDescription";
 import ProductList from "../pages/Product/ProductList/ProductList";
@@ -18,11 +15,8 @@ import NotificationTest from "../components/test/NotificationTest";
 import BannerIndex from "../pages/Banner/BannerIndex";
 import AddBannerForm from "../pages/Banner/Components/AddBannerForm";
 import NotificationIndex from "../pages/Notification/NotificationIndex";
-import ConfirmedOrder from "../pages/OrderManagement/ConfirmedOrder/ConfirmedOrder";
-import AddOrderForm from "../pages/OrderManagement/Order/components/AddOrderPage";
 import OrderIndex from "../pages/OrderManagement/Order/OrderIndex";
 
-import CustomerIndex from "../pages/Customer/CustomerIndex";
 // import AddCustomerForm from "../pages/Customer/components/AddCustomerForm";
 import Transaction from "../pages/transaction/Transaction";
 
@@ -32,7 +26,6 @@ import BlogList from "@/pages/Blog/BlogList/BlogList";
 import BlogView from "@/pages/Blog/BlogView/BlogView";
 import Calculator from "@/pages/settings/calculator/Calculator";
 import CalculatorIndex from "@/pages/settings/calculator/CalculatorIndex";
-import CustomerDetails from "../pages/Customer/components/CustomerDetails";
 import OrderDetails from "../pages/OrderManagement/Order/OrderDetails";
 import NewProductForm from "../pages/Product/components/NewProductForm";
 import ProductImageDemo from "../pages/Product/ProductImageDemo";
@@ -55,54 +48,54 @@ export const routesConfig = [
     element: <DashboardPage />,
     //******<Route element={element}/> *****/
   },
-  {
-    path: FrontendRoutes.ORDER,
-    element: <OrderIndex />,
-  },
-  {
-    path: "/order/order-details/:id",
-    element: <OrderDetails />,
-  },
-  {
-    path: "/order/confirmed-order-details/:id",
-    element: <OrderDetails />,
-  },
+  // {
+  //   path: FrontendRoutes.ORDER,
+  //   element: <OrderIndex />,
+  // },
+  // {
+  //   path: "/order/order-details/:id",
+  //   element: <OrderDetails />,
+  // },
+  // {
+  //   path: "/order/confirmed-order-details/:id",
+  //   element: <OrderDetails />,
+  // },
   {
     path: "/attribs",
     element: <AttribConfig />,
   },
-  {
-    path: "/order/assigned-order-details/:id",
-    element: <OrderDetails />,
-  },
-  {
-    path: "/order/completed-order-details/:id",
-    element: <OrderDetails />,
-  },
-  {
-    path: "/order/cancelled-order-details/:id",
-    element: <OrderDetails />,
-  },
-  {
-    path: FrontendRoutes.ADDORDER,
-    element: <AddOrderForm />,
-  },
-  {
-    path: FrontendRoutes.ASSIGNEDORDER,
-    element: <AssignedOrders />,
-  },
-  {
-    path: FrontendRoutes.CONFIRMEDORDER,
-    element: <ConfirmedOrder />,
-  },
-  {
-    path: FrontendRoutes.CANCELLEDORDER,
-    element: <CancelledOrder />,
-  },
-  {
-    path: FrontendRoutes.COMPLETEDORDER,
-    element: <CompletedOrder />,
-  },
+  // {
+  //   path: "/order/assigned-order-details/:id",
+  //   element: <OrderDetails />,
+  // },
+  // {
+  //   path: "/order/completed-order-details/:id",
+  //   element: <OrderDetails />,
+  // },
+  // {
+  //   path: "/order/cancelled-order-details/:id",
+  //   element: <OrderDetails />,
+  // },
+  // {
+  //   path: FrontendRoutes.ADDORDER,
+  //   element: <AddOrderForm />,
+  // },
+  // {
+  //   path: FrontendRoutes.ASSIGNEDORDER,
+  //   element: <AssignedOrders />,
+  // },
+  // {
+  //   path: FrontendRoutes.CONFIRMEDORDER,
+  //   element: <ConfirmedOrder />,
+  // },
+  // {
+  //   path: FrontendRoutes.CANCELLEDORDER,
+  //   element: <CancelledOrder />,
+  // },
+  // {
+  //   path: FrontendRoutes.COMPLETEDORDER,
+  //   element: <CompletedOrder />,
+  // },
   {
     path: FrontendRoutes.PRODUCTLIST,
     element: <ProductList />,
@@ -136,16 +129,16 @@ export const routesConfig = [
     element: <ProductImageDemo />,
   },
   
-  {
-    path: FrontendRoutes.CUSTOMER,
-    element: <CustomerIndex />,
-  },
-  {
-    // path: "/customer/customer-details/:id",
-    path: FrontendRoutes.CUSTOMERDETAILS,
+  // {
+  //   path: FrontendRoutes.CUSTOMER,
+  //   element: <CustomerIndex />,
+  // },
+  // {
+  //   // path: "/customer/customer-details/:id",
+  //   path: FrontendRoutes.CUSTOMERDETAILS,
     
-    element: <CustomerDetails />,
-  },
+  //   element: <CustomerDetails />,
+  // },
   
   // Banner
   {
