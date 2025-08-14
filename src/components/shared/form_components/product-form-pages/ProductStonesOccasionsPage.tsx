@@ -36,12 +36,11 @@ export const ProductStonesOccasionsPage: React.FC = () => {
 
   // Add new stone
   const addStone = () => {
-    const newStone: ProductStone = {
-      stone: '',
-      quantity: 1,
-      totalPrice: 0,
-      isOptional: true,
-      isDefault: false,
+    const newStone = {
+      name: '',
+      weight: '',
+      price: '',
+      color: '',
     };
 
     const currentStones = formData.stones || [];
@@ -58,7 +57,7 @@ export const ProductStonesOccasionsPage: React.FC = () => {
   };
 
   // Update stone
-  const updateStone = (index: number, updates: Partial<ProductStone>) => {
+  const updateStone = (index: number, updates: any) => {
     const currentStones = formData.stones || [];
     const newStones = [...currentStones];
     newStones[index] = { ...newStones[index], ...updates };
@@ -142,32 +141,52 @@ export const ProductStonesOccasionsPage: React.FC = () => {
                     </button>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {/* Stone Selection */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {/* Stone Name */}
                     <div className="space-y-2">
-                      <DropdownField
-                        label="Stone Type"
-                        firstInput="Select stone"
+                      <InputField
+                        label="Stone Name"
+                        placeholder="Enter stone name"
                         required
-                        options={stonesList}
-                        value={stone.stone}
+                        value={stone.name || ''}
                         onChange={(e) => {
-                          updateStone(index, { stone: e.target.value });
+                          updateStone(index, { name: e.target.value });
                         }}
                       />
                     </div>
 
-                    {/* Quantity */}
+                    {/* Weight */}
                     <div className="space-y-2">
                       <InputField
-                        label="Quantity"
-                        type="number"
-                        min="1"
-                        placeholder="1"
-                        value={stone.quantity || ''}
+                        label="Weight"
+                        placeholder="Enter weight"
+                        value={stone.weight || ''}
                         onChange={(e) => {
-                          const value = Number(e.target.value) || 1;
-                          updateStone(index, { quantity: value });
+                          updateStone(index, { weight: e.target.value });
+                        }}
+                      />
+                    </div>
+
+                    {/* Price */}
+                    <div className="space-y-2">
+                      <InputField
+                        label="Price"
+                        placeholder="Enter price"
+                        value={stone.price || ''}
+                        onChange={(e) => {
+                          updateStone(index, { price: e.target.value });
+                        }}
+                      />
+                    </div>
+
+                    {/* Color */}
+                    <div className="space-y-2">
+                      <InputField
+                        label="Color"
+                        placeholder="Enter color"
+                        value={stone.color || ''}
+                        onChange={(e) => {
+                          updateStone(index, { color: e.target.value });
                         }}
                       />
                     </div>

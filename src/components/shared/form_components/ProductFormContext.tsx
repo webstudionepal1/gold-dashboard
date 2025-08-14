@@ -14,13 +14,12 @@ export interface ProductVariant {
   isActive: boolean;
 }
 
-// Product Stone Interface
+// Product Stone Interface - Updated to match server model
 export interface ProductStone {
-  stone: string;
-  quantity: number;
-  totalPrice: number;
-  isOptional: boolean;
-  isDefault: boolean;
+  name: string;
+  weight: string;
+  price: string;
+  color: string;
 }
 
 // Product Form Data Interface
@@ -32,6 +31,9 @@ export interface ProductFormData {
   category: string;
   subCategory: string;
   existingImages?: string[];
+
+  // Required product type from server model
+  productType: "gold" | "silver" | "platinum" | "diamond";
 
   // Page 2: Product Specifications
   length: number;
@@ -46,12 +48,25 @@ export interface ProductFormData {
   gender?: "male" | "female" | "unisex";
   makingCharges: number;
 
+  // Wastage configuration
+  wastage: {
+    type: "fixed" | "per";
+    value: number;
+  };
+
+  // Other charges
+  others: Array<{
+    name: string;
+    value: number;
+  }>;
+
   // Page 3: Product Variants
   variants: ProductVariant[];
 
   // Page 4: Stones and Occasions
-  stones?: ProductStone[];
+  stones: ProductStone[]; // Made required to match server model
   occasions?: string[];
+  collections?: string[]; // Added collections support
 
   // Page 5: Media Assets
   images: (string | File)[];
@@ -71,6 +86,7 @@ export interface ProductFormData {
   // Page 7: Inventory & Status
   isActive: boolean;
   isFeatured: boolean;
+  newArrivalsDate?: Date; // Track when product was marked as newArrivals
 }
 
 // Validation State Interface
@@ -127,6 +143,7 @@ const defaultFormData: ProductFormData = {
   description: "",
   category: "",
   subCategory: "",
+  productType: "gold", // Default product type
 
   // Page 2: Product Specifications
   length: 0,
@@ -140,6 +157,15 @@ const defaultFormData: ProductFormData = {
   dimension: 0,
   gender: undefined,
   makingCharges: 0,
+
+  // Wastage configuration
+  wastage: {
+    type: "per",
+    value: 0,
+  },
+
+  // Other charges
+  others: [],
 
   // Page 3: Product Variants
   variants: [
@@ -159,6 +185,7 @@ const defaultFormData: ProductFormData = {
   // Page 4: Stones and Occasions
   stones: [],
   occasions: [],
+  collections: [],
 
   // Page 5: Media Assets
   images: [],
@@ -178,6 +205,7 @@ const defaultFormData: ProductFormData = {
   // Page 7: Inventory & Status
   isActive: true,
   isFeatured: false,
+  newArrivalsDate: undefined,
 };
 
 // Create Context

@@ -9,29 +9,46 @@ export interface IParams {
 export interface IBaseProductSubCategory {
   _id?: string;
   name?: string;
+  slug?: string; // For SEO-friendly URLs
   description?: string;
   totalProducts?: number;
   isActive?: boolean;
   category?: string;
+  sortOrder?: number; // For ordering subcategories
+  images?: string[]; // Array of image URLs
+  metadata?: {
+    seoTitle?: string;
+    seoDescription?: string;
+    keywords?: string[];
+  };
 }
 export interface IFetchSubCategory extends IBaseProductSubCategory {
   _id: string;
   name: string;
+  slug: string;
   category: string;
 }
 
 export interface IProductCategory {
   _id?: string;
   name?: string;
+  slug?: string; // For SEO-friendly URLs
   description?: string;
-  image?: string;
   totalProducts?: number;
   isActive?: boolean;
   subCategory?: IProductCategory[];
+  sortOrder?: number; // For ordering categories
+  images?: string[]; // Array of image URLs (changed from single image)
+  metadata?: {
+    seoTitle?: string;
+    seoDescription?: string;
+    keywords?: string[];
+  };
 }
 export interface IFetchCategory extends IProductCategory {
   _id: string;
   name: string;
+  slug: string;
 }
 export interface StockItem {
   usedStock: number;
@@ -51,6 +68,7 @@ export interface IBaseProduct {
   category?: string;
   subCategory?: string;
   variant?: Array<{
+    sku?: string; // Optional - auto-generated if not provided
     price?: number;
     wt?: number;
     unit?: string;
@@ -58,8 +76,37 @@ export interface IBaseProduct {
     usedStock?: number;
     remainingStock?: number;
     reorderPoint?: number;
+    costPrice?: number;
   }>;
   makingCharges?: number;
+
+  // Required product type from server model
+  productType?: "gold" | "silver" | "platinum" | "diamond";
+
+  // Stones configuration
+  stones?: Array<{
+    name: string;
+    weight: string;
+    price: string;
+    color: string;
+  }>;
+
+  // Wastage configuration
+  wastage?: {
+    type: "fixed" | "per";
+    value: number;
+  };
+
+  // Other charges
+  others?: Array<{
+    name: string;
+    value: number;
+  }>;
+
+  // Occasions and Collections references
+  occasions?: string[]; // Array of occasion ObjectIds
+  collections?: string[]; // Array of collection ObjectIds
+
   length?: number;
   claspType?: string;
   rhodoumFinishes?: boolean;
@@ -69,6 +116,7 @@ export interface IBaseProduct {
   color?: string;
   clarity?: string;
   dimension?: number;
+  gender?: "male" | "female" | "unisex"; // Target gender
 
   // SEO and marketing
   tags?: string[];
@@ -76,28 +124,66 @@ export interface IBaseProduct {
   images?: string[];
   averageRating?: number;
   numberOfReviews?: number;
+  reviews?: string[]; // Array of review ObjectIds
+
+  // Status and inventory
+  isActive?: boolean;
+  isFeatured?: boolean;
+  newArrivalsDate?: Date; // Track when product was marked as newArrivals
 }
 export interface IFetchProduct {
   _id: string;
   name: string;
+  slug: string;
   ratings: number;
   description: string;
   category: IFetchCategory;
   subCategory: IFetchSubCategory;
   averageRating?: number;
   numberOfReviews?: number;
-  variants: [
-    {
-      price: number;
-      wt: number;
-      unit: string;
-      totalStock: number;
-      usedStock: number;
-      remainingStock: number;
-      reorderPoint: number;
-    }
-  ];
+  reviews: string[]; // Array of review ObjectIds
+  variants: Array<{
+    _id?: string;
+    sku?: string; // Optional - auto-generated if not provided
+    price: number;
+    wt: number;
+    unit: string;
+    totalStock: number;
+    usedStock: number;
+    remainingStock: number;
+    reorderPoint: number;
+    costPrice?: number;
+    isActive: boolean;
+  }>;
   makingCharges: number;
+
+  // Required product type from server model
+  productType: "gold" | "silver" | "platinum" | "diamond";
+
+  // Stones configuration
+  stones: Array<{
+    name: string;
+    weight: string;
+    price: string;
+    color: string;
+  }>;
+
+  // Wastage configuration
+  wastage: {
+    type: "fixed" | "per";
+    value: number;
+  };
+
+  // Other charges
+  others: Array<{
+    name: string;
+    value: number;
+  }>;
+
+  // Occasions and Collections references
+  occasions?: IFetchOccasion[]; // Populated occasion objects
+  collections?: IFetchCollection[]; // Populated collection objects
+
   length: number;
   claspType: IFetchClasps;
   rhodoumFinishes: boolean;
@@ -112,6 +198,24 @@ export interface IFetchProduct {
   visibleAs: string;
   images: string[];
   isActive: boolean;
+  isFeatured: boolean;
+  newArrivalsDate?: Date; // Track when product was marked as newArrivals
+
+  // Enhanced Metadata
+  metadata?: {
+    seoTitle?: string;
+    seoDescription?: string;
+    keywords?: string[];
+    vendor?: string;
+    barcode?: string;
+    compareAtPrice?: number;
+  };
+
+  // Audit fields
+  createdBy?: string;
+  updatedBy?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 //clasps interfaces
@@ -130,7 +234,8 @@ export interface IFetchOccasion {
   description: string;
   totalProducts: number;
   isActive: boolean;
-  image: string;
+  sortOrder: number;
+  image: string[];
   video: string;
   metadata?: {
     seoTitle?: string;
@@ -139,6 +244,38 @@ export interface IFetchOccasion {
     seasonality?: "spring" | "summer" | "autumn" | "winter" | "year-round";
     popularity?: number;
   };
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+//collection interfaces
+export interface IFetchCollection {
+  _id: string;
+  name: string;
+  slug: string;
+  description: string;
+  collectionType: "seasonal" | "bridal" | "casual" | "formal" | "traditional" | "modern";
+  materialType: "gold" | "silver" | "platinum" | "diamond" | "mixed";
+  gemstoneType?: "diamond" | "ruby" | "emerald" | "sapphire" | "pearl" | "mixed" | "none";
+  styleCategory: "classic" | "contemporary" | "vintage" | "minimalist" | "statement" | "ethnic";
+  totalProducts: number;
+  isActive: boolean;
+  isFeatured: boolean;
+  sortOrder: number;
+  images: string[];
+  bannerImage?: string;
+  metadata?: {
+    seoTitle?: string;
+    seoDescription?: string;
+    keywords?: string[];
+    targetAudience?: string[];
+    priceRange?: {
+      min: number;
+      max: number;
+    };
+  };
+  createdBy?: string;
+  updatedBy?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
