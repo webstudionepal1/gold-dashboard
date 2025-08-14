@@ -30,14 +30,12 @@ export const FrontendRoutes = {
   SUPPLIERDETAIL: '/inventory/supplier/:id',
   SUPPLIERHISTORY: '/inventory/suppliers/supplier-history',
 
-  BANNER: '/banner',
-  ADDBANNER: '/banner/add-banner',
-  COLLECTION: '/collection',
-  ADDCOLLECTION: '/collection/add',
-  EDITCOLLECTION: '/collection/edit/:id',
-  COLLECTIONDETAILS: '/collection/:id',
-  NOTIFICATION: '/notification',
-  MYPOSTBUSINESS: '/my-post-business',
+  BANNER: "/banner",
+  ADDBANNER: "/banner/add-banner",
+  NOTIFICATION: "/notification",
+  MYPOSTBUSINESS: "/my-post-business",
+
+  GIFTS: "/gifts",
 
   TRANSACTION: '/transaction',
   VERIFY_CASH: '/transaction/verify-cash-payment',
