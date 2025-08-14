@@ -67,7 +67,9 @@ const BlogList: React.FC = () => {
   const handleFilter = useCallback((filter: string) => {
     setSearchParams((prev) => ({
       ...prev,
-      status: filter ? (filter as "draft" | "published" | "archived") : undefined,
+      status: filter
+        ? (filter as "draft" | "published" | "archived")
+        : undefined,
       page: 1,
     }));
   }, []);
@@ -133,7 +135,9 @@ const BlogList: React.FC = () => {
       <div className="aspect-video w-full overflow-hidden bg-gray-100">
         {blog.featuredImage ? (
           <img
-            src={blog.featuredImage}
+            src={String(import.meta.env.VITE_API_IMAGE_BASE_URL).concat(
+              blog.featuredImage
+            )}
             alt={blog.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
           />
@@ -316,7 +320,10 @@ const BlogList: React.FC = () => {
                 }}
                 className="w-4 h-4 text-customorange bg-gray-100 border-gray-300 rounded focus:ring-customorange focus:ring-2"
               />
-              <label htmlFor="featured-filter" className="text-sm font-medium text-gray-700">
+              <label
+                htmlFor="featured-filter"
+                className="text-sm font-medium text-gray-700"
+              >
                 Featured Only
               </label>
             </div>
@@ -324,7 +331,8 @@ const BlogList: React.FC = () => {
             {/* Search Results Info */}
             {blogData && (
               <div className="text-sm text-gray-500 ml-auto">
-                {blogData.pagination.totalBlogs} blog{blogData.pagination.totalBlogs !== 1 ? 's' : ''} found
+                {blogData.pagination.totalBlogs} blog
+                {blogData.pagination.totalBlogs !== 1 ? "s" : ""} found
                 {searchParams.search && (
                   <span> for "{searchParams.search}"</span>
                 )}
