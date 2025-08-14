@@ -18,6 +18,7 @@ import BannerIndex from "../pages/Banner/BannerIndex";
 import NotificationIndex from "../pages/Notification/NotificationIndex";
 import MyPostBusinessIndex from "../pages/MyPostBusiness/MyPostBusinessIndex";
 import NotificationAdminPanel from "../components/admin/NotificationAdminPanel";
+import GiftsAdminPanel from "../components/admin/GiftsAdminPanel";
 import NotificationTest from "../components/test/NotificationTest";
 import ConfirmedOrder from "../pages/OrderManagement/ConfirmedOrder/ConfirmedOrder";
 import OrderIndex from "../pages/OrderManagement/Order/OrderIndex";
@@ -197,6 +198,10 @@ export const routesConfig = [
   {
     path: "/notification-admin",
     element: <NotificationAdminPanel />,
+  },
+  {
+    path: FrontendRoutes.GIFTS,
+    element: <GiftsAdminPanel />,
   },
   {
     path: "/notification-test",

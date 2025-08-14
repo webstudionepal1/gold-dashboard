@@ -188,6 +188,12 @@ export const SidebarConfig = {
           icon: "fluent:content-view-32-regular",
         },
         {
+          id: 16,
+          path: FrontendRoutes.GIFTS,
+          title: "Gifts & Packages",
+          icon: "tabler:gift",
+        },
+        {
           id: 19,
           path: FrontendRoutes.NOTIFICATION,
           title: "Notification",

@@ -29,6 +29,8 @@ export const FrontendRoutes = {
   NOTIFICATION: "/notification",
   MYPOSTBUSINESS: "/my-post-business",
 
+  GIFTS: "/gifts",
+
   TRANSACTION: "/transaction",
   VERIFY_CASH: "/transaction/verify-cash-payment",
 

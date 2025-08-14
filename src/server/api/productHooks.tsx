@@ -570,9 +570,14 @@ export const useGetAllProductsQuery = (params: IParams = {}) => {
       const res = await apiClient.get<{
         data: {
           products: IFetchProduct[];
-          pagination?: any;
+          pagination?: {
+            currentPage: number;
+            totalPages: number;
+            totalItems: number;
+            itemsPerPage: number;
+          };
           searchQuery?: string;
-          appliedFilters?: any;
+          appliedFilters?: Record<string, unknown>;
         };
       }>("search", {
         params: {
@@ -582,6 +587,19 @@ export const useGetAllProductsQuery = (params: IParams = {}) => {
         },
       });
       return res?.data?.data?.products || [];
+    },
+  });
+};
+
+// Alternative query for getting all products without stock filter (for gift/package creation)
+export const useGetAllProductsForGiftsQuery = (params: IParams = {}) => {
+  return useQuery({
+    queryKey: ["products-for-gifts", params],
+    queryFn: async () => {
+      const res = await apiClient.get<{ data: IFetchProduct[] }>("product", {
+        params,
+      });
+      return res?.data?.data || [];
     },
   });
 };
@@ -612,7 +630,7 @@ export const useCreateProductsMutation = () => {
       handleMutationSuccess("Product created successfully");
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
-    onError(err: any) {
+    onError(err: unknown) {
       handleMutationError(err, "Error creating products");
     },
   });
@@ -640,7 +658,7 @@ export const useUpdateProductsMutation = () => {
       handleMutationSuccess("Product updated successfully");
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
-    onError(err: any) {
+    onError(err: unknown) {
       handleMutationError(err, "Error updating products");
     },
   });
