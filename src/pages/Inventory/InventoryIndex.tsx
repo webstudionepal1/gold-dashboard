@@ -78,10 +78,10 @@ const getStockStatus = (
   return remainingStock <= threshold ? "Low Stock" : "On Stock";
 };
 
-const extractCategoryName = (category: any): string => {
-  return typeof category === "object" && category && "name" in category
-    ? (category.name as string)
-    : "";
+const extractCategoryName = (category: string | { name: string } | undefined): string => {
+  if (typeof category === 'string') return category;
+  if (category && typeof category === 'object' && category.name) return category.name;
+  return 'Uncategorized';
 };
 
 const transformProductToInventoryItems = (
@@ -227,7 +227,8 @@ const InventoryIndex = () => {
   const [selectedFilter, setSelectedFilter] = useState("");
   const [selectedSort, setSelectedSort] = useState("");
 
-  const { data: products = [], isLoading, error } = useGetAllProductsQuery({});
+  const { data: productsData, isLoading, error } = useGetAllProductsQuery({});
+  const products = productsData?.products || [];
   // Transform products to inventory items
   const inventoryItems = useMemo(
     () => products.flatMap(transformProductToInventoryItems),
@@ -238,13 +239,13 @@ const InventoryIndex = () => {
   const categoryOptions = useMemo(() => {
     const categories = new Set(
       products
-        .map((product) => extractCategoryName(product.category))
+        .map((product: IFetchProduct) => extractCategoryName(product.category))
         .filter(Boolean)
     );
 
     return [
       { value: "", label: "All Products" },
-      ...Array.from(categories).map((category) => ({
+      ...Array.from(categories).map((category: string) => ({
         value: category,
         label: category,
       })),

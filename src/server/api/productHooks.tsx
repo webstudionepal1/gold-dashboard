@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../utils/ApiGateway";
 import capitalize from "lodash/capitalize";
 import { toast } from "react-toastify";
+import { handleMutationError } from "../../utils/errorHandler";
 export interface IParams {
   [key: string]: string;
 }

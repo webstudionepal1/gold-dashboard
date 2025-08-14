@@ -310,6 +310,7 @@ import { DropdownField } from '../../../components/shared/form_components/Dropdo
 import { InputField } from '../../../components/shared/form_components/InputField';
 import {
   IBaseProduct,
+  IFetchProduct,
   useGetAllProductsQuery,
 } from '../../../server/api/productHooks';
 import {
@@ -346,7 +347,7 @@ const NewProductForm = ({
       }))
     : [];
   const productList = productSuccess
-    ? products?.map((item) => ({ label: item.name, value: item._id }))
+    ? products?.products?.map((item: IFetchProduct) => ({ label: item.name, value: item._id }))
     : [];
 
   const form = useForm({
@@ -394,7 +395,7 @@ const NewProductForm = ({
 
   // Function to get available weights for a product
   const getProductWeightOptions = (productId: string) => {
-    const product = products?.find((p) => p._id === productId);
+    const product = products?.products?.find((p: IFetchProduct) => p._id === productId);
     if (!product?.variants) return [];
 
     return product.variants.map((variant) => ({
