@@ -124,6 +124,31 @@ const ProductForm = () => {
           formData.append('subCategory', value.subCategory);
         }
 
+        // Required product type
+        formData.append('productType', value.productType);
+
+        // Wastage configuration
+        formData.append('wastage[type]', value.wastage.type);
+        formData.append('wastage[value]', value.wastage.value.toString());
+
+        // Other charges
+        if (value.others) {
+          value.others.forEach((other, index) => {
+            formData.append(`others[${index}][name]`, other.name);
+            formData.append(`others[${index}][value]`, other.value.toString());
+          });
+        }
+
+        // Stones
+        if (value.stones) {
+          value.stones.forEach((stone, index) => {
+            formData.append(`stones[${index}][name]`, stone.name);
+            formData.append(`stones[${index}][weight]`, stone.weight);
+            formData.append(`stones[${index}][price]`, stone.price);
+            formData.append(`stones[${index}][color]`, stone.color);
+          });
+        }
+
         value.variant.forEach((v, index: number) => {
           formData.append(`variant[${index}][price]`, String(v.price));
           formData.append(`variant[${index}][wt]`, v.wt.toString());
@@ -302,6 +327,69 @@ const ProductForm = () => {
                       </div>
                     )}
                   </form.Field>
+
+                  {/* Product Type */}
+                  <form.Field name="productType">
+                    {(field) => (
+                      <div>
+                        <DropdownField
+                          label="Product Type"
+                          required
+                          firstInput="Select Product Type"
+                          options={[
+                            { value: "gold", label: "Gold" },
+                            { value: "silver", label: "Silver" },
+                            { value: "platinum", label: "Platinum" },
+                            { value: "diamond", label: "Diamond" },
+                          ]}
+                          value={field.state.value}
+                          onChange={(e) => field.handleChange(e.target.value as "gold" | "silver" | "platinum" | "diamond")}
+                        />
+                        <FieldError field={field} />
+                      </div>
+                    )}
+                  </form.Field>
+
+                  {/* Wastage Configuration */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <form.Field name="wastage.type">
+                      {(field) => (
+                        <div>
+                          <DropdownField
+                            label="Wastage Type"
+                            required
+                            firstInput="Select Wastage Type"
+                            options={[
+                              { value: "fixed", label: "Fixed Amount" },
+                              { value: "per", label: "Percentage" },
+                            ]}
+                            value={field.state.value}
+                            onChange={(e) => field.handleChange(e.target.value as "fixed" | "per")}
+                          />
+                          <FieldError field={field} />
+                        </div>
+                      )}
+                    </form.Field>
+
+                    <form.Field name="wastage.value">
+                      {(field) => (
+                        <div>
+                          <InputField
+                            label="Wastage Value"
+                            required
+                            type="number"
+                            placeholder="0"
+                            step="0.01"
+                            numberValue={Number(field.state.value) || 0}
+                            onNumberChange={field.handleChange}
+                            allowNegative={false}
+                            clearZeroOnFocus={true}
+                          />
+                          <FieldError field={field} />
+                        </div>
+                      )}
+                    </form.Field>
+                  </div>
                 </div>
               </div>
             </div>
@@ -676,11 +764,10 @@ const ProductForm = () => {
                         type="button"
                         onClick={() =>
                           field.pushValue({
-                            stone: '',
-                            quantity: 1,
-                            totalPrice: 0,
-                            isOptional: true,
-                            isDefault: false,
+                            name: '',
+                            weight: '',
+                            price: '',
+                            color: '',
                           })
                         }
                         className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
@@ -709,112 +796,74 @@ const ProductForm = () => {
                             </button>
                           </div>
 
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <form.Field name={`stones[${index}].stone`}>
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                            <form.Field name={`stones[${index}].name`}>
                               {(subField) => (
                                 <div>
-                                  <DropdownField
-                                    label="Stone"
+                                  <InputField
+                                    label="Stone Name"
                                     required
-                                    firstInput={
-                                      (stones || []).length > 0
-                                        ? 'Select stone'
-                                        : 'No stones available'
-                                    }
-                                    options={(stones || []).map((stone) => ({
-                                      value: stone._id,
-                                      label: stone.name,
-                                    }))}
+                                    placeholder="Enter stone name"
                                     value={String(subField.state.value || '')}
                                     onChange={(e) =>
                                       subField.handleChange(e.target.value)
                                     }
                                   />
                                   <FieldError field={subField} />
-                                  {(stones || []).length === 0 && (
-                                    <p className="text-xs text-gray-500 mt-1">
-                                      No stones available. Please add stones
-                                      first.
-                                    </p>
-                                  )}
                                 </div>
                               )}
                             </form.Field>
 
-                            <form.Field name={`stones[${index}].quantity`}>
+                            <form.Field name={`stones[${index}].weight`}>
                               {(subField) => (
                                 <div>
                                   <InputField
-                                    label="Quantity"
+                                    label="Weight"
                                     required
-                                    type="number"
-                                    placeholder="1"
-                                    numberValue={
-                                      Number(subField.state.value) || 0
+                                    placeholder="Enter weight"
+                                    value={String(subField.state.value || '')}
+                                    onChange={(e) =>
+                                      subField.handleChange(e.target.value)
                                     }
-                                    onNumberChange={subField.handleChange}
-                                    allowNegative={false}
-                                    clearZeroOnFocus={true}
                                   />
                                   <FieldError field={subField} />
                                 </div>
                               )}
                             </form.Field>
 
-                            <form.Field name={`stones[${index}].totalPrice`}>
+                            <form.Field name={`stones[${index}].price`}>
                               {(subField) => (
                                 <div>
                                   <InputField
-                                    label="Total Price (Rs.)"
+                                    label="Price"
                                     required
-                                    type="number"
-                                    placeholder="0"
-                                    step="0.01"
-                                    numberValue={
-                                      Number(subField.state.value) || 0
+                                    placeholder="Enter price"
+                                    value={String(subField.state.value || '')}
+                                    onChange={(e) =>
+                                      subField.handleChange(e.target.value)
                                     }
-                                    onNumberChange={subField.handleChange}
-                                    allowNegative={false}
-                                    clearZeroOnFocus={true}
                                   />
                                   <FieldError field={subField} />
                                 </div>
                               )}
                             </form.Field>
 
-                            <div className="flex gap-4">
-                              <form.Field name={`stones[${index}].isOptional`}>
-                                {(subField) => (
-                                  <label className="flex items-center">
-                                    <input
-                                      type="checkbox"
-                                      checked={Boolean(subField.state.value)}
-                                      onChange={(e) =>
-                                        subField.handleChange(e.target.checked)
-                                      }
-                                      className="mr-2"
-                                    />
-                                    <span className="text-sm">Optional</span>
-                                  </label>
-                                )}
-                              </form.Field>
-
-                              <form.Field name={`stones[${index}].isDefault`}>
-                                {(subField) => (
-                                  <label className="flex items-center">
-                                    <input
-                                      type="checkbox"
-                                      checked={Boolean(subField.state.value)}
-                                      onChange={(e) =>
-                                        subField.handleChange(e.target.checked)
-                                      }
-                                      className="mr-2"
-                                    />
-                                    <span className="text-sm">Default</span>
-                                  </label>
-                                )}
-                              </form.Field>
-                            </div>
+                            <form.Field name={`stones[${index}].color`}>
+                              {(subField) => (
+                                <div>
+                                  <InputField
+                                    label="Color"
+                                    required
+                                    placeholder="Enter color"
+                                    value={String(subField.state.value || '')}
+                                    onChange={(e) =>
+                                      subField.handleChange(e.target.value)
+                                    }
+                                  />
+                                  <FieldError field={subField} />
+                                </div>
+                              )}
+                            </form.Field>
                           </div>
                         </div>
                       ))}

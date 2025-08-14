@@ -136,6 +136,21 @@ const NewProductForm: React.FC = () => {
     formDataObj.append("category", formData.category);
     formDataObj.append("subCategory", formData.subCategory);
 
+    // Required product type
+    formDataObj.append("productType", formData.productType);
+
+    // Wastage configuration
+    formDataObj.append("wastage[type]", formData.wastage.type);
+    formDataObj.append("wastage[value]", formData.wastage.value.toString());
+
+    // Other charges
+    if (formData.others) {
+      formData.others.forEach((other, index) => {
+        formDataObj.append(`others[${index}][name]`, other.name);
+        formDataObj.append(`others[${index}][value]`, other.value.toString());
+      });
+    }
+
     // Specifications
     formDataObj.append("length", formData.length.toString());
     if (formData.claspType) formDataObj.append("claspType", formData.claspType);
@@ -187,23 +202,10 @@ const NewProductForm: React.FC = () => {
     // Stones
     if (formData.stones) {
       formData.stones.forEach((stone, index) => {
-        formDataObj.append(`stones[${index}][stone]`, stone.stone);
-        formDataObj.append(
-          `stones[${index}][quantity]`,
-          stone.quantity.toString()
-        );
-        formDataObj.append(
-          `stones[${index}][totalPrice]`,
-          stone.totalPrice.toString()
-        );
-        formDataObj.append(
-          `stones[${index}][isOptional]`,
-          stone.isOptional.toString()
-        );
-        formDataObj.append(
-          `stones[${index}][isDefault]`,
-          stone.isDefault.toString()
-        );
+        formDataObj.append(`stones[${index}][name]`, stone.name);
+        formDataObj.append(`stones[${index}][weight]`, stone.weight);
+        formDataObj.append(`stones[${index}][price]`, stone.price);
+        formDataObj.append(`stones[${index}][color]`, stone.color);
       });
     }
 
@@ -211,6 +213,13 @@ const NewProductForm: React.FC = () => {
     if (formData.occasions) {
       formData.occasions.forEach((occasion, index) => {
         formDataObj.append(`occasions[${index}]`, occasion);
+      });
+    }
+
+    // Collections
+    if (formData.collections) {
+      formData.collections.forEach((collection, index) => {
+        formDataObj.append(`collections[${index}]`, collection);
       });
     }
 

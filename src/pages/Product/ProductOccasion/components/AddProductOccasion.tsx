@@ -115,8 +115,8 @@ const AddProductOccasion = ({ modalRef, closeModal, editData }: PropTypes) => {
       // Handle image file
       if (value.image instanceof File) {
         formData.append('image', value.image);
-      } else if (editData?.image) {
-        formData.append('existingImage', editData.image);
+      } else if (editData?.image && editData.image.length > 0) {
+        formData.append('existingImage', editData.image[0]); // Use first image from array
       }
 
       // Handle video file
@@ -215,7 +215,7 @@ const AddProductOccasion = ({ modalRef, closeModal, editData }: PropTypes) => {
                     label="Occasion Image"
                     value={field.state.value}
                     onChange={(file: File | null) => field.handleChange(file)}
-                    existingImageUrl={editData?.image}
+                    existingImageUrl={editData?.image && editData.image.length > 0 ? editData.image[0] : undefined}
                   />
                   <FieldError field={field} />
                 </div>

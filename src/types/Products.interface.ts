@@ -100,16 +100,7 @@ export interface Product {
     totalcarat: string;
     carat: string;
   };
-  reviews?: {
-    average: number;
-    count: number;
-    items: Array<{
-      author: string;
-      rating: number;
-      verified: boolean;
-      text: string;
-    }>;
-  };
+
 
   // Status and inventory
   isActive: boolean;
