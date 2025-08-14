@@ -342,7 +342,7 @@ const CompactFormContent: React.FC<{
     );
     formik.setFieldValue("images", newFormImages);
   };
-  console.log('errors', formik.errors)
+  console.log("errors", formik.errors);
 
   return (
     <div className="min-h-screen bg-gray-50 relative">
@@ -794,33 +794,6 @@ const CompactFormContent: React.FC<{
                         <FieldGroup columns={3}>
                           <div>
                             <InputField
-                              label="Price"
-                              type="number"
-                              step="0.01"
-                              placeholder="0.00"
-                              numberValue={variant.price}
-                              onNumberChange={(value) =>
-                                updateVariant(index, "price", value)
-                              }
-                              allowNegative={false}
-                              clearZeroOnFocus
-                            />
-                            {(formik.errors as any)[
-                              `variants.${index}.price`
-                            ] &&
-                              formik.touched.variants?.[index]?.price && (
-                                <ErrorDisplay
-                                  errors={[
-                                    (formik.errors as any)[
-                                      `variants.${index}.price`
-                                    ] as string,
-                                  ]}
-                                />
-                              )}
-                          </div>
-
-                          <div>
-                            <InputField
                               label="Weight"
                               type="number"
                               step="0.01"
@@ -848,6 +821,32 @@ const CompactFormContent: React.FC<{
                                 updateVariant(index, "unit", e.target.value)
                               }
                             />
+                          </div>
+                          <div>
+                            <InputField
+                              label="Price"
+                              type="number"
+                              step="0.01"
+                              placeholder="0.00"
+                              numberValue={variant.price}
+                              onNumberChange={(value) =>
+                                updateVariant(index, "price", value)
+                              }
+                              allowNegative={false}
+                              clearZeroOnFocus
+                            />
+                            {(formik.errors as any)[
+                              `variants.${index}.price`
+                            ] &&
+                              formik.touched.variants?.[index]?.price && (
+                                <ErrorDisplay
+                                  errors={[
+                                    (formik.errors as any)[
+                                      `variants.${index}.price`
+                                    ] as string,
+                                  ]}
+                                />
+                              )}
                           </div>
                         </FieldGroup>
 
@@ -1175,6 +1174,8 @@ const CompactFormContent: React.FC<{
                         { value: "featured", label: "Featured" },
                         { value: "bestSellers", label: "Best Sellers" },
                         { value: "newArrivals", label: "New Arrivals" },
+                        { value: "popular", label: "Popular" },
+                        { value: "trending", label: "Trending" },
                       ]}
                       value={formik.values.visibleAs}
                       onChange={(e) =>
