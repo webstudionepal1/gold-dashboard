@@ -57,7 +57,6 @@ const colorOptions = [
 ];
 
 const genderOptions = [
-  { value: '', label: 'Select Target Gender' },
   { value: 'male', label: 'Male' },
   { value: 'female', label: 'Female' },
   { value: 'unisex', label: 'Unisex' },

@@ -1,12 +1,12 @@
-import React from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { MultiPageProductForm } from "../../../components/shared/form_components/MultiPageProductForm";
+import React from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { MultiPageProductForm } from '../../../components/shared/form_components/MultiPageProductForm';
 import {
   useCreateProductsMutation,
   useUpdateProductsMutation,
   useGetProductByIdQuery,
-} from "../../../server/api/productHooks";
-import { ProductFormData } from "../../../components/shared/form_components/ProductFormContext";
+} from '../../../server/api/productHooks';
+import { ProductFormData } from '../../../components/shared/form_components/ProductFormContext';
 
 const NewProductForm: React.FC = () => {
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ const NewProductForm: React.FC = () => {
   const createProductMutation = useCreateProductsMutation();
   const updateProductMutation = useUpdateProductsMutation();
   const { data: existingProduct, isLoading: isLoadingProduct } =
-    useGetProductByIdQuery(id || "", { enabled: isEdit });
+    useGetProductByIdQuery(id || '', { enabled: isEdit });
 
   // Transform API data to form data format
   const getInitialData = (): Partial<ProductFormData> => {
@@ -25,45 +25,45 @@ const NewProductForm: React.FC = () => {
       return {};
     }
 
-    const product = existingProduct.data;
+    const product = existingProduct?.data;
 
     return {
       // Basic Information
-      name: product.name || "",
-      slug: "",
-      description: product.description || "",
+      name: product?.name || '',
+      slug: '',
+      description: product?.description || '',
       category:
-        typeof product.category === "object"
-          ? product.category._id
-          : product.category || "",
+        typeof product.category === 'object'
+          ? product?.category?._id
+          : product?.category || '',
       subCategory:
-        typeof product.subCategory === "object"
-          ? product.subCategory._id
-          : product.subCategory || "",
+        typeof product?.subCategory === 'object'
+          ? product?.subCategory?._id
+          : product?.subCategory || '',
 
       // Specifications
       length: product.length || 0,
       claspType:
-        typeof product.claspType === "object"
-          ? product.claspType._id
-          : product.claspType || "",
-      rhodoumFinishes: product.rhodoumFinishes || false,
-      shape: product.shape || "",
-      quantity: product.quantity || 0,
-      totalCarat: product.totalCarat || 0,
-      color: product.color || "",
-      clarity: product.clarity || "",
-      dimension: product.dimension || 0,
-      gender: product.gender as "male" | "female" | "unisex" | undefined,
-      makingCharges: product.makingCharges || 0,
+        typeof product?.claspType === 'object'
+          ? product?.claspType?._id
+          : product?.claspType || '',
+      rhodoumFinishes: product?.rhodoumFinishes || false,
+      shape: product?.shape || '',
+      quantity: product?.quantity || 0,
+      totalCarat: product?.totalCarat || 0,
+      color: product?.color || '',
+      clarity: product?.clarity || '',
+      dimension: product?.dimension || 0,
+      gender: product?.gender as 'male' | 'female' | 'unisex' | undefined,
+      makingCharges: product?.makingCharges || 0,
 
       // Variants
       variants: [
         {
-          sku: "",
+          sku: '',
           price: 0,
           wt: 0,
-          unit: "grams" as "grams" | "kg" | "pieces" | "carats",
+          // unit: "grams" as "grams" | "kg" | "pieces" | "carats",
           totalStock: 0,
           usedStock: 0,
           remainingStock: 0,
@@ -83,10 +83,10 @@ const NewProductForm: React.FC = () => {
       tags: product.tags || [],
       visibleAs:
         (product.visibleAs as
-          | "featured"
-          | "bestSellers"
-          | "newArrivals"
-          | "normal") || "normal",
+          | 'featured'
+          | 'bestSellers'
+          | 'newArrivals'
+          | 'normal') || 'normal',
       // metadata: {
       //   seoTitle: "",
       //   seoDescription: "",
@@ -118,9 +118,9 @@ const NewProductForm: React.FC = () => {
       }
 
       // Navigate back to products list on success
-      navigate("/product/product-list");
+      navigate('/product/product-list');
     } catch (error) {
-      console.error("Error saving product:", error);
+      console.error('Error saving product:', error);
       // Handle error (show toast, etc.)
     }
   };
@@ -130,25 +130,25 @@ const NewProductForm: React.FC = () => {
     const formDataObj = new FormData();
 
     // Basic Information
-    formDataObj.append("name", formData.name);
-    if (formData.slug) formDataObj.append("slug", formData.slug);
-    formDataObj.append("description", formData.description);
-    formDataObj.append("category", formData.category);
-    formDataObj.append("subCategory", formData.subCategory);
+    formDataObj.append('name', formData.name);
+    if (formData.slug) formDataObj.append('slug', formData.slug);
+    formDataObj.append('description', formData.description);
+    formDataObj.append('category', formData.category);
+    formDataObj.append('subCategory', formData.subCategory);
 
     // Specifications
-    formDataObj.append("length", formData.length.toString());
-    if (formData.claspType) formDataObj.append("claspType", formData.claspType);
-    formDataObj.append("rhodoumFinishes", formData.rhodoumFinishes.toString());
-    formDataObj.append("shape", formData.shape);
-    formDataObj.append("quantity", formData.quantity.toString());
+    formDataObj.append('length', formData.length.toString());
+    if (formData.claspType) formDataObj.append('claspType', formData.claspType);
+    formDataObj.append('rhodoumFinishes', formData.rhodoumFinishes.toString());
+    formDataObj.append('shape', formData.shape);
+    formDataObj.append('quantity', formData.quantity.toString());
     if (formData.totalCarat)
-      formDataObj.append("totalCarat", formData.totalCarat.toString());
-    if (formData.color) formDataObj.append("color", formData.color);
-    formDataObj.append("clarity", formData.clarity);
-    formDataObj.append("dimension", formData.dimension.toString());
-    if (formData.gender) formDataObj.append("gender", formData.gender);
-    formDataObj.append("makingCharges", formData.makingCharges.toString());
+      formDataObj.append('totalCarat', formData.totalCarat.toString());
+    if (formData.color) formDataObj.append('color', formData.color);
+    formDataObj.append('clarity', formData.clarity);
+    formDataObj.append('dimension', formData.dimension.toString());
+    if (formData.gender) formDataObj.append('gender', formData.gender);
+    formDataObj.append('makingCharges', formData.makingCharges.toString());
 
     // Variants
     formData.variants.forEach((variant, index) => {
@@ -156,7 +156,7 @@ const NewProductForm: React.FC = () => {
         formDataObj.append(`variants[${index}][sku]`, variant.sku);
       formDataObj.append(`variants[${index}][price]`, variant.price.toString());
       formDataObj.append(`variants[${index}][wt]`, variant.wt.toString());
-      formDataObj.append(`variants[${index}][unit]`, variant.unit);
+      // formDataObj.append(`variants[${index}][unit]`, variant.unit);
       formDataObj.append(
         `variants[${index}][totalStock]`,
         variant.totalStock.toString()
@@ -220,11 +220,11 @@ const NewProductForm: React.FC = () => {
     });
 
     // Visibility
-    formDataObj.append("visibleAs", formData.visibleAs);
+    formDataObj.append('visibleAs', formData.visibleAs);
 
     // Status
-    formDataObj.append("isActive", formData.isActive.toString());
-    formDataObj.append("isFeatured", formData.isFeatured.toString());
+    formDataObj.append('isActive', formData.isActive.toString());
+    formDataObj.append('isFeatured', formData.isFeatured.toString());
 
     // Metadata
     // if (formData.metadata) {
@@ -261,7 +261,7 @@ const NewProductForm: React.FC = () => {
       formData.images.forEach((image: File | string, index: number) => {
         if (image instanceof File) {
           formDataObj.append(`images`, image);
-        } else if (typeof image === "string" && image.trim() !== "") {
+        } else if (typeof image === 'string' && image.trim() !== '') {
           // For existing images (URLs), append as string
           formDataObj.append(`existingImages[${index}]`, image);
         }
@@ -273,7 +273,7 @@ const NewProductForm: React.FC = () => {
 
   // Handle form cancellation
   const handleFormCancel = () => {
-    navigate("/product/product-list");
+    navigate('/product/product-list');
   };
 
   // Show loading state while fetching existing product data

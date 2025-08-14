@@ -236,7 +236,7 @@ const ProductList: React.FC = () => {
               product.images[0]
             }`}
             alt={'product image'}
-            className="w-full h-full rounded-sm object fite aspect-square"
+            className="w-full h-full rounded-sm object fite aspect-square cursor-default"
           />
         ) : (
           <img
@@ -248,7 +248,13 @@ const ProductList: React.FC = () => {
       </div>
     ),
     product: get(product, 'name', ''),
-    categ: get(product, 'category.name', ''),
+    categ: (
+      <div
+        className={`${!product.category ? 'text-gray-500 font-medium' : ''}`}
+      >
+        {get(product, 'category.name', 'Not Specified')}
+      </div>
+    ),
     subCate: get(product, 'subCategory.name', ''),
     price: get(product, 'price', 0),
     stock: get(product, 'variant[0].remainingStock', 0),

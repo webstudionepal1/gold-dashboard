@@ -60,7 +60,7 @@ const ProductOccasion: React.FC = () => {
                   item.image.length > 0 ? item.image[0] : '/no-image.png'
                 }`}
                 alt={item.name}
-                className="w-12 h-12 mx-auto object-cover rounded"
+                className="w-12 h-12 mx-auto object-cover rounded cursor-default"
               />
             ) : (
               <span className="text-gray-400">No image</span>

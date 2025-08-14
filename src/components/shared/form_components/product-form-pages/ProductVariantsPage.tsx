@@ -1,17 +1,16 @@
-import React, { useState } from "react";
-import { Icon } from "@iconify/react/dist/iconify.js";
-import { InputField } from "../InputField";
-import { DropdownField } from "../Dropdown";
-import { useProductForm } from "../ProductFormContext";
-import { ProductVariant } from "../ProductFormContext";
+import React, { useState } from 'react';
+import { Icon } from '@iconify/react/dist/iconify.js';
+import { InputField } from '../InputField';
+import { useProductForm } from '../ProductFormContext';
+import { ProductVariant } from '../ProductFormContext';
 
 // Unit options for variants
-const unitOptions = [
-  { value: "grams", label: "Grams" },
-  { value: "kg", label: "Kilograms" },
-  { value: "pieces", label: "Pieces" },
-  { value: "carats", label: "Carats" },
-];
+// const unitOptions = [
+//   { value: 'grams', label: 'Grams' },
+//   { value: 'kg', label: 'Kilograms' },
+//   { value: 'pieces', label: 'Pieces' },
+//   { value: 'carats', label: 'Carats' },
+// ];
 
 export const ProductVariantsPage: React.FC = () => {
   const { formData, updateFormData, updateValidation, validationState } =
@@ -24,10 +23,10 @@ export const ProductVariantsPage: React.FC = () => {
   // Add new variant
   const addVariant = () => {
     const newVariant: ProductVariant = {
-      sku: "",
+      sku: '',
       price: 0,
       wt: 0,
-      unit: "grams",
+      // unit: "grams",
       totalStock: 0,
       usedStock: 0,
       remainingStock: 0,
@@ -68,11 +67,11 @@ export const ProductVariantsPage: React.FC = () => {
     const skuKey = `variant-${variantIndex}-sku`;
 
     if (!sku.trim()) {
-      setSKUValidationStates((prev) => ({ ...prev, [skuKey]: "" }));
+      setSKUValidationStates((prev) => ({ ...prev, [skuKey]: '' }));
       return;
     }
 
-    setSKUValidationStates((prev) => ({ ...prev, [skuKey]: "validating" }));
+    setSKUValidationStates((prev) => ({ ...prev, [skuKey]: 'validating' }));
 
     try {
       const response = await fetch(
@@ -82,10 +81,10 @@ export const ProductVariantsPage: React.FC = () => {
 
       setSKUValidationStates((prev) => ({
         ...prev,
-        [skuKey]: result.success ? "valid" : "invalid",
+        [skuKey]: result.success ? 'valid' : 'invalid',
       }));
     } catch (error) {
-      setSKUValidationStates((prev) => ({ ...prev, [skuKey]: "error" }));
+      setSKUValidationStates((prev) => ({ ...prev, [skuKey]: 'error' }));
     }
   };
 
@@ -94,16 +93,16 @@ export const ProductVariantsPage: React.FC = () => {
     const errors: string[] = [];
 
     if (formData.variants.length === 0) {
-      errors.push("At least one variant is required");
+      errors.push('At least one variant is required');
     }
 
     // Check for duplicate SKUs
     const skus = formData.variants
       .map((v) => v.sku)
-      .filter((sku) => sku && sku.trim() !== "");
+      .filter((sku) => sku && sku.trim() !== '');
     const uniqueSkus = new Set(skus);
     if (skus.length !== uniqueSkus.size) {
-      errors.push("SKUs must be unique across all variants");
+      errors.push('SKUs must be unique across all variants');
     }
 
     // Validate stock calculations
@@ -112,10 +111,10 @@ export const ProductVariantsPage: React.FC = () => {
         variant.remainingStock !== variant.totalStock - variant.usedStock
     );
     if (hasInvalidStock) {
-      errors.push("Remaining stock must equal total stock minus used stock");
+      errors.push('Remaining stock must equal total stock minus used stock');
     }
 
-    updateValidation("variants", errors.length === 0, errors);
+    updateValidation('variants', errors.length === 0, errors);
   };
 
   return (
@@ -190,7 +189,7 @@ export const ProductVariantsPage: React.FC = () => {
                   <InputField
                     label="SKU"
                     placeholder="Enter unique SKU (optional)"
-                    value={variant.sku || ""}
+                    value={variant.sku || ''}
                     onChange={(e) => {
                       const value = e.target.value;
                       updateVariant(index, { sku: value });
@@ -199,7 +198,7 @@ export const ProductVariantsPage: React.FC = () => {
                       if (skuValidationStates[skuKey]) {
                         setSKUValidationStates((prev) => ({
                           ...prev,
-                          [skuKey]: "",
+                          [skuKey]: '',
                         }));
                       }
                     }}
@@ -213,7 +212,7 @@ export const ProductVariantsPage: React.FC = () => {
                     skuValidationStates[`variant-${index}-sku`] && (
                       <div className="mt-1">
                         {skuValidationStates[`variant-${index}-sku`] ===
-                          "validating" && (
+                          'validating' && (
                           <p className="text-xs text-blue-500 flex items-center gap-1">
                             <Icon
                               icon="eos-icons:loading"
@@ -223,7 +222,7 @@ export const ProductVariantsPage: React.FC = () => {
                           </p>
                         )}
                         {skuValidationStates[`variant-${index}-sku`] ===
-                          "valid" && (
+                          'valid' && (
                           <p className="text-xs text-green-600 flex items-center gap-1">
                             <Icon
                               icon="material-symbols:check-circle"
@@ -233,7 +232,7 @@ export const ProductVariantsPage: React.FC = () => {
                           </p>
                         )}
                         {skuValidationStates[`variant-${index}-sku`] ===
-                          "invalid" && (
+                          'invalid' && (
                           <p className="text-xs text-red-600 flex items-center gap-1">
                             <Icon
                               icon="material-symbols:error"
@@ -257,7 +256,8 @@ export const ProductVariantsPage: React.FC = () => {
                     min="0"
                     step="0.01"
                     placeholder="0.00"
-                    value={variant.price || ""}
+                    numberValue={Number(variant.price) || 0}
+                    allowNegative={false}
                     onChange={(e) => {
                       const value = Number(e.target.value) || 0;
                       updateVariant(index, { price: value });
@@ -275,22 +275,22 @@ export const ProductVariantsPage: React.FC = () => {
                       min="0"
                       step="0.01"
                       placeholder="0.00"
-                      value={variant.wt || ""}
+                      numberValue={variant.wt || 0}
                       onChange={(e) => {
                         const value = Number(e.target.value) || 0;
                         updateVariant(index, { wt: value });
                       }}
                     />
-                    <DropdownField
+                    {/* <DropdownField
                       label="Unit"
                       options={unitOptions}
                       value={variant.unit}
                       onChange={(e) => {
                         updateVariant(index, {
-                          unit: e.target.value as ProductVariant["unit"],
+                          unit: e.target.value as ProductVariant['unit'],
                         });
                       }}
-                    />
+                    /> */}
                   </div>
                 </div>
 
@@ -301,7 +301,7 @@ export const ProductVariantsPage: React.FC = () => {
                     type="number"
                     min="0"
                     placeholder="0"
-                    value={variant.totalStock || ""}
+                    numberValue={variant.totalStock || 0}
                     onChange={(e) => {
                       const value = Number(e.target.value) || 0;
                       updateVariant(index, { totalStock: value });
@@ -317,7 +317,7 @@ export const ProductVariantsPage: React.FC = () => {
                     type="number"
                     min="0"
                     placeholder="0"
-                    value={variant.usedStock || ""}
+                    numberValue={variant.usedStock || 0}
                     onChange={(e) => {
                       const value = Number(e.target.value) || 0;
                       updateVariant(index, { usedStock: value });
@@ -331,7 +331,7 @@ export const ProductVariantsPage: React.FC = () => {
                   <InputField
                     label="Remaining Stock"
                     type="number"
-                    value={variant.remainingStock || 0}
+                    numberValue={variant.remainingStock || 0}
                     disabled
                     className="bg-gray-50"
                   />
@@ -347,7 +347,7 @@ export const ProductVariantsPage: React.FC = () => {
                     type="number"
                     min="0"
                     placeholder="10"
-                    value={variant.reorderPoint || ""}
+                    numberValue={variant.reorderPoint || 0}
                     onChange={(e) => {
                       const value = Number(e.target.value) || 0;
                       updateVariant(index, { reorderPoint: value });
@@ -366,7 +366,7 @@ export const ProductVariantsPage: React.FC = () => {
                     min="0"
                     step="0.01"
                     placeholder="0.00"
-                    value={variant.costPrice || ""}
+                    numberValue={variant.costPrice || 0}
                     onChange={(e) => {
                       const value = Number(e.target.value) || 0;
                       updateVariant(index, { costPrice: value });
@@ -405,33 +405,33 @@ export const ProductVariantsPage: React.FC = () => {
                   <div
                     className={`flex items-center gap-1 ${
                       variant.remainingStock <= variant.reorderPoint
-                        ? "text-red-600"
+                        ? 'text-red-600'
                         : variant.remainingStock <= variant.reorderPoint * 2
-                        ? "text-yellow-600"
-                        : "text-green-600"
+                        ? 'text-yellow-600'
+                        : 'text-green-600'
                     }`}
                   >
                     <Icon
                       icon={
                         variant.remainingStock <= variant.reorderPoint
-                          ? "material-symbols:warning"
+                          ? 'material-symbols:warning'
                           : variant.remainingStock <= variant.reorderPoint * 2
-                          ? "material-symbols:info"
-                          : "material-symbols:check-circle"
+                          ? 'material-symbols:info'
+                          : 'material-symbols:check-circle'
                       }
                       className="w-4 h-4 text-customorange"
                     />
                     <span>
                       {variant.remainingStock <= variant.reorderPoint
-                        ? "Low Stock"
+                        ? 'Low Stock'
                         : variant.remainingStock <= variant.reorderPoint * 2
-                        ? "Medium Stock"
-                        : "Good Stock"}
+                        ? 'Medium Stock'
+                        : 'Good Stock'}
                     </span>
                   </div>
                   {variant.price > 0 && variant.costPrice && (
                     <div className="text-gray-600">
-                      Margin:{" "}
+                      Margin:{' '}
                       {(
                         ((variant.price - variant.costPrice) / variant.price) *
                         100

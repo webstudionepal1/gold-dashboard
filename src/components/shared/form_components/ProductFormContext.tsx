@@ -1,11 +1,11 @@
-import React, { createContext, useContext, useState, useCallback } from "react";
+import React, { createContext, useContext, useState, useCallback } from 'react';
 
 // Product Variant Interface
 export interface ProductVariant {
   sku?: string;
   price: number;
   wt: number;
-  unit: "grams" | "kg" | "pieces" | "carats";
+  unit?: 'grams' | 'kg' | 'pieces' | 'carats';
   totalStock: number;
   usedStock: number;
   remainingStock: number;
@@ -42,7 +42,7 @@ export interface ProductFormData {
   color?: string;
   clarity: string;
   dimension: number;
-  gender?: "male" | "female" | "unisex";
+  gender?: 'male' | 'female' | 'unisex';
   makingCharges: number;
 
   // Page 3: Product Variants
@@ -57,7 +57,7 @@ export interface ProductFormData {
 
   // Page 6: SEO & Marketing
   tags: string[];
-  visibleAs: "featured" | "bestSellers" | "newArrivals" | "normal";
+  visibleAs: 'featured' | 'bestSellers' | 'newArrivals' | 'normal';
   metadata?: {
     seoTitle?: string;
     seoDescription?: string;
@@ -121,21 +121,21 @@ interface ProductFormContextType {
 // Default Form Data
 const defaultFormData: ProductFormData = {
   // Page 1: Basic Information
-  name: "",
-  slug: "",
-  description: "",
-  category: "",
-  subCategory: "",
+  name: '',
+  slug: '',
+  description: '',
+  category: '',
+  subCategory: '',
 
   // Page 2: Product Specifications
   length: 0,
-  claspType: "",
+  claspType: '',
   rhodoumFinishes: false,
-  shape: "",
+  shape: '',
   quantity: 0,
   totalCarat: 0,
-  color: "",
-  clarity: "",
+  color: '',
+  clarity: '',
   dimension: 0,
   gender: undefined,
   makingCharges: 0,
@@ -143,10 +143,10 @@ const defaultFormData: ProductFormData = {
   // Page 3: Product Variants
   variants: [
     {
-      sku: "",
+      sku: '',
       price: 0,
       wt: 0,
-      unit: "grams",
+      unit: 'grams',
       totalStock: 0,
       usedStock: 0,
       remainingStock: 0,
@@ -164,13 +164,13 @@ const defaultFormData: ProductFormData = {
 
   // Page 6: SEO & Marketing
   tags: [],
-  visibleAs: "normal",
+  visibleAs: 'normal',
   metadata: {
-    seoTitle: "",
-    seoDescription: "",
+    seoTitle: '',
+    seoDescription: '',
     keywords: [],
-    vendor: "",
-    barcode: "",
+    vendor: '',
+    barcode: '',
     compareAtPrice: 0,
   },
 
@@ -312,7 +312,7 @@ export const ProductFormProvider: React.FC<ProductFormProviderProps> = ({
 export const useProductForm = (): ProductFormContextType => {
   const context = useContext(ProductFormContext);
   if (!context) {
-    throw new Error("useProductForm must be used within a ProductFormProvider");
+    throw new Error('useProductForm must be used within a ProductFormProvider');
   }
   return context;
 };
@@ -321,19 +321,19 @@ export const useProductForm = (): ProductFormContextType => {
 const getStepFields = (step: number): string[] => {
   switch (step) {
     case 1:
-      return ["name", "description", "category", "subCategory"];
+      return ['name', 'description', 'category', 'subCategory'];
     case 2:
-      return ["length", "shape", "clarity", "dimension", "gender"];
+      return ['length', 'shape', 'clarity', 'dimension', 'gender'];
     case 3:
-      return ["variants"];
+      return ['variants'];
     case 4:
-      return ["stones", "occasions"];
+      return ['stones', 'occasions'];
     case 5:
-      return ["images"];
+      return ['images'];
     case 6:
-      return ["tags", "visibleAs"];
+      return ['tags', 'visibleAs'];
     case 7:
-      return ["isActive"];
+      return ['isActive'];
     default:
       return [];
   }

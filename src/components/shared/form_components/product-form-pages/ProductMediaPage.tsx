@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { Icon } from "@iconify/react/dist/iconify.js";
-import { useProductForm } from "../ProductFormContext";
+import React, { useState } from 'react';
+import { Icon } from '@iconify/react/dist/iconify.js';
+import { useProductForm } from '../ProductFormContext';
 
 export const ProductMediaPage: React.FC = () => {
   const { formData, updateFormData, updateValidation, validationState } =
@@ -18,7 +18,7 @@ export const ProductMediaPage: React.FC = () => {
     const filesToAdd = files.slice(0, availableSlots);
 
     if (filesToAdd.length < files.length) {
-      updateValidation("images", false, [
+      updateValidation('images', false, [
         `Maximum ${maxImages} images allowed. Only ${filesToAdd.length} images were added.`,
       ]);
     }
@@ -31,7 +31,7 @@ export const ProductMediaPage: React.FC = () => {
     const allImages = [...existingImages, ...filesToAdd];
 
     updateFormData({ images: allImages });
-    updateValidation("images", true, []);
+    updateValidation('images', true, []);
   };
 
   // Handle file input change
@@ -46,9 +46,9 @@ export const ProductMediaPage: React.FC = () => {
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
+    if (e.type === 'dragenter' || e.type === 'dragover') {
       setDragActive(true);
-    } else if (e.type === "dragleave") {
+    } else if (e.type === 'dragleave') {
       setDragActive(false);
     }
   };
@@ -60,7 +60,7 @@ export const ProductMediaPage: React.FC = () => {
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const files = Array.from(e.dataTransfer.files).filter((file) =>
-        file.type.startsWith("image/")
+        file.type.startsWith('image/')
       );
       handleImageUpload(files);
     }
@@ -76,7 +76,7 @@ export const ProductMediaPage: React.FC = () => {
 
     // Clear validation errors if we're now within limits
     if (newImages.length <= 10) {
-      updateValidation("images", true, []);
+      updateValidation('images', true, []);
     }
   };
 
@@ -124,13 +124,14 @@ export const ProductMediaPage: React.FC = () => {
           <div
             className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
               dragActive
-                ? "border-customorange bg-blue-50"
-                : "border-customorange hover:border-customorangedark"
+                ? 'border-customorange bg-blue-50'
+                : 'border-customorange hover:border-customorangedark'
             }`}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
             onDragOver={handleDrag}
-            onDrop={handleDrop}>
+            onDrop={handleDrop}
+          >
             <input
               type="file"
               multiple
@@ -144,9 +145,10 @@ export const ProductMediaPage: React.FC = () => {
               htmlFor="product-images"
               className={`cursor-pointer ${
                 selectedImages.length >= 10
-                  ? "cursor-not-allowed opacity-50"
-                  : ""
-              }`}>
+                  ? 'cursor-not-allowed opacity-50'
+                  : ''
+              }`}
+            >
               <div className="flex flex-col items-center gap-3">
                 <Icon
                   icon="material-symbols:add-photo-alternate"
@@ -155,17 +157,18 @@ export const ProductMediaPage: React.FC = () => {
                 <div>
                   <p className="text-lg font-medium text-gray-700">
                     {selectedImages.length >= 10
-                      ? "Maximum images reached"
-                      : "Upload Product Images"}
+                      ? 'Maximum images reached'
+                      : 'Upload Product Images'}
                   </p>
                   <p className="text-sm text-gray-500">
                     {selectedImages.length >= 10
-                      ? "Remove some images to add more"
-                      : "Click to select or drag and drop images here"}
+                      ? 'Remove some images to add more'
+                      : 'Click to select or drag and drop images here'}
                   </p>
                   <p className="text-xs text-gray-400 mt-1">
-                    Maximum 10 images • JPG, PNG, WebP • Max 5MB each
+                    Maximum 10 images • JPG, PNG •
                   </p>
+                  <p className="text-xs font-medium">Max 5MB each</p>
                 </div>
               </div>
             </label>
@@ -199,7 +202,8 @@ export const ProductMediaPage: React.FC = () => {
                             <button
                               type="button"
                               onClick={() => moveImage(index, index - 1)}
-                              className="bg-white text-gray-700 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors">
+                              className="bg-white text-gray-700 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors"
+                            >
                               <Icon
                                 icon="material-symbols:chevron-left"
                                 className="w-4 h-4"
@@ -212,7 +216,8 @@ export const ProductMediaPage: React.FC = () => {
                             <button
                               type="button"
                               onClick={() => moveImage(index, index + 1)}
-                              className="bg-white text-gray-700 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors">
+                              className="bg-white text-gray-700 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors"
+                            >
                               <Icon
                                 icon="material-symbols:chevron-right"
                                 className="w-4 h-4"
@@ -224,7 +229,8 @@ export const ProductMediaPage: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => removeImage(index)}
-                            className="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors">
+                            className="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors"
+                          >
                             <Icon
                               icon="material-symbols:close"
                               className="w-4 h-4"
@@ -262,7 +268,8 @@ export const ProductMediaPage: React.FC = () => {
           {validationState.images?.errors.map((error, index) => (
             <div
               key={index}
-              className="mt-4 p-3 bg-red-50 rounded-lg border border-red-200">
+              className="mt-4 p-3 bg-red-50 rounded-lg border border-red-200"
+            >
               <p className="text-red-600 text-sm flex items-center gap-2">
                 <Icon icon="material-symbols:error" className="w-4 h-4" />
                 {error}

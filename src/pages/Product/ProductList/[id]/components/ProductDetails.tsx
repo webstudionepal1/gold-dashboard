@@ -102,7 +102,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-3">
                     <div className="bg-amber-100 text-amber-800 px-2 py-1 rounded text-sm font-semibold">
-                      RS. {item?.price?.toLocaleString() || 0}
+                      Rs. {item?.price?.toLocaleString() || 0}
                     </div>
                     <div className="text-sm font-medium text-gray-900">
                       {item?.wt || 0}{' '}
@@ -112,7 +112,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
                     </div>
                   </div>
                   {(item?.remainingStock || 0) <= (item?.reorderPoint || 0) && (
-                    <div className="bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-xs font-medium">
+                    <div className="bg-red text-white px-2 py-0.5 rounded-full text-xs font-medium">
                       ⚠ Low Stock
                     </div>
                   )}
@@ -129,7 +129,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
                     </span>
                     <span>
                       Used:{' '}
-                      <span className="font-semibold text-red-600">
+                      <span className="font-semibold text-red">
                         {item?.usedStock || 0}
                       </span>
                     </span>
@@ -139,8 +139,8 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
                         className={`font-semibold ${
                           (item?.remainingStock || 0) <=
                           (item?.reorderPoint || 0)
-                            ? 'text-red-600'
-                            : 'text-green-600'
+                            ? 'text-red'
+                            : 'text-green'
                         }`}
                       >
                         {item?.remainingStock || 0}
@@ -156,11 +156,11 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
                     <div
                       className={`h-1 rounded-full transition-all duration-300 ${
                         (item?.remainingStock || 0) <= (item?.reorderPoint || 0)
-                          ? 'bg-red-500'
+                          ? 'bg-red'
                           : (item?.remainingStock || 0) <=
                             (item?.totalStock || 1) * 0.3
-                          ? 'bg-yellow-500'
-                          : 'bg-green-500'
+                          ? 'bg-yellow'
+                          : 'bg-green'
                       }`}
                       style={{
                         width: `${Math.min(

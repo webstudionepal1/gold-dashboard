@@ -1,6 +1,6 @@
-import React from "react";
-import { Icon } from "@iconify/react/dist/iconify.js";
-import { useProductForm } from "../ProductFormContext";
+import React from 'react';
+import { Icon } from '@iconify/react/dist/iconify.js';
+import { useProductForm } from '../ProductFormContext';
 
 export const ProductInventoryStatusPage: React.FC = () => {
   const { formData, updateFormData, updateValidation, validationState } =
@@ -38,15 +38,15 @@ export const ProductInventoryStatusPage: React.FC = () => {
 
     // Featured products must be active
     if (formData.isFeatured && !formData.isActive) {
-      errors.push("Featured products must be active");
+      errors.push('Featured products must be active');
     }
 
     // Must have at least one active variant if product is active
     if (formData.isActive && activeVariants === 0) {
-      errors.push("Active products must have at least one active variant");
+      errors.push('Active products must have at least one active variant');
     }
 
-    updateValidation("status", errors.length === 0, errors);
+    updateValidation('status', errors.length === 0, errors);
   };
 
   return (
@@ -89,21 +89,21 @@ export const ProductInventoryStatusPage: React.FC = () => {
               </h4>
               <div className="space-y-1 text-sm text-gray-600">
                 <p>
-                  <strong>Name:</strong> {formData.name || "Not set"}
+                  <strong>Name:</strong> {formData.name || 'Not set'}
                 </p>
                 <p>
-                  <strong>Category:</strong>{" "}
-                  {formData.category ? "Selected" : "Not selected"}
+                  <strong>Category:</strong>{' '}
+                  {formData.category ? 'Selected' : 'Not selected'}
                 </p>
                 <p>
-                  <strong>Sub-category:</strong>{" "}
-                  {formData.subCategory ? "Selected" : "Not selected"}
+                  <strong>Sub-category:</strong>{' '}
+                  {formData.subCategory ? 'Selected' : 'Not selected'}
                 </p>
                 <p>
-                  <strong>Description:</strong>{" "}
+                  <strong>Description:</strong>{' '}
                   {formData.description
                     ? `${formData.description.length} characters`
-                    : "Not set"}
+                    : 'Not set'}
                 </p>
               </div>
             </div>
@@ -125,7 +125,7 @@ export const ProductInventoryStatusPage: React.FC = () => {
                   <strong>Active Variants:</strong> {activeVariants}
                 </p>
                 <p>
-                  <strong>Price Range:</strong>{" "}
+                  <strong>Price Range:</strong>{' '}
                   {priceRange.min === priceRange.max
                     ? `$${priceRange.min}`
                     : `$${priceRange.min} - $${priceRange.max}`}
@@ -157,11 +157,11 @@ export const ProductInventoryStatusPage: React.FC = () => {
                 </p>
                 <p
                   className={`font-medium ${
-                    totalRemainingStock > 0 ? "text-green-600" : "text-red-600"
+                    totalRemainingStock > 0 ? 'text-green-600' : 'text-red-600'
                   }`}
                 >
-                  <strong>Status:</strong>{" "}
-                  {totalRemainingStock > 0 ? "In Stock" : "Out of Stock"}
+                  <strong>Status:</strong>{' '}
+                  {totalRemainingStock > 0 ? 'In Stock' : 'Out of Stock'}
                 </p>
               </div>
             </div>
@@ -180,11 +180,11 @@ export const ProductInventoryStatusPage: React.FC = () => {
                   <strong>Images:</strong> {formData.images.length} uploaded
                 </p>
                 <p>
-                  <strong>Stones:</strong> {(formData.stones || []).length}{" "}
+                  <strong>Stones:</strong> {(formData.stones || []).length}{' '}
                   configured
                 </p>
                 <p>
-                  <strong>Occasions:</strong>{" "}
+                  <strong>Occasions:</strong>{' '}
                   {(formData.occasions || []).length} selected
                 </p>
                 <p>
@@ -222,7 +222,7 @@ export const ProductInventoryStatusPage: React.FC = () => {
             </div> */}
 
             {/* Additional Info */}
-            <div className="bg-white rounded-lg p-4 border border-gray-200">
+            {/* <div className="bg-white rounded-lg p-4 border border-gray-200">
               <h4 className="font-medium text-gray-900 mb-2 flex items-center gap-2">
                 <Icon
                   icon="material-symbols:more-horiz"
@@ -250,7 +250,7 @@ export const ProductInventoryStatusPage: React.FC = () => {
                   {formData.rhodoumFinishes ? "Yes" : "No"}
                 </p>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
 
@@ -351,43 +351,43 @@ export const ProductInventoryStatusPage: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[
-              { label: "Product name", completed: !!formData.name },
+              { label: 'Product name', completed: !!formData.name },
               {
-                label: "Product description",
+                label: 'Product description',
                 completed: !!formData.description,
               },
-              { label: "Category selected", completed: !!formData.category },
+              { label: 'Category selected', completed: !!formData.category },
               {
-                label: "Sub-category selected",
+                label: 'Sub-category selected',
                 completed: !!formData.subCategory,
               },
               {
-                label: "At least one variant",
+                label: 'At least one variant',
                 completed: formData.variants.length > 0,
               },
               {
-                label: "At least one active variant",
+                label: 'At least one active variant',
                 completed: activeVariants > 0,
               },
               {
-                label: "Product images",
+                label: 'Product images',
                 completed: formData.images.length > 0,
               },
-              { label: "Product tags", completed: formData.tags.length > 0 },
+              { label: 'Product tags', completed: formData.tags.length > 0 },
             ].map((item, index) => (
               <div
                 key={index}
                 className={`flex items-center gap-3 p-3 rounded-lg ${
                   item.completed
-                    ? "bg-green-100 text-green-800"
-                    : "bg-yellow-100 text-yellow-800"
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-yellow-100 text-yellow-800'
                 }`}
               >
                 <Icon
                   icon={
                     item.completed
-                      ? "material-symbols:check-circle"
-                      : "material-symbols:radio-button-unchecked"
+                      ? 'material-symbols:check-circle'
+                      : 'material-symbols:radio-button-unchecked'
                   }
                   className="w-5 h-5"
                 />
