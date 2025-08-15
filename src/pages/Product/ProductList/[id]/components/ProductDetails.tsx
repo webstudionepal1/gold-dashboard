@@ -8,10 +8,6 @@ interface ProductVariant {
   price: number;
   wt: number;
   unit: string;
-  totalStock: number;
-  usedStock: number;
-  remainingStock: number;
-  reorderPoint: number;
   sku?: string;
   isActive?: boolean;
 }
