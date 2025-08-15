@@ -176,7 +176,8 @@ export const ProductSelectionPage: React.FC = () => {
   const previewProductsMutation = usePreviewCollectionProductsMutation();
 
   // Fetch products and categories
-  const { data: products = [], isLoading: isLoadingProducts } = useGetAllProductsQuery();
+  const { data: productsData, isLoading: isLoadingProducts } = useGetAllProductsQuery();
+  const products = productsData?.products || [];
   const { data: categories = [] } = useGetAllProductCategoriesQuery();
 
   // Fetch automatic products for hybrid mode
@@ -242,7 +243,7 @@ export const ProductSelectionPage: React.FC = () => {
         updateFormData({
           conditions: {
             ...formData.conditions,
-            excludedProductIds: newExcludedProducts.map(id => id as any)
+            excludedProductIds: newExcludedProducts
           }
         });
       } else {
@@ -256,7 +257,7 @@ export const ProductSelectionPage: React.FC = () => {
           selectedProducts: newSelectedProducts,
           conditions: {
             ...formData.conditions,
-            manualProductIds: newSelectedProducts.map(id => id as any)
+            manualProductIds: newSelectedProducts
           }
         });
       }
@@ -273,7 +274,7 @@ export const ProductSelectionPage: React.FC = () => {
 
   // Handle select all/none
   const handleSelectAll = () => {
-    const allProductIds = filteredProducts.map(product => product._id);
+    const allProductIds = filteredProducts.map((product: IFetchProduct) => product._id);
     setSelectedProducts(allProductIds);
     updateFormData({ selectedProducts: allProductIds });
   };

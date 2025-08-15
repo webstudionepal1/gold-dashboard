@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../utils/ApiGateway";
 import capitalize from "lodash/capitalize";
 import { toast } from "react-toastify";
+import { handleMutationError } from "../../utils/errorHandler";
 export interface IParams {
   [key: string]: string;
 }
@@ -148,13 +149,43 @@ export const useGetAllProductsQuery = (params: IParams = {}) => {
   return useQuery({
     queryKey: ["products"],
     queryFn: async () => {
-      const res = await apiClient.get<{ data: IFetchProduct[] }>("product", {
-        params,
+      const res = await apiClient.get<{
+        data: {
+          products: IFetchProduct[];
+          pagination?: {
+            currentPage: number;
+            totalPages: number;
+            totalItems: number;
+            itemsPerPage: number;
+          };
+          searchQuery?: string;
+          appliedFilters?: Record<string, unknown>;
+        };
+      }>("search", {
+        params: {
+          ...params,
+          inStock: true, // Keep your existing stock filter
+          includeAll: true, // Add this to get both active and inactive products
+        },
       });
       return res?.data?.data;
     },
   });
 };
+
+// Alternative query for getting all products without stock filter (for gift/package creation)
+export const useGetAllProductsForGiftsQuery = (params: IParams = {}) => {
+  return useQuery({
+    queryKey: ["products-for-gifts", params],
+    queryFn: async () => {
+      const res = await apiClient.get<{ data: IFetchProduct[] }>("product", {
+        params,
+      });
+      return res?.data?.data || [];
+    },
+  });
+};
+
 export const useGetProductById = (id: string) => {
   return useQuery({
     queryKey: ["products", id],
@@ -195,8 +226,8 @@ export const useCreateProductsMutation = () => {
       toast.success("Product created successfully");
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
-    onError(err: any) {
-      toast.error(capitalize(err || "Error Creating Product"));
+    onError(err: unknown) {
+      handleMutationError(err, "Error creating products");
     },
   });
 };
@@ -225,11 +256,8 @@ export const useUpdateProductsMutation = () => {
       toast.success("Product updated successfully");
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
-    onError(err: any) {
-      console.error("Product update error:", err);
-      toast.error(
-        err?.response?.data?.message || err?.message || "Error updating product"
-      );
+    onError(err: unknown) {
+      handleMutationError(err, "Error updating products");
     },
   });
 };

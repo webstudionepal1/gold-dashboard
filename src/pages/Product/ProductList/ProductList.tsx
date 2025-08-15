@@ -16,7 +16,7 @@ import { productListColumns } from "../productObj";
 const ProductList: React.FC = () => {
   const { data: productsList, isSuccess, isLoading } = useGetAllProductsQuery();
   const productsData = useMemo(
-    () => (isSuccess && productsList ? productsList : []),
+    () => (isSuccess && productsList?.products ? productsList.products : []),
     [isSuccess, productsList]
   );
   const { mutate: deleteProduct } = useDeleteProductsMutation();
@@ -40,7 +40,7 @@ const ProductList: React.FC = () => {
     navigate(`/product/edit/${row._id}`);
   }, []);
 
-  const tableData = productsData.map((product, index) => ({
+  const tableData = productsData.map((product: IFetchProduct, index: number) => ({
     ...product,
     sn: index + 1,
 

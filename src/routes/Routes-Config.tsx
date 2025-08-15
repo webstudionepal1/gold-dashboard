@@ -11,6 +11,7 @@ import Productsubcategory from "../pages/Product/ProductSubcategory/ProductSubCa
 import { FrontendRoutes } from "./routes";
 
 import NotificationAdminPanel from "../components/admin/NotificationAdminPanel";
+import GiftsAdminPanel from "../components/admin/GiftsAdminPanel";
 import NotificationTest from "../components/test/NotificationTest";
 import BannerIndex from "../pages/Banner/BannerIndex";
 import AddBannerForm from "../pages/Banner/Components/AddBannerForm";
@@ -164,96 +165,13 @@ export const routesConfig = [
     element: <NotificationAdminPanel />,
   },
   {
-    path: FrontendRoutes.TRANSACTION,
-    element: <Transaction />,
-  },
-  
-  {
-    path: FrontendRoutes.PROFILECONFIG,
-    element: <EditProfileForm />,
-  },
-  // {
-  //   path: "/settings/attribute-config",
-  //   element: <AttribConfig />,
-  // },
-  {
-    path: "/settings/calculator",
-    element: <Calculator />,
+    path: FrontendRoutes.GIFTS,
+    element: <GiftsAdminPanel />,
   },
   {
-    path:'/settings/calculator/:status',
-    element:<CalculatorIndex />,
+    path: "/notification-test",
+    element: <NotificationTest />,
   },
-  {
-    path: "/test-upload",
-    element: <TestUpload />,
-  },
-  // {
-  //   path: FrontendRoutes.LOGIN,
-  //   element: <LoginPage />,
-  // },
-  // {
-  //   path: FrontendRoutes.PRODUCTDESCRIPTION,
-  //   element: <ProductDescription />,
-  // },
-  // {
-  //   path: FrontendRoutes.PRODUCTOCCASION,
-  //   element: <ProductOccasion />,
-  // },
-  // {
-  //   path: FrontendRoutes.STONE,
-  //   element: <StoneIndex />,
-  // },
-  // {
-  //   path: FrontendRoutes.ADDCUSTOMER,
-  //   element: <AddCustomerForm />,
-  // },
-
-  // {
-  //   path: FrontendRoutes.INVENTORY,
-  //   element: <InventoryIndex />,
-  // },
-  // {
-  //   path: FrontendRoutes.ADDSUPPLIERS,
-  //   element: <AddSupplierForm />,
-  // },
-  // {
-  //   path: FrontendRoutes.SUPPLIERDETAIL,
-  //   element: <SupplierDetail />,
-  // },
-  // {
-  //   path: FrontendRoutes.SUPPLIERHISTORY,
-  //   element: <SupplierHistory />,
-  // },
-  // {
-  //   path: FrontendRoutes.PURCHASE,
-  //   element: <PurchaseIndex />,
-  // },
-  // {
-  //   path: FrontendRoutes.PURCHASERETURN,
-  //   element: <PurchaseReturn />,
-  // },
-  // {
-  //   path: FrontendRoutes.SUPPLIERS,
-  //   element: <Suppliers />,
-  // },
-  // Collections
-  // {
-  //   path: FrontendRoutes.COLLECTION,
-  //   element: <CollectionIndex />,
-  // },
-  // {
-  //   path: FrontendRoutes.ADDCOLLECTION,
-  //   element: <NewCollectionForm />,
-  // },
-  // {
-  //   path: FrontendRoutes.EDITCOLLECTION,
-  //   element: <NewCollectionForm />,
-  // },
-  // {
-  //   path: FrontendRoutes.COLLECTIONDETAILS,
-  //   element: <CollectionDetails />,
-  // },
   // MyPostBusiness route commented out - will be integrated later
   // {
   //   path: FrontendRoutes.MYPOSTBUSINESS,
