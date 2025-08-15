@@ -3,7 +3,7 @@ name: CI/CD for Web Deployment (VPS)
 on:
   push:
     branches:
-      - ridisiddhi
+      - ridhisidhi
 
 jobs:
   build-and-deploy:
