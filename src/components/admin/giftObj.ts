@@ -1,19 +1,23 @@
 import { IFetchGift } from "../../server/api/giftHooks";
 
 export const giftColumns = [
-  { key: "sn", title: "S.N" },
-  { key: "typeCategory", title: "Type & Category" },
-  { key: "name", title: "Gift Name" },
-  { key: "pricing", title: "Pricing" },
-  { key: "status", title: "Status" },
+  { title: "S.N", key: "sn" },
+  { title: "Type", key: "type" },
+  { title: "Category", key: "category" },
+  { title: "Gift Name", key: "name" },
+  { title: "Occasion", key: "occasion" },
+  { title: "Items No", key: "itemsNo" },
+  { title: "Pricing", key: "pricing" },
 ];
 
 export interface GiftTableRow {
   id: string;
   sn: number;
-  typeCategory: React.ReactNode;
-  name: React.ReactNode;
+  type: React.ReactNode;
+  category: string;
+  name: string;
+  occasion: string;
+  itemsNo: React.ReactNode;
   pricing: React.ReactNode;
-  status: React.ReactNode;
   _originalData: IFetchGift;
 }
