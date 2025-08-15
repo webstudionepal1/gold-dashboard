@@ -23,6 +23,7 @@ import {
 } from "../../../server/api/productHooks";
 import { mainProductFormSchema } from "../../../components/shared/form_components/validation/ProductFormValidation";
 import { Form, FormikProvider, useFormik } from "formik";
+import { DropdownTagField } from "@/components/shared/form_components/DropdownTags";
 
 // Default Form Data
 const defaultFormData: ProductFormData = {
@@ -73,7 +74,7 @@ const defaultFormData: ProductFormData = {
 
   // SEO & Marketing
   tags: [],
-  visibleAs: "normal",
+  visibleAs: [],
   metadata: {
     seoTitle: "",
     seoDescription: "",
@@ -1167,7 +1168,7 @@ const CompactFormContent: React.FC<{
               >
                 <FieldGroup columns={3}>
                   <div>
-                    <DropdownField
+                    {/* <DropdownField
                       label="Visible As"
                       options={[
                         { value: "normal", label: "Normal" },
@@ -1181,6 +1182,22 @@ const CompactFormContent: React.FC<{
                       onChange={(e) =>
                         formik.setFieldValue("visibleAs", e.target.value)
                       }
+                    /> */}
+                    <DropdownTagField
+                      required
+                      options={[
+                        { value: "normal", label: "Normal" },
+                        { value: "featured", label: "Featured" },
+                        { value: "bestSellers", label: "Best Sellers" },
+                        { value: "newArrivals", label: "New Arrivals" },
+                        { value: "popular", label: "Popular" },
+                        { value: "trending", label: "Trending" },
+                      ]}
+                      label="Visible As"
+                      values={formik.values.visibleAs}
+                      onChange={(newValues) => {
+                        formik.setFieldValue("visibleAs", newValues);
+                      }}
                     />
                   </div>
 
