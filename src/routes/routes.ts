@@ -44,6 +44,11 @@ export const FrontendRoutes = {
   ORDER_REPORT: '/order-report',
   SALES_REPORT: '/sales-report',
 
+  // Collection routes
+  COLLECTION: '/collection',
+  ADDCOLLECTION: '/collection/add',
+  EDITCOLLECTION: '/collection/edit/:id',
+  COLLECTIONDETAILS: '/collection/:id',
 
   SETTINGS: '/settings',
   PROFILECONFIG: '/settings/profile-config',

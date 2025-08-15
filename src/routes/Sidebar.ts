@@ -49,13 +49,26 @@ export const SidebarConfig = {
             // },
           ],
         },
-        // {
-        //   id: 25,
-        //   path: FrontendRoutes.COLLECTION,
-        //   title: "Collections",
-        //   // icon: "material-symbols:collections",
-        //   icon: "bi:collection",
-        // },
+        {
+          id: 25,
+          path: "#",
+          title: "Collections",
+          icon: "bi:collection",
+          children: [
+            {
+              id: 250,
+              path: FrontendRoutes.COLLECTION,
+              title: "Collection List",
+              icon: "",
+            },
+            {
+              id: 251,
+              path: FrontendRoutes.ADDCOLLECTION,
+              title: "Add Collection",
+              icon: "",
+            },
+          ],
+        },
         // {
         //   id: 3,
         //   path: "#",

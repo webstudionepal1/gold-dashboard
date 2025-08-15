@@ -18,6 +18,11 @@ import AddBannerForm from "../pages/Banner/Components/AddBannerForm";
 import NotificationIndex from "../pages/Notification/NotificationIndex";
 import OrderIndex from "../pages/OrderManagement/Order/OrderIndex";
 
+// Collection imports
+import CollectionIndex from "../pages/Collection/CollectionIndex";
+import NewCollectionForm from "../pages/Collection/components/NewCollectionForm";
+import CollectionDetails from "../pages/Collection/components/CollectionDetails";
+
 // import AddCustomerForm from "../pages/Customer/components/AddCustomerForm";
 import Transaction from "../pages/transaction/Transaction";
 
@@ -128,6 +133,24 @@ export const routesConfig = [
   {
     path: "/product/image-demo",
     element: <ProductImageDemo />,
+  },
+  
+  // Collection routes
+  {
+    path: FrontendRoutes.COLLECTION,
+    element: <CollectionIndex />,
+  },
+  {
+    path: FrontendRoutes.ADDCOLLECTION,
+    element: <NewCollectionForm />,
+  },
+  {
+    path: FrontendRoutes.EDITCOLLECTION,
+    element: <NewCollectionForm />,
+  },
+  {
+    path: FrontendRoutes.COLLECTIONDETAILS,
+    element: <CollectionDetails />,
   },
   
   // {
