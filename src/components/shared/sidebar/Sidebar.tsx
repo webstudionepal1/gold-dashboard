@@ -42,7 +42,7 @@ const SidebarHeader: React.FC = () => {
       )}
     >
       <img
-        src="/companylogo.png"
+        src="/logo.png"
         alt="company-logo"
         className={clsx(
           isCollapsed ? "h-[50px] w-[44px]" : "w-28",

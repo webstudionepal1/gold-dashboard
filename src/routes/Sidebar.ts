@@ -206,11 +206,11 @@ export const SidebarConfig = {
             //   path: "/settings/attribute-config",
             //   title: "Attribute config",
             // },
-            {
-              id:109,
-              path: "/settings/calculator",
-              title: "Calculator",
-            }
+            // {
+            //   id:109,
+            //   path: "/settings/calculator",
+            //   title: "Calculator",
+            // }
           ],
         },
         {
@@ -225,12 +225,12 @@ export const SidebarConfig = {
           title: "Gifts & Packages",
           icon: "tabler:gift",
         },
-        {
-          id: 19,
-          path: FrontendRoutes.NOTIFICATION,
-          title: "Notification",
-          icon: "iconamoon:notification-bold",
-        },
+        // {
+        //   id: 19,
+        //   path: FrontendRoutes.NOTIFICATION,
+        //   title: "Notification",
+        //   icon: "iconamoon:notification-bold",
+        // },
         {
           id: 20,
           path: "#",
