@@ -9,7 +9,7 @@ import {
 } from "../../../server/api/giftHooks";
 import { IFetchProduct } from "../../../server/api/productHooks";
 import FileDropInput from "../../shared/form_components/FileDropInput";
-import { uploadFiles } from "../../../utils/uploadUtils";
+// Removed uploadFiles import as we're now using FormData directly
 
 interface GiftFormProps {
   gift?: IFetchGift;
@@ -89,54 +89,79 @@ const GiftForm: React.FC<GiftFormProps> = ({ gift, onSuccess, onCancel, products
       try {
         setIsUploading(true);
         
-        // Upload images if any are selected
-        let imageUrls: string[] = [];
-        if (selectedImages.length > 0) {
-          imageUrls = await uploadFiles(selectedImages, 'gift-image');
+        // Create FormData object
+        const formData = new FormData();
+        
+        // Append basic fields
+        formData.append('name', value.name);
+        formData.append('description', value.description);
+        formData.append('type', value.type);
+        formData.append('pricingType', value.pricingType);
+        formData.append('isActive', value.isActive.toString());
+        formData.append('isAvailable', value.isAvailable.toString());
+        formData.append('stockType', value.stockType);
+        formData.append('visibleAs', value.visibleAs);
+        formData.append('isCustomizable', value.isCustomizable.toString());
+        formData.append('allowPartialPurchase', value.allowPartialPurchase.toString());
+        
+        // Append optional fields only if they have values
+        if (value.fixedPrice) formData.append('fixedPrice', value.fixedPrice.toString());
+        if (value.discountPercentage) formData.append('discountPercentage', value.discountPercentage.toString());
+        if (value.discountAmount) formData.append('discountAmount', value.discountAmount.toString());
+        if (value.category) formData.append('category', value.category);
+        if (value.setCategory) formData.append('setCategory', value.setCategory);
+        if (value.occasion) formData.append('occasion', value.occasion);
+        if (value.setType) formData.append('setType', value.setType);
+        if (value.setTheme) formData.append('setTheme', value.setTheme);
+        if (value.metalType) formData.append('metalType', value.metalType);
+        if (value.stoneType) formData.append('stoneType', value.stoneType);
+        if (value.totalStock) formData.append('totalStock', value.totalStock.toString());
+        if (value.featuredImage) formData.append('featuredImage', value.featuredImage);
+        if (value.slug) formData.append('slug', value.slug);
+        if (value.weight) formData.append('weight', value.weight.toString());
+        if (value.minimumOrderQuantity) formData.append('minimumOrderQuantity', value.minimumOrderQuantity.toString());
+        if (value.maximumOrderQuantity) formData.append('maximumOrderQuantity', value.maximumOrderQuantity.toString());
+        if (value.priority) formData.append('priority', value.priority.toString());
+        
+        // Handle tags
+        if (value.tags) {
+          const tags = value.tags.split(",").map(tag => tag.trim()).filter(Boolean);
+          tags.forEach((tag, index) => {
+            formData.append(`tags[${index}]`, tag);
+          });
         }
         
-        const giftData: ICreateGiftData = {
-          name: value.name,
-          description: value.description,
-          type: value.type,
-          pricingType: value.pricingType,
-          fixedPrice: value.fixedPrice || undefined,
-          discountPercentage: value.discountPercentage || undefined,
-          discountAmount: value.discountAmount || undefined,
-          category: value.category || undefined,
-          setCategory: value.setCategory || undefined,
-          occasion: value.occasion || undefined,
-          setType: value.setType || undefined,
-          setTheme: value.setTheme || undefined,
-          metalType: value.metalType || undefined,
-          stoneType: value.stoneType || undefined,
-          tags: value.tags ? value.tags.split(",").map(tag => tag.trim()).filter(Boolean) : [],
-          isActive: value.isActive,
-          isAvailable: value.isAvailable,
-          stockType: value.stockType,
-          totalStock: value.totalStock || undefined,
-          images: imageUrls,
-          featuredImage: imageUrls.length > 0 ? imageUrls[0] : (value.featuredImage || undefined),
-          slug: value.slug || undefined,
-          visibleAs: value.visibleAs,
-          weight: value.weight || undefined,
-          isCustomizable: value.isCustomizable,
-          allowPartialPurchase: value.allowPartialPurchase,
-          minimumOrderQuantity: value.minimumOrderQuantity || undefined,
-          maximumOrderQuantity: value.maximumOrderQuantity || undefined,
-          priority: value.priority,
-          products: selectedProducts.filter(p => p.product).map(p => ({
-            product: p.product,
-            quantity: p.quantity,
-            isOptional: p.isOptional,
-            alternativeProducts: p.alternativeProducts.filter(Boolean)
-          }))
-        };
+        // Handle products
+        const validProducts = selectedProducts.filter(p => p.product);
+        validProducts.forEach((product, index) => {
+          formData.append(`products[${index}][product]`, product.product);
+          formData.append(`products[${index}][quantity]`, product.quantity.toString());
+          formData.append(`products[${index}][isOptional]`, product.isOptional.toString());
+          
+          product.alternativeProducts.filter(Boolean).forEach((altProduct, altIndex) => {
+            formData.append(`products[${index}][alternativeProducts][${altIndex}]`, altProduct);
+          });
+        });
+        
+        // Handle new images
+        selectedImages.forEach((file, index) => {
+          formData.append('images', file);
+        });
+        
+        // Handle existing images for updates
+         if (gift?.images) {
+           const currentExistingImages = gift.images;
+           if (Array.isArray(currentExistingImages)) {
+             currentExistingImages.forEach((imageUrl: string, index: number) => {
+               formData.append(`existingImages[${index}]`, imageUrl);
+             });
+           }
+         }
 
         if (gift) {
-          await updateGiftMutation.mutateAsync({ id: gift._id, data: giftData });
+          await updateGiftMutation.mutateAsync({ id: gift._id, data: formData });
         } else {
-          await createGiftMutation.mutateAsync(giftData);
+          await createGiftMutation.mutateAsync(formData);
         }
         onSuccess();
       } catch (error) {

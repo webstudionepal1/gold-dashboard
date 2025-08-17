@@ -1,6 +1,7 @@
-import React from "react";
-import { Edit, Package, Gift, Tag, Calendar, Star, Users, ShoppingBag, Zap, Award } from "lucide-react";
+import React, { useState } from "react";
+import { Icon } from "@iconify/react/dist/iconify.js";
 import { IFetchGift } from "../../../server/api/giftHooks";
+import SafeImage from "../../ui/SafeImage";
 
 interface GiftDetailsModalProps {
   gift: IFetchGift;
@@ -9,12 +10,27 @@ interface GiftDetailsModalProps {
 }
 
 const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({ gift, onEdit, onClose }) => {
+  // State for image modal
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
       minimumFractionDigits: 0,
     }).format(price);
+  };
+
+  // Handle image modal
+  const openImageModal = (index: number) => {
+    setSelectedImageIndex(index);
+    setIsImageModalOpen(true);
+  };
+
+  const closeImageModal = () => {
+    setIsImageModalOpen(false);
+    setSelectedImageIndex(0);
   };
 
   const formatDate = (dateString: string) => {
@@ -35,9 +51,9 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({ gift, onEdit, onClo
               gift.type === "gift" ? "bg-purple-100" : "bg-blue-100"
             }`}>
               {gift.type === "gift" ? (
-                <Gift className="w-8 h-8 text-purple-600" />
+                <Icon icon="material-symbols:card-giftcard" className="w-8 h-8 text-purple-600" />
               ) : (
-                <Package className="w-8 h-8 text-blue-600" />
+                <Icon icon="material-symbols:package-2" className="w-8 h-8 text-blue-600" />
               )}
             </div>
             <div>
@@ -63,7 +79,7 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({ gift, onEdit, onClo
             onClick={onEdit}
             className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl"
           >
-            <Edit className="w-5 h-5" />
+            <Icon icon="material-symbols:edit" className="w-5 h-5" />
             <span className="font-medium">Edit Gift</span>
           </button>
         </div>
@@ -113,7 +129,7 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({ gift, onEdit, onClo
             {gift.setType && (
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div className="flex items-center space-x-3">
-                  <Package className="w-5 h-5 text-purple-500" />
+                  <Icon icon="material-symbols:package-2" className="w-5 h-5 text-purple-500" />
                   <span className="text-sm font-medium text-gray-700">Set Type</span>
                 </div>
                 <span className="text-sm font-semibold text-gray-900 capitalize px-3 py-1 bg-white rounded-md">
@@ -123,7 +139,7 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({ gift, onEdit, onClo
             )}
             <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
               <div className="flex items-center space-x-3">
-                <Star className="w-5 h-5 text-yellow-500" />
+                <Icon icon="material-symbols:star" className="w-5 h-5 text-yellow-500" />
                 <span className="text-sm font-medium text-gray-700">Priority</span>
               </div>
               <span className={`text-sm font-semibold px-3 py-1 rounded-md ${
@@ -136,14 +152,14 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({ gift, onEdit, onClo
             </div>
             <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
               <div className="flex items-center space-x-3">
-                <Calendar className="w-5 h-5 text-blue-500" />
+                <Icon icon="material-symbols:calendar-today" className="w-5 h-5 text-blue-500" />
                 <span className="text-sm font-medium text-gray-700">Created</span>
               </div>
               <span className="text-sm font-semibold text-gray-900">{formatDate(gift.createdAt)}</span>
             </div>
             <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
               <div className="flex items-center space-x-3">
-                <Calendar className="w-5 h-5 text-green-500" />
+                <Icon icon="material-symbols:calendar-today" className="w-5 h-5 text-green-500" />
                 <span className="text-sm font-medium text-gray-700">Updated</span>
               </div>
               <span className="text-sm font-semibold text-gray-900">{formatDate(gift.updatedAt)}</span>
@@ -164,14 +180,14 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({ gift, onEdit, onClo
                   key={index}
                   className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 text-sm font-medium rounded-lg border border-blue-200 hover:shadow-md transition-shadow"
                 >
-                  <Tag className="w-4 h-4 mr-2" />
+                  <Icon icon="material-symbols:tag" className="w-4 h-4 mr-2" />
                   {tag}
                 </span>
               ))}
             </div>
           ) : (
             <div className="text-center py-8">
-              <Tag className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+              <Icon icon="material-symbols:tag" className="w-12 h-12 text-gray-300 mx-auto mb-3" />
               <p className="text-gray-500">No tags assigned</p>
             </div>
           )}
@@ -186,7 +202,7 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({ gift, onEdit, onClo
             Products
           </h3>
           <div className="flex items-center space-x-2 px-4 py-2 bg-orange-50 rounded-lg">
-            <ShoppingBag className="w-5 h-5 text-orange-600" />
+            <Icon icon="material-symbols:shopping-bag" className="w-5 h-5 text-orange-600" />
             <span className="text-lg font-bold text-orange-600">{gift.products?.length || 0}</span>
             <span className="text-sm text-orange-600">items</span>
           </div>
@@ -283,22 +299,46 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({ gift, onEdit, onClo
         </div>
       </div>
 
-      {/* Gift Images */}
+      {/* Gift Images Gallery */}
       {gift.images && gift.images.length > 0 && (
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Gift Images</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Icon
+              icon="material-symbols:image"
+              className="w-5 h-5 text-[#DF8D28]"
+            />
+            <h3 className="text-lg font-semibold text-gray-900">
+              Gift Images
+            </h3>
+            <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-md">
+              {gift.images.length} {gift.images.length === 1 ? "image" : "images"}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {gift.images.map((image, index) => (
-              <img
+              <div
                 key={index}
-                src={image}
-                alt={`${gift.name} ${index + 1}`}
-                className="w-full h-32 object-cover rounded-lg border border-gray-200"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = '/no-image.png';
-                }}
-              />
+                className="relative aspect-square overflow-hidden rounded-lg group cursor-pointer"
+                onClick={() => openImageModal(index)}
+              >
+                <SafeImage
+                  src={image}
+                  alt={`${gift.name} ${index + 1}`}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  showLoadingPlaceholder={true}
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
+                  <Icon
+                    icon="material-symbols:zoom-in"
+                    className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  />
+                </div>
+                {/* Image counter */}
+                <div className="absolute bottom-2 right-2 bg-black/50 text-white px-2 py-1 rounded text-xs backdrop-blur-sm">
+                  {index + 1}
+                </div>
+              </div>
             ))}
           </div>
         </div>
@@ -319,6 +359,86 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({ gift, onEdit, onClo
           Edit Gift
         </button>
       </div>
+
+      {/* Image Modal/Lightbox */}
+      {isImageModalOpen && gift.images && gift.images.length > 0 && (
+        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4">
+          <div className="relative max-w-4xl max-h-full w-full h-full flex items-center justify-center">
+            {/* Close Button */}
+            <button
+              onClick={closeImageModal}
+              className="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all duration-200 backdrop-blur-sm"
+            >
+              <Icon icon="material-symbols:close" className="w-6 h-6" />
+            </button>
+
+            {/* Navigation Buttons */}
+            {gift.images.length > 1 && (
+              <>
+                <button
+                  onClick={() => {
+                    const newIndex = selectedImageIndex > 0 ? selectedImageIndex - 1 : gift.images!.length - 1;
+                    setSelectedImageIndex(newIndex);
+                  }}
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-200 backdrop-blur-sm"
+                >
+                  <Icon icon="material-symbols:chevron-left" className="w-6 h-6" />
+                </button>
+                <button
+                  onClick={() => {
+                    const newIndex = selectedImageIndex < gift.images!.length - 1 ? selectedImageIndex + 1 : 0;
+                    setSelectedImageIndex(newIndex);
+                  }}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-200 backdrop-blur-sm"
+                >
+                  <Icon icon="material-symbols:chevron-right" className="w-6 h-6" />
+                </button>
+              </>
+            )}
+
+            {/* Main Image */}
+            <div className="relative max-w-full max-h-full">
+              <SafeImage
+                src={gift.images[selectedImageIndex]}
+                alt={`${gift.name} ${selectedImageIndex + 1}`}
+                className="max-w-full max-h-full object-contain rounded-lg"
+                showLoadingPlaceholder={true}
+              />
+              
+              {/* Image Info */}
+              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-4 py-2 rounded-full backdrop-blur-sm">
+                <span className="text-sm font-medium">
+                  {selectedImageIndex + 1} of {gift.images.length}
+                </span>
+              </div>
+            </div>
+
+            {/* Thumbnail Strip */}
+            {gift.images.length > 1 && (
+              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 bg-black/30 p-2 rounded-lg backdrop-blur-sm max-w-full overflow-x-auto">
+                {gift.images.map((image, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedImageIndex(index)}
+                    className={`flex-shrink-0 w-12 h-12 rounded border-2 overflow-hidden transition-all duration-200 ${
+                      index === selectedImageIndex
+                        ? "border-white shadow-lg"
+                        : "border-transparent hover:border-gray-300"
+                    }`}
+                  >
+                    <SafeImage
+                      src={image}
+                      alt={`Thumbnail ${index + 1}`}
+                      className="w-full h-full object-cover"
+                      showLoadingPlaceholder={true}
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

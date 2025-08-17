@@ -311,8 +311,12 @@ export const useGetGiftByIdQuery = (id: string) => {
 export const useCreateGiftMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: ICreateGiftData) => {
-      const res = await apiClient.post<{ data: IFetchGift }>("gift", data);
+    mutationFn: async (data: FormData) => {
+      const res = await apiClient.post<{ data: IFetchGift }>("gift", data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       return res?.data;
     },
     onSuccess: (data) => {
@@ -329,8 +333,12 @@ export const useCreateGiftMutation = () => {
 export const useUpdateGiftMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: Partial<ICreateGiftData> }) => {
-      const res = await apiClient.patch<{ data: IFetchGift }>(`gift/${id}`, data);
+    mutationFn: async ({ id, data }: { id: string; data: FormData }) => {
+      const res = await apiClient.patch<{ data: IFetchGift }>(`gift/${id}`, data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       return res?.data;
     },
     onSuccess: (data) => {
