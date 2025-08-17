@@ -1,15 +1,17 @@
-import React, { useState } from "react";
+import React from "react";
 import { Bell, BellRing } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
+import { useNavigate } from "react-router-dom";
 import useCriticalNotifications from "../../hooks/useCriticalNotifications";
-import NotificationCenter from "./NotificationCenter";
 import CriticalNotificationBanner from "./CriticalNotificationBanner";
 
 const NotificationBell: React.FC = () => {
-  const [isNotificationCenterOpen, setIsNotificationCenterOpen] =
-    useState(false);
+  const navigate = useNavigate();
   const {
+    criticalNotifications,
     unreadCount,
+    dismissNotification,
+    markAsRead,
     getNotificationStats,
   } = useCriticalNotifications();
 
@@ -30,14 +32,26 @@ const NotificationBell: React.FC = () => {
   };
 
   const pulseVariants = {
-    idle: { scale: 1, opacity: 0.7 },
+    idle: { scale: 1, opacity: 0 },
     pulse: {
       scale: [1, 1.2, 1],
-      opacity: [0.7, 1, 0.7],
+      opacity: [0.7, 0.3, 0.7],
       transition: {
         duration: 1.5,
-        repeat: hasCriticalNotifications ? Infinity : 0,
-        ease: "easeInOut" as const,
+        repeat: Infinity,
+      },
+    },
+  };
+
+  const badgeVariants = {
+    hidden: { scale: 0, opacity: 0 },
+    visible: {
+      scale: 1,
+      opacity: 1,
+      transition: {
+        type: "spring" as const,
+        stiffness: 500,
+        damping: 30,
       },
     },
   };
@@ -45,15 +59,16 @@ const NotificationBell: React.FC = () => {
   return (
     <>
       {/* Critical Notification Banner */}
-      <CriticalNotificationBanner maxVisible={3} />
+      <CriticalNotificationBanner />
 
       {/* Notification Bell */}
-      <div className="relative">
+      <div className="relative group">
         <motion.button
-          onClick={() => setIsNotificationCenterOpen(true)}
+          onClick={() => navigate("/notification")}
           className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}>
+          whileTap={{ scale: 0.95 }}
+        >
           {/* Pulsing background for critical notifications */}
           {hasCriticalNotifications && (
             <motion.div
@@ -68,7 +83,8 @@ const NotificationBell: React.FC = () => {
           <motion.div
             variants={bellVariants}
             animate={hasCriticalNotifications ? "ring" : "idle"}
-            initial="idle">
+            initial="idle"
+          >
             {hasCriticalNotifications || hasHighPriorityNotifications ? (
               <BellRing className="w-6 h-6 relative z-10" />
             ) : (
@@ -79,33 +95,30 @@ const NotificationBell: React.FC = () => {
           {/* Notification count badge */}
           {unreadCount > 0 && (
             <motion.span
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0 }}
-              className={`absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 rounded-full min-w-[1.25rem] h-5 ${
+              className={`absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] text-xs font-bold text-white rounded-full z-20 ${
                 hasCriticalNotifications
-                  ? "bg-red-600 animate-pulse"
+                  ? "bg-red-600"
                   : hasHighPriorityNotifications
                   ? "bg-orange-500"
                   : "bg-blue-500"
-              }`}>
+              }`}
+              variants={badgeVariants}
+              initial="hidden"
+              animate="visible"
+            >
               {unreadCount > 99 ? "99+" : unreadCount}
             </motion.span>
           )}
 
-          {/* Critical notification indicator */}
-          {hasCriticalNotifications && (
+          {/* Priority indicator dot */}
+          {(hasCriticalNotifications || hasHighPriorityNotifications) && (
             <motion.div
-              className="absolute top-0 right-0 w-3 h-3 bg-red-600 rounded-full border-2 border-white"
-              animate={{
-                scale: [1, 1.2, 1],
-                opacity: [1, 0.7, 1],
-              }}
-              transition={{
-                duration: 1,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
+              className={`absolute top-0 right-0 w-3 h-3 rounded-full z-10 ${
+                hasCriticalNotifications ? "bg-red-600" : "bg-orange-500"
+              }`}
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2 }}
             />
           )}
         </motion.button>
@@ -124,12 +137,6 @@ const NotificationBell: React.FC = () => {
           )}
         </div>
       </div>
-
-      {/* Notification Center */}
-      <NotificationCenter
-        isOpen={isNotificationCenterOpen}
-        onClose={() => setIsNotificationCenterOpen(false)}
-      />
     </>
   );
 };

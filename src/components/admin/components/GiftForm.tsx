@@ -8,6 +8,8 @@ import {
   ICreateGiftData,
 } from "../../../server/api/giftHooks";
 import { IFetchProduct } from "../../../server/api/productHooks";
+import FileDropInput from "../../shared/form_components/FileDropInput";
+import { uploadFiles } from "../../../utils/uploadUtils";
 
 interface GiftFormProps {
   gift?: IFetchGift;
@@ -34,6 +36,16 @@ const GiftForm: React.FC<GiftFormProps> = ({ gift, onSuccess, onCancel, products
   );
   const [productSearch, setProductSearch] = useState("");
   const [showProductDropdown, setShowProductDropdown] = useState<number | null>(null);
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+
+  // Initialize existing images when editing
+  useEffect(() => {
+    if (gift?.images) {
+      // For editing mode, we'll show existing images in the FileDropInput
+      // The component will handle displaying them
+    }
+  }, [gift]);
 
   const createGiftMutation = useCreateGiftMutation();
   const updateGiftMutation = useUpdateGiftMutation();
@@ -75,6 +87,14 @@ const GiftForm: React.FC<GiftFormProps> = ({ gift, onSuccess, onCancel, products
     },
     onSubmit: async ({ value }) => {
       try {
+        setIsUploading(true);
+        
+        // Upload images if any are selected
+        let imageUrls: string[] = [];
+        if (selectedImages.length > 0) {
+          imageUrls = await uploadFiles(selectedImages, 'gift-image');
+        }
+        
         const giftData: ICreateGiftData = {
           name: value.name,
           description: value.description,
@@ -95,8 +115,8 @@ const GiftForm: React.FC<GiftFormProps> = ({ gift, onSuccess, onCancel, products
           isAvailable: value.isAvailable,
           stockType: value.stockType,
           totalStock: value.totalStock || undefined,
-          images: [],
-          featuredImage: value.featuredImage || undefined,
+          images: imageUrls,
+          featuredImage: imageUrls.length > 0 ? imageUrls[0] : (value.featuredImage || undefined),
           slug: value.slug || undefined,
           visibleAs: value.visibleAs,
           weight: value.weight || undefined,
@@ -121,6 +141,8 @@ const GiftForm: React.FC<GiftFormProps> = ({ gift, onSuccess, onCancel, products
         onSuccess();
       } catch (error) {
         console.error("Error saving gift:", error);
+      } finally {
+        setIsUploading(false);
       }
     },
   });
@@ -229,6 +251,30 @@ const GiftForm: React.FC<GiftFormProps> = ({ gift, onSuccess, onCancel, products
           </div>
         )}
       </form.Field>
+
+      {/* Image Upload Section */}
+      <div className="space-y-4">
+        <label className="block text-sm font-medium text-gray-700">
+          Gift Images
+        </label>
+        <FileDropInput
+          multiple={true}
+          value={selectedImages}
+          onChange={setSelectedImages}
+          maxFiles={10}
+          accept={{
+            'image/*': ['.jpeg', '.jpg', '.png', '.webp']
+          }}
+          existingFiles={gift?.images}
+          existingFileField="images"
+          form={form}
+        />
+        {selectedImages.length > 0 && (
+          <div className="text-sm text-gray-600">
+            {selectedImages.length} image(s) selected
+          </div>
+        )}
+      </div>
 
       {/* Occasion and Set Type */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -540,10 +586,12 @@ const GiftForm: React.FC<GiftFormProps> = ({ gift, onSuccess, onCancel, products
         </button>
         <button
           type="submit"
-          disabled={createGiftMutation.isPending || updateGiftMutation.isPending}
+          disabled={createGiftMutation.isPending || updateGiftMutation.isPending || isUploading}
           className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-          {createGiftMutation.isPending || updateGiftMutation.isPending
+          {isUploading
+            ? "Uploading images..."
+            : createGiftMutation.isPending || updateGiftMutation.isPending
             ? "Saving..."
             : gift
             ? "Update Gift"
