@@ -22,9 +22,6 @@ export const FrontendRoutes = {
   CUSTOMER: '/customer/customer-list',
   CUSTOMERDETAILS: '/customer/customer-details/:id',
   ADDCUSTOMER: '/customer/add-customer',
-  INVENTORY: '/inventory/inventory-overview',
-  PURCHASE: '/inventory/purchase',
-  PURCHASERETURN: '/inventory/purchase-return',
   SUPPLIERS: '/inventory/suppliers',
   ADDSUPPLIERS: '/inventory/suppliers/:page',
   SUPPLIERDETAIL: '/inventory/supplier/:id',
@@ -46,7 +43,7 @@ export const FrontendRoutes = {
 
   ORDER_REPORT: '/order-report',
   SALES_REPORT: '/sales-report',
-  STOCK_REPORT: '/stock-report',
+
 
   SETTINGS: '/settings',
   PROFILECONFIG: '/settings/profile-config',

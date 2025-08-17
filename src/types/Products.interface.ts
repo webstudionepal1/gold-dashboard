@@ -4,10 +4,6 @@ export interface ProductVariant {
   price: number;
   wt: number;
   unit: string;
-  totalStock: number;
-  usedStock: number;
-  remainingStock: number;
-  reorderPoint: number;
   costPrice?: number;
   isActive: boolean;
   createdAt?: Date;
@@ -53,11 +49,7 @@ export interface Product {
   onSale?: boolean;
   image?: string;
   status?: string;
-  inventory?: {
-    sku: number;
-    stockQty: number;
-    reorderLevel: number;
-  };
+
   specifications?: {
     length: string;
     claspType: string;

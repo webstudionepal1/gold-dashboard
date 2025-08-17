@@ -35,7 +35,7 @@ const NewProductForm: React.FC = () => {
       name: product.name || "",
       slug: "",
       description: product.description || "",
-      productType: get(product, 'productType','gold'), 
+      productType: get(product, "productType", "gold"),
       category:
         typeof product.category === "object"
           ? product.category._id
@@ -66,7 +66,7 @@ const NewProductForm: React.FC = () => {
       ]),
 
       // Stones and Occasions
-      stones: get(product, "stones",[]),
+      stones: get(product, "stones", []),
       otherCharges: get(product, "others", []).map(
         (item: { name: string; value: number }) => ({
           name: item.name,
@@ -78,13 +78,11 @@ const NewProductForm: React.FC = () => {
       images: [],
 
       // SEO & Marketing
-      visibleAs:
-        (product.visibleAs as
-          | "featured"
-          | "bestSellers"
-          | "newArrivals"
-          | "normal") || "normal",
-
+      visibleAs: Array.isArray(product.visibleAs)
+        ? product.visibleAs
+        : product.visibleAs
+          ? [product.visibleAs]
+          : [],
       // Status
       isActive: get(product, "isActive", true),
       isFeatured: get(product, "isFeatured", false),
@@ -191,7 +189,9 @@ const NewProductForm: React.FC = () => {
     // Status & Visibility - Only for non-normal products
     if (formData.productType !== "normal") {
       if (formData.visibleAs)
-        formDataObj.append("visibleAs", formData.visibleAs);
+        formData.visibleAs.forEach((element, index) => {
+          formDataObj.append(`visibleAs[${index}]`, element);
+        });
       if (formData.isActive !== undefined)
         formDataObj.append("isActive", formData.isActive.toString());
       if (formData.isFeatured !== undefined)

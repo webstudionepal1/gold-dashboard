@@ -13,7 +13,7 @@ import { ProductVariantsPage } from "./product-form-pages/ProductVariantsPage";
 import { ProductStonesOccasionsPage } from "./product-form-pages/ProductStonesOccasionsPage";
 import { ProductMediaPage } from "./product-form-pages/ProductMediaPage";
 import { ProductSEOMarketingPage } from "./product-form-pages/ProductSEOMarketingPage";
-import { ProductInventoryStatusPage } from "./product-form-pages/ProductInventoryStatusPage";
+
 
 // Define the steps for the stepper
 const FORM_STEPS: StepperStep[] = [
@@ -32,8 +32,8 @@ const FORM_STEPS: StepperStep[] = [
   {
     id: 3,
     title: "Variants",
-    description: "Pricing & Inventory",
-    icon: "material-symbols:inventory",
+    description: "Pricing & Details",
+    icon: "material-symbols:list",
   },
   {
     id: 4,
@@ -139,8 +139,8 @@ const MultiPageFormContent: React.FC<{
         return <ProductMediaPage />;
       // case 6:
       //   return <ProductSEOMarketingPage />;
-      case 6:
-        return <ProductInventoryStatusPage />;
+      // case 6:
+      //   return <ProductInventoryStatusPage />;
       default:
         return <BasicProductInformationPage />;
     }
@@ -258,6 +258,6 @@ export {
   ProductStonesOccasionsPage,
   ProductMediaPage,
   ProductSEOMarketingPage,
-  ProductInventoryStatusPage,
+  // ProductInventoryStatusPage,
   FORM_STEPS,
 };

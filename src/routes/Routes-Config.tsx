@@ -1,4 +1,3 @@
-
 import { DashboardPage } from "../pages/Dashboard/Dashboard";
 
 // import PurchaseReturn from "../pages/Inventory/PurchaseManagement/PurchaseReturn";
@@ -10,30 +9,24 @@ import ProductList from "../pages/Product/ProductList/ProductList";
 import Productsubcategory from "../pages/Product/ProductSubcategory/ProductSubCategory";
 import { FrontendRoutes } from "./routes";
 
-import NotificationAdminPanel from "../components/admin/NotificationAdminPanel";
 import GiftsAdminPanel from "../components/admin/GiftsAdminPanel";
+import NotificationAdminPanel from "../components/admin/NotificationAdminPanel";
 import NotificationTest from "../components/test/NotificationTest";
 import BannerIndex from "../pages/Banner/BannerIndex";
 import AddBannerForm from "../pages/Banner/Components/AddBannerForm";
 import NotificationIndex from "../pages/Notification/NotificationIndex";
-import OrderIndex from "../pages/OrderManagement/Order/OrderIndex";
 
 // import AddCustomerForm from "../pages/Customer/components/AddCustomerForm";
-import Transaction from "../pages/transaction/Transaction";
 
 import BlogAnalytics from "@/pages/Blog/BlogAnalytics/BlogAnalytics";
 import BlogEditor from "@/pages/Blog/BlogEditor/BlogEditor";
 import BlogList from "@/pages/Blog/BlogList/BlogList";
 import BlogView from "@/pages/Blog/BlogView/BlogView";
-import Calculator from "@/pages/settings/calculator/Calculator";
-import CalculatorIndex from "@/pages/settings/calculator/CalculatorIndex";
-import OrderDetails from "../pages/OrderManagement/Order/OrderDetails";
 import NewProductForm from "../pages/Product/components/NewProductForm";
 import ProductImageDemo from "../pages/Product/ProductImageDemo";
 import ProductForm from "../pages/Product/ProductList/component/ProductForm";
 import AttribConfig from "../pages/settings/components/AttribConfig";
 import EditProfileForm from "../pages/settings/ProfileConfig/EditProfileForm";
-import TestUpload from "../pages/TestUpload";
 // import BlogList from "@/pages/Blog/BlogList/BlogList";
 // import BlogEditor from "@/pages/Blog/BlogEditor/BlogEditor";
 // import BlogView from "@/pages/Blog/BlogView/BlogView";
@@ -64,6 +57,10 @@ export const routesConfig = [
   {
     path: "/attribs",
     element: <AttribConfig />,
+  },
+  {
+    path: "/settings/profile-config",
+    element: <EditProfileForm />,
   },
   // {
   //   path: "/order/assigned-order-details/:id",
@@ -129,7 +126,7 @@ export const routesConfig = [
     path: "/product/image-demo",
     element: <ProductImageDemo />,
   },
-  
+
   // {
   //   path: FrontendRoutes.CUSTOMER,
   //   element: <CustomerIndex />,
@@ -137,10 +134,10 @@ export const routesConfig = [
   // {
   //   // path: "/customer/customer-details/:id",
   //   path: FrontendRoutes.CUSTOMERDETAILS,
-    
+
   //   element: <CustomerDetails />,
   // },
-  
+
   // Banner
   {
     path: FrontendRoutes.BANNER,
@@ -150,20 +147,19 @@ export const routesConfig = [
     path: "/banner/:id",
     element: <AddBannerForm />,
   },
-  
-  
-  {
-    path: FrontendRoutes.NOTIFICATION,
-    element: <NotificationIndex />,
-  },
-  {
-    path: "/notification-test",
-    element: <NotificationTest />,
-  },
-  {
-    path: "/notification-admin",
-    element: <NotificationAdminPanel />,
-  },
+
+  // {
+  //   path: FrontendRoutes.NOTIFICATION,
+  //   element: <NotificationIndex />,
+  // },
+  // {
+  //   path: "/notification-test",
+  //   element: <NotificationTest />,
+  // },
+  // {
+  //   path: "/notification-admin",
+  //   element: <NotificationAdminPanel />,
+  // },
   {
     path: FrontendRoutes.GIFTS,
     element: <GiftsAdminPanel />,

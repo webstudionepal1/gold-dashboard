@@ -69,7 +69,7 @@ export interface ProductFormData {
 
   // Page 6: SEO & Marketing
   tags: string[];
-  visibleAs: "featured" | "bestSellers" | "newArrivals" | "normal";
+  visibleAs: string[];
   metadata?: {
     seoTitle?: string;
     seoDescription?: string;
@@ -136,7 +136,7 @@ const defaultFormData: ProductFormData = {
   name: "",
   slug: "",
   description: "",
-  productType: 'gold',
+  productType: "gold",
   category: "",
   subCategory: "",
 
@@ -179,7 +179,7 @@ const defaultFormData: ProductFormData = {
 
   // Page 6: SEO & Marketing
   tags: [],
-  visibleAs: "normal",
+  visibleAs: ["normal"],
   metadata: {
     seoTitle: "",
     seoDescription: "",

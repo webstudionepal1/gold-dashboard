@@ -2,12 +2,7 @@ import React, { useState } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { InputField } from "../InputField";
 import { TextareaField } from "../TextArea";
-import { DropdownField } from "../Dropdown";
 import { useProductForm } from "../ProductFormContext";
-import {
-  useGetAllStonesQuery,
-  useGetAllProductOccasionsQuery,
-} from "../../../../server/api/productHooks";
 
 // Visibility options
 const visibilityOptions = [
@@ -363,22 +358,75 @@ export const ProductSEOMarketingPage: React.FC = () => {
               </p>
             </div>
 
-            {/* Visibility */}
+            {/* Visibility - Multiple Selection */}
             <div className="space-y-2">
-              <DropdownField
-                label="Product Visibility"
-                firstInput="Select visibility level"
-                required
-                options={visibilityOptions}
-                value={formData.visibleAs}
-                onChange={(e) => {
-                  updateFormData({
-                    visibleAs: e.target.value as typeof formData.visibleAs,
-                  });
-                }}
-              />
+              <label className="block text-sm font-medium text-gray-700">
+                Product Visibility <span className="text-red-500">*</span>
+              </label>
+              <div className="space-y-2">
+                {visibilityOptions.map((option) => (
+                  <div key={option.value} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id={`visibility-${option.value}`}
+                      checked={formData.visibleAs.includes(option.value)}
+                      onChange={(e) => {
+                        const currentVisibility = [...formData.visibleAs];
+                        if (e.target.checked) {
+                          // Add to array if not already present
+                          if (!currentVisibility.includes(option.value)) {
+                            currentVisibility.push(option.value);
+                          }
+                        } else {
+                          // Remove from array
+                          const index = currentVisibility.indexOf(option.value);
+                          if (index > -1) {
+                            currentVisibility.splice(index, 1);
+                          }
+                        }
+                        updateFormData({ visibleAs: currentVisibility });
+                      }}
+                      className="h-4 w-4 text-[#DF8D28] focus:ring-[#DF8D28] border-gray-300 rounded"
+                    />
+                    <label
+                      htmlFor={`visibility-${option.value}`}
+                      className="ml-2 text-sm text-gray-700 cursor-pointer"
+                    >
+                      {option.label}
+                    </label>
+                  </div>
+                ))}
+              </div>
+              {formData.visibleAs.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {formData.visibleAs.map((visibility, index) => {
+                    const option = visibilityOptions.find(opt => opt.value === visibility);
+                    return (
+                      <span
+                        key={index}
+                        className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm"
+                      >
+                        {option?.label || visibility}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newVisibility = formData.visibleAs.filter((_, i) => i !== index);
+                            updateFormData({ visibleAs: newVisibility });
+                          }}
+                          className="text-purple-600 hover:text-purple-800"
+                        >
+                          <Icon
+                            icon="material-symbols:close"
+                            className="w-3 h-3"
+                          />
+                        </button>
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
               <p className="text-sm text-gray-500">
-                Controls where and how prominently your product appears
+                Select multiple visibility levels where your product should appear
               </p>
             </div>
           </div>

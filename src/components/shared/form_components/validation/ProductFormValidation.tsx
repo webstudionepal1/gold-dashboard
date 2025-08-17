@@ -4,7 +4,9 @@ import * as z from "zod";
 
 // Wastage Schema
 export const wastageSchema = z.object({
-  type: z.enum(["fixed", "per"], { required_error: "Wastage type is required" }),
+  type: z.enum(["fixed", "per"], {
+    required_error: "Wastage type is required",
+  }),
   value: z.number().min(0, "Wastage value cannot be negative"),
 });
 
@@ -30,7 +32,7 @@ export const basicProductInformationSchema = z.object({
     .max(2000, "Description cannot exceed 2000 characters")
     .trim(),
   productType: z.enum(["normal", "gold", "silver"], {
-    required_error: "Product type is required"
+    required_error: "Product type is required",
   }),
   category: z.string().optional(),
   subCategory: z.string().optional(),
@@ -109,7 +111,7 @@ export const productSEOMarketingSchema = z.object({
   tags: z
     .array(z.string().min(1, "Tag cannot be empty"))
     .min(1, "At least one tag is required"),
-  visibleAs: z.enum(["featured", "bestSellers", "newArrivals", "normal"]),
+  visibleAs: z.array(z.string()),
   metadata: z
     .object({
       seoTitle: z
@@ -192,7 +194,8 @@ export const stepValidationSchemas = {
 
 // Helper function to validate a specific step
 export const validateStep = (step: number, data: any) => {
-  const schema = stepValidationSchemas[step as keyof typeof stepValidationSchemas];
+  const schema =
+    stepValidationSchemas[step as keyof typeof stepValidationSchemas];
   if (!schema) {
     return { success: true, errors: [] };
   }
@@ -210,7 +213,10 @@ export const validateStep = (step: number, data: any) => {
         })),
       };
     }
-    return { success: false, errors: [{ path: "", message: "Validation error" }] };
+    return {
+      success: false,
+      errors: [{ path: "", message: "Validation error" }],
+    };
   }
 };
 
@@ -280,7 +286,9 @@ export const getStepInfo = (step: number) => {
     },
   };
 
-  return stepInfo[step as keyof typeof stepInfo] || { title: "", description: "" };
+  return (
+    stepInfo[step as keyof typeof stepInfo] || { title: "", description: "" }
+  );
 };
 
 // Conditional validation schema based on product type requirements
@@ -293,7 +301,7 @@ export const conditionalProductFormSchema = z
       .max(200, "Product name cannot exceed 200 characters")
       .trim(),
     productType: z.enum(["normal", "gold", "silver"], {
-      required_error: "Product type is required"
+      required_error: "Product type is required",
     }),
     description: z
       .string()

@@ -34,15 +34,7 @@ export interface IFetchCategory extends IProductCategory {
   _id: string;
   name: string;
 }
-export interface StockItem {
-  usedStock: number;
-  price: number;
-  unit: string;
-  _id: string;
-  wt: number;
-  remainingStock: number;
-  totalStock: number;
-}
+
 
 export interface IBaseProduct {
   _id?: string;
@@ -55,10 +47,6 @@ export interface IBaseProduct {
     price?: number;
     wt?: number;
     unit?: string;
-    totalStock?: number;
-    usedStock?: number;
-    remainingStock?: number;
-    reorderPoint?: number;
   }>;
   makingCharges?: number;
   length?: number;
@@ -92,10 +80,6 @@ export interface IFetchProduct {
       price: number;
       wt: number;
       unit: string;
-      totalStock: number;
-      usedStock: number;
-      remainingStock: number;
-      reorderPoint: number;
     }
   ];
   makingCharges: number;
@@ -164,8 +148,6 @@ export const useGetAllProductsQuery = (params: IParams = {}) => {
       }>("search", {
         params: {
           ...params,
-          inStock: true, // Keep your existing stock filter
-          includeAll: true, // Add this to get both active and inactive products
         },
       });
       return res?.data?.data;
