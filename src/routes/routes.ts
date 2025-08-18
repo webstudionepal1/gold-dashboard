@@ -27,12 +27,12 @@ export const FrontendRoutes = {
   SUPPLIERDETAIL: '/inventory/supplier/:id',
   SUPPLIERHISTORY: '/inventory/suppliers/supplier-history',
 
-  BANNER: "/banner",
-  ADDBANNER: "/banner/add-banner",
-  NOTIFICATION: "/notification",
-  MYPOSTBUSINESS: "/my-post-business",
+  BANNER: '/banner',
+  ADDBANNER: '/banner/add-banner',
+  NOTIFICATION: '/notification',
+  MYPOSTBUSINESS: '/my-post-business',
 
-  GIFTS: "/gifts",
+  GIFTS: '/gifts',
 
   TRANSACTION: '/transaction',
   VERIFY_CASH: '/transaction/verify-cash-payment',
@@ -44,7 +44,6 @@ export const FrontendRoutes = {
   ORDER_REPORT: '/order-report',
   SALES_REPORT: '/sales-report',
 
-
   SETTINGS: '/settings',
   PROFILECONFIG: '/settings/profile-config',
 
@@ -55,4 +54,6 @@ export const FrontendRoutes = {
   EDITBLOG: '/blog/edit/:id',
   BLOGDETAILS: '/blog/details/:id',
   BLOGANALYTICS: '/blog/analytics',
+
+  CONTACTUS: '/contact-us',
 };
