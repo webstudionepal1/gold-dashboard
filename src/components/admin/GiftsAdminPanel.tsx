@@ -16,6 +16,7 @@ import MasterTable from "../shared/MasterTable";
 import Header from "../shared/table_heading/Header";
 
 import { giftColumns, GiftTableRow } from "./giftObj";
+import { calculateGiftPrices, formatPrice } from "../../utils/giftPriceCalculator";
 
 const GiftsAdminPanel: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"gifts" | "packages">("gifts");
@@ -124,18 +125,32 @@ const GiftsAdminPanel: React.FC = () => {
           )}
         </div>
       ),
-      pricing: (
-        <div>
-          <div className="font-medium">
-            NRS {(gift.finalPrice || gift.totalPrice || 0).toLocaleString()}
+      pricing: (() => {
+        const calculatedPrices = calculateGiftPrices(gift);
+        return (
+          <div>
+            {calculatedPrices.hasValidProducts ? (
+              <>
+                <div className="font-medium text-green-600">
+                  {formatPrice(calculatedPrices.totalDiscountedPrice)}
+                </div>
+                {gift.discountPercentage && gift.discountPercentage > 0 && (
+                  <div className="text-sm text-orange-600">
+                    {gift.discountPercentage}% off
+                  </div>
+                )}
+                <div className="text-xs text-gray-500">
+                  Original: {formatPrice(calculatedPrices.totalOriginalPrice)}
+                </div>
+              </>
+            ) : (
+              <div className="text-red-600 text-sm">
+                ⚠ No Price Data
+              </div>
+            )}
           </div>
-          {gift.discountPercentage && gift.discountPercentage > 0 && (
-            <div className="text-sm text-green-600">
-              {gift.discountPercentage}% off
-            </div>
-          )}
-        </div>
-      ),
+        );
+      })(),
       _originalData: gift,
     }));
   };
@@ -181,6 +196,8 @@ const GiftsAdminPanel: React.FC = () => {
           Create Gift
         </button>
       </Header>
+
+
 
       <div className="p-3 bg-white border-2 rounded-lg">
         <MasterTable

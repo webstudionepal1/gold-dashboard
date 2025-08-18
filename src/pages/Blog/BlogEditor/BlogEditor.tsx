@@ -6,7 +6,6 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import "./BlogEditor.css";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { toast } from "react-toastify";
 
 import { Button } from "../../../components/ui/button";
 import Header from "../../../components/shared/table_heading/Header";
@@ -440,7 +439,8 @@ const BlogEditor: React.FC = () => {
         </div>
       </Header>
 
-      <div className="max-full mx-auto">
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
         <form
           id="blog-form"
           onSubmit={(e) => {
@@ -605,7 +605,7 @@ const BlogEditor: React.FC = () => {
                     Blog Content
                   </h3>
                 </div>
-                <div className="border border-gray-300 rounded overflow-hidden">
+                <div className="border border-gray-300 rounded overflow-hidden max-w-full">
                   <ReactQuill
                     theme="snow"
                     value={formik.values.content}
@@ -618,6 +618,7 @@ const BlogEditor: React.FC = () => {
                     placeholder="Write your blog content here..."
                     style={{
                       minHeight: "280px",
+                      maxWidth: "100%",
                     }}
                   />
                 </div>
@@ -655,7 +656,10 @@ const BlogEditor: React.FC = () => {
                 <div className="flex justify-between mt-1">
                   {formik.touched.excerpt && formik.errors.excerpt && (
                     <p className="text-xs text-red flex items-center gap-1">
-                      <Icon icon="material-symbols:error" className="w-3 h-3" />
+                      <Icon
+                        icon="material-symbols:error"
+                        className="w-3 h-3"
+                      />
                       {formik.errors.excerpt}
                     </p>
                   )}

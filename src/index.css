@@ -2,6 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Prevent overscroll behavior */
+html {
+  overscroll-behavior: none;
+  overflow-y: hidden;
+}
+
+body {
+  overscroll-behavior: none;
+  overflow-y: hidden;
+}
+
+#root {
+  overscroll-behavior: none;
+  overflow-y: hidden;
+}
+
 @font-face {
   font-family: "Dm Sans";
   src: url("/fonts/DMSans-Light.ttf") format("ttf");
@@ -70,6 +86,7 @@
   font-family: "Dm Sans" inherit;
   /* overflow: auto; */
   padding: 0;
+  max-width: 100%;
 }
 
 /* Hide scrollbar globally (except ProductList) */
@@ -106,6 +123,7 @@ button,
 textarea,
 select {
   font: inherit;
+  max-width: 100%;
 }
 blockquote,
 dl,
@@ -124,6 +142,7 @@ pre {
   margin: 0;
   box-sizing: border-box;
   text-decoration: none !important;
+  max-width: 100%;
 }
 blockquote,
 dl,
@@ -142,6 +161,7 @@ pre {
   margin: 0;
   box-sizing: border-box;
   text-decoration: none !important;
+  max-width: 100%;
 }
 
 ul,

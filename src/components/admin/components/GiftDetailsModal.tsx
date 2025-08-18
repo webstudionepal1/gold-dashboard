@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { IFetchGift } from "../../../server/api/giftHooks";
 import SafeImage from "../../ui/SafeImage";
+import { calculateGiftPrices, formatPrice, getGiftPricingSummary } from "../../../utils/giftPriceCalculator";
 
 interface GiftDetailsModalProps {
   gift: IFetchGift;
@@ -18,13 +19,8 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      minimumFractionDigits: 0,
-    }).format(price);
-  };
+  // Get calculated prices using utility function
+  const calculatedPrices = calculateGiftPrices(gift);
 
   // Handle image modal
   const openImageModal = (index: number) => {
@@ -47,6 +43,21 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
 
   return (
     <div className="space-y-8">
+      {/* Pricing Status Summary */}
+      {!calculatedPrices.hasValidProducts && (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+          <div className="flex items-center">
+            <Icon icon="material-symbols:error" className="w-6 h-6 text-red-600 mr-3" />
+            <div>
+              <h4 className="text-lg font-medium text-red-800">Gift Pricing Issue</h4>
+              <p className="text-red-700 mt-1">
+                This gift cannot display pricing information. Please check that all products are active and have valid pricing data.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header with gradient background */}
       <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6">
         <div className="flex items-start justify-between">
@@ -122,32 +133,63 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
           <div className="w-2 h-6 bg-green-500 rounded-full mr-3"></div>
           Pricing Information
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white rounded-lg p-4 shadow-sm">
-            <label className="block text-sm font-medium text-gray-500 mb-2">
-              Total Price
-            </label>
-            <p className="text-2xl font-bold text-gray-900">
-              {formatPrice(gift?.totalPrice || 0)}
-            </p>
+        
+        {!calculatedPrices.hasValidProducts ? (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <div className="flex items-center">
+              <Icon icon="material-symbols:warning" className="w-6 h-6 text-yellow-600 mr-3" />
+              <div>
+                <h4 className="text-lg font-medium text-yellow-800">Price Calculation Issue</h4>
+                <p className="text-yellow-700 mt-1">
+                  Unable to calculate gift price. This may be due to inactive products or missing product data.
+                </p>
+              </div>
+            </div>
           </div>
-          <div className="bg-white rounded-lg p-4 shadow-sm">
-            <label className="block text-sm font-medium text-gray-500 mb-2">
-              Discount
-            </label>
-            <p className="text-2xl font-bold text-orange-600">
-              {gift?.discountPercentage || 0}%
-            </p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white rounded-lg p-4 shadow-sm">
+              <label className="block text-sm font-medium text-gray-500 mb-2">Total Original Price</label>
+              <p className="text-2xl font-bold text-gray-900">{formatPrice(calculatedPrices.totalOriginalPrice)}</p>
+              <p className="text-sm text-gray-500 mt-1">Based on product prices</p>
+            </div>
+            <div className="bg-white rounded-lg p-4 shadow-sm">
+              <label className="block text-sm font-medium text-gray-500 mb-2">Discount</label>
+              <p className="text-2xl font-bold text-orange-600">{gift.discountPercentage || 0}%</p>
+              <p className="text-sm text-gray-500 mt-1">Applied discount</p>
+            </div>
+            <div className="bg-white rounded-lg p-4 shadow-sm border-2 border-green-200">
+              <label className="block text-sm font-medium text-gray-500 mb-2">Final Price</label>
+              <p className="text-3xl font-bold text-green-600">{formatPrice(calculatedPrices.totalDiscountedPrice)}</p>
+              <p className="text-sm text-gray-500 mt-1">After discount</p>
+            </div>
           </div>
-          <div className="bg-white rounded-lg p-4 shadow-sm border-2 border-green-200">
-            <label className="block text-sm font-medium text-gray-500 mb-2">
-              Final Price
-            </label>
-            <p className="text-3xl font-bold text-green-600">
-              {formatPrice(gift.finalPrice || 0)}
-            </p>
+        )}
+
+        {/* Price Breakdown */}
+        {calculatedPrices.hasValidProducts && (
+          <div className="mt-6 bg-white rounded-lg p-4 border border-gray-200">
+            <h4 className="text-lg font-medium text-gray-900 mb-3">Price Breakdown</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Original Price:</span>
+                <span className="font-medium">{formatPrice(calculatedPrices.totalOriginalPrice)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Discount Amount:</span>
+                <span className="font-medium text-orange-600">-{formatPrice(calculatedPrices.savings)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Final Price:</span>
+                <span className="font-medium text-green-600">{formatPrice(calculatedPrices.totalDiscountedPrice)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Total Savings:</span>
+                <span className="font-medium text-green-600">{formatPrice(calculatedPrices.savings)}</span>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Gift Details */}
@@ -264,18 +306,35 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
             <div className="w-2 h-6 bg-orange-500 rounded-full mr-3"></div>
             Products
           </h3>
-          <div className="flex items-center space-x-2 px-4 py-2 bg-orange-50 rounded-lg">
-            <Icon
-              icon="material-symbols:shopping-bag"
-              className="w-5 h-5 text-orange-600"
-            />
-            <span className="text-lg font-bold text-orange-600">
-              {gift?.products?.length || 0}
-            </span>
-            <span className="text-sm text-orange-600">items</span>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 px-4 py-2 bg-orange-50 rounded-lg">
+              <Icon icon="material-symbols:shopping-bag" className="w-5 h-5 text-orange-600" />
+              <span className="text-lg font-bold text-orange-600">{gift.products?.length || 0}</span>
+              <span className="text-sm text-orange-600">items</span>
+            </div>
+            {calculatedPrices.hasValidProducts && (
+              <div className="flex items-center space-x-2 px-4 py-2 bg-green-50 rounded-lg border border-green-200">
+                <Icon icon="material-symbols:calculate" className="w-5 h-5 text-green-600" />
+                <span className="text-sm text-green-600">Total Value:</span>
+                <span className="text-lg font-bold text-green-600">{formatPrice(calculatedPrices.totalOriginalPrice)}</span>
+              </div>
+            )}
           </div>
         </div>
         <div className="space-y-6">
+          {!calculatedPrices.hasValidProducts && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="flex items-center">
+                <Icon icon="material-symbols:error" className="w-6 h-6 text-red-600 mr-3" />
+                <div>
+                  <h4 className="text-lg font-medium text-red-800">No Valid Products Found</h4>
+                  <p className="text-red-700 mt-1">
+                    All products in this gift are either inactive or missing pricing information. Please check product status and pricing data.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
           {gift.products?.map((giftProduct, index) => (
             <div
               key={index}
@@ -283,32 +342,39 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
-                  <h4 className="font-semibold text-gray-900">
-                    {giftProduct?.product?.name}
-                  </h4>
-                  <p className="text-sm text-gray-600 mt-1">
-                    {giftProduct.product.description}
-                  </p>
-                  <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
-                    <span>Category: {giftProduct?.product?.category?.name}</span>
-                    <span>
-                      Subcategory: {giftProduct?.product?.subCategory?.name}
-                    </span>
-                  </div>
+                  <h4 className="font-semibold text-gray-900">{giftProduct.product.name}</h4>
+                  <p className="text-sm text-gray-600 mt-1">{giftProduct.product.description}</p>
+                                <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
+                <span>Category: {giftProduct.product.category.name}</span>
+                <span>Subcategory: {giftProduct.product.subCategory.name}</span>
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                  giftProduct.product.isActive && giftProduct.product.variant?.[0]?.price
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-red-100 text-red-700'
+                }`}>
+                  {giftProduct.product.isActive && giftProduct.product.variant?.[0]?.price
+                    ? '✓ Priced'
+                    : '⚠ No Price'
+                  }
+                </span>
+              </div>
                 </div>
-                <div className="text-right ml-4">
-                  <div className="text-lg font-semibold text-gray-900">
-                    {formatPrice(giftProduct?.product?.variant[0]?.price || 0)}
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    Qty: {giftProduct?.quantity}
-                  </div>
-                  {giftProduct?.isOptional && (
-                    <span className="inline-block px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-md mt-1">
-                      Optional
-                    </span>
-                  )}
+                              <div className="text-right ml-4">
+                <div className="text-lg font-semibold text-gray-900">
+                  {formatPrice(giftProduct.product.variant[0]?.price || 0)}
                 </div>
+                <div className="text-sm text-gray-500">
+                  Qty: {giftProduct.quantity}
+                </div>
+                <div className="text-sm font-medium text-green-600 mt-1">
+                  Total: {formatPrice((giftProduct.product.variant[0]?.price || 0) * giftProduct.quantity)}
+                </div>
+                {giftProduct.isOptional && (
+                  <span className="inline-block px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-md mt-1">
+                    Optional
+                  </span>
+                )}
+              </div>
               </div>
 
               {/* Product Details */}
@@ -340,32 +406,53 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
                 </div>
               </div>
 
-              {/* Alternative Products */}
-              {giftProduct.alternativeProducts &&
-                giftProduct.alternativeProducts.length > 0 && (
-                  <div className="mt-3 pt-3 border-t border-gray-100">
-                    <h5 className="text-sm font-medium text-gray-700 mb-2">
-                      Alternative Products:
-                    </h5>
-                    <div className="space-y-2">
-                      {giftProduct.alternativeProducts.map(
-                        (altProduct, altIndex) => (
-                          <div
-                            key={altIndex}
-                            className="flex items-center justify-between text-sm bg-gray-50 rounded p-2"
-                          >
-                            <span className="font-medium">
-                              {altProduct?.name}
-                            </span>
-                            <span className="text-gray-600">
-                              {formatPrice(altProduct?.variant[0]?.price || 0)}
-                            </span>
-                          </div>
-                        )
-                      )}
+              {/* Price Breakdown for this product */}
+              {calculatedPrices.productBreakdown[index]?.status === "calculated" && (
+                <div className="mt-3 pt-3 border-t border-gray-100 bg-blue-50 rounded-lg p-3">
+                  <h5 className="text-sm font-medium text-blue-800 mb-2">Price Breakdown:</h5>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+                    <div className="flex justify-between">
+                      <span className="text-blue-600">Base Price:</span>
+                      <span className="font-medium">{formatPrice(calculatedPrices.productBreakdown[index].basePrice)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-blue-600">Making:</span>
+                      <span className="font-medium">{formatPrice(calculatedPrices.productBreakdown[index].makingCharges)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-blue-600">Wastage:</span>
+                      <span className="font-medium">{formatPrice(calculatedPrices.productBreakdown[index].wastageCost)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-blue-600">Stones:</span>
+                      <span className="font-medium">{formatPrice(calculatedPrices.productBreakdown[index].stonesCost)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-blue-600">Others:</span>
+                      <span className="font-medium">{formatPrice(calculatedPrices.productBreakdown[index].othersCost)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-blue-600">Per Unit:</span>
+                      <span className="font-medium font-semibold">{formatPrice(calculatedPrices.productBreakdown[index].pricePerUnit)}</span>
                     </div>
                   </div>
-                )}
+                </div>
+              )}
+
+              {/* Alternative Products */}
+              {giftProduct.alternativeProducts && giftProduct.alternativeProducts.length > 0 && (
+                <div className="mt-3 pt-3 border-t border-gray-100">
+                  <h5 className="text-sm font-medium text-gray-700 mb-2">Alternative Products:</h5>
+                  <div className="space-y-2">
+                    {giftProduct.alternativeProducts.map((altProduct, altIndex) => (
+                      <div key={altIndex} className="flex items-center justify-between text-sm bg-gray-50 rounded p-2">
+                        <span className="font-medium">{altProduct.name}</span>
+                        <span className="text-gray-600">{formatPrice(altProduct.variant[0]?.price || 0)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Product Images */}
               {giftProduct.product.images &&

@@ -73,7 +73,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
   const stones = get(product, "stones", []);
 
   // Check product type
-  const productType = get(product, "productType", "gold").toLowerCase();
+  const productType = (get(product, "productType", "gold") || "gold").toLowerCase();
   const isNormalProduct = productType === "normal";
   const isGoldOrSilver = productType === "gold" || productType === "silver";
   const hasGemstones = stones && stones.length > 0;
@@ -120,7 +120,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
             {/* Inline Price Display */}
             {get(product, "variant[0].price") && (
               <div className="bg-green-50 text-green-800 px-3 py-2 rounded-lg font-bold">
-                ₹{get(product, "variant[0].price", 0).toLocaleString()}
+                ₹{(get(product, "variant[0].price", 0) || 0).toLocaleString()}
               </div>
             )}
           </div>
@@ -139,19 +139,19 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
   // Build specifications conditionally
   const specifications: { [key: string]: string } = {
     "Making Charges": get(product, "makingCharges", 0)
-      ? `Rs ${get(product, "makingCharges", 0).toLocaleString()}`
+      ? `Rs ${(get(product, "makingCharges", 0) || 0).toLocaleString()}`
       : "Rs 0",
     "Rhodoum Finishes": get(product, "rhodoumFinishes", false) ? "Yes" : "No",
   };
 
   // Add length if available
   if (get(product, "length", 0)) {
-    specifications["Length"] = `${get(product, "length", 0)} mm`;
+    specifications["Length"] = `${get(product, "length", 0) || 0} mm`;
   }
 
   // Add dimension if available
   if (get(product, "dimension", 0)) {
-    specifications["Dimension"] = `${get(product, "dimension", 0)} mm`;
+    specifications["Dimension"] = `${get(product, "dimension", 0) || 0} mm`;
   }
 
   // Add clasp type only for jewelry items (not for loose stones/gems)
@@ -170,10 +170,10 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
   if (isGemstoneProduct) {
     if (isGoldOrSilver && hasTotalCarat) {
       // For gold/silver with gemstones, show karat
-      gemstoneInfo["Total Karat"] = `${get(product, "totalCarat", 0)} kt`;
+      gemstoneInfo["Total Karat"] = `${get(product, "totalCarat", 0) || 0} kt`;
     } else if (hasTotalCarat) {
       // For pure gemstones, show carat
-      gemstoneInfo["Total Carat"] = `${get(product, "totalCarat", 0)} ct`;
+      gemstoneInfo["Total Carat"] = `${get(product, "totalCarat", 0) || 0} ct`;
     }
 
     if (get(product, "color")) {
@@ -185,13 +185,14 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
     }
 
     if (get(product, "quantity", 0)) {
-      gemstoneInfo["Quantity"] = get(product, "quantity", 0).toString();
+      const quantity = get(product, "quantity", 0);
+      gemstoneInfo["Quantity"] = quantity ? quantity.toString() : "0";
     }
   }
 
   // Get wastage info
   const wastageInfo = get(product, "wastage");
-  const wastageDisplay = wastageInfo
+  const wastageDisplay = wastageInfo && wastageInfo.value !== undefined && wastageInfo.type
     ? `${wastageInfo.value}${wastageInfo.type === "per" ? "%" : " (flat)"}`
     : "-";
 
@@ -255,14 +256,14 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
         {/* Compact Tags and Wastage in same row */}
         <div className="flex items-center justify-between gap-4">
           {/* Tags */}
-          {product.tags && product.tags.length > 0 && (
+          {product.tags && Array.isArray(product.tags) && product.tags.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {product.tags.slice(0, 4).map((tag, index) => (
                 <span
                   key={index}
                   className="px-2 py-1 text-xs font-medium text-blue-700 bg-blue-50 rounded-full"
                 >
-                  #{tag.replace(/\s+/g, "")}
+                  #{tag && typeof tag === 'string' ? tag.replace(/\s+/g, "") : 'tag'}
                 </span>
               ))}
               {product.tags.length > 4 && (
@@ -352,17 +353,17 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
                 >
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="font-semibold text-gray-800 capitalize text-sm">
-                      {stone.name}
+                      {stone.name || 'Unnamed Stone'}
                     </h4>
                     <span className="px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded-full">
-                      {stone.color}
+                      {stone.color || 'N/A'}
                     </span>
                   </div>
                   <div className="flex justify-between text-xs">
                     <span className="text-gray-600">
-                      Weight: <span className="font-medium text-gray-900">{stone.weight.toString().concat(' Carat')}</span>
+                      Weight: <span className="font-medium text-gray-900">{stone.weight ? stone.weight.toString().concat(' Carat') : 'N/A'}</span>
                     </span>
-                    <span className="font-medium text-green-600">₹{stone.price}</span>
+                    <span className="font-medium text-green-600">₹{stone.price || 'N/A'}</span>
                   </div>
                 </div>
               ))}
@@ -392,10 +393,10 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-medium text-gray-800 capitalize text-sm">
-                      {charge.name}
+                      {charge.name || 'Unnamed Charge'}
                     </span>
                     <span className="font-bold text-green-600 text-sm">
-                      ₹{charge.value.toLocaleString()}
+                      ₹{(charge.value || 0).toLocaleString()}
                     </span>
                   </div>
                 </div>
@@ -407,7 +408,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
                   Total Additional Charges:
                 </span>
                 <span className="font-bold text-base text-green-600">
-                  ₹{otherCharges.reduce((sum, charge) => sum + charge.value, 0).toLocaleString()}
+                  ₹{otherCharges.reduce((sum, charge) => sum + (charge.value || 0), 0).toLocaleString()}
                 </span>
               </div>
             </div>

@@ -22,16 +22,16 @@ export default function App() {
 
   return (
     <SidebarProvider>
-      <div className="flex max-h-screen h-full overflow-y-auto">
+      <div className="flex max-h-screen h-full overflow-hidden">
         <Sidebar config={SidebarConfig} />
-        <SidebarInset className="max-h-screen px-2 space-y-2 overflow-y-auto bg-gray-50">
+        <SidebarInset className="max-h-screen px-2 space-y-2 overflow-y-auto overflow-x-hidden bg-gray-50">
           {/* Critical Notification Banner - Re-enabled after fixing infinite loop issues */}
           <CriticalNotificationBanner />
 
           <Navbar />
 
           {/* Page Content */}
-          <main className="flex-1">
+          <main className="flex-1 overflow-x-hidden">
             <Outlet />
           </main>
         </SidebarInset>
