@@ -1,35 +1,35 @@
-import { useForm, useStore } from "@tanstack/react-form";
-import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import * as z from "zod";
+import { useForm, useStore } from '@tanstack/react-form';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import * as z from 'zod';
 
-import Breadcrumbs from "../../../components/shared/Breadcrumb";
-import { DropdownField } from "../../../components/shared/form_components/Dropdown";
-import { DropdownTagField } from "../../../components/shared/form_components/DropdownTags";
-import MultiImageUploader from "../../../components/shared/form_components/FileDropInput";
-import { InputField } from "../../../components/shared/form_components/InputField";
-import Header from "../../../components/shared/table_heading/Header";
+import Breadcrumbs from '../../../components/shared/Breadcrumb';
+import { DropdownField } from '../../../components/shared/form_components/Dropdown';
+import { DropdownTagField } from '../../../components/shared/form_components/DropdownTags';
+import MultiImageUploader from '../../../components/shared/form_components/FileDropInput';
+import { InputField } from '../../../components/shared/form_components/InputField';
+import Header from '../../../components/shared/table_heading/Header';
 import {
   useCreateBannerMutation,
   useGetAllBannerQuery,
   useUpdateBannerMutation,
-} from "../../../server/api/bannerHook";
+} from '../../../server/api/bannerHook';
 import {
   useGetAllProductCategoriesQuery,
   useGetAllProductSubCategoriesQuery,
-} from "../../../server/api/productHooks";
-import { cleanObject } from "../../../utils/cleanObject";
-import { bannerStore } from "./bannerStore";
-import { generateBannerFormDefaultValue } from "./bannerobj";
+} from '../../../server/api/productHooks';
+import { cleanObject } from '../../../utils/cleanObject';
+import { bannerStore } from './bannerStore';
+import { generateBannerFormDefaultValue } from './bannerobj';
 
 const AddBannerSchema = z
   .object({
-    title: z.string().min(1, "Banner Title is required"),
-    description: z.string().min(1, "Description is required"),
-    category: z.string().min(1, "Category is required"),
-    subCategory: z.string().min(1, "Sub Category is required"),
-    priority: z.number().min(0, "Price must be a positive number"),
-    locations: z.array(z.string()).min(1, "Location is required"),
+    title: z.string().min(1, 'Banner Title is required'),
+    category: z.string().min(1, 'Category is required'),
+    description: z.string().optional(),
+    subCategory: z.string().min(1, 'Sub Category is required'),
+    priority: z.number().min(0, 'Price must be a positive number'),
+    locations: z.array(z.string()).min(1, 'Location is required'),
     image: z.instanceof(File).nullable(),
     mobImage: z.instanceof(File).nullable(), // Mobile image is optional
     existingImage: z.string().optional().nullable(), // Track existing image
@@ -41,14 +41,14 @@ const AddBannerSchema = z
       return data.image !== null || data.existingImage;
     },
     {
-      message: "Web image is required",
-      path: ["image"], // Show error on the image field
+      message: 'Web image is required',
+      path: ['image'], // Show error on the image field
     }
   );
 
 const AddBannerForm = () => {
   const { id } = useParams();
-  const [categoryKey, setCategory] = useState("");
+  const [_, setCategory] = useState('');
   const bannerData = useStore(bannerStore, (state) => state);
   const router = useNavigate();
   const {
@@ -84,7 +84,7 @@ const AddBannerForm = () => {
     [categorySuccess, categories]
   );
 
-  const formState = id ?? "add";
+  const formState = id ?? 'add';
 
   // UseForm with inferred types from defaultValues
   const form = useForm({
@@ -92,39 +92,40 @@ const AddBannerForm = () => {
     validators: {
       onSubmit: AddBannerSchema,
     },
+
     onSubmit: async ({ value }) => {
-      console.log("entered");
+      console.log('entered');
       try {
         const formData = new FormData();
         const formattedData = cleanObject(value);
 
-        delete formattedData["image"];
-        delete formattedData["existingImage"];
-        delete formattedData["mobImage"];
-        delete formattedData["existingMobImage"];
+        delete formattedData['image'];
+        delete formattedData['existingImage'];
+        delete formattedData['mobImage'];
+        delete formattedData['existingMobImage'];
 
-        formData.append("title", value.title);
-        formData.append("description", value.description);
-        formData.append("category", value.category);
-        formData.append("subCategory", value.subCategory);
-        formData.append("priority", `${value.priority}`);
+        formData.append('title', value.title);
+        formData.append('description', value.description ?? '');
+        formData.append('category', value.category);
+        formData.append('subCategory', value.subCategory);
+        formData.append('priority', `${value.priority}`);
         value.locations.forEach((item: string) =>
-          formData.append("locations", item)
+          formData.append('locations', item)
         );
 
         // Handle image uploads
         if (value.image) {
-          formData.append("image", value.image);
+          formData.append('image', value.image);
         }
 
         if (value.mobImage) {
-          formData.append("mobImage", value.mobImage);
+          formData.append('mobImage', value.mobImage);
         }
 
-        if (id === "add") createBanner(formData);
+        if (id === 'add') createBanner(formData);
         else updateBanner({ id: bannerData._id, body: formData });
       } catch (error) {
-        console.error("Failed to create banner", error);
+        console.error('Failed to create banner', error);
       }
     },
   });
@@ -137,13 +138,13 @@ const AddBannerForm = () => {
     if (field.state.meta.errors.length > 0) {
       const error = field.state.meta.errors[0];
       const errorMessage =
-        typeof error === "string"
+        typeof error === 'string'
           ? error
           : (error as { message?: string })?.message || JSON.stringify(error);
 
       return (
         <div className="min-h-[20px] mt-1">
-          <span className="text-xs font-medium" style={{ color: "#ef4444" }}>
+          <span className="text-xs font-medium" style={{ color: '#ef4444' }}>
             {errorMessage}
           </span>
         </div>
@@ -158,11 +159,11 @@ const AddBannerForm = () => {
     error: _subCategoryError,
   } = useGetAllProductSubCategoriesQuery(
     {
-      category: categoryKey,
-    },
-    {
-      enabled: !!categoryKey,
+      category: form.state.values.category,
     }
+    // {
+    //   enabled: !!categoryKey,
+    // }
   );
 
   const subCategoryOptions = subCategorySuccess
@@ -173,16 +174,16 @@ const AddBannerForm = () => {
     if (bannerSuccess || bannerUpdateSuccess) {
       form.reset();
       // router.replace("/banner");
-      router("/banner", { replace: true });
+      router('/banner', { replace: true });
     }
   }, [bannerSuccess, bannerUpdateSuccess]);
 
-  console.log("formisks", form.state.errors);
-  console.log("values", form.state.values);
+  console.log('formisks', form.state.errors);
+  console.log('values', form.state.values);
   return (
     <div className="">
       <div className="flex items-center justify-between">
-        <Header text={id === "add" ? "Add New Banner" : "Edit Banner"} />
+        <Header text={id === 'add' ? 'Add New Banner' : 'Edit Banner'} />
         <Breadcrumbs />
       </div>
 
@@ -222,7 +223,6 @@ const AddBannerForm = () => {
                   <div className="w-full">
                     <InputField
                       label="Description"
-                      required
                       placeholder="Add Description"
                       value={field.state.value}
                       onChange={(e) => field.handleChange(e.target.value)}
@@ -275,7 +275,7 @@ const AddBannerForm = () => {
                 {(field) => (
                   <div className="w-full">
                     <InputField
-                      label="Weight"
+                      label="Priority"
                       type="number"
                       step="0.01"
                       placeholder="0.00"
@@ -300,11 +300,11 @@ const AddBannerForm = () => {
                         field.handleChange(newValues);
                       }}
                       options={[
-                        { value: "homepage", label: "Home Page" },
-                        { value: "category-page", label: "Category Page" },
-                        { value: "marketing", label: "Marketing Section" },
-                        { value: "advertisement", label: "Advertisement" },
-                        { value: "product-page", label: "Product Page" },
+                        { value: 'homepage', label: 'Home Page' },
+                        { value: 'category-page', label: 'Category Page' },
+                        { value: 'marketing', label: 'Marketing Section' },
+                        { value: 'advertisement', label: 'Advertisement' },
+                        { value: 'product-page', label: 'Product Page' },
                       ]}
                     />
                     <FieldError field={field} />
@@ -318,7 +318,7 @@ const AddBannerForm = () => {
               disabled={bannerPending || bannerUpdatePending}
               className="self-end bg-[#df8d29] text-white px-7 py-2 rounded-xl disabled:opacity-50"
             >
-              {bannerPending || bannerUpdatePending ? "Saving..." : "Save"}
+              {bannerPending || bannerUpdatePending ? 'Saving...' : 'Save'}
             </button>
           </form>
         </div>
@@ -328,7 +328,7 @@ const AddBannerForm = () => {
             <div className="mx-6 my-4">
               <div>
                 <h1 className="text-xl font-semibold">
-                  Upload Web Image <span style={{ color: "#ef4444" }}>*</span>
+                  Upload Web Image <span style={{ color: '#ef4444' }}>*</span>
                 </h1>
                 <div className="border-b border-[#dedde2] w-full my-2"></div>
               </div>
@@ -343,14 +343,14 @@ const AddBannerForm = () => {
                       value={field.state.value}
                       existingFileField="existingImage"
                       accept={{
-                        "image/*": [".png", ".jpg", ".jpeg", ".svg"],
+                        'image/*': ['.png', '.jpg', '.jpeg', '.svg'],
                       }}
-                      existingFile={form.getFieldValue("existingImage")}
+                      existingFile={form.getFieldValue('existingImage')}
                       onChange={(file) => {
                         field.handleChange(file);
                         // When a new image is selected, clear the existing image
                         if (file) {
-                          form.setFieldValue("existingImage", undefined);
+                          form.setFieldValue('existingImage', undefined);
                         }
                       }}
                     />
