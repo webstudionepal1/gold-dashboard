@@ -1,19 +1,20 @@
-import React, { useState, useCallback } from "react";
-import { Icon } from "@iconify/react/dist/iconify.js";
-import { Link, useNavigate } from "react-router-dom";
-import { format } from "date-fns";
-import Header from "../../../components/shared/table_heading/Header";
-import { SearchFilterSort } from "../../../components/global/SearchFilterSort";
-import { StatusSwitch } from "../../../components/shared/StatusSwitch";
-import { Text } from "../../../components/shared/Text";
-import { Button } from "../../../components/ui/button";
+import React, { useState, useCallback } from 'react';
+import { Icon } from '@iconify/react/dist/iconify.js';
+import { Link, useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
+import Header from '../../../components/shared/table_heading/Header';
+import { SearchFilterSort } from '../../../components/global/SearchFilterSort';
+import { StatusSwitch } from '../../../components/shared/StatusSwitch';
+import { Text } from '../../../components/shared/Text';
+import { Button } from '../../../components/ui/button';
 import {
   useGetAllBlogsQuery,
   useDeleteBlogMutation,
   useToggleFeaturedMutation,
-} from "../../../server/api/blogHooks";
-import { IBlog, IBlogSearchParams } from "../../../types/blog.types";
-import { FrontendRoutes } from "../../../routes/routes";
+  useSearchBlogsQuery,
+} from '../../../server/api/blogHooks';
+import { IBlog, IBlogSearchParams } from '../../../types/blog.types';
+import { FrontendRoutes } from '../../../routes/routes';
 
 const BlogList: React.FC = () => {
   const navigate = useNavigate();
@@ -22,37 +23,39 @@ const BlogList: React.FC = () => {
   const [searchParams, setSearchParams] = useState<IBlogSearchParams>({
     page: 1,
     limit: 12,
-    search: "",
+    search: '',
     status: undefined,
     featured: undefined,
-    sortBy: "createdAt",
-    sortOrder: "desc",
+    sortBy: 'createdAt',
+    sortOrder: 'desc',
   });
 
   // API hooks - now using search endpoint with parameters
-  const { data: blogData, isLoading } = useGetAllBlogsQuery(searchParams);
+  const { data: blogData, isLoading } = useSearchBlogsQuery(searchParams);
+
+  console.log(blogData, 'blogs');
   const { mutate: deleteBlog } = useDeleteBlogMutation();
   const { mutate: toggleFeatured } = useToggleFeaturedMutation();
 
   // Filter and sort options for advanced search
   const filterOptions = [
-    { value: "", label: "All Status" },
-    { value: "draft", label: "Draft" },
-    { value: "published", label: "Published" },
-    { value: "archived", label: "Archived" },
+    { value: '', label: 'All Status' },
+    { value: 'draft', label: 'Draft' },
+    { value: 'published', label: 'Published' },
+    { value: 'archived', label: 'Archived' },
   ];
 
   const sortOptions = [
-    { value: "createdAt-desc", label: "Newest First" },
-    { value: "createdAt-asc", label: "Oldest First" },
-    { value: "publishedAt-desc", label: "Recently Published" },
-    { value: "publishedAt-asc", label: "Oldest Published" },
-    { value: "title-asc", label: "Title A-Z" },
-    { value: "title-desc", label: "Title Z-A" },
-    { value: "views-desc", label: "Most Viewed" },
-    { value: "views-asc", label: "Least Viewed" },
-    { value: "likes-desc", label: "Most Liked" },
-    { value: "likes-asc", label: "Least Liked" },
+    { value: 'createdAt-desc', label: 'Newest First' },
+    { value: 'createdAt-asc', label: 'Oldest First' },
+    { value: 'publishedAt-desc', label: 'Recently Published' },
+    { value: 'publishedAt-asc', label: 'Oldest Published' },
+    { value: 'title-asc', label: 'Title A-Z' },
+    { value: 'title-desc', label: 'Title Z-A' },
+    { value: 'views-desc', label: 'Most Viewed' },
+    { value: 'views-asc', label: 'Least Viewed' },
+    { value: 'likes-desc', label: 'Most Liked' },
+    { value: 'likes-asc', label: 'Least Liked' },
   ];
 
   // Event handlers
@@ -68,39 +71,39 @@ const BlogList: React.FC = () => {
     setSearchParams((prev) => ({
       ...prev,
       status: filter
-        ? (filter as "draft" | "published" | "archived")
+        ? (filter as 'draft' | 'published' | 'archived')
         : undefined,
       page: 1,
     }));
   }, []);
 
   const handleSort = useCallback((sort: string) => {
-    const [sortBy, sortOrder] = sort.split("-");
+    const [sortBy, sortOrder] = sort.split('-');
     setSearchParams((prev) => ({
       ...prev,
       sortBy,
-      sortOrder: sortOrder as "asc" | "desc",
+      sortOrder: sortOrder as 'asc' | 'desc',
       page: 1,
     }));
   }, []);
 
   const handleEdit = useCallback(
     (blog: IBlog) => {
-      navigate(`${FrontendRoutes.EDITBLOG.replace(":id", blog._id)}`);
+      navigate(`${FrontendRoutes.EDITBLOG.replace(':id', blog._id)}`);
     },
     [navigate]
   );
 
   const handleView = useCallback(
     (blog: IBlog) => {
-      navigate(`${FrontendRoutes.BLOGDETAILS.replace(":id", blog._id)}`);
+      navigate(`${FrontendRoutes.BLOGDETAILS.replace(':id', blog._id)}`);
     },
     [navigate]
   );
 
   const handleDelete = useCallback(
     (id: string) => {
-      if (window.confirm("Are you sure you want to delete this blog?")) {
+      if (window.confirm('Are you sure you want to delete this blog?')) {
         deleteBlog(id);
       }
     },
@@ -117,14 +120,14 @@ const BlogList: React.FC = () => {
   // Get status color
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case "published":
-        return "bg-green-100 text-green-800";
-      case "draft":
-        return "bg-yellow-100 text-yellow-800";
-      case "archived":
-        return "bg-gray-100 text-gray-800";
+      case 'published':
+        return 'bg-green-100 text-green-800';
+      case 'draft':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'archived':
+        return 'bg-gray-100 text-gray-800';
       default:
-        return "bg-gray-100 text-gray-800";
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -219,7 +222,7 @@ const BlogList: React.FC = () => {
               {blog.likes}
             </span>
           </div>
-          <span>{format(new Date(blog.createdAt), "MMM dd, yyyy")}</span>
+          <span>{format(new Date(blog.createdAt), 'MMM dd, yyyy')}</span>
         </div>
 
         {/* Actions */}
@@ -391,7 +394,7 @@ const BlogList: React.FC = () => {
                   </Button>
 
                   <span className="px-4 py-2 text-sm text-gray-600">
-                    Page {blogData.pagination.currentPage} of{" "}
+                    Page {blogData.pagination.currentPage} of{' '}
                     {blogData.pagination.totalPages}
                   </span>
 
