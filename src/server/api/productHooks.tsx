@@ -39,7 +39,6 @@ export interface IFetchCategory extends IProductCategory {
   name: string;
 }
 
-
 export interface IBaseProduct {
   _id?: string;
   name?: string;
@@ -246,8 +245,13 @@ export const useUpdateProductsMutation = () => {
       toast.success("Product updated successfully");
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
-    onError(err: unknown) {
-      handleMutationError(err, "Error updating products");
+    onError(err: any) {
+      const errorMessage =
+        err ||
+        err?.data?.message ||
+        err?.response?.data?.message ||
+        "Error updating product category";
+      toast.error(errorMessage);
     },
   });
 };
@@ -264,9 +268,13 @@ export const useDeleteProductsMutation = () => {
       toast.success("Product deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
-    onError(err: string) {
-      // toast.error(err || "Error deleting products");
-      toast.error("Error deleting products");
+    onError(err: any) {
+      const errorMessage =
+        err ||
+        err?.data?.message ||
+        err?.response?.data?.message ||
+        "Error updating product category";
+      toast.error(errorMessage);
     },
   });
 };
@@ -299,9 +307,13 @@ export const useCreateProductCategoriesMutation = () => {
       toast.success("Product category created successfully");
       queryClient.invalidateQueries({ queryKey: ["category"] });
     },
-    onError(err: string) {
-      // toast.error(err || "Error creating product category");
-      toast.error("Error creating product category");
+    onError(err: any) {
+      const errorMessage =
+        err ||
+        err?.data?.message ||
+        err?.response?.data?.message ||
+        "Error updating product category";
+      toast.error(errorMessage);
     },
   });
 };
@@ -326,9 +338,13 @@ export const useUpdateProductCategoriesMutation = () => {
       toast.success("Product category updated successfully");
       queryClient.invalidateQueries({ queryKey: ["category"] });
     },
-    onError(err: string) {
-      // toast.error(err || "Error updating product category");
-      toast.error("Error updating product category");
+    onError(err: any) {
+      const errorMessage =
+        err ||
+        err?.data?.message ||
+        err?.response?.data?.message ||
+        "Error updating product category";
+      toast.error(errorMessage);
     },
   });
 };
