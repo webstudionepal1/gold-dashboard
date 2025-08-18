@@ -128,10 +128,10 @@ export const useGetMyBlogsQuery = (params: IBlogSearchParams = {}) => {
 // Search blogs with advanced filters
 export const useSearchBlogsQuery = (params: IBlogSearchParams) => {
   return useQuery({
-    queryKey: ['search-blogs', params],
+    queryKey: ['blogs', params],
     queryFn: async () => {
       const res = await apiClient.get<{ data: IBlogListResponse }>(
-        'blog/search',
+        'blog/admin',
         {
           params,
         }
@@ -160,7 +160,7 @@ export const useCreateBlogMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ['create-blog'],
+    mutationKey: ['blogs'],
     mutationFn: async (blogData: FormData) => {
       const res = await apiClient.post('blog', blogData, {
         headers: {
@@ -206,7 +206,7 @@ export const useUpdateBlogMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ['update-blog'],
+    mutationKey: ['blogs'],
     mutationFn: async ({
       id,
       formData,
@@ -220,7 +220,6 @@ export const useUpdateBlogMutation = () => {
           'Content-Type': 'multipart/form-data',
         },
       });
-      console.log('✅ Update API response received:', res);
       return res?.data?.data;
     },
     onSuccess: (_, variables) => {
