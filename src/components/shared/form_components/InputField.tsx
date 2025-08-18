@@ -151,11 +151,11 @@ export const InputField = React.forwardRef<
             {error && (
               <Icon
                 icon="material-symbols:error"
-                className="w-3 h-3 text-red-500 flex-shrink-0"
+                className="w-3 h-3 text-red flex-shrink-0"
               />
             )}
             <span
-              className={`text-xs ${error ? 'text-red-500' : 'text-gray-500'}`}
+              className={`text-xs ${error ? 'text-red' : 'text-gray-500'}`}
             >
               {error || helperText}
             </span>

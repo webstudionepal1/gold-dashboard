@@ -4,7 +4,11 @@ import capitalize from "lodash/capitalize";
 import { toast } from "react-toastify";
 import { handleMutationError } from "../../utils/errorHandler";
 export interface IParams {
-  [key: string]: string;
+  [key: string]: string | number | boolean | undefined;
+  page?: number;
+  limit?: number;
+  search?: string;
+  sort?: string;
 }
 
 export interface IBaseProductSubCategory {
@@ -131,7 +135,7 @@ export interface IFetchOccasion {
 //Products routes
 export const useGetAllProductsQuery = (params: IParams = {}) => {
   return useQuery({
-    queryKey: ["products"],
+    queryKey: ["products", params],
     queryFn: async () => {
       const res = await apiClient.get<{
         data: {
@@ -139,8 +143,12 @@ export const useGetAllProductsQuery = (params: IParams = {}) => {
           pagination?: {
             currentPage: number;
             totalPages: number;
-            totalItems: number;
-            itemsPerPage: number;
+            totalCount: number;
+            limit: number;
+            hasNextPage: boolean;
+            hasPrevPage: boolean;
+            nextPage: number | null;
+            prevPage: number | null;
           };
           searchQuery?: string;
           appliedFilters?: Record<string, unknown>;

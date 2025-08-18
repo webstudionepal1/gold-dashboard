@@ -329,7 +329,7 @@ const BlogList: React.FC = () => {
             </div>
 
             {/* Search Results Info */}
-            {blogData && (
+            {/* {blogData && (
               <div className="text-sm text-gray-500 ml-auto">
                 {blogData.pagination.totalBlogs} blog
                 {blogData.pagination.totalBlogs !== 1 ? "s" : ""} found
@@ -337,7 +337,7 @@ const BlogList: React.FC = () => {
                   <span> for "{searchParams.search}"</span>
                 )}
               </div>
-            )}
+            )} */}
           </div>
         </div>
 

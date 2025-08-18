@@ -49,7 +49,7 @@ export const useGetAllBlogsQuery = (params: IBlogSearchParams = {}) => {
       }
 
       const res = await apiClient.get<{ data: IBlogListResponse }>(
-        "blog/search",
+        "blog",
         {
           params: searchParams,
         }

@@ -142,9 +142,9 @@ export const DropdownField = React.forwardRef<
         {(helperText || error) && (
           <div className="flex items-center gap-1">
             {error && (
-              <Icon icon="material-symbols:error" className="w-3 h-3 text-red-500 flex-shrink-0" />
+              <Icon icon="material-symbols:error" className="w-3 h-3 text-red flex-shrink-0" />
             )}
-            <span className={`text-xs ${error ? "text-red-500" : "text-gray-500"}`}>
+            <span className={`text-xs ${error ? "text-red" : "text-gray-500"}`}>
               {error || helperText}
             </span>
           </div>

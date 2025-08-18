@@ -10,7 +10,7 @@ import {
 } from "../../server/api/giftHooks";
 import { useGetAllProductsForGiftsQuery } from "../../server/api/productHooks";
 import { ScrollableModal } from "../shared/ScrollableModal";
-import GiftForm from "./components/GiftForm";
+import GiftForm, { occassion } from "./components/GiftForm";
 import GiftDetailsModal from "./components/GiftDetailsModal";
 import MasterTable from "../shared/MasterTable";
 import Header from "../shared/table_heading/Header";
@@ -20,7 +20,9 @@ import { giftColumns, GiftTableRow } from "./giftObj";
 const GiftsAdminPanel: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"gifts" | "packages">("gifts");
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedType, setSelectedType] = useState<"all" | "gift" | "package">("all");
+  const [selectedType, setSelectedType] = useState<"all" | "gift" | "package">(
+    "all"
+  );
   const [selectedOccasion, setSelectedOccasion] = useState<string>("all");
   const [selectedSetType, setSelectedSetType] = useState<string>("all");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -38,23 +40,43 @@ const GiftsAdminPanel: React.FC = () => {
     };
 
     if (searchTerm) params.search = searchTerm;
-    if (selectedType !== "all") params.type = selectedType as "gift" | "package";
+    if (selectedType !== "all")
+      params.type = selectedType as "gift" | "package";
     if (selectedOccasion !== "all") params.occasion = selectedOccasion;
     if (selectedSetType !== "all") {
-      params.setType = selectedSetType as "necklace_set" | "bridal_set" | "earring_set" | "bracelet_set" | "ring_set" | "custom";
+      params.setType = selectedSetType as
+        | "necklace_set"
+        | "bridal_set"
+        | "earring_set"
+        | "bracelet_set"
+        | "ring_set"
+        | "custom";
     }
 
     return params;
-  }, [currentPage, itemsPerPage, searchTerm, selectedType, selectedOccasion, selectedSetType]);
+  }, [
+    currentPage,
+    itemsPerPage,
+    searchTerm,
+    selectedType,
+    selectedOccasion,
+    selectedSetType,
+  ]);
 
-  const { data: giftsData, isLoading, error } = useGetAllGiftsQuery(queryParams);
+  const {
+    data: giftsData,
+    isLoading,
+    error,
+  } = useGetAllGiftsQuery(queryParams);
   const { data: productsData } = useGetAllProductsForGiftsQuery();
   const deleteGiftMutation = useDeleteGiftMutation();
 
-
-
-  const gifts = Array.isArray(giftsData?.data) ? giftsData.data : giftsData?.data?.gifts || [];
-  const pagination = Array.isArray(giftsData?.data) ? undefined : giftsData?.data?.pagination;
+  const gifts = Array.isArray(giftsData?.data)
+    ? giftsData.data
+    : giftsData?.data?.gifts || [];
+  const pagination = Array.isArray(giftsData?.data)
+    ? undefined
+    : giftsData?.data?.pagination;
 
   const handleCreateGift = () => {
     setSelectedGift(null);
@@ -85,12 +107,10 @@ const GiftsAdminPanel: React.FC = () => {
     return gifts.map((gift, index) => ({
       id: gift._id,
       sn: index + 1,
-      type: (
-        <div className="capitalize font-medium">
-          {gift.type}
-        </div>
-      ),
-      category: gift.setType ? gift.setType.replace('_', ' ') : (gift.category || "-"),
+      type: <div className="capitalize font-medium">{gift.type}</div>,
+      category: gift.setType
+        ? gift.setType.replace("_", " ")
+        : gift.category || "-",
       name: gift.name,
       occasion: gift.occasion || "-",
       itemsNo: (
@@ -107,7 +127,7 @@ const GiftsAdminPanel: React.FC = () => {
       pricing: (
         <div>
           <div className="font-medium">
-            ₹{(gift.finalPrice || gift.totalPrice || 0).toLocaleString()}
+            NRS {(gift.finalPrice || gift.totalPrice || 0).toLocaleString()}
           </div>
           {gift.discountPercentage && gift.discountPercentage > 0 && (
             <div className="text-sm text-green-600">
@@ -120,8 +140,11 @@ const GiftsAdminPanel: React.FC = () => {
     }));
   };
 
-  const handleTableAction = (action: string, data: GiftTableRow | IFetchGift) => {
-    const gift = '_originalData' in data ? data._originalData : data;
+  const handleTableAction = (
+    action: string,
+    data: GiftTableRow | IFetchGift
+  ) => {
+    const gift = "_originalData" in data ? data._originalData : data;
     switch (action) {
       case "view":
         handleViewGift(gift);
@@ -139,7 +162,9 @@ const GiftsAdminPanel: React.FC = () => {
     return (
       <div className="container mx-auto p-6">
         <div className="bg-red-50 border border-red-200 rounded-md p-4">
-          <div className="text-red-800">Error loading gifts. Please try again later.</div>
+          <div className="text-red-800">
+            Error loading gifts. Please try again later.
+          </div>
         </div>
       </div>
     );
@@ -165,9 +190,9 @@ const GiftsAdminPanel: React.FC = () => {
           viewAction={(row) => handleTableAction("view", row)}
           editAction={(row) => handleTableAction("edit", row)}
           onDelete={(id) => {
-             const gift = gifts.find(g => g._id === id);
-             if (gift) handleTableAction("delete", gift);
-           }}
+            const gift = gifts.find((g) => g._id === id);
+            if (gift) handleTableAction("delete", gift);
+          }}
           canSearch={false}
           apiPagination={true}
           totalItems={pagination?.totalItems || gifts.length}
@@ -186,18 +211,25 @@ const GiftsAdminPanel: React.FC = () => {
                   className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                 />
               </div>
-              
+
               {/* Filter Row */}
               <div className="flex gap-3">
                 {/* Type Filter */}
                 <div className="relative">
-                  <label htmlFor="type-filter" className="block text-xs font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="type-filter"
+                    className="block text-xs font-medium text-gray-700 mb-1"
+                  >
                     Type
                   </label>
                   <select
                     id="type-filter"
                     value={selectedType}
-                    onChange={(e) => setSelectedType(e.target.value as "all" | "gift" | "package")}
+                    onChange={(e) =>
+                      setSelectedType(
+                        e.target.value as "all" | "gift" | "package"
+                      )
+                    }
                     className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm min-w-[120px]"
                   >
                     <option value="all">All Types</option>
@@ -208,7 +240,10 @@ const GiftsAdminPanel: React.FC = () => {
 
                 {/* Occasion Filter */}
                 <div className="relative">
-                  <label htmlFor="occasion-filter" className="block text-xs font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="occasion-filter"
+                    className="block text-xs font-medium text-gray-700 mb-1"
+                  >
                     Occasion
                   </label>
                   <select
@@ -218,17 +253,20 @@ const GiftsAdminPanel: React.FC = () => {
                     className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm min-w-[120px]"
                   >
                     <option value="all">All Occasions</option>
-                    <option value="Wedding">Wedding</option>
-                    <option value="Anniversary">Anniversary</option>
-                    <option value="Birthday">Birthday</option>
-                    <option value="Festival">Festival</option>
-                    <option value="Engagement">Engagement</option>
+                    {occassion.map((occasion) => (
+                      <option key={occasion} value={occasion}>
+                        {occasion}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
                 {/* Set Type Filter */}
                 <div className="relative">
-                  <label htmlFor="settype-filter" className="block text-xs font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="settype-filter"
+                    className="block text-xs font-medium text-gray-700 mb-1"
+                  >
                     Set Type
                   </label>
                   <select
@@ -253,9 +291,16 @@ const GiftsAdminPanel: React.FC = () => {
 
         {gifts.length === 0 && !isLoading && (
           <div className="text-center py-12">
-            <Icon icon="mdi:gift-outline" className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No gifts found</h3>
-            <p className="text-gray-600">Try adjusting your filters or create a new gift.</p>
+            <Icon
+              icon="mdi:gift-outline"
+              className="w-12 h-12 text-gray-400 mx-auto mb-4"
+            />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              No gifts found
+            </h3>
+            <p className="text-gray-600">
+              Try adjusting your filters or create a new gift.
+            </p>
           </div>
         )}
       </div>
