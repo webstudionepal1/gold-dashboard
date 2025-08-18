@@ -36,6 +36,7 @@ const NewProductForm: React.FC = () => {
       slug: "",
       description: product.description || "",
       productType: get(product, "productType", "gold"),
+      dimension: product.dimension || 0,
       category:
         typeof product.category === "object"
           ? product.category._id
