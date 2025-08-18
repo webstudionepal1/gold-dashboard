@@ -12,6 +12,7 @@ import {
   useDeleteBlogMutation,
   useToggleFeaturedMutation,
   useSearchBlogsQuery,
+  useUpdateBlogMutation,
 } from '../../../server/api/blogHooks';
 import { IBlog, IBlogSearchParams } from '../../../types/blog.types';
 import { FrontendRoutes } from '../../../routes/routes';
@@ -30,12 +31,12 @@ const BlogList: React.FC = () => {
     sortOrder: 'desc',
   });
 
+  // const queryParams=buildQueryParams
+
   // API hooks - now using search endpoint with parameters
   const { data: blogData, isLoading } = useSearchBlogsQuery(searchParams);
-
-  console.log(blogData, 'blogs');
   const { mutate: deleteBlog } = useDeleteBlogMutation();
-  const { mutate: toggleFeatured } = useToggleFeaturedMutation();
+  const { mutate: toggleFeatured } = useUpdateBlogMutation();
 
   // Filter and sort options for advanced search
   const filterOptions = [
@@ -112,7 +113,12 @@ const BlogList: React.FC = () => {
 
   const handleToggleFeatured = useCallback(
     (blog: IBlog) => {
-      toggleFeatured(blog._id);
+      const formData = new FormData();
+      formData.append('isActive', String(!blog.isActive));
+      toggleFeatured({
+        id: blog._id,
+        formData,
+      });
     },
     [toggleFeatured]
   );
@@ -174,13 +180,13 @@ const BlogList: React.FC = () => {
         </div>
 
         {/* Title */}
-        <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-customorange transition-colors">
+        <h3 className="text-lg font-semibold text-gray-900 mb-2  group-hover:text-customorange transition-colors line-clamp-1">
           {blog.title}
         </h3>
 
         {/* Excerpt */}
         {blog.excerpt && (
-          <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+          <p className="text-gray-600 text-sm mb-4 line-clamp-1">
             {blog.excerpt}
           </p>
         )}
@@ -254,7 +260,7 @@ const BlogList: React.FC = () => {
             </Button>
             <Button
               size="sm"
-              variant="destructive"
+              variant="outline"
               onClick={() => handleDelete(blog._id)}
               className="text-xs"
             >
@@ -266,15 +272,12 @@ const BlogList: React.FC = () => {
             </Button>
           </div>
 
-          <div className="flex items-center">
+          <div className="flex items-center ml-4">
             <StatusSwitch
-              isActive={blog.isFeatured}
+              isActive={blog.isActive}
               onToggle={() => handleToggleFeatured(blog)}
               size="sm"
             />
-            <Text size="body-xs-default" className="ml-2 text-gray-500">
-              Featured
-            </Text>
           </div>
         </div>
       </div>
