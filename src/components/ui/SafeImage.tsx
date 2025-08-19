@@ -19,6 +19,7 @@ const SafeImage: React.FC<SafeImageProps> = ({
   alt = '',
   ...props
 }) => {
+  console.log('src', src)
   const { imageSrc, isLoading, hasError, handleLoad, handleError } = useImageWithFallback({
     src,
     fallbackSrc
