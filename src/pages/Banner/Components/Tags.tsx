@@ -1,5 +1,5 @@
-import { FieldApi } from "@tanstack/react-form";
-import { useState, useEffect, useRef } from "react";
+import { FieldApi } from '@tanstack/react-form';
+import { useState, useEffect, useRef } from 'react';
 
 type ChipInputProps = {
   field: any;
@@ -22,9 +22,9 @@ const Tags = ({ field, options }: ChipInputProps) => {
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
@@ -77,7 +77,7 @@ const Tags = ({ field, options }: ChipInputProps) => {
             <div
               key={index}
               className={`p-2 hover:bg-gray-100 cursor-pointer ${
-                selectedValues.includes(option) ? "bg-blue-50" : ""
+                selectedValues.includes(option) ? 'bg-blue-50' : ''
               }`}
               onClick={() => {
                 toggleOption(option);

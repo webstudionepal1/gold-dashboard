@@ -1,11 +1,10 @@
-import { Icon } from "@iconify/react/dist/iconify.js";
-import clsx from "clsx";
-import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { useSidebar } from "./SidebarHooks";
-import { Text } from "./SidebarText";
-import { COLORS } from "./sidebarConstants";
-import CompanyLogo from "../CompanyLogo";
+import { Icon } from '@iconify/react/dist/iconify.js';
+import clsx from 'clsx';
+import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { useSidebar } from './SidebarHooks';
+import { Text } from './SidebarText';
+import { COLORS } from './sidebarConstants';
 
 interface SidebarInsetProps {
   children: React.ReactNode;
@@ -37,16 +36,16 @@ const SidebarHeader: React.FC = () => {
   return (
     <section
       className={clsx(
-        "flex items-center p-4",
-        isCollapsed ? "justify-center" : "justify-between"
+        'flex items-center p-4',
+        isCollapsed ? 'justify-center' : 'justify-between'
       )}
     >
       <img
         src="/companylogo.png"
         alt="company-logo"
         className={clsx(
-          isCollapsed ? "h-[50px] w-[44px]" : "w-28",
-          "transition-all duration-300 mx-auto aspect-video"
+          isCollapsed ? 'h-[50px] w-[44px]' : 'w-28',
+          'transition-all duration-300 mx-auto aspect-video'
         )}
       />
     </section>
@@ -72,15 +71,15 @@ const SubRouteItem: React.FC<{
       <div className="absolute left-[0.4rem] top-1/2 -translate-y-1/2">
         <div
           className={`h-[1px] w-2 rounded-full transition-colors duration-200 ${
-            isActive ? "bg-yellow" : "bg-gray-300"
+            isActive ? 'bg-yellow' : 'bg-gray-300'
           }`}
         />
       </div>
       <Text
-        variant={isActive ? "yellow" : "fadish-black"}
+        variant={isActive ? 'yellow' : 'fadish-black'}
         size="body-sm-default"
         className={`hover:bg-gray-50 py-2 px-3 rounded transition-colors duration-200 ${
-          isActive ? "bg-[#FCF4EA]" : ""
+          isActive ? 'bg-[#FCF4EA]' : ''
         }`}
       >
         {child.title}
@@ -107,10 +106,10 @@ const RouteItem: React.FC<{
         to={route.path}
         className={clsx(
           `flex items-center ${
-            isCollapsed ? "justify-center" : "justify-between"
+            isCollapsed ? 'justify-center' : 'justify-between'
           } rounded-lg transition-colors duration-200`,
-          isCollapsed ? "px-2 py-3" : "px-6 py-2 gap-5",
-          isActive && "bg-[#FCF4EA] text-white rounded-lg",
+          isCollapsed ? 'px-2 py-3' : 'px-6 py-2 gap-5',
+          isActive && 'bg-[#FCF4EA] text-white rounded-lg',
           !pathname.startsWith(route.path) &&
             `hover:bg-[${COLORS.navHoverColor}]`
         )}
@@ -122,20 +121,20 @@ const RouteItem: React.FC<{
             closeSidebar();
           }
         }}
-        title={isCollapsed ? route.title : ""}
+        title={isCollapsed ? route.title : ''}
       >
-        <div className={clsx("flex items-center", isCollapsed ? "" : "gap-3")}>
+        <div className={clsx('flex items-center', isCollapsed ? '' : 'gap-3')}>
           <Icon
             icon={route.icon}
-            color={isActive ? "orange" : "#5C5E64"}
+            color={isActive ? 'orange' : '#5C5E64'}
             className={clsx(
-              "transition-colors duration-200",
-              isCollapsed ? "size-4" : "size-5"
+              'transition-colors duration-200',
+              isCollapsed ? 'size-4' : 'size-5'
             )}
           />
           {!isCollapsed && (
             <Text
-              variant={isActive ? "orange" : "fadish-black"}
+              variant={isActive ? 'orange' : 'fadish-black'}
               size="body-sm-default"
             >
               {route.title}
@@ -146,8 +145,8 @@ const RouteItem: React.FC<{
           <Icon
             icon="oui:arrow-right"
             className={clsx(
-              "size-3 transition-transform text-black duration-200",
-              isExpanded && "rotate-90"
+              'size-3 transition-transform text-black duration-200',
+              isExpanded && 'rotate-90'
             )}
           />
         )}
@@ -156,7 +155,7 @@ const RouteItem: React.FC<{
       {hasChildren && !isCollapsed && (
         <div
           className={`ml-8 flex flex-col relative overflow-hidden transition-all duration-200 ease-in-out ${
-            isExpanded ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+            isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
           }`}
         >
           <div className="absolute left-[0.3125rem] top-0 bottom-0 w-px bg-yellow" />
@@ -183,7 +182,7 @@ const MobileToggleButton: React.FC = () => {
       className="fixed z-40 p-2 text-white rounded-full shadow-lg top-4 left-4 md:hidden bg-primary-blue"
       aria-label="Toggle Sidebar"
     >
-      <Icon icon={"mdi-light:unfold-more-vertical"} className="size-6" />
+      <Icon icon={'mdi-light:unfold-more-vertical'} className="size-6" />
     </button>
   );
 };
@@ -194,8 +193,8 @@ const Overlay: React.FC = () => {
   return (
     <div
       className={clsx(
-        "fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity duration-300",
-        isSidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        'fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity duration-300',
+        isSidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
       )}
       onClick={closeSidebar}
     />
@@ -264,11 +263,11 @@ const Sidebar: React.FC<{ config: { sections: SidebarSection[] } }> = ({
       {/* Sidebar */}
       <aside
         className={clsx(
-          "flex flex-col h-screen  border-r border-gray-200 transition-all duration-300 bg-white ease-in-out z-50",
-          "fixed md:static md:translate-x-0",
-          isCollapsed ? "md:w-16 min-w-16" : "md:w-72 md:min-w-72",
-          "w-72 max-w-72",
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full",
+          'flex flex-col h-screen  border-r border-gray-200 transition-all duration-300 bg-white ease-in-out z-50',
+          'fixed md:static md:translate-x-0',
+          isCollapsed ? 'md:w-16 min-w-16' : 'md:w-72 md:min-w-72',
+          'w-72 max-w-72',
+          isSidebarOpen ? 'translate-x-0' : '-translate-x-full',
           `bg-[${COLORS.sidebarBackground}]`
         )}
       >
@@ -278,7 +277,7 @@ const Sidebar: React.FC<{ config: { sections: SidebarSection[] } }> = ({
           {config.sections.map((section, index) => (
             <section
               key={section.title}
-              className={index > 1 ? "pb-[178px]" : ""}
+              className={index > 1 ? 'pb-[178px]' : ''}
             >
               <div className="flex flex-col gap-2">
                 <SectionDivider
@@ -315,7 +314,7 @@ export const SidebarInset: React.FC<SidebarInsetProps> = ({
   return (
     <div
       className={clsx(
-        "flex-1 transition-all duration-300 ease-in-out",
+        'flex-1 transition-all duration-300 ease-in-out',
         className
       )}
     >

@@ -32,29 +32,28 @@ const NewProductForm: React.FC = () => {
 
     return {
       // Basic Information
-      name: product.name || "",
+      name: get(product, "name", ""),
       slug: "",
-      description: product.description || "",
+      description: get(product, "description", ""),
       productType: get(product, "productType", "gold"),
-      category:
-        typeof product.category === "object"
-          ? product.category._id
-          : product.category || "",
-      subCategory:
-        typeof product.subCategory === "object"
-          ? product.subCategory._id
-          : product.subCategory || "",
+      dimension: get(product, "dimension", 0),
+      category: get(product, "category._id", ""),
+      subCategory: get(product, "subCategory._id", ""),
 
       // Specifications
-      length: product.length || 0,
-      rhodoumFinishes: product.rhodoumFinishes || false,
-      totalCarat: product.totalCarat || 0,
-      color: product.color || "",
-      clarity: product.clarity || "",
-      gender: product.gender as "male" | "female" | "unisex" | undefined,
-      makingCharges: product.makingCharges || 0,
+      length: get(product, "length", 0),
+      rhodoumFinishes: get(product, "rhodoumFinishes", false),
+      totalCarat: get(product, "totalCarat", 0),
+      color: get(product, "color", ""),
+      clarity: get(product, "clarity", ""),
+      gender: get(product, "gender", "male") as
+        | "male"
+        | "female"
+        | "unisex"
+        | undefined,
+      makingCharges: get(product, "makingCharges", 0),
 
-      wastage: get(product, "wastage", undefined), // Will be set by user
+      wastage: get(product, "wastage"), // Will be set by user
 
       variants: get(product, "variant", [
         {
@@ -73,7 +72,7 @@ const NewProductForm: React.FC = () => {
           price: item.value,
         })
       ),
-      existingImages: product.images || [],
+      existingImages: get(product, "images", []),
       // Media
       images: [],
 
@@ -81,8 +80,8 @@ const NewProductForm: React.FC = () => {
       visibleAs: Array.isArray(product.visibleAs)
         ? product.visibleAs
         : product.visibleAs
-          ? [product.visibleAs]
-          : [],
+        ? [product.visibleAs]
+        : [],
       // Status
       isActive: get(product, "isActive", true),
       isFeatured: get(product, "isFeatured", false),

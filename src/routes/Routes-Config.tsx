@@ -1,44 +1,48 @@
-
-import { DashboardPage } from "../pages/Dashboard/Dashboard";
+import { DashboardPage } from '../pages/Dashboard/Dashboard';
 
 // import PurchaseReturn from "../pages/Inventory/PurchaseManagement/PurchaseReturn";
 // import Suppliers from "../pages/Inventory/PurchaseManagement/Suppliers";
-import { NotFoundPage } from "../pages/NotFound/NotFound";
-import ProductCategory from "../pages/Product/ProductCategory/ProductCategory";
-import ProductDescription from "../pages/Product/ProductList/[id]/ProdectDescription";
-import ProductList from "../pages/Product/ProductList/ProductList";
-import Productsubcategory from "../pages/Product/ProductSubcategory/ProductSubCategory";
-import { FrontendRoutes } from "./routes";
+import { NotFoundPage } from '../pages/NotFound/NotFound';
+import ProductCategory from '../pages/Product/ProductCategory/ProductCategory';
+import ProductDescription from '../pages/Product/ProductList/[id]/ProdectDescription';
+import ProductList from '../pages/Product/ProductList/ProductList';
+import Productsubcategory from '../pages/Product/ProductSubcategory/ProductSubCategory';
+import { FrontendRoutes } from './routes';
 
-import NotificationAdminPanel from "../components/admin/NotificationAdminPanel";
-import GiftsAdminPanel from "../components/admin/GiftsAdminPanel";
-import NotificationTest from "../components/test/NotificationTest";
-import BannerIndex from "../pages/Banner/BannerIndex";
-import AddBannerForm from "../pages/Banner/Components/AddBannerForm";
-import NotificationIndex from "../pages/Notification/NotificationIndex";
-import OrderIndex from "../pages/OrderManagement/Order/OrderIndex";
+import NotificationAdminPanel from '../components/admin/NotificationAdminPanel';
+import GiftsAdminPanel from '../components/admin/GiftsAdminPanel';
+import NotificationTest from '../components/test/NotificationTest';
+import BannerIndex from '../pages/Banner/BannerIndex';
+import AddBannerForm from '../pages/Banner/Components/AddBannerForm';
+import NotificationIndex from '../pages/Notification/NotificationIndex';
+import OrderIndex from '../pages/OrderManagement/Order/OrderIndex';
 
 // Collection imports
-import CollectionIndex from "../pages/Collection/CollectionIndex";
-import NewCollectionForm from "../pages/Collection/components/NewCollectionForm";
-import CollectionDetails from "../pages/Collection/components/CollectionDetails";
+import CollectionIndex from '../pages/Collection/CollectionIndex';
+import NewCollectionForm from '../pages/Collection/components/NewCollectionForm';
+import CollectionDetails from '../pages/Collection/components/CollectionDetails';
 
 // import AddCustomerForm from "../pages/Customer/components/AddCustomerForm";
-import Transaction from "../pages/transaction/Transaction";
+import Transaction from '../pages/transaction/Transaction';
 
-import BlogAnalytics from "@/pages/Blog/BlogAnalytics/BlogAnalytics";
-import BlogEditor from "@/pages/Blog/BlogEditor/BlogEditor";
-import BlogList from "@/pages/Blog/BlogList/BlogList";
-import BlogView from "@/pages/Blog/BlogView/BlogView";
-import Calculator from "@/pages/settings/calculator/Calculator";
-import CalculatorIndex from "@/pages/settings/calculator/CalculatorIndex";
-import OrderDetails from "../pages/OrderManagement/Order/OrderDetails";
-import NewProductForm from "../pages/Product/components/NewProductForm";
-import ProductImageDemo from "../pages/Product/ProductImageDemo";
-import ProductForm from "../pages/Product/ProductList/component/ProductForm";
-import AttribConfig from "../pages/settings/components/AttribConfig";
-import EditProfileForm from "../pages/settings/ProfileConfig/EditProfileForm";
-import TestUpload from "../pages/TestUpload";
+import BlogAnalytics from '@/pages/Blog/BlogAnalytics/BlogAnalytics';
+import BlogEditor from '@/pages/Blog/BlogEditor/BlogEditor';
+import BlogList from '@/pages/Blog/BlogList/BlogList';
+import BlogView from '@/pages/Blog/BlogView/BlogView';
+import Calculator from '@/pages/settings/calculator/Calculator';
+import CalculatorIndex from '@/pages/settings/calculator/CalculatorIndex';
+import OrderDetails from '../pages/OrderManagement/Order/OrderDetails';
+import NewProductForm from '../pages/Product/components/NewProductForm';
+import ProductImageDemo from '../pages/Product/ProductImageDemo';
+import ProductForm from '../pages/Product/ProductList/component/ProductForm';
+import AttribConfig from '../pages/settings/components/AttribConfig';
+import EditProfileForm from '../pages/settings/ProfileConfig/EditProfileForm';
+import TestUpload from '../pages/TestUpload';
+import { ContactUs } from '@/pages/contact-us/ContactUs.page';
+import AddOrderForm from '@/pages/OrderManagement/Order/components/AddOrderPage';
+import ConfirmedOrder from '@/pages/OrderManagement/ConfirmedOrder/ConfirmedOrder';
+import CancelledOrder from '@/pages/OrderManagement/CancelledOrder/CancelledOrder';
+import CompletedOrder from '@/pages/OrderManagement/CompletedOrder/CompletedOrder';
 // import BlogList from "@/pages/Blog/BlogList/BlogList";
 // import BlogEditor from "@/pages/Blog/BlogEditor/BlogEditor";
 // import BlogView from "@/pages/Blog/BlogView/BlogView";
@@ -54,54 +58,55 @@ export const routesConfig = [
     element: <DashboardPage />,
     //******<Route element={element}/> *****/
   },
-  // {
-  //   path: FrontendRoutes.ORDER,
-  //   element: <OrderIndex />,
-  // },
-  // {
-  //   path: "/order/order-details/:id",
-  //   element: <OrderDetails />,
-  // },
-  // {
-  //   path: "/order/confirmed-order-details/:id",
-  //   element: <OrderDetails />,
-  // },
   {
-    path: "/attribs",
+    path: FrontendRoutes.ORDER,
+    element: <OrderIndex />,
+  },
+  {
+    path: '/order/order-details/:id',
+    element: <OrderDetails />,
+  },
+  {
+    path: '/order/confirmed-order-details/:id',
+    element: <OrderDetails />,
+  },
+  {
+    path: '/attribs',
     element: <AttribConfig />,
   },
-  // {
-  //   path: "/order/assigned-order-details/:id",
-  //   element: <OrderDetails />,
-  // },
-  // {
-  //   path: "/order/completed-order-details/:id",
-  //   element: <OrderDetails />,
-  // },
-  // {
-  //   path: "/order/cancelled-order-details/:id",
-  //   element: <OrderDetails />,
-  // },
-  // {
-  //   path: FrontendRoutes.ADDORDER,
-  //   element: <AddOrderForm />,
-  // },
+
+  {
+    path: '/order/assigned-order-details/:id',
+    element: <OrderDetails />,
+  },
+  {
+    path: '/order/completed-order-details/:id',
+    element: <OrderDetails />,
+  },
+  {
+    path: '/order/cancelled-order-details/:id',
+    element: <OrderDetails />,
+  },
+  {
+    path: FrontendRoutes.ADDORDER,
+    element: <AddOrderForm />,
+  },
   // {
   //   path: FrontendRoutes.ASSIGNEDORDER,
   //   element: <AssignedOrders />,
   // },
-  // {
-  //   path: FrontendRoutes.CONFIRMEDORDER,
-  //   element: <ConfirmedOrder />,
-  // },
-  // {
-  //   path: FrontendRoutes.CANCELLEDORDER,
-  //   element: <CancelledOrder />,
-  // },
-  // {
-  //   path: FrontendRoutes.COMPLETEDORDER,
-  //   element: <CompletedOrder />,
-  // },
+  {
+    path: FrontendRoutes.CONFIRMEDORDER,
+    element: <ConfirmedOrder />,
+  },
+  {
+    path: FrontendRoutes.CANCELLEDORDER,
+    element: <CancelledOrder />,
+  },
+  {
+    path: FrontendRoutes.COMPLETEDORDER,
+    element: <CompletedOrder />,
+  },
   {
     path: FrontendRoutes.PRODUCTLIST,
     element: <ProductList />,
@@ -115,11 +120,11 @@ export const routesConfig = [
     element: <NewProductForm />,
   },
   {
-    path: "/product/details/:id",
+    path: '/product/details/:id',
     element: <ProductDescription />,
   },
   {
-    path: "/product/:id",
+    path: '/product/:id',
     element: <ProductForm />,
   },
   {
@@ -131,10 +136,10 @@ export const routesConfig = [
     element: <Productsubcategory />,
   },
   {
-    path: "/product/image-demo",
+    path: '/product/image-demo',
     element: <ProductImageDemo />,
   },
-  
+
   // Collection routes
   {
     path: FrontendRoutes.COLLECTION,
@@ -152,7 +157,7 @@ export const routesConfig = [
     path: FrontendRoutes.COLLECTIONDETAILS,
     element: <CollectionDetails />,
   },
-  
+
   // {
   //   path: FrontendRoutes.CUSTOMER,
   //   element: <CustomerIndex />,
@@ -160,31 +165,30 @@ export const routesConfig = [
   // {
   //   // path: "/customer/customer-details/:id",
   //   path: FrontendRoutes.CUSTOMERDETAILS,
-    
+
   //   element: <CustomerDetails />,
   // },
-  
+
   // Banner
   {
     path: FrontendRoutes.BANNER,
     element: <BannerIndex />,
   },
   {
-    path: "/banner/:id",
+    path: '/banner/:id',
     element: <AddBannerForm />,
   },
-  
-  
+
   {
     path: FrontendRoutes.NOTIFICATION,
     element: <NotificationIndex />,
   },
   {
-    path: "/notification-test",
+    path: '/notification-test',
     element: <NotificationTest />,
   },
   {
-    path: "/notification-admin",
+    path: '/notification-admin',
     element: <NotificationAdminPanel />,
   },
   {
@@ -192,8 +196,13 @@ export const routesConfig = [
     element: <GiftsAdminPanel />,
   },
   {
-    path: "/notification-test",
+    path: '/notification-test',
     element: <NotificationTest />,
+  },
+
+  {
+    path: '/settings/profile-config',
+    element: <EditProfileForm />,
   },
   // MyPostBusiness route commented out - will be integrated later
   // {
@@ -254,8 +263,13 @@ export const routesConfig = [
     path: FrontendRoutes.BLOGANALYTICS,
     element: <BlogAnalytics />,
   },
+
   {
-    path: "*",
+    path: FrontendRoutes.CONTACTUS,
+    element: <ContactUs />,
+  },
+  {
+    path: '*',
     element: <NotFoundPage />,
   },
 ];
