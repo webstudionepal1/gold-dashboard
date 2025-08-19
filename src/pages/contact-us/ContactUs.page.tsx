@@ -9,7 +9,7 @@ import {
 import { IParams } from '@/server/api/productHooks';
 import dayjs from 'dayjs';
 import get from 'lodash/get';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 export const ContactUs = () => {
   const [paginationParams, setPaginationParams] = useState<IParams>({
@@ -29,6 +29,7 @@ export const ContactUs = () => {
     data: contactList,
     isSuccess,
     isLoading,
+    isError,
   } = useGetAllContactUsQuery(paginationParams);
 
   // Extract pagination data from API response
@@ -56,30 +57,30 @@ export const ContactUs = () => {
     }));
   }, []);
 
-  const contactListColumns = [
-    { title: 'S.N', key: 'sn' },
-    { title: 'User', key: 'user' },
-    { title: 'Email', key: 'email' },
-    { title: 'Subject', key: 'subject' },
-    { title: 'Description', key: 'description' },
-  ];
+  const contactListColumns = useMemo(
+    () => [
+      { title: 'S.N', key: 'sn' },
+      { title: 'User', key: 'user' },
+      { title: 'Email', key: 'email' },
+      { title: 'Subject', key: 'subject' },
+      { title: 'Description', key: 'description' },
+    ],
+    []
+  );
 
-  const tableData = contactList?.map((product: IContact, index: number) => {
-    // Calculate serial number based on current page and limit
-    // const currentPage = paginationData?.currentPage || 1;
-    // const limit = paginationData?.limit || 10;
-    // const serialNumber = (currentPage - 1) * limit + index + 1;
+  const tableData = useMemo(() => {
+    return contactList?.map((product: IContact, index: number) => {
+      return {
+        ...product,
+        sn: index + 1,
 
-    return {
-      ...product,
-      sn: index + 1,
-
-      user: get(product, 'name', ''),
-      email: get(product, 'email', '-'),
-      subject: get(product, 'subject', '-'),
-      description: get(product, 'description', '-'),
-    };
-  });
+        user: get(product, 'name', ''),
+        email: get(product, 'email', '-'),
+        subject: get(product, 'subject', '-'),
+        description: get(product, 'description', '-'),
+      };
+    });
+  }, [contactList]);
 
   const { mutateAsync: deleteProduct } = useDeleteContactUsMutation();
 
@@ -89,15 +90,17 @@ export const ContactUs = () => {
       <section className="">
         <MasterTable
           columns={contactListColumns}
-          onDelete={(id) => deleteProduct(id)}
+          // onDelete={(id) => {
+          // return deleteProduct(id);
+          // }}
           viewAction={viewAction}
-          loading={isLoading}
+          // loading={isError ? false : isLoading}
           showAction={true}
           rows={tableData}
           canSearch={false}
           apiPagination={true}
           totalItems={contactList?.length || 0}
-          onPageChange={handlePageChange}
+          // onPageChange={handlePageChange}
           //   onSearch={handleSearch}
           //   entriesPerPage={paginationData?.limit || 10}
         />

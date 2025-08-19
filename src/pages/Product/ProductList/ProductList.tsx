@@ -1,18 +1,18 @@
-import { Icon } from "@iconify/react/dist/iconify.js";
-import { get } from "lodash";
-import React, { useCallback, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import MasterTable from "../../../components/shared/MasterTable";
-import Header from "../../../components/shared/table_heading/Header";
+import { Icon } from '@iconify/react/dist/iconify.js';
+import { get } from 'lodash';
+import React, { useCallback, useMemo, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import MasterTable from '../../../components/shared/MasterTable';
+import Header from '../../../components/shared/table_heading/Header';
 import {
   IFetchProduct,
   IParams,
   useDeleteProductsMutation,
   useGetAllProductsQuery,
   useUpdateProductsMutation,
-} from "../../../server/api/productHooks";
-import { updateProductState } from "../../../store/productStore";
-import { productListColumns } from "../productObj";
+} from '../../../server/api/productHooks';
+import { updateProductState } from '../../../store/productStore';
+import { productListColumns } from '../productObj';
 
 const ProductList: React.FC = () => {
   // State for pagination parameters
@@ -21,7 +21,11 @@ const ProductList: React.FC = () => {
     limit: 10,
   });
 
-  const { data: productsList, isSuccess, isLoading } = useGetAllProductsQuery(paginationParams);
+  const {
+    data: productsList,
+    isSuccess,
+    isLoading,
+  } = useGetAllProductsQuery(paginationParams);
   const productsData = useMemo(
     () => (isSuccess && productsList?.products ? productsList.products : []),
     [isSuccess, productsList]
@@ -50,7 +54,7 @@ const ProductList: React.FC = () => {
 
   // Pagination handlers
   const handlePageChange = useCallback((page: number, pageSize: number) => {
-    setPaginationParams(prev => ({
+    setPaginationParams((prev) => ({
       ...prev,
       page: page + 1, // MasterTable uses 0-based indexing, API uses 1-based
       limit: pageSize,
@@ -58,7 +62,7 @@ const ProductList: React.FC = () => {
   }, []);
 
   const handleSearch = useCallback((searchTerm: string) => {
-    setPaginationParams(prev => ({
+    setPaginationParams((prev) => ({
       ...prev,
       page: 1, // Reset to first page when searching
       search: searchTerm || undefined,
@@ -67,7 +71,11 @@ const ProductList: React.FC = () => {
 
   const handleStatusToggle = async (productId: string, newStatus: boolean) => {
     const formData = new FormData();
-    formData.append("isActive", newStatus.toString());
+    formData.append('isActive', newStatus.toString());
+    for (const [key, value] of formData) {
+      console.log(key, value);
+      console.log(productId, 'id');
+    }
     updateProduct({
       id: productId,
       body: formData,
@@ -82,87 +90,89 @@ const ProductList: React.FC = () => {
     navigate(`/product/edit/${row._id}`);
   }, []);
 
-  const tableData = productsData.map((product: IFetchProduct, index: number) => {
-    // Calculate serial number based on current page and limit
-    const currentPage = paginationData?.currentPage || 1;
-    const limit = paginationData?.limit || 10;
-    const serialNumber = (currentPage - 1) * limit + index + 1;
+  const tableData = productsData.map(
+    (product: IFetchProduct, index: number) => {
+      // Calculate serial number based on current page and limit
+      const currentPage = paginationData?.currentPage || 1;
+      const limit = paginationData?.limit || 10;
+      const serialNumber = (currentPage - 1) * limit + index + 1;
 
-    return {
-    ...product,
-    sn: serialNumber,
+      return {
+        ...product,
+        sn: serialNumber,
 
-    image: (
-      <div className="size-12 text-center group cursor-pointer relative">
-        {product.images && product.images.length > 0 ? (
-          <>
-            <img
-              src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${
-                product.images[0]
-              }`}
-              alt="product image"
-              className="w-full h-full rounded-sm object-cover aspect-square transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:rounded-md"
-            />
-            {/* Large preview on hover */}
-            <div className="fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[100] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-              <div className="bg-transparent rounded-lg overflow-hidden">
+        image: (
+          <div className="size-12 text-center group cursor-pointer relative">
+            {product.images && product.images.length > 0 ? (
+              <>
                 <img
                   src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${
                     product.images[0]
                   }`}
-                  alt="product image preview"
-                  className="h-48 object-contain"
-                  style={{ width: "500px" }}
+                  alt="product image"
+                  className="w-full h-full rounded-sm object-cover aspect-square transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:rounded-md"
                 />
-              </div>
-            </div>
-          </>
-        ) : (
-          <>
-            <img
-              src="/no-image.png"
-              alt="product image"
-              className="w-full h-full rounded-sm object-cover aspect-square transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:rounded-md opacity-60"
-            />
-            {/* No image preview */}
-            <div className="fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[100] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-              <div className="bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
-                <div
-                  className="h-48 bg-gray-100 flex items-center justify-center"
-                  style={{ width: "500px" }}
-                >
-                  <span className="text-gray-400 text-sm">
-                    No image available
-                  </span>
+                {/* Large preview on hover */}
+                <div className="fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[100] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                  <div className="bg-transparent rounded-lg overflow-hidden">
+                    <img
+                      src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${
+                        product.images[0]
+                      }`}
+                      alt="product image preview"
+                      className="h-48 object-contain"
+                      style={{ width: '500px' }}
+                    />
+                  </div>
                 </div>
-                <div className="p-2 text-xs text-gray-600 bg-gray-50">
-                  {product.name}
+              </>
+            ) : (
+              <>
+                <img
+                  src="/no-image.png"
+                  alt="product image"
+                  className="w-full h-full rounded-sm object-cover aspect-square transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:rounded-md opacity-60"
+                />
+                {/* No image preview */}
+                <div className="fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[100] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                  <div className="bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+                    <div
+                      className="h-48 bg-gray-100 flex items-center justify-center"
+                      style={{ width: '500px' }}
+                    >
+                      <span className="text-gray-400 text-sm">
+                        No image available
+                      </span>
+                    </div>
+                    <div className="p-2 text-xs text-gray-600 bg-gray-50">
+                      {product.name}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          </>
-        )}
-      </div>
-    ),
-    product: get(product, "name", ""),
-    categ: get(product, "category.name", "-"),
-    subCate: get(product, "subCategory.name", "-"),
-    price: get(product, "price", 0),
-    stock: get(product, "variant[0].remainingStock", 0),
-    sold: get(product, "variant[0].usedStock", 0),
-    status: (
-      <span
-        className={`px-2 py-1 text-xs font-medium rounded-full ${
-          get(product, "isActive", true)
-            ? "bg-green-100 text-green-800"
-            : "bg-red-100 text-red-800"
-        }`}
-      >
-        {get(product, "isActive", true) ? "Active" : "Inactive"}
-      </span>
-    ),
-    };
-  });
+              </>
+            )}
+          </div>
+        ),
+        product: get(product, 'name', ''),
+        categ: get(product, 'category.name', '-'),
+        subCate: get(product, 'subCategory.name', '-'),
+        price: get(product, 'price', 0),
+        stock: get(product, 'variant[0].remainingStock', 0),
+        sold: get(product, 'variant[0].usedStock', 0),
+        status: (
+          <span
+            className={`px-2 py-1 text-xs font-medium rounded-full ${
+              get(product, 'isActive', true)
+                ? 'bg-green-100 text-green-800'
+                : 'bg-red-100 text-red-800'
+            }`}
+          >
+            {get(product, 'isActive', true) ? 'Active' : 'Inactive'}
+          </span>
+        ),
+      };
+    }
+  );
 
   return (
     <div className="">

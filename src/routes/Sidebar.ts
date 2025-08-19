@@ -271,12 +271,12 @@ export const SidebarConfig = {
           ],
         },
 
-        {
-          id: 22,
-          path: FrontendRoutes.CONTACTUS,
-          title: 'Contact Us',
-          icon: 'lucide:contact-round',
-        },
+        // {
+        //   id: 22,
+        //   path: FrontendRoutes.CONTACTUS,
+        //   title: 'Contact Us',
+        //   icon: 'lucide:contact-round',
+        // },
         // MyPostBusiness commented out - will be integrated later
         // {
         //   id: 9,
