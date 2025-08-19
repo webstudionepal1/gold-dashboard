@@ -1,63 +1,63 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
-import './BlogEditor.css';
-import { Icon } from '@iconify/react/dist/iconify.js';
-import { toast } from 'react-toastify';
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import "./BlogEditor.css";
+import { Icon } from "@iconify/react/dist/iconify.js";
+import { toast } from "react-toastify";
 
-import { Button } from '../../../components/ui/button';
-import Header from '../../../components/shared/table_heading/Header';
-import FileDropInput from '../../../components/shared/form_components/FileDropInput';
-import VideoUploadField from '../../../components/shared/form_components/VideoUploadField';
+import { Button } from "../../../components/ui/button";
+import Header from "../../../components/shared/table_heading/Header";
+import FileDropInput from "../../../components/shared/form_components/FileDropInput";
+import VideoUploadField from "../../../components/shared/form_components/VideoUploadField";
 
 import {
   useCreateBlogMutation,
   useUpdateBlogMutation,
   useGetBlogByIdQuery,
-} from '../../../server/api/blogHooks';
-import { IBlogFormData } from '../../../types/blog.types';
-import { FrontendRoutes } from '../../../routes/routes';
-import { useAuth } from '@/hooks/useAuth';
+} from "../../../server/api/blogHooks";
+import { IBlogFormData } from "../../../types/blog.types";
+import { FrontendRoutes } from "../../../routes/routes";
+import { useAuth } from "@/hooks/useAuth";
 
 // Fallback base URL for canonical URL generation
 const BASE_URL =
-  typeof window !== 'undefined' && window.location.origin
+  typeof window !== "undefined" && window.location.origin
     ? window.location.origin
-    : 'https://panch-admin.webstudiomatrix.com/'; // Replace with your actual domain
+    : "https://panch-admin.webstudiomatrix.com/"; // Replace with your actual domain
 
 // Validation schema
 const blogValidationSchema = Yup.object({
   title: Yup.string()
-    .required('Title is required')
-    .max(200, 'Title must be less than 200 characters')
+    .required("Title is required")
+    .max(200, "Title must be less than 200 characters")
     .trim(),
   slug: Yup.string()
-    .required('Slug is required')
+    .required("Slug is required")
     .matches(
       /^[a-z0-9-]+$/,
-      'Slug can only contain lowercase letters, numbers, and hyphens'
+      "Slug can only contain lowercase letters, numbers, and hyphens"
     )
     .trim(),
   content: Yup.string()
-    .required('Content is required')
-    .test('not-empty-html', 'Content cannot be empty', (value) => {
-      if (typeof value !== 'string' || !value) return false;
-      return value !== '<p><br></p>' && value.trim().length > 0;
+    .required("Content is required")
+    .test("not-empty-html", "Content cannot be empty", (value) => {
+      if (typeof value !== "string" || !value) return false;
+      return value !== "<p><br></p>" && value.trim().length > 0;
     }),
-  excerpt: Yup.string().max(500, 'Excerpt must be less than 500 characters'),
+  excerpt: Yup.string().max(500, "Excerpt must be less than 500 characters"),
   tags: Yup.array().of(Yup.string()),
   categories: Yup.array().of(Yup.string()),
   status: Yup.string()
-    .oneOf(['draft', 'published', 'archived'])
-    .required('Status is required'),
+    .oneOf(["draft", "published", "archived"])
+    .required("Status is required"),
   metadata: Yup.object({
-    seoTitle: Yup.string().max(60, 'SEO title must be less than 60 characters'),
+    seoTitle: Yup.string().max(60, "SEO title must be less than 60 characters"),
     seoDescription: Yup.string().max(
       160,
-      'SEO description must be less than 160 characters'
+      "SEO description must be less than 160 characters"
     ),
     keywords: Yup.array().of(Yup.string()),
     canonicalUrl: Yup.string().optional().nullable(), // Simplified to plain string
@@ -71,13 +71,13 @@ const generateSlug = (title: string): string => {
       .toLowerCase()
       .trim()
       // Replace spaces with hyphens
-      .replace(/\s+/g, '-')
+      .replace(/\s+/g, "-")
       // Remove special characters except hyphens
-      .replace(/[^a-z0-9-]/g, '')
+      .replace(/[^a-z0-9-]/g, "")
       // Remove multiple consecutive hyphens
-      .replace(/-+/g, '-')
+      .replace(/-+/g, "-")
       // Remove leading and trailing hyphens
-      .replace(/^-+|-+$/g, '')
+      .replace(/^-+|-+$/g, "")
   );
 };
 
@@ -86,40 +86,40 @@ const BlogEditor: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const isEditing = Boolean(id);
   const { data } = useAuth();
-  const userData = JSON.parse(data?.user ?? '');
+  const userData = JSON.parse(data?.user ?? "");
 
   // State
-  const [tagInput, setTagInput] = useState('');
-  const [categoryInput, setCategoryInput] = useState('');
-  const [keywordInput, setKeywordInput] = useState('');
+  const [tagInput, setTagInput] = useState("");
+  const [categoryInput, setCategoryInput] = useState("");
+  const [keywordInput, setKeywordInput] = useState("");
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
 
   // API hooks
-  const { data: existingBlog, isLoading: isLoadingBlog } = isEditing
-    ? useGetBlogByIdQuery(id!)
-    : { data: undefined, isLoading: false };
+  const { data: existingBlog, isLoading: isLoadingBlog } = useGetBlogByIdQuery(
+    id!
+  );
   const { mutate: createBlog, isPending: isCreating } = useCreateBlogMutation();
   const { mutate: updateBlog, isPending: isUpdating } = useUpdateBlogMutation();
 
   // Initial values
   const initialValues: IBlogFormData = {
-    title: '',
-    slug: '',
-    content: '',
-    excerpt: '',
+    title: "",
+    slug: "",
+    content: "",
+    excerpt: "",
     tags: [],
     categories: [],
     featuredImage: null,
     images: [],
     video: null,
-    status: 'draft',
+    status: "draft",
     isFeatured: false,
-    author: '',
+    author: "",
     metadata: {
-      seoTitle: '',
-      seoDescription: '',
+      seoTitle: "",
+      seoDescription: "",
       keywords: [],
-      canonicalUrl: '',
+      canonicalUrl: "",
     },
   };
 
@@ -131,42 +131,42 @@ const BlogEditor: React.FC = () => {
     validateOnChange: true,
     validateOnBlur: true,
     onSubmit: async (values, { setSubmitting, resetForm }) => {
-      console.log('🚀 Form submission started!', values);
+      console.log("🚀 Form submission started!", values);
 
       // Quick test - just log and return
       if (!values.title || !values.author) {
-        console.log('⚠️ Missing required fields - filling with test data');
-        values.title = values.title || 'Test Blog Title';
-        values.author = values.author || 'Test Author';
-        values.slug = values.slug || 'test-blog-title';
-        values.content = values.content || '<p>Test content</p>';
+        console.log("⚠️ Missing required fields - filling with test data");
+        values.title = values.title || "Test Blog Title";
+        values.author = values.author || "Test Author";
+        values.slug = values.slug || "test-blog-title";
+        values.content = values.content || "<p>Test content</p>";
       }
 
       try {
         const formData = new FormData();
 
-        formData.append('title', values.title.trim());
-        formData.append('slug', values.slug.trim());
-        formData.append('content', values.content.trim());
-        formData.append('excerpt', values.excerpt.trim());
-        formData.append('status', values.status);
-        formData.append('isFeatured', values.isFeatured.toString());
-        formData.append('author', userData?._id);
-        formData.append('tags', JSON.stringify(values.tags));
-        formData.append('categories', JSON.stringify(values.categories));
-        formData.append('metadata', JSON.stringify(values.metadata));
+        formData.append("title", values.title.trim());
+        formData.append("slug", values.slug.trim());
+        formData.append("content", values.content.trim());
+        formData.append("excerpt", values.excerpt.trim());
+        formData.append("status", values.status);
+        formData.append("isFeatured", values.isFeatured.toString());
+        formData.append("author", userData?._id);
+        formData.append("tags", JSON.stringify(values.tags));
+        formData.append("categories", JSON.stringify(values.categories));
+        formData.append("metadata", JSON.stringify(values.metadata));
 
         if (values.featuredImage) {
-          formData.append('featuredImage', values.featuredImage);
-          console.log('✅ Featured image added');
+          formData.append("featuredImage", values.featuredImage);
+          console.log("✅ Featured image added");
         }
         if (values.video) {
-          formData.append('video', values.video);
-          console.log('✅ Video added');
+          formData.append("video", values.video);
+          console.log("✅ Video added");
         }
         if (values.images.length > 0) {
           values.images.forEach((image, index) => {
-            formData.append('images', image);
+            formData.append("images", image);
             console.log(`✅ Image ${index + 1} added`);
           });
         }
@@ -212,25 +212,25 @@ const BlogEditor: React.FC = () => {
   // Load existing blog data for editing
   useEffect(() => {
     if (existingBlog && isEditing) {
-      console.log('📥 Loading existing blog data:', existingBlog);
+      console.log("📥 Loading existing blog data:", existingBlog);
       formik.setValues({
-        title: existingBlog.title || '',
-        slug: existingBlog.slug || '',
-        content: existingBlog.content || '',
-        excerpt: existingBlog.excerpt || '',
+        title: existingBlog.title || "",
+        slug: existingBlog.slug || "",
+        content: existingBlog.content || "",
+        excerpt: existingBlog.excerpt || "",
         tags: existingBlog.tags || [],
         categories: existingBlog.categories || [],
         featuredImage: null,
         images: [],
         video: null,
-        status: existingBlog.status || 'draft',
+        status: existingBlog.status || "draft",
         isFeatured: existingBlog.isFeatured || false,
-        author: existingBlog.author?.name || '',
+        author: existingBlog.author?.name || "",
         metadata: {
-          seoTitle: existingBlog.metadata?.seoTitle || '',
-          seoDescription: existingBlog.metadata?.seoDescription || '',
+          seoTitle: existingBlog.metadata?.seoTitle || "",
+          seoDescription: existingBlog.metadata?.seoDescription || "",
           keywords: existingBlog.metadata?.keywords || [],
-          canonicalUrl: existingBlog.metadata?.canonicalUrl || '',
+          canonicalUrl: existingBlog.metadata?.canonicalUrl || "",
         },
       });
     }
@@ -238,7 +238,7 @@ const BlogEditor: React.FC = () => {
 
   // Memoize image blob URLs with immediate cleanup
   const imagePreviews = useMemo(() => {
-    console.log('🔍 Computing imagePreviews for images:', formik.values.images);
+    console.log("🔍 Computing imagePreviews for images:", formik.values.images);
     const urls = formik.values.images.map((file) => URL.createObjectURL(file));
     return urls;
   }, [formik.values.images]);
@@ -247,7 +247,7 @@ const BlogEditor: React.FC = () => {
   useEffect(() => {
     return () => {
       imagePreviews.forEach((url) => URL.revokeObjectURL(url));
-      console.log('🧹 Cleaned up blob URLs for images');
+      console.log("🧹 Cleaned up blob URLs for images");
     };
   }, [imagePreviews]);
 
@@ -255,22 +255,22 @@ const BlogEditor: React.FC = () => {
   const handleTitleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const title = e.target.value;
-      formik.setFieldValue('title', title);
-      formik.validateField('title');
+      formik.setFieldValue("title", title);
+      formik.validateField("title");
 
       // Auto-generate slug from title (only if slug hasn't been manually edited)
       if (!isSlugManuallyEdited) {
         const autoSlug = generateSlug(title);
-        formik.setFieldValue('slug', autoSlug);
-        formik.validateField('slug');
+        formik.setFieldValue("slug", autoSlug);
+        formik.validateField("slug");
 
         // Update canonical URL as well
-        const canonicalUrl = autoSlug ? `${BASE_URL}/blog/${autoSlug}` : '';
-        formik.setFieldValue('metadata.canonicalUrl', canonicalUrl);
-        formik.validateField('metadata.canonicalUrl');
+        const canonicalUrl = autoSlug ? `${BASE_URL}/blog/${autoSlug}` : "";
+        formik.setFieldValue("metadata.canonicalUrl", canonicalUrl);
+        formik.validateField("metadata.canonicalUrl");
 
-        console.log('🔄 Auto-generated slug:', autoSlug);
-        console.log('🔄 Auto-generated canonical URL:', canonicalUrl);
+        console.log("🔄 Auto-generated slug:", autoSlug);
+        console.log("🔄 Auto-generated canonical URL:", canonicalUrl);
       }
     },
     [formik, isEditing]
@@ -282,15 +282,15 @@ const BlogEditor: React.FC = () => {
       // Mark that slug has been manually edited
       setIsSlugManuallyEdited(true);
 
-      let slug = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
-      slug = slug.replace(/^-+|-+$/g, '').replace(/-+/g, '-');
-      console.log('📍 Manual slug edit:', slug);
-      formik.setFieldValue('slug', slug);
-      formik.validateField('slug');
-      const canonicalUrl = slug ? `${BASE_URL}/blog/${slug}` : '';
-      console.log('📍 Canonical URL:', canonicalUrl);
-      formik.setFieldValue('metadata.canonicalUrl', canonicalUrl);
-      formik.validateField('metadata.canonicalUrl');
+      let slug = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "");
+      slug = slug.replace(/^-+|-+$/g, "").replace(/-+/g, "-");
+      console.log("📍 Manual slug edit:", slug);
+      formik.setFieldValue("slug", slug);
+      formik.validateField("slug");
+      const canonicalUrl = slug ? `${BASE_URL}/blog/${slug}` : "";
+      console.log("📍 Canonical URL:", canonicalUrl);
+      formik.setFieldValue("metadata.canonicalUrl", canonicalUrl);
+      formik.validateField("metadata.canonicalUrl");
     },
     [formik, setIsSlugManuallyEdited]
   );
@@ -300,50 +300,50 @@ const BlogEditor: React.FC = () => {
     () => ({
       toolbar: [
         [{ header: [1, 2, 3, 4, 5, 6, false] }],
-        ['bold', 'italic', 'underline', 'strike'],
+        ["bold", "italic", "underline", "strike"],
         [{ color: [] }, { background: [] }],
-        [{ list: 'ordered' }, { list: 'bullet' }],
-        [{ indent: '-1' }, { indent: '+1' }],
+        [{ list: "ordered" }, { list: "bullet" }],
+        [{ indent: "-1" }, { indent: "+1" }],
         [{ align: [] }],
-        ['link', 'image', 'video'],
-        ['blockquote', 'code-block'],
-        ['clean'],
+        ["link", "image", "video"],
+        ["blockquote", "code-block"],
+        ["clean"],
       ],
     }),
     []
   );
 
   const quillFormats = [
-    'header',
-    'bold',
-    'italic',
-    'underline',
-    'strike',
-    'color',
-    'background',
-    'list',
-    'bullet',
-    'indent',
-    'align',
-    'link',
-    'image',
-    'video',
-    'blockquote',
-    'code-block',
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "color",
+    "background",
+    "list",
+    "bullet",
+    "indent",
+    "align",
+    "link",
+    "image",
+    "video",
+    "blockquote",
+    "code-block",
   ];
 
   // Helper functions
   const addTag = useCallback(() => {
     if (tagInput.trim() && !formik.values.tags.includes(tagInput.trim())) {
-      formik.setFieldValue('tags', [...formik.values.tags, tagInput.trim()]);
-      setTagInput('');
+      formik.setFieldValue("tags", [...formik.values.tags, tagInput.trim()]);
+      setTagInput("");
     }
   }, [tagInput, formik]);
 
   const removeTag = useCallback(
     (tagToRemove: string) => {
       formik.setFieldValue(
-        'tags',
+        "tags",
         formik.values.tags.filter((tag) => tag !== tagToRemove)
       );
     },
@@ -355,18 +355,18 @@ const BlogEditor: React.FC = () => {
       categoryInput.trim() &&
       !formik.values.categories.includes(categoryInput.trim())
     ) {
-      formik.setFieldValue('categories', [
+      formik.setFieldValue("categories", [
         ...formik.values.categories,
         categoryInput.trim(),
       ]);
-      setCategoryInput('');
+      setCategoryInput("");
     }
   }, [categoryInput, formik]);
 
   const removeCategory = useCallback(
     (categoryToRemove: string) => {
       formik.setFieldValue(
-        'categories',
+        "categories",
         formik.values.categories.filter((cat) => cat !== categoryToRemove)
       );
     },
@@ -378,18 +378,18 @@ const BlogEditor: React.FC = () => {
       keywordInput.trim() &&
       !formik.values.metadata.keywords.includes(keywordInput.trim())
     ) {
-      formik.setFieldValue('metadata.keywords', [
+      formik.setFieldValue("metadata.keywords", [
         ...formik.values.metadata.keywords,
         keywordInput.trim(),
       ]);
-      setKeywordInput('');
+      setKeywordInput("");
     }
   }, [keywordInput, formik]);
 
   const removeKeyword = useCallback(
     (keywordToRemove: string) => {
       formik.setFieldValue(
-        'metadata.keywords',
+        "metadata.keywords",
         formik.values.metadata.keywords.filter((kw) => kw !== keywordToRemove)
       );
     },
@@ -406,7 +406,7 @@ const BlogEditor: React.FC = () => {
 
   return (
     <div className="bg-gray-50">
-      <Header text={isEditing ? 'Edit Blog' : 'Create New Blog'}>
+      <Header text={isEditing ? "Edit Blog" : "Create New Blog"}>
         <div className="flex gap-3">
           <Button
             variant="outline"
@@ -422,12 +422,12 @@ const BlogEditor: React.FC = () => {
             disabled={isCreating || isUpdating}
             className="bg-customorange hover:bg-customorangedark text-white"
             onClick={() => {
-              console.log('🔘 Submit button clicked!');
+              console.log("🔘 Submit button clicked!");
               console.log(
-                '🔍 Button disabled:',
+                "🔍 Button disabled:",
                 isCreating || isUpdating || !formik.isValid
               );
-              console.log('🔍 Form valid:', formik.isValid);
+              console.log("🔍 Form valid:", formik.isValid);
             }}
           >
             {isCreating || isUpdating ? (
@@ -435,19 +435,19 @@ const BlogEditor: React.FC = () => {
             ) : (
               <Icon icon="material-symbols:save" className="w-4 h-4 mr-2" />
             )}
-            {isEditing ? 'Update Blog' : 'Create Blog'}
+            {isEditing ? "Update Blog" : "Create Blog"}
           </Button>
         </div>
       </Header>
 
-      <div className="max-w-7xl mx-auto">
+      <div className="max-full mx-auto">
         <form
           id="blog-form"
           onSubmit={(e) => {
-            console.log('🔘 Form submit event triggered!');
-            console.log('🔍 Form valid:', formik.isValid);
-            console.log('🔍 Form errors:', formik.errors);
-            console.log('🔍 Form values:', formik.values);
+            console.log("🔘 Form submit event triggered!");
+            console.log("🔍 Form valid:", formik.isValid);
+            console.log("🔍 Form errors:", formik.errors);
+            console.log("🔍 Form values:", formik.values);
             formik.handleSubmit(e);
           }}
           className="space-y-3"
@@ -533,18 +533,18 @@ const BlogEditor: React.FC = () => {
                           onClick={() => {
                             setIsSlugManuallyEdited(false);
                             const autoSlug = generateSlug(formik.values.title);
-                            formik.setFieldValue('slug', autoSlug);
-                            formik.validateField('slug');
+                            formik.setFieldValue("slug", autoSlug);
+                            formik.validateField("slug");
                             const canonicalUrl = autoSlug
                               ? `${BASE_URL}/blog/${autoSlug}`
-                              : '';
+                              : "";
                             formik.setFieldValue(
-                              'metadata.canonicalUrl',
+                              "metadata.canonicalUrl",
                               canonicalUrl
                             );
-                            formik.validateField('metadata.canonicalUrl');
+                            formik.validateField("metadata.canonicalUrl");
                             console.log(
-                              '🔄 Reset to auto-generated slug:',
+                              "🔄 Reset to auto-generated slug:",
                               autoSlug
                             );
                           }}
@@ -610,14 +610,14 @@ const BlogEditor: React.FC = () => {
                     theme="snow"
                     value={formik.values.content}
                     onChange={(content) => {
-                      formik.setFieldValue('content', content);
-                      formik.validateField('content');
+                      formik.setFieldValue("content", content);
+                      formik.validateField("content");
                     }}
                     modules={quillModules}
                     formats={quillFormats}
                     placeholder="Write your blog content here..."
                     style={{
-                      minHeight: '280px',
+                      minHeight: "280px",
                     }}
                   />
                 </div>
@@ -682,7 +682,7 @@ const BlogEditor: React.FC = () => {
                   multiple={false}
                   value={formik.values.featuredImage}
                   onChange={(file) =>
-                    formik.setFieldValue('featuredImage', file)
+                    formik.setFieldValue("featuredImage", file)
                   }
                   label="Upload Featured Image"
                 />
@@ -704,7 +704,7 @@ const BlogEditor: React.FC = () => {
                 <FileDropInput
                   multiple={true}
                   value={formik.values.images}
-                  onChange={(files) => formik.setFieldValue('images', files)}
+                  onChange={(files) => formik.setFieldValue("images", files)}
                   label="Upload Additional Images"
                   maxFiles={10}
                 />
@@ -723,7 +723,7 @@ const BlogEditor: React.FC = () => {
                             const newImages = formik.values.images.filter(
                               (_, i) => i !== index
                             );
-                            formik.setFieldValue('images', newImages);
+                            formik.setFieldValue("images", newImages);
                           }}
                           className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs hover:bg-red-600"
                         >
@@ -762,7 +762,7 @@ const BlogEditor: React.FC = () => {
                       value={formik.values.status}
                       onChange={(e) => {
                         formik.handleChange(e);
-                        formik.validateField('status');
+                        formik.validateField("status");
                       }}
                       className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-customorange focus:border-transparent text-sm"
                     >
@@ -807,7 +807,7 @@ const BlogEditor: React.FC = () => {
                     value={tagInput}
                     onChange={(e) => setTagInput(e.target.value)}
                     onKeyPress={(e) =>
-                      e.key === 'Enter' && (e.preventDefault(), addTag())
+                      e.key === "Enter" && (e.preventDefault(), addTag())
                     }
                     className="flex-1 px-2 py-1.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-customorange focus:border-transparent text-sm"
                     placeholder="Add tag..."
@@ -862,7 +862,7 @@ const BlogEditor: React.FC = () => {
                     value={categoryInput}
                     onChange={(e) => setCategoryInput(e.target.value)}
                     onKeyPress={(e) =>
-                      e.key === 'Enter' && (e.preventDefault(), addCategory())
+                      e.key === "Enter" && (e.preventDefault(), addCategory())
                     }
                     className="flex-1 px-2 py-1.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-customorange focus:border-transparent text-sm"
                     placeholder="Add category..."
@@ -913,7 +913,7 @@ const BlogEditor: React.FC = () => {
                 </div>
                 <VideoUploadField
                   value={formik.values.video}
-                  onChange={(file) => formik.setFieldValue('video', file)}
+                  onChange={(file) => formik.setFieldValue("video", file)}
                   label="Upload Video"
                 />
               </div>
@@ -1004,7 +1004,7 @@ const BlogEditor: React.FC = () => {
                     value={keywordInput}
                     onChange={(e) => setKeywordInput(e.target.value)}
                     onKeyPress={(e) =>
-                      e.key === 'Enter' && (e.preventDefault(), addKeyword())
+                      e.key === "Enter" && (e.preventDefault(), addKeyword())
                     }
                     className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-customorange focus:border-transparent text-sm"
                     placeholder="Add SEO keyword..."

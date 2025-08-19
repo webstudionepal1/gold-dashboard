@@ -756,7 +756,7 @@ const BannerIndex: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-2 md:px-0 py-3">
+    <div className="w-full mx-auto px-2 md:px-0 py-3">
       <Header text="Banner">
         <button className="px-3 py-2 flex items-center text-white bg-[#d49327] transition-transform duration-200 ease-in-out hover:scale-105 rounded-lg">
           <a className="flex items-center" href="/banner/add">

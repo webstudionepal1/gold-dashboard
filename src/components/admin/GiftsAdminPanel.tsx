@@ -171,7 +171,7 @@ const GiftsAdminPanel: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto">
+    <div className="mx-auto">
       <Header text="Gifts & Packages Management">
         <button
           onClick={handleCreateGift}
