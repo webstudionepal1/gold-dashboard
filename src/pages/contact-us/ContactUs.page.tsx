@@ -8,7 +8,7 @@ import {
 } from "@/server/api/contact.api";
 import { IParams } from "@/server/api/productHooks";
 import dayjs from "dayjs";
-import get from 'lodash/get';
+import get from "lodash/get";
 import { useCallback, useState } from "react";
 
 export const ContactUs = () => {
@@ -133,18 +133,16 @@ export const ContactUs = () => {
                 </p>
               </div>
 
-          <div className="text-sm text-gray-500">
-  <p>
-    Created: {dayjs(get(view?.data, "createdAt")).isValid()
-      ? dayjs(get(view?.data, "createdAt")).format("DD MMM YYYY hh:mm A")
-      : "-"}
-  </p>
-  <p>
-    Updated: {dayjs(get(view?.data, "updatedAt")).isValid()
-      ? dayjs(get(view?.data, "updatedAt")).format("DD MMM YYYY hh:mm A")
-      : "-"}
-  </p>
-</div>
+              <div className="text-sm text-gray-500">
+                <p>
+                  Created:{" "}
+                  {dayjs(get(view?.data, "createdAt")).isValid()
+                    ? dayjs(get(view?.data, "createdAt")).format(
+                        "DD MMM YYYY hh:mm A"
+                      )
+                    : "-"}
+                </p>
+              </div>
             </div>
           </div>
         </ScrollableModal>

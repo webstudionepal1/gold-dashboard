@@ -300,9 +300,7 @@ export const conditionalProductFormSchema = z
       .min(1, "Product name is required")
       .max(200, "Product name cannot exceed 200 characters")
       .trim(),
-    productType: z.enum(["normal", "gold", "silver"], {
-      required_error: "Product type is required",
-    }),
+    productType: z.string().min(1, "Product type is required"),
     description: z
       .string()
       .min(1, "Description is required")

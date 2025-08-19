@@ -76,13 +76,11 @@ const NewProductForm: React.FC = () => {
       // Media
       images: [],
 
-      // SEO & Marketing
       visibleAs: Array.isArray(product.visibleAs)
         ? product.visibleAs
-        : product.visibleAs
+        : typeof product.visibleAs === "string"
         ? [product.visibleAs]
         : [],
-      // Status
       isActive: get(product, "isActive", true),
       isFeatured: get(product, "isFeatured", false),
     };

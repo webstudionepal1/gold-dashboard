@@ -70,24 +70,24 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
             </div>
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                {gift.name}
+                {gift?.name}
               </h2>
               <div className="flex items-center space-x-3">
                 <span
                   className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    gift.isActive
+                    gift?.isActive
                       ? "bg-green-100 text-green-700"
                       : "bg-gray-100 text-gray-700"
                   }`}
                 >
-                  {gift.isActive ? "✓ Active" : "⚠ Inactive"}
+                  {gift?.isActive ? "✓ Active" : "⚠ Inactive"}
                 </span>
                 <span className="px-3 py-1 bg-white rounded-full text-sm font-medium text-gray-700 capitalize">
-                  {gift.type}
+                  {gift?.type}
                 </span>
-                {gift.occasion && (
+                {gift?.occasion && (
                   <span className="px-3 py-1 bg-white rounded-full text-sm font-medium text-gray-700 capitalize">
-                    {gift.occasion}
+                    {gift?.occasion}
                   </span>
                 )}
               </div>
@@ -104,14 +104,14 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
       </div>
 
       {/* Description */}
-      {gift.description && (
+      {gift?.description && (
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
             <div className="w-2 h-6 bg-blue-500 rounded-full mr-3"></div>
             Description
           </h3>
           <p className="text-gray-700 leading-relaxed text-lg">
-            {gift.description}
+            {gift?.description}
           </p>
         </div>
       )}
@@ -128,7 +128,7 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
               Total Price
             </label>
             <p className="text-2xl font-bold text-gray-900">
-              {formatPrice(gift.totalPrice || 0)}
+              {formatPrice(gift?.totalPrice || 0)}
             </p>
           </div>
           <div className="bg-white rounded-lg p-4 shadow-sm">
@@ -136,7 +136,7 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
               Discount
             </label>
             <p className="text-2xl font-bold text-orange-600">
-              {gift.discountPercentage || 0}%
+              {gift?.discountPercentage || 0}%
             </p>
           </div>
           <div className="bg-white rounded-lg p-4 shadow-sm border-2 border-green-200">
@@ -158,7 +158,7 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
             Gift Information
           </h3>
           <div className="space-y-4">
-            {gift.setType && (
+            {gift?.setType && (
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div className="flex items-center space-x-3">
                   <Icon
@@ -170,7 +170,7 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
                   </span>
                 </div>
                 <span className="text-sm font-semibold text-gray-900 capitalize px-3 py-1 bg-white rounded-md">
-                  {gift.setType.replace("_", " ")}
+                  {gift?.setType.replace("_", " ")}
                 </span>
               </div>
             )}
@@ -186,14 +186,14 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
               </div>
               <span
                 className={`text-sm font-semibold px-3 py-1 rounded-md ${
-                  (gift.priority || 0) >= 8
+                  (gift?.priority || 0) >= 8
                     ? "bg-red-100 text-red-700"
-                    : (gift.priority || 0) >= 5
+                    : (gift?.priority || 0) >= 5
                     ? "bg-yellow-100 text-yellow-700"
                     : "bg-green-100 text-green-700"
                 }`}
               >
-                {gift.priority || "Not set"}
+                {gift?.priority || "Not set"}
               </span>
             </div>
             <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -235,7 +235,7 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
           </h3>
           {gift.tags && gift.tags.length > 0 ? (
             <div className="flex flex-wrap gap-3">
-              {gift.tags.map((tag, index) => (
+              {gift?.tags?.map((tag, index) => (
                 <span
                   key={index}
                   className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 text-sm font-medium rounded-lg border border-blue-200 hover:shadow-md transition-shadow"
@@ -270,7 +270,7 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
               className="w-5 h-5 text-orange-600"
             />
             <span className="text-lg font-bold text-orange-600">
-              {gift.products?.length || 0}
+              {gift?.products?.length || 0}
             </span>
             <span className="text-sm text-orange-600">items</span>
           </div>
@@ -284,26 +284,26 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
                   <h4 className="font-semibold text-gray-900">
-                    {giftProduct.product.name}
+                    {giftProduct?.product?.name}
                   </h4>
                   <p className="text-sm text-gray-600 mt-1">
                     {giftProduct.product.description}
                   </p>
                   <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
-                    <span>Category: {giftProduct.product.category.name}</span>
+                    <span>Category: {giftProduct?.product?.category?.name}</span>
                     <span>
-                      Subcategory: {giftProduct.product.subCategory.name}
+                      Subcategory: {giftProduct?.product?.subCategory?.name}
                     </span>
                   </div>
                 </div>
                 <div className="text-right ml-4">
                   <div className="text-lg font-semibold text-gray-900">
-                    {formatPrice(giftProduct.product.variant[0]?.price || 0)}
+                    {formatPrice(giftProduct?.product?.variant[0]?.price || 0)}
                   </div>
                   <div className="text-sm text-gray-500">
-                    Qty: {giftProduct.quantity}
+                    Qty: {giftProduct?.quantity}
                   </div>
-                  {giftProduct.isOptional && (
+                  {giftProduct?.isOptional && (
                     <span className="inline-block px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-md mt-1">
                       Optional
                     </span>
@@ -316,26 +316,26 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
                 <div>
                   <span className="text-gray-600">Weight:</span>
                   <span className="ml-1 font-medium">
-                    {giftProduct.product.variant[0]?.wt || 0}{" "}
-                    {giftProduct.product.variant[0]?.unit || "grams"}
+                    {giftProduct?.product?.variant[0]?.wt || 0}{" "}
+                    {giftProduct?.product?.variant[0]?.unit || "grams"}
                   </span>
                 </div>
                 <div>
                   <span className="text-gray-600">Making Charges:</span>
                   <span className="ml-1 font-medium">
-                    {formatPrice(giftProduct.product.makingCharges || 0)}
+                    {formatPrice(giftProduct?.product?.makingCharges || 0)}
                   </span>
                 </div>
                 <div>
                   <span className="text-gray-600">Color:</span>
                   <span className="ml-1 font-medium capitalize">
-                    {giftProduct.product.color || "N/A"}
+                    {giftProduct?.product?.color || "N/A"}
                   </span>
                 </div>
                 <div>
                   <span className="text-gray-600">Clarity:</span>
                   <span className="ml-1 font-medium">
-                    {giftProduct.product.clarity || "N/A"}
+                    {giftProduct?.product?.clarity || "N/A"}
                   </span>
                 </div>
               </div>
@@ -355,10 +355,10 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
                             className="flex items-center justify-between text-sm bg-gray-50 rounded p-2"
                           >
                             <span className="font-medium">
-                              {altProduct.name}
+                              {altProduct?.name}
                             </span>
                             <span className="text-gray-600">
-                              {formatPrice(altProduct.variant[0]?.price || 0)}
+                              {formatPrice(altProduct?.variant[0]?.price || 0)}
                             </span>
                           </div>
                         )
@@ -383,7 +383,7 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
                             src={import.meta.env.VITE_API_IMAGE_BASE_URL.toString().concat(
                               image
                             )}
-                            alt={`${giftProduct.product.name} ${imgIndex + 1}`}
+                            alt={`${giftProduct?.product?.name} ${imgIndex + 1}`}
                             className="w-16 h-16 object-cover rounded border border-gray-200 flex-shrink-0"
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
@@ -393,7 +393,7 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
                         ))}
                       {giftProduct.product.images.length > 3 && (
                         <div className="w-16 h-16 bg-gray-100 rounded border border-gray-200 flex items-center justify-center text-xs text-gray-500 flex-shrink-0">
-                          +{giftProduct.product.images.length - 3}
+                          +{giftProduct?.product?.images?.length - 3}
                         </div>
                       )}
                     </div>
@@ -405,7 +405,7 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
       </div>
 
       {/* Gift Images Gallery */}
-      {gift.images && gift.images.length > 0 && (
+      {gift?.images && gift?.images?.length > 0 && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center gap-2 mb-4">
             <Icon
@@ -467,7 +467,7 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
       </div>
 
       {/* Image Modal/Lightbox */}
-      {isImageModalOpen && gift.images && gift.images.length > 0 && (
+      {isImageModalOpen && gift?.images && gift?.images.length > 0 && (
         <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4">
           <div className="relative max-w-4xl max-h-full w-full h-full flex items-center justify-center">
             {/* Close Button */}

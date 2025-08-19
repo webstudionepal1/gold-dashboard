@@ -207,7 +207,11 @@ const GiftForm: React.FC<GiftFormProps> = ({ gift, onCancel, products }) => {
     totalStock: gift?.totalStock || 0,
     featuredImage: gift?.featuredImage || "",
     slug: gift?.slug || "",
-    visibleAs: gift?.visibleAs || "",
+    visibleAs: Array.isArray(gift?.visibleAs)
+      ? gift?.visibleAs.length > 0
+        ? gift?.visibleAs[0]
+        : ""
+      : gift?.visibleAs || "",
     weight: gift?.weight || 0,
     isCustomizable: gift?.isCustomizable ?? false,
     allowPartialPurchase: gift?.allowPartialPurchase ?? false,
