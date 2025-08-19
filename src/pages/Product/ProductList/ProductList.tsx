@@ -6,6 +6,7 @@ import MasterTable from "../../../components/shared/MasterTable";
 import Header from "../../../components/shared/table_heading/Header";
 import {
   IFetchProduct,
+  IParams,
   useDeleteProductsMutation,
   useGetAllProductsQuery,
   useUpdateProductsMutation,
@@ -14,14 +15,55 @@ import { updateProductState } from "../../../store/productStore";
 import { productListColumns } from "../productObj";
 
 const ProductList: React.FC = () => {
-  const { data: productsList, isSuccess, isLoading } = useGetAllProductsQuery();
+  // State for pagination parameters
+  const [paginationParams, setPaginationParams] = useState<IParams>({
+    page: 1,
+    limit: 10,
+  });
+
+  const { data: productsList, isSuccess, isLoading } = useGetAllProductsQuery(paginationParams);
   const productsData = useMemo(
     () => (isSuccess && productsList?.products ? productsList.products : []),
     [isSuccess, productsList]
   );
+
+  // Extract pagination data from API response
+  const paginationData = useMemo(() => {
+    if (productsList?.pagination) {
+      return {
+        currentPage: productsList.pagination.currentPage,
+        totalPages: productsList.pagination.totalPages,
+        totalCount: productsList.pagination.totalCount,
+        limit: productsList.pagination.limit,
+        hasNextPage: productsList.pagination.hasNextPage,
+        hasPrevPage: productsList.pagination.hasPrevPage,
+        nextPage: productsList.pagination.nextPage,
+        prevPage: productsList.pagination.prevPage,
+      };
+    }
+    return null;
+  }, [productsList?.pagination]);
+
   const { mutate: deleteProduct } = useDeleteProductsMutation();
   const { mutate: updateProduct } = useUpdateProductsMutation();
   const navigate = useNavigate();
+
+  // Pagination handlers
+  const handlePageChange = useCallback((page: number, pageSize: number) => {
+    setPaginationParams(prev => ({
+      ...prev,
+      page: page + 1, // MasterTable uses 0-based indexing, API uses 1-based
+      limit: pageSize,
+    }));
+  }, []);
+
+  const handleSearch = useCallback((searchTerm: string) => {
+    setPaginationParams(prev => ({
+      ...prev,
+      page: 1, // Reset to first page when searching
+      search: searchTerm || undefined,
+    }));
+  }, []);
 
   const handleStatusToggle = async (productId: string, newStatus: boolean) => {
     const formData = new FormData();
@@ -40,9 +82,15 @@ const ProductList: React.FC = () => {
     navigate(`/product/edit/${row._id}`);
   }, []);
 
-  const tableData = productsData.map((product: IFetchProduct, index: number) => ({
+  const tableData = productsData.map((product: IFetchProduct, index: number) => {
+    // Calculate serial number based on current page and limit
+    const currentPage = paginationData?.currentPage || 1;
+    const limit = paginationData?.limit || 10;
+    const serialNumber = (currentPage - 1) * limit + index + 1;
+
+    return {
     ...product,
-    sn: index + 1,
+    sn: serialNumber,
 
     image: (
       <div className="size-12 text-center group cursor-pointer relative">
@@ -113,7 +161,8 @@ const ProductList: React.FC = () => {
         {get(product, "isActive", true) ? "Active" : "Inactive"}
       </span>
     ),
-  }));
+    };
+  });
 
   return (
     <div className="">
@@ -137,6 +186,11 @@ const ProductList: React.FC = () => {
             handleStatusToggle(row._id, !row.isActive);
           }}
           rows={tableData}
+          apiPagination={true}
+          totalItems={paginationData?.totalCount || 0}
+          onPageChange={handlePageChange}
+          onSearch={handleSearch}
+          entriesPerPage={paginationData?.limit || 10}
         />
       </div>
     </div>

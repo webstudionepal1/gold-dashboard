@@ -20,12 +20,13 @@ import {
 } from "../../../server/api/blogHooks";
 import { IBlogFormData } from "../../../types/blog.types";
 import { FrontendRoutes } from "../../../routes/routes";
+import { useAuth } from "@/hooks/useAuth";
 
 // Fallback base URL for canonical URL generation
 const BASE_URL =
   typeof window !== "undefined" && window.location.origin
     ? window.location.origin
-    : "https://your-default-domain.com"; // Replace with your actual domain
+    : "https://panch-admin.webstudiomatrix.com/"; // Replace with your actual domain
 
 // Validation schema
 const blogValidationSchema = Yup.object({
@@ -52,7 +53,6 @@ const blogValidationSchema = Yup.object({
   status: Yup.string()
     .oneOf(["draft", "published", "archived"])
     .required("Status is required"),
-  author: Yup.string().required("Author is required").trim(),
   metadata: Yup.object({
     seoTitle: Yup.string().max(60, "SEO title must be less than 60 characters"),
     seoDescription: Yup.string().max(
@@ -85,6 +85,8 @@ const BlogEditor: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const isEditing = Boolean(id);
+  const { data } = useAuth();
+  const userData = JSON.parse(data?.user ?? "");
 
   // State
   const [tagInput, setTagInput] = useState("");
@@ -93,9 +95,9 @@ const BlogEditor: React.FC = () => {
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
 
   // API hooks
-  const { data: existingBlog, isLoading: isLoadingBlog } = isEditing
-    ? useGetBlogByIdQuery(id!)
-    : { data: undefined, isLoading: false };
+  const { data: existingBlog, isLoading: isLoadingBlog } = useGetBlogByIdQuery(
+    id!
+  );
   const { mutate: createBlog, isPending: isCreating } = useCreateBlogMutation();
   const { mutate: updateBlog, isPending: isUpdating } = useUpdateBlogMutation();
 
@@ -149,7 +151,7 @@ const BlogEditor: React.FC = () => {
         formData.append("excerpt", values.excerpt.trim());
         formData.append("status", values.status);
         formData.append("isFeatured", values.isFeatured.toString());
-        formData.append("author", values.author.trim());
+        formData.append("author", userData?._id);
         formData.append("tags", JSON.stringify(values.tags));
         formData.append("categories", JSON.stringify(values.categories));
         formData.append("metadata", JSON.stringify(values.metadata));
@@ -182,17 +184,16 @@ const BlogEditor: React.FC = () => {
             { id, formData },
             {
               onSuccess: () => {
-                history.back()
+                history.back();
               },
             }
           );
         } else {
           createBlog(formData, {
             onSuccess: () => {
-            resetForm()
+              resetForm();
             },
-          }
-          );
+          });
         }
       } catch {
         setSubmitting(false);
@@ -439,8 +440,7 @@ const BlogEditor: React.FC = () => {
         </div>
       </Header>
 
-
-      <div className="max-w-7xl mx-auto">
+      <div className="max-full mx-auto">
         <form
           id="blog-form"
           onSubmit={(e) => {
@@ -497,7 +497,7 @@ const BlogEditor: React.FC = () => {
                   </div>
 
                   {/* Author Input */}
-                  <div>
+                  {/* <div>
                     <label className="block text-xs font-medium text-gray-700 mb-1">
                       Author *
                     </label>
@@ -519,7 +519,7 @@ const BlogEditor: React.FC = () => {
                         {formik.errors.author}
                       </p>
                     )}
-                  </div>
+                  </div> */}
 
                   {/* Slug Input */}
                   <div>
