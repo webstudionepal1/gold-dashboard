@@ -1,17 +1,18 @@
-import { useForm } from "@tanstack/react-form";
-import { useEffect, useMemo } from "react";
-import * as z from "zod";
-import { Modal } from "../../../../components/shared";
+import { useForm } from '@tanstack/react-form';
+import { useEffect, useMemo } from 'react';
+import * as z from 'zod';
+import { Modal } from '../../../../components/shared';
 import {
   IFetchSubCategory,
   useCreateProductSubCategoryMutation,
   useGetAllProductCategoriesQuery,
   useUpdateProductSubCategoryMutation,
-} from "../../../../server/api/productHooks";
-import { DropdownField } from "../../../../components/shared/form_components/Dropdown";
-import { FieldError } from "../../../auth/LoginPage";
-import { get } from "lodash";
-import { InputField } from "../../../../components/shared/form_components/InputField";
+} from '../../../../server/api/productHooks';
+import { DropdownField } from '../../../../components/shared/form_components/Dropdown';
+import { FieldError } from '../../../auth/LoginPage';
+import { get } from 'lodash';
+import { InputField } from '../../../../components/shared/form_components/InputField';
+import { FormLoader } from '@/components/shared/FormLoader.component';
 interface propTypes {
   modalRef: React.RefObject<HTMLDivElement | null>;
   editData?: IFetchSubCategory | null;
@@ -19,8 +20,8 @@ interface propTypes {
 }
 
 const validationSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  category: z.string().min(1, "Category is required"),
+  name: z.string().min(1, 'Name is required'),
+  category: z.string().min(1, 'Category is required'),
   description: z.string().optional(),
 });
 interface ISubCategorForm {
@@ -36,10 +37,16 @@ export const AddProductSubCategory = ({
   console.log(editData, 'editData');
   const { data: categories, isSuccess: categorySuccess } =
     useGetAllProductCategoriesQuery();
-  const { mutate: createSubCategory, isSuccess } =
-    useCreateProductSubCategoryMutation();
-  const { mutate: updateSubCategory, isSuccess: isUpdateSuccess } =
-    useUpdateProductSubCategoryMutation();
+  const {
+    mutate: createSubCategory,
+    isSuccess,
+    isPending: createPending,
+  } = useCreateProductSubCategoryMutation();
+  const {
+    mutate: updateSubCategory,
+    isSuccess: isUpdateSuccess,
+    isPending: updatePending,
+  } = useUpdateProductSubCategoryMutation();
 
   const categoriesList = useMemo(
     () =>
@@ -50,9 +57,9 @@ export const AddProductSubCategory = ({
   );
   const form = useForm({
     defaultValues: {
-      name: editData ? get(editData, "name", "") : "",
-      category: editData ? get(editData, "category", "") : "",
-      description: editData ? get(editData, "rawDescription", "") : "",
+      name: editData ? get(editData, 'name', '') : '',
+      category: editData ? get(editData, 'category', '') : '',
+      description: editData ? get(editData, 'rawDescription', '') : '',
     } as ISubCategorForm,
     validators: {
       onSubmit: validationSchema,
@@ -70,7 +77,12 @@ export const AddProductSubCategory = ({
   }, [isSuccess, isUpdateSuccess]);
 
   return (
-    <Modal classname="w-[400px]  h-auto" ref={modalRef}>
+    <Modal
+      classname="w-[400px]  h-auto"
+      ref={modalRef}
+      blurChildren={createPending || updatePending}
+      showLoader={createPending || updatePending}
+    >
       <form
         className="p-6"
         onSubmit={(e) => {
@@ -79,11 +91,10 @@ export const AddProductSubCategory = ({
         }}
       >
         <h2 className="mb-6 text-xl font-semibold">
-          {editData ? "Edit Subcategory" : "Add New Subcategory"}
+          {editData ? 'Edit Subcategory' : 'Add New Subcategory'}
         </h2>
         <div className="space-y-6">
           <div>
-
             <form.Field name="name">
               {(field) => (
                 <div>
@@ -119,7 +130,7 @@ export const AddProductSubCategory = ({
               <div>
                 <div className="flex flex-col">
                   <label className="mb-1 text-sm font-medium text-gray-700">
-                    Description 
+                    Description
                   </label>
                   <textarea
                     placeholder="Enter short description"
@@ -146,7 +157,7 @@ export const AddProductSubCategory = ({
             type="submit"
             className="px-7 py-2 bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-white rounded-md text-sm font-medium transition-colors duration-200"
           >
-            {editData ? "Update" : "Add"}
+            {editData ? 'Update' : 'Add'}
           </button>
         </div>
       </form>

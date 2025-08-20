@@ -1,5 +1,5 @@
-import React from "react";
-import { Icon } from "@iconify/react/dist/iconify.js";
+import React from 'react';
+import { Icon } from '@iconify/react/dist/iconify.js';
 
 export interface MatchingProduct {
   _id: string;
@@ -90,7 +90,7 @@ export const MatchingProductsList: React.FC<MatchingProductsListProps> = ({
           </h4>
           <div className="flex items-center gap-2">
             <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
-              {totalCount} {totalCount === 1 ? "product" : "products"}
+              {totalCount} {totalCount === 1 ? 'product' : 'products'}
             </span>
             {totalCount > products.length && (
               <span className="text-sm text-gray-600">
@@ -107,7 +107,8 @@ export const MatchingProductsList: React.FC<MatchingProductsListProps> = ({
           {products.map((product) => (
             <div
               key={product._id}
-              className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-200">
+              className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-200"
+            >
               {/* Product Image */}
               <div className="aspect-square bg-gray-100 relative">
                 {product.images && product.images.length > 0 ? (
@@ -133,11 +134,11 @@ export const MatchingProductsList: React.FC<MatchingProductsListProps> = ({
                 </h5>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">
-                    ${getLowestPrice(product.variants).toFixed(2)}
+                    Rs. {getLowestPrice(product.variants).toFixed(2)}
                   </span>
                   <span className="text-xs text-gray-500">
                     {product.variants?.length || 0} variant
-                    {product.variants?.length !== 1 ? "s" : ""}
+                    {product.variants?.length !== 1 ? 's' : ''}
                   </span>
                 </div>
               </div>
@@ -152,7 +153,7 @@ export const MatchingProductsList: React.FC<MatchingProductsListProps> = ({
               <Icon icon="material-symbols:more-horiz" className="w-4 h-4" />
               <span>
                 And {totalCount - products.length} more product
-                {totalCount - products.length !== 1 ? "s" : ""}
+                {totalCount - products.length !== 1 ? 's' : ''}
               </span>
             </div>
           </div>

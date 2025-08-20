@@ -189,6 +189,7 @@ const NewCollectionForm: React.FC = () => {
         </div>
       </div>
     );
+    
   }
 
   return (

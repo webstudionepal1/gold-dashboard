@@ -44,9 +44,9 @@
 //   )
 // );
 
-import React, { useState } from "react";
-import { twMerge } from "tailwind-merge";
-import { Icon } from "@iconify/react/dist/iconify.js";
+import React, { useState } from 'react';
+import { twMerge } from 'tailwind-merge';
+import { Icon } from '@iconify/react/dist/iconify.js';
 
 interface dropDownFieldPropTypes
   extends React.SelectHTMLAttributes<HTMLSelectElement> {
@@ -72,6 +72,7 @@ export const DropdownField = React.forwardRef<
       firstInput,
       inputClassname,
       icon,
+      value,
       helperText,
       error,
       ...other
@@ -79,6 +80,7 @@ export const DropdownField = React.forwardRef<
     ref
   ) => {
     const [isFocused, setIsFocused] = useState(false);
+    const isShowingPlaceholder = !value || value === '';
 
     return (
       <div className="flex flex-col gap-1.5 w-full">
@@ -91,7 +93,7 @@ export const DropdownField = React.forwardRef<
 
         <div className="relative">
           {icon && (
-            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
+            <div className="absolute left-3 top-1/2 transform -translate-y-2 z-10">
               <Icon icon={icon} className="w-4 h-4 text-gray-400" />
             </div>
           )}
@@ -100,17 +102,21 @@ export const DropdownField = React.forwardRef<
             ref={ref}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
+            value={value || ''}
             className={twMerge(
-              `w-full transition-all duration-200 ease-in-out appearance-none`,
+              `w-full transition-all rounded-lg text-sm duration-200 ease-in-out appearance-none`,
               `border ${
                 error
-                  ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
+                  ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20'
                   : isFocused
-                    ? "border-blue-400 focus:border-blue-500 focus:ring-blue-500/20"
-                    : "border-gray-200 hover:border-gray-300"
-              }`,
-              `${icon ? "py-2.5 pl-10 pr-10" : "py-2.5 px-3 pr-10"}`,
-              `rounded-lg text-sm bg-white text-gray-900`,
+                  ? 'border-blue-400 focus:border-blue-500 focus:ring-blue-500/20'
+                  : 'border-gray-200 hover:border-gray-300'
+              }
+              ${isShowingPlaceholder ? 'text-gray-400' : 'text-gray-700'}    
+              `,
+              `${icon ? 'py-2.5 pl-10 pr-10' : 'py-2.5 px-3 pr-10'}`,
+
+              // `rounded-lg text-sm bg-white text-gray-900`,
               `focus:outline-none focus:ring-2`,
               `shadow-sm`,
               `cursor-pointer`,
@@ -122,7 +128,11 @@ export const DropdownField = React.forwardRef<
               {firstInput ?? `Select ${label?.toLowerCase() || 'option'}`}
             </option>
             {options?.map((option) => (
-              <option key={option.value} value={option.value} className="text-gray-900">
+              <option
+                key={option.value}
+                value={option.value}
+                className="text-gray-900"
+              >
                 {option.label}
               </option>
             ))}
@@ -142,9 +152,14 @@ export const DropdownField = React.forwardRef<
         {(helperText || error) && (
           <div className="flex items-center gap-1">
             {error && (
-              <Icon icon="material-symbols:error" className="w-3 h-3 text-red-500 flex-shrink-0" />
+              <Icon
+                icon="material-symbols:error"
+                className="w-3 h-3 text-red-500 flex-shrink-0"
+              />
             )}
-            <span className={`text-xs ${error ? "text-red-500" : "text-gray-500"}`}>
+            <span
+              className={`text-xs ${error ? 'text-red-500' : 'text-gray-500'}`}
+            >
               {error || helperText}
             </span>
           </div>
@@ -154,4 +169,4 @@ export const DropdownField = React.forwardRef<
   }
 );
 
-DropdownField.displayName = "DropdownField";
+DropdownField.displayName = 'DropdownField';
