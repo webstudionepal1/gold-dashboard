@@ -57,7 +57,7 @@ const EditProfileForm = () => {
 
   const form = useForm({
     defaultValues: generateProfileValue(companyData) as IProfileValue,
-    onSubmit: async ({ value }: { value: any }) => {
+    onSubmit: async ({ value }: { value: IProfileValue }) => {
       const obj = [
         'companyName',
         'name',
@@ -79,7 +79,12 @@ const EditProfileForm = () => {
         'branch',
       ];
       const formdata = new FormData();
-      obj.forEach((item) => formdata.append(item, value[item] || ''));
+      obj.forEach((item) =>
+        formdata.append(
+          item,
+          value[item as keyof IProfileValue]?.toString() || ''
+        )
+      );
       if (value.logo) formdata.append('logo', value.logo);
 
       if (Array.isArray(value.qr)) {

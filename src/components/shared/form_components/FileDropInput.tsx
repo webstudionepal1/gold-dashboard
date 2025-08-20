@@ -41,7 +41,6 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
     maxFiles = 10,
   } = props;
 
-  console.log(props, 'props');
   const defaultPlaceholder = props.multiple
     ? "Drag 'n' drop files here, or click to select files"
     : "Drag 'n' drop a file here, or click to select a file";
@@ -165,8 +164,6 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
       }
     }
 
-    console.log(previewUrl);
-
     return (
       <div
         key={`${isExisting ? 'existing' : 'new'}-${index}`}
@@ -175,7 +172,7 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
         <img
           src={previewUrl}
           alt={`preview-${index}`}
-          className="w-full h-24  rounded-md border"
+          className="w-full h-24  object-cover rounded-md border"
         />
 
         <button
@@ -203,7 +200,7 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
       if (
         existingImage &&
         typeof existingImage === 'object' &&
-        (existingImage as any)?.props &&
+        (existingImage as { props?: { src: string } })?.props &&
         (existingImage as any)?.props.src
       ) {
         existingImage = (existingImage as any).props.src;

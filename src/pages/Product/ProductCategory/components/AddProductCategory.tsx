@@ -45,7 +45,6 @@ interface ICategoryValue {
   existingImage?: string | null;
 }
 const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
-  console.log(editData, 'editdata');
   const {
     mutate: createCategory,
     isSuccess: createSuccess,
@@ -61,7 +60,7 @@ const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
       name: editData ? get(editData, 'name', '') : '',
       description: editData
         ? typeof editData?.description === 'object'
-          ? (editData?.description as any)?.props?.children
+          ? (editData?.description as { props: { children: string } })?.props?.children
           : get(editData, 'description', '')
         : '',
       image: null,

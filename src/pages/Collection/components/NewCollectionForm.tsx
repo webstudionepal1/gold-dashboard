@@ -8,8 +8,6 @@ import {
 } from '../../../server/api/collectionHooks';
 import { FormLoader } from '@/components/shared/FormLoader.component';
 
-
-
 const NewCollectionForm: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -130,10 +128,13 @@ const NewCollectionForm: React.FC = () => {
         formData.selectedProducts &&
         Array.isArray(formData.selectedProducts)
       ) {
-        formDataObj.append(
-          'selectedProducts',
-          JSON.stringify(formData.selectedProducts)
-        );
+        // formDataObj.append(
+        //   'selectedProducts',
+        //   JSON.stringify(formData.selectedProducts)
+        // );
+        formData.selectedProducts?.map((product, index) => {
+          formDataObj.append(`selectedProducts[${index}]`, product);
+        });
       }
 
       // Handle conditions array
