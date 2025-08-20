@@ -24,6 +24,7 @@ import {
 import { mainProductFormSchema } from "../../../components/shared/form_components/validation/ProductFormValidation";
 import { Form, FormikProvider, useFormik } from "formik";
 import { DropdownTagField } from "@/components/shared/form_components/DropdownTags";
+import { ProductMediaPage } from "../../../components/shared/form_components/product-form-pages/ProductMediaPage";
 
 // Default Form Data
 const defaultFormData: ProductFormData = {
@@ -34,6 +35,7 @@ const defaultFormData: ProductFormData = {
   productType: "gold",
   category: "",
   subCategory: "",
+  existingImages: [],
 
   // Product Specifications
   length: 0,
@@ -207,48 +209,30 @@ const CompactFormContent: React.FC<{
     subCategories?.map((sub: any) => ({ value: sub._id, label: sub.name })) ||
     [];
 
-  const addVariant = () => {
-    const newVariant = {
-      sku: "",
-      price: 0,
-      wt: 0,
-      unit: "grams" as const,
-      isActive: true,
-    };
-    formik.setFieldValue("variants", [...formik.values.variants, newVariant]);
-  };
-
-  const removeVariant = (index: number) => {
-    if (formik.values.variants.length > 1) {
-      const newVariants = formik.values.variants.filter((_, i) => i !== index);
-      formik.setFieldValue("variants", newVariants);
-    }
-  };
-
+  // Helper functions for form updates
   const updateVariant = (index: number, field: string, value: any) => {
-    const newVariants = [...formik.values.variants];
+    const currentVariants = formik.values.variants || [];
+    const newVariants = [...currentVariants];
     newVariants[index] = { ...newVariants[index], [field]: value };
     formik.setFieldValue("variants", newVariants);
   };
 
-  // Stone management functions
-  const addStone = () => {
-    const newStone = {
-      name: "",
-      weight: 0,
+  const addVariant = () => {
+    const currentVariants = formik.values.variants || [];
+    const newVariant = {
+      sku: "",
       price: 0,
-      color: "",
+      wt: formik.values.productType === "normal" ? undefined : 0,
+      unit: formik.values.productType === "normal" ? undefined : "grams",
+      isActive: true,
     };
-    const currentStones = formik.values.stones || [];
-    formik.setFieldValue("stones", [...currentStones, newStone]);
+    formik.setFieldValue("variants", [...currentVariants, newVariant]);
   };
 
-  const removeStone = (index: number) => {
-    const currentStones = formik.values.stones || [];
-    if (currentStones.length > 0) {
-      const newStones = currentStones.filter((_, i) => i !== index);
-      formik.setFieldValue("stones", newStones);
-    }
+  const removeVariant = (index: number) => {
+    const currentVariants = formik.values.variants || [];
+    const newVariants = currentVariants.filter((_, i) => i !== index);
+    formik.setFieldValue("variants", newVariants);
   };
 
   const updateStone = (index: number, field: string, value: any) => {
@@ -258,22 +242,21 @@ const CompactFormContent: React.FC<{
     formik.setFieldValue("stones", newStones);
   };
 
-  // Other charges management functions
-  const addOtherCharge = () => {
-    const newCharge = {
+  const addStone = () => {
+    const currentStones = formik.values.stones || [];
+    const newStone = {
       name: "",
+      weight: 0,
       price: 0,
+      color: "",
     };
-    const currentCharges = formik.values.otherCharges || [];
-    formik.setFieldValue("otherCharges", [...currentCharges, newCharge]);
+    formik.setFieldValue("stones", [...currentStones, newStone]);
   };
 
-  const removeOtherCharge = (index: number) => {
-    const currentCharges = formik.values.otherCharges || [];
-    if (currentCharges.length > 0) {
-      const newCharges = currentCharges.filter((_, i) => i !== index);
-      formik.setFieldValue("otherCharges", newCharges);
-    }
+  const removeStone = (index: number) => {
+    const currentStones = formik.values.stones || [];
+    const newStones = currentStones.filter((_, i) => i !== index);
+    formik.setFieldValue("stones", newStones);
   };
 
   const updateOtherCharge = (index: number, field: string, value: any) => {
@@ -283,32 +266,22 @@ const CompactFormContent: React.FC<{
     formik.setFieldValue("otherCharges", newCharges);
   };
 
-  // Image upload functions
-  const handleImageUpload = async (files: File[]) => {
-    // Limit to 10 images total
-    const maxImages = 10;
-    const currentImageCount = selectedImages.length;
-    const availableSlots = maxImages - currentImageCount;
-    const filesToAdd = files.slice(0, availableSlots);
-
-    const newImages = [...selectedImages, ...filesToAdd];
-    setSelectedImages(newImages);
-
-    // Store actual File objects in form data
-    const existingImages = formik.values.images || [];
-    const allImages = [...existingImages, ...filesToAdd];
-    formik.setFieldValue("images", allImages);
+  const addOtherCharge = () => {
+    const currentCharges = formik.values.otherCharges || [];
+    const newCharge = {
+      name: "",
+      price: 0,
+    };
+    formik.setFieldValue("otherCharges", [...currentCharges, newCharge]);
   };
 
-  // Handle file input change
-  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const files = Array.from(e.target.files);
-      handleImageUpload(files);
-    }
+  const removeOtherCharge = (index: number) => {
+    const currentCharges = formik.values.otherCharges || [];
+    const newCharges = currentCharges.filter((_, i) => i !== index);
+    formik.setFieldValue("otherCharges", newCharges);
   };
 
-  // Handle drag and drop
+  // Image handling functions for ProductMediaPage
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -323,25 +296,14 @@ const CompactFormContent: React.FC<{
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const files = Array.from(e.dataTransfer.files).filter((file) =>
-        file.type.startsWith("image/")
-      );
-      handleImageUpload(files);
-    }
   };
 
-  // Remove image
-  const removeImage = (index: number) => {
-    const newImages = selectedImages.filter((_, i) => i !== index);
-    setSelectedImages(newImages);
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // This is handled by ProductMediaPage now
+  };
 
-    // Update form data
-    const newFormImages = (formik.values.images || []).filter(
-      (_, i) => i !== index
-    );
-    formik.setFieldValue("images", newFormImages);
+  const removeImage = (index: number) => {
+    // This is handled by ProductMediaPage now
   };
   console.log("errors", formik.errors);
 
@@ -419,6 +381,7 @@ const CompactFormContent: React.FC<{
                       { value: "normal", label: "Normal" },
                       { value: "gold", label: "Gold" },
                       { value: "silver", label: "Silver" },
+                      { value: "diamond", label: "Diamond" },
                     ]}
                     value={formik.values.productType || ""}
                     onChange={(e) => {
@@ -769,11 +732,13 @@ const CompactFormContent: React.FC<{
                               <p className="text-xs text-gray-500">
                                 {variant.price > 0
                                   ? `₹${variant.price}`
-                                  : "No price"}{" "}
-                                •{" "}
-                                {variant.wt > 0
-                                  ? `${variant.wt} ${variant.unit}`
-                                  : "No weight"}
+                                  : "No price"}
+                                {formik.values.productType !== "normal" && variant.wt > 0 && variant.unit && (
+                                  <>
+                                    {" "}•{" "}
+                                    {variant.wt} {variant.unit}
+                                  </>
+                                )}
                               </p>
                             </div>
                           </div>
@@ -792,37 +757,43 @@ const CompactFormContent: React.FC<{
                           )}
                         </div>
 
-                        <FieldGroup columns={3}>
-                          <div>
-                            <InputField
-                              label="Weight"
-                              type="number"
-                              step="0.01"
-                              placeholder="0.00"
-                              numberValue={variant.wt}
-                              onNumberChange={(value) =>
-                                updateVariant(index, "wt", value)
-                              }
-                              allowNegative={false}
-                              clearZeroOnFocus
-                            />
-                          </div>
+                        <FieldGroup columns={formik.values.productType === "normal" ? 1 : 3}>
+                          {/* Show weight and unit only for non-normal products */}
+                          {formik.values.productType !== "normal" && (
+                            <>
+                              <div>
+                                <InputField
+                                  label="Weight"
+                                  type="number"
+                                  step="0.01"
+                                  placeholder="0.00"
+                                  numberValue={variant.wt}
+                                  onNumberChange={(value) =>
+                                    updateVariant(index, "wt", value)
+                                  }
+                                  allowNegative={false}
+                                  clearZeroOnFocus
+                                />
+                              </div>
 
-                          <div>
-                            <DropdownField
-                              label="Unit"
-                              options={[
-                                { value: "grams", label: "Grams" },
-                                { value: "kg", label: "Kilograms" },
-                                { value: "pieces", label: "Pieces" },
-                                { value: "carats", label: "Carats" },
-                              ]}
-                              value={variant.unit}
-                              onChange={(e) =>
-                                updateVariant(index, "unit", e.target.value)
-                              }
-                            />
-                          </div>
+                              <div>
+                                <DropdownField
+                                  label="Unit"
+                                  options={[
+                                    { value: "grams", label: "Grams" },
+                                    { value: "kg", label: "Kilograms" },
+                                    { value: "pieces", label: "Pieces" },
+                                    { value: "carats", label: "Carats" },
+                                  ]}
+                                  value={variant.unit}
+                                  onChange={(e) =>
+                                    updateVariant(index, "unit", e.target.value)
+                                  }
+                                />
+                              </div>
+                            </>
+                          )}
+                          
                           <div>
                             <InputField
                               label="Price"
@@ -1055,108 +1026,50 @@ const CompactFormContent: React.FC<{
 
             {/* Product Images - Show for all product types */}
             <FormSection title="Product Images" icon="material-symbols:image">
+              <ProductMediaPage
+                selectedImages={selectedImages}
+                setSelectedImages={setSelectedImages}
+                dragActive={dragActive}
+                setDragActive={setDragActive}
+                handleDrag={handleDrag}
+                handleDrop={handleDrop}
+                handleFileInputChange={handleFileInputChange}
+                removeImage={removeImage}
+                formik={formik}
+                isEdit={isEdit}
+                isLoading={isLoading}
+              />
+            </FormSection>
+
+            {/* Tags - Required for all product types */}
+            <FormSection title="Tags" icon="material-symbols:label">
               <div className="space-y-3">
                 <p className="text-xs text-gray-600">
-                  Upload product images (Max 10)
+                  Add tags to help customers find your product (at least one required)
                 </p>
-
-                {/* Upload Area */}
-                <div
-                  className={`border-2 border-dashed rounded p-4 text-center transition-colors cursor-pointer ${
-                    dragActive
-                      ? "border-[#DF8D28] bg-[#DF8D28]/5"
-                      : "border-gray-300 hover:border-[#DF8D28] hover:bg-gray-50"
-                  }`}
-                  onDragEnter={handleDrag}
-                  onDragLeave={handleDrag}
-                  onDragOver={handleDrag}
-                  onDrop={handleDrop}
-                  onClick={() =>
-                    document.getElementById("file-upload")?.click()
-                  }
-                >
-                  <input
-                    id="file-upload"
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    onChange={handleFileInputChange}
-                    className="hidden"
-                  />
-                  <div className="flex flex-col items-center gap-2">
-                    <Icon
-                      icon="material-symbols:cloud-upload"
-                      className="w-8 h-8 text-gray-400"
-                    />
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">
-                        Click to upload or drag and drop
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        PNG, JPG, GIF up to 10MB each
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Selected Images Preview */}
-                {selectedImages.length > 0 && (
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                    {selectedImages.map((file, index) => (
-                      <div key={index} className="relative group">
-                        <div className="relative aspect-square">
-                          <img
-                            src={URL.createObjectURL(file)}
-                            alt={`Preview ${index + 1}`}
-                            className="w-full h-full object-cover rounded border border-gray-200"
-                          />
-                          {index === 0 && (
-                            <div className="absolute top-1 left-1 bg-[#DF8D28] text-white text-xs px-1.5 py-0.5 rounded font-medium">
-                              Primary
-                            </div>
-                          )}
-                          <button
-                            type="button"
-                            onClick={() => removeImage(index)}
-                            className="absolute top-1 right-1 bg-red text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                            title="Remove image"
-                          >
-                            <Icon
-                              icon="material-symbols:close"
-                              className="w-3 h-3"
-                            />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                <DropdownTagField
+                  required
+                  options={[
+                    { value: "jewelry", label: "Jewelry" },
+                    { value: "accessories", label: "Accessories" },
+                    { value: "gifts", label: "Gifts" },
+                    { value: "fashion", label: "Fashion" },
+                    { value: "luxury", label: "Luxury" },
+                    { value: "traditional", label: "Traditional" },
+                    { value: "modern", label: "Modern" },
+                    { value: "handmade", label: "Handmade" },
+                    { value: "custom", label: "Custom" },
+                    { value: "premium", label: "Premium" },
+                  ]}
+                  label="Product Tags"
+                  values={formik.values.tags || []}
+                  onChange={(newValues) => {
+                    formik.setFieldValue("tags", newValues);
+                  }}
+                />
+                {formik.errors.tags && formik.touched.tags && (
+                  <ErrorDisplay errors={[formik.errors.tags as string]} />
                 )}
-
-                {/* Existing Images (for edit mode) */}
-                {!selectedImages.length &&
-                  formik.values.existingImages &&
-                  formik.values.existingImages.length > 0 && (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                      {formik.values.existingImages.map((imageUrl, index) => (
-                        <div key={index} className="relative group">
-                          <div className="relative aspect-square">
-                            <img
-                              src={`${
-                                import.meta.env.VITE_API_IMAGE_BASE_URL
-                              }${imageUrl}`}
-                              alt={`Existing Product ${index + 1}`}
-                              className="w-full h-full object-cover rounded border border-gray-200"
-                            />
-                            {index === 0 && (
-                              <div className="absolute top-1 left-1 bg-[#DF8D28] text-white text-xs px-1.5 py-0.5 rounded font-medium">
-                                Primary
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
               </div>
             </FormSection>
 

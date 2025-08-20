@@ -161,8 +161,12 @@ const NewProductForm: React.FC = () => {
 
       // Only add weight and unit for non-normal products
       if (formData.productType !== "normal") {
-        formDataObj.append(`variant[${index}][wt]`, variant.wt.toString());
-        formDataObj.append(`variant[${index}][unit]`, variant.unit);
+        if (variant.wt !== undefined && variant.wt > 0) {
+          formDataObj.append(`variant[${index}][wt]`, variant.wt.toString());
+        }
+        if (variant.unit) {
+          formDataObj.append(`variant[${index}][unit]`, variant.unit);
+        }
         formDataObj.append(
           `variant[${index}][isActive]`,
           variant.isActive.toString()
@@ -202,14 +206,29 @@ const NewProductForm: React.FC = () => {
 
     // Handle images - All product types can have images
     if (formData.images && Array.isArray(formData.images)) {
-      formData.images.forEach((image: File | string, index: number) => {
-        if (image instanceof File) {
+      // For updates, new images replace old ones
+      // For new products, just add the images
+      if (isEdit) {
+        // When updating, only send new images (Files)
+        // Existing images that weren't removed will be preserved on the server
+        const newImages = formData.images.filter(image => image instanceof File);
+        newImages.forEach((image: File) => {
           formDataObj.append(`images`, image);
-        } else if (typeof image === "string" && image.trim() !== "") {
-          // For existing images (URLs), append as string
-          formDataObj.append(`existingImages[${index}]`, image);
+        });
+        
+        // If there are no new images but existing images were removed,
+        // we need to indicate that images should be cleared
+        if (newImages.length === 0 && formData.existingImages && formData.existingImages.length === 0) {
+          formDataObj.append(`clearImages`, 'true');
         }
-      });
+      } else {
+        // For new products, send all images
+        formData.images.forEach((image: File | string) => {
+          if (image instanceof File) {
+            formDataObj.append(`images`, image);
+          }
+        });
+      }
     }
 
     return formDataObj;

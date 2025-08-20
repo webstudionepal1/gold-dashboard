@@ -139,6 +139,7 @@ const defaultFormData: ProductFormData = {
   productType: "gold",
   category: "",
   subCategory: "",
+  existingImages: [],
 
   // Page 2: Product Specifications
   length: 0,
@@ -287,13 +288,13 @@ export const ProductFormProvider: React.FC<ProductFormProviderProps> = ({
   // Check if step is valid
   const isStepValid = useCallback(
     (step: number): boolean => {
-      const stepFields = getStepFields(step);
+      const stepFields = getStepFields(step, formData.productType);
       return stepFields.every((field) => {
         const validation = validationState[field];
         return !validation || validation.isValid;
       });
     },
-    [validationState]
+    [validationState, formData.productType]
   );
 
   const contextValue: ProductFormContextType = {
@@ -333,7 +334,7 @@ export const useProductForm = (): ProductFormContextType => {
 };
 
 // Helper function to get fields for each step
-const getStepFields = (step: number): string[] => {
+const getStepFields = (step: number, productType?: string): string[] => {
   switch (step) {
     case 1:
       return ["name", "description", "category", "subCategory"];

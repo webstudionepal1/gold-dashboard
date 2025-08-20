@@ -56,8 +56,8 @@ export const productSpecificationsSchema = z.object({
 export const productVariantSchema = z.object({
   sku: z.string().optional(),
   price: z.number().min(0.01, "Price is required and must be greater than 0"),
-  wt: z.number().min(0, "Weight cannot be negative"),
-  unit: z.enum(["grams", "kg", "pieces", "carats"]),
+  wt: z.number().min(0, "Weight cannot be negative").optional(),
+  unit: z.enum(["grams", "kg", "pieces", "carats"]).optional(),
   costPrice: z.number().min(0, "Cost price cannot be negative").optional(),
   isActive: z.boolean(),
 });
@@ -184,12 +184,49 @@ export const completeProductFormSchema = basicProductInformationSchema
 // Individual step validation schemas
 export const stepValidationSchemas = {
   1: basicProductInformationSchema,
-  2: productSpecificationsSchema,
+  2: z.object({
+    length: z.number().min(0, "Length cannot be negative").optional(),
+    claspType: z.string().optional(),
+    rhodoumFinishes: z.boolean().optional(),
+    shape: z.string().optional(),
+    quantity: z.number().min(0, "Quantity cannot be negative").optional(),
+    totalCarat: z.number().min(0, "Total carat cannot be negative").optional(),
+    color: z.string().optional(),
+    clarity: z.string().optional(),
+    dimension: z.number().min(0, "Dimension cannot be negative").optional(),
+    gender: z.enum(["male", "female", "unisex"]).optional(),
+    makingCharges: z.number().min(0, "Making charges cannot be negative").optional(),
+  }),
   3: productVariantsSchema,
-  4: stonesOccasionsSchema,
-  5: productMediaAssetsSchema,
-  6: productSEOMarketingSchema,
-  7: productInventoryStatusSchema,
+  4: z.object({
+    stones: z.array(z.object({
+      name: z.string().min(1, "Stone name is required"),
+      weight: z.number().min(0, "Weight cannot be negative"),
+      price: z.number().min(0, "Price cannot be negative"),
+      color: z.string().min(1, "Color is required"),
+    })).optional(),
+    occasions: z.array(z.string()).optional(),
+  }),
+  5: z.object({
+    images: z.array(z.union([z.instanceof(File), z.string()])).optional(),
+    existingImages: z.array(z.string()).optional(),
+  }),
+  6: z.object({
+    tags: z.array(z.string().min(1, "Tag cannot be empty")).optional(),
+    visibleAs: z.array(z.string()).optional(),
+    metadata: z.object({
+      seoTitle: z.string().max(60, "SEO title cannot exceed 60 characters").optional(),
+      seoDescription: z.string().max(160, "SEO description cannot exceed 160 characters").optional(),
+      keywords: z.array(z.string()).optional(),
+      vendor: z.string().max(100, "Vendor name cannot exceed 100 characters").optional(),
+      barcode: z.string().max(50, "Barcode cannot exceed 50 characters").optional(),
+      compareAtPrice: z.number().min(0, "Compare at price cannot be negative").optional(),
+    }).optional(),
+  }),
+  7: z.object({
+    isActive: z.boolean().optional(),
+    isFeatured: z.boolean().optional(),
+  }),
 };
 
 // Helper function to validate a specific step
@@ -221,31 +258,34 @@ export const validateStep = (step: number, data: any) => {
 };
 
 // Helper function to get fields for each step
-export const getStepFields = (step: number): string[] => {
+export const getStepFields = (step: number, productType?: string): string[] => {
   switch (step) {
     case 1:
-      return ["name", "slug", "description", "category", "subCategory"];
+      return ["name", "description", "productType"];
     case 2:
+      // For normal products, no specifications are required
+      if (productType === "normal") {
+        return [];
+      }
       return [
         "length",
-        "claspType",
-        "rhodoumFinishes",
-        "shape",
-        "quantity",
-        "totalCarat",
-        "color",
-        "clarity",
         "dimension",
         "makingCharges",
+        "color",
+        "totalCarat",
       ];
     case 3:
       return ["variants"];
     case 4:
+      // For normal products, stones and occasions are optional
+      if (productType === "normal") {
+        return [];
+      }
       return ["stones", "occasions"];
     case 5:
-      return ["images"];
+      return ["images", "existingImages"];
     case 6:
-      return ["tags", "visibleAs", "metadata"];
+      return ["tags"];
     case 7:
       return ["isActive", "isFeatured"];
     default:
@@ -300,35 +340,98 @@ export const conditionalProductFormSchema = z
       .min(1, "Product name is required")
       .max(200, "Product name cannot exceed 200 characters")
       .trim(),
-    productType: z.string().min(1, "Product type is required"),
+    productType: z.enum(["normal", "gold", "silver", "diamond"], {
+      required_error: "Product type is required",
+    }),
     description: z
       .string()
       .min(1, "Description is required")
       .max(2000, "Description cannot exceed 2000 characters")
       .trim(),
 
-    // Optional fields that may be required based on product type
+    // Fields that are required for specific product types
     category: z.string().optional(),
     subCategory: z.string().optional(),
+    length: z.number().min(0, "Length cannot be negative").optional(),
+    dimension: z.number().min(0, "Dimension cannot be negative").optional(),
+    makingCharges: z.number().min(0, "Making charges cannot be negative").optional(),
+    color: z.string().optional(),
+    clarity: z.string().optional(),
     totalCarat: z.number().min(0, "Total carat cannot be negative").optional(),
     wastage: wastageSchema.optional(),
 
-    // Variants array
+    // Variants array - always required
     variants: z
       .array(productVariantSchema)
       .min(1, "At least one variant is required"),
+
+    // Optional fields
+    stones: z.array(z.object({
+      name: z.string().min(1, "Stone name is required"),
+      weight: z.number().min(0, "Weight cannot be negative"),
+      price: z.number().min(0, "Price cannot be negative"),
+      color: z.string().min(1, "Color is required"),
+    })).optional(),
+
+    occasions: z.array(z.string()).optional(),
+    otherCharges: z.array(z.object({
+      name: z.string().min(1, "Charge name is required"),
+      price: z.number().min(0, "Price cannot be negative"),
+    })).optional(),
+
+    // Media and marketing
+    images: z.array(z.union([z.instanceof(File), z.string()])).optional(),
+    existingImages: z.array(z.string()).optional(),
+    tags: z.array(z.string()).optional(),
+    visibleAs: z.array(z.string()).optional(),
+    isActive: z.boolean().optional(),
+    isFeatured: z.boolean().optional(),
+    metadata: z.object({
+      seoTitle: z.string().max(60, "SEO title cannot exceed 60 characters").optional(),
+      seoDescription: z.string().max(160, "SEO description cannot exceed 160 characters").optional(),
+      keywords: z.array(z.string()).optional(),
+      vendor: z.string().max(100, "Vendor name cannot exceed 100 characters").optional(),
+      barcode: z.string().max(50, "Barcode cannot exceed 50 characters").optional(),
+      compareAtPrice: z.number().min(0, "Compare at price cannot be negative").optional(),
+    }).optional(),
   })
   .refine(
     (data) => {
-      // For normal products: require price and product name (already covered above)
+      // For normal products: only require name, description, and price
       if (data.productType === "normal") {
-        return true; // Basic validation already covers name and price in variants
+        return true; // Basic validation already covers name, description, and price in variants
       }
       return true;
     },
     {
-      message: "Normal products require product name and price",
+      message: "Normal products require product name, description, and price",
       path: ["productType"],
+    }
+  )
+  .refine(
+    (data) => {
+      // For gold, silver, or diamond products: require category
+      if (data.productType === "gold" || data.productType === "silver" || data.productType === "diamond") {
+        return !!(data.category && data.category.trim() !== "");
+      }
+      return true;
+    },
+    {
+      message: "Category is required for gold, silver, and diamond products",
+      path: ["category"],
+    }
+  )
+  .refine(
+    (data) => {
+      // For gold, silver, or diamond products: require subCategory
+      if (data.productType === "gold" || data.productType === "silver" || data.productType === "diamond") {
+        return !!(data.subCategory && data.subCategory.trim() !== "");
+      }
+      return true;
+    },
+    {
+      message: "Sub-category is required for gold, silver, and diamond products",
+      path: ["subCategory"],
     }
   )
   .refine(
@@ -340,47 +443,115 @@ export const conditionalProductFormSchema = z
       return true;
     },
     {
-      message: "Wastage is required for gold/silver products",
+      message: "Wastage is required for gold and silver products",
       path: ["wastage"],
     }
   )
   .refine(
     (data) => {
-      // For gold or silver products: require category
-      if (data.productType === "gold" || data.productType === "silver") {
-        return !!(data.category && data.category.trim() !== "");
-      }
-      return true;
-    },
-    {
-      message: "Category is required for gold/silver products",
-      path: ["category"],
-    }
-  )
-  .refine(
-    (data) => {
-      // For gold or silver products: require subCategory
-      if (data.productType === "gold" || data.productType === "silver") {
-        return !!(data.subCategory && data.subCategory.trim() !== "");
-      }
-      return true;
-    },
-    {
-      message: "Sub-category is required for gold/silver products",
-      path: ["subCategory"],
-    }
-  )
-  .refine(
-    (data) => {
-      // For gold or silver products: require totalCarat
-      if (data.productType === "gold" || data.productType === "silver") {
+      // For gold, silver, or diamond products: require totalCarat
+      if (data.productType === "gold" || data.productType === "silver" || data.productType === "diamond") {
         return !!(data.totalCarat && data.totalCarat > 0);
       }
       return true;
     },
     {
-      message: "Total carat is required for gold/silver products",
+      message: "Total carat is required for gold, silver, and diamond products",
       path: ["totalCarat"],
+    }
+  )
+  .refine(
+    (data) => {
+      // For gold, silver, or diamond products: require length and dimension
+      if (data.productType === "gold" || data.productType === "silver" || data.productType === "diamond") {
+        return !!(data.length && data.length > 0 && data.dimension && data.dimension > 0);
+      }
+      return true;
+    },
+    {
+      message: "Length and dimension are required for gold, silver, and diamond products",
+      path: ["length"],
+    }
+  )
+  .refine(
+    (data) => {
+      // For gold, silver, or diamond products: require making charges
+      if (data.productType === "gold" || data.productType === "silver" || data.productType === "diamond") {
+        return !!(data.makingCharges && data.makingCharges >= 0);
+      }
+      return true;
+    },
+    {
+      message: "Making charges are required for gold, silver, and diamond products",
+      path: ["makingCharges"],
+    }
+  )
+  .refine(
+    (data) => {
+      // For diamond products: require clarity
+      if (data.productType === "diamond") {
+        return !!(data.clarity && data.clarity.trim() !== "");
+      }
+      return true;
+    },
+    {
+      message: "Clarity is required for diamond products",
+      path: ["clarity"],
+    }
+  )
+  .refine(
+    (data) => {
+      // For gold, silver, or diamond products: require color
+      if (data.productType === "gold" || data.productType === "silver" || data.productType === "diamond") {
+        return !!(data.color && data.color.trim() !== "");
+      }
+      return true;
+    },
+    {
+      message: "Color is required for gold, silver, and diamond products",
+      path: ["color"],
+    }
+  )
+  .refine(
+    (data) => {
+      // Validate that featured products are active
+      if (data.isFeatured && !data.isActive) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "Featured products must be active",
+      path: ["isFeatured"],
+    }
+  )
+  .refine(
+    (data) => {
+      // Validate that if compareAtPrice is set, it should be higher than the lowest variant price
+      if (data.metadata?.compareAtPrice && data.variants.length > 0) {
+        const lowestPrice = Math.min(...data.variants.map((v) => v.price));
+        return data.metadata.compareAtPrice > lowestPrice;
+      }
+      return true;
+    },
+    {
+      message: "Compare at price must be higher than the product price",
+      path: ["metadata", "compareAtPrice"],
+    }
+  )
+  .refine(
+    (data) => {
+      // For non-normal products, weight and unit are required in variants
+      if (data.productType !== "normal" && data.variants.length > 0) {
+        return data.variants.every((variant) => {
+          return variant.wt !== undefined && variant.wt > 0 && variant.unit;
+        });
+      }
+      return true;
+    },
+    {
+      message: "Weight and unit are required for gold, silver, and diamond products",
+      path: ["variants"],
     }
   );
 
