@@ -144,13 +144,13 @@ export const calculateGiftPrices = (gift: IFetchGift): GiftPriceCalculation => {
     }
     
     // Add stones cost if available
-    const stonesCost = (product.stones || []).reduce((total, stone) => {
+    const stonesCost = (product.stones || []).reduce((total: number, stone: { price: string }) => {
       return total + (parseFloat(stone.price) || 0);
     }, 0);
     
     // Add others cost if available
-    const othersCost = (product.others || []).reduce((total, other) => {
-      return total + (parseFloat(other.value) || 0);
+    const othersCost = (product.others || []).reduce((total: number, other: { name: string; value: number }) => {
+      return total + (other.value || 0);
     }, 0);
     
     // Calculate total price per unit

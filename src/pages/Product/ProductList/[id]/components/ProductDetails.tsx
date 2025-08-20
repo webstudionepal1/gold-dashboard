@@ -197,7 +197,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
     : "-";
 
   // Get other charges
-  const otherCharges = get(product, "others", []);
+  const otherCharges = get(product, "others", []) as OtherCharge[];
 
   return (
     <div className="space-y-4 col-span-2">
@@ -408,7 +408,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
                   Total Additional Charges:
                 </span>
                 <span className="font-bold text-base text-green-600">
-                  ₹{otherCharges.reduce((sum, charge) => sum + (charge.value || 0), 0).toLocaleString()}
+                  ₹{otherCharges.reduce((sum: number, charge: OtherCharge) => sum + (charge.value || 0), 0).toLocaleString()}
                 </span>
               </div>
             </div>

@@ -78,13 +78,12 @@ export interface IFetchProduct {
   subCategory: IFetchSubCategory;
   averageRating?: number;
   numberOfReviews?: number;
-  variants: [
-    {
-      price: number;
-      wt: number;
-      unit: string;
-    }
-  ];
+  variants: Array<{
+    price: number;
+    wt: number;
+    unit: string;
+    isActive: boolean;
+  }>;
   makingCharges: number;
   length: number;
   claspType: IFetchClasps;
@@ -100,6 +99,20 @@ export interface IFetchProduct {
   visibleAs: string;
   images: string[];
   isActive: boolean;
+  wastage?: {
+    type: 'fixed' | 'per';
+    value: number;
+  };
+  stones?: Array<{
+    name: string;
+    weight: string;
+    price: string;
+    color: string;
+  }>;
+  others?: Array<{
+    name: string;
+    value: number;
+  }>;
 }
 
 //clasps interfaces

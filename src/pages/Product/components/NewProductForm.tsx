@@ -65,7 +65,12 @@ const NewProductForm: React.FC = () => {
       ]),
 
       // Stones and Occasions
-      stones: get(product, "stones", []),
+      stones: get(product, "stones", []).map((stone: { name: string; weight: string; price: string; color: string }) => ({
+        name: stone.name,
+        weight: parseFloat(stone.weight) || 0,
+        price: parseFloat(stone.price) || 0,
+        color: stone.color
+      })),
       otherCharges: get(product, "others", []).map(
         (item: { name: string; value: number }) => ({
           name: item.name,

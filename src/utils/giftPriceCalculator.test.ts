@@ -16,7 +16,7 @@ const mockGift: IFetchGift = {
         category: { _id: 'cat-1', name: 'Rings', description: '', image: '', isActive: true, subCategory: [], createdAt: '', updatedAt: '' },
         subCategory: { _id: 'sub-1', name: 'Gold Rings', description: '', category: '', image: '', isActive: true, createdAt: '', updatedAt: '' },
         variant: [
-          { price: 10000, wt: 5, unit: 'grams' }
+          { price: 10000, wt: 5, unit: 'grams', isActive: true }
         ],
         makingCharges: 500,
         length: 0,
@@ -49,7 +49,7 @@ const mockGift: IFetchGift = {
         category: { _id: 'cat-2', name: 'Chains', description: '', image: '', isActive: true, subCategory: [], createdAt: '', updatedAt: '' },
         subCategory: { _id: 'sub-2', name: 'Silver Chains', description: '', category: '', image: '', isActive: true, createdAt: '', updatedAt: '' },
         variant: [
-          { price: 5000, wt: 3, unit: 'grams' }
+          { price: 5000, wt: 3, unit: 'grams', isActive: true }
         ],
         makingCharges: 300,
         length: 0,

@@ -54,6 +54,7 @@ export interface IProductVariant {
   price: number;
   wt: number;
   unit: string;
+  isActive: boolean;
 }
 
 export interface IFetchProduct {
@@ -78,6 +79,21 @@ export interface IFetchProduct {
   images: string[];
   averageRating: number;
   numberOfReviews: number;
+  isActive: boolean;
+  wastage?: {
+    type: 'fixed' | 'per';
+    value: number;
+  };
+  stones?: Array<{
+    name: string;
+    weight: string;
+    price: string;
+    color: string;
+  }>;
+  others?: Array<{
+    name: string;
+    value: number;
+  }>;
   createdAt: string;
   updatedAt: string;
 }
