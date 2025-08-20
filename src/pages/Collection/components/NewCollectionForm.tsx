@@ -1,11 +1,14 @@
-import React from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { MultiPageCollectionForm } from "../../../components/shared/form_components/MultiPageCollectionForm";
+import React from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { MultiPageCollectionForm } from '../../../components/shared/form_components/MultiPageCollectionForm';
 import {
   useCreateCollectionMutation,
   useUpdateCollectionMutation,
   useGetCollectionByIdQuery,
-} from "../../../server/api/collectionHooks";
+} from '../../../server/api/collectionHooks';
+import { FormLoader } from '@/components/shared/FormLoader.component';
+
+
 
 const NewCollectionForm: React.FC = () => {
   const navigate = useNavigate();
@@ -13,86 +16,124 @@ const NewCollectionForm: React.FC = () => {
   const isEdit = Boolean(id);
 
   // API hooks
-  const createCollectionMutation = useCreateCollectionMutation();
-  const updateCollectionMutation = useUpdateCollectionMutation();
+  const { mutateAsync: createCollectionMutation, isPending: createPending } =
+    useCreateCollectionMutation();
+  const { mutateAsync: updateCollectionMutation, isPending: updatePending } =
+    useUpdateCollectionMutation();
   const { data: existingCollection, isLoading: isLoadingCollection } =
-    useGetCollectionByIdQuery(id || "");
+    useGetCollectionByIdQuery(id || '');
 
   // Transform existing collection data for the form
   const getInitialData = () => {
     if (!isEdit || !existingCollection) return undefined;
 
     return {
-      name: existingCollection.name || "",
-      slug: existingCollection.slug || "",
-      description: existingCollection.description || "",
-      shortDescription: existingCollection.shortDescription || "",
+      name: existingCollection.name || '',
+      slug: existingCollection.slug || '',
+      description: existingCollection.description || '',
+      shortDescription: existingCollection.shortDescription || '',
       isActive: existingCollection.isActive ?? true,
       isFeatured: existingCollection.isFeatured ?? false,
-      materialType: existingCollection.materialType || "",
-      gemstoneType: existingCollection.gemstoneType || "",
-      styleCategory: existingCollection.styleCategory || "",
-      collectionMode: existingCollection.collectionMode || "manual",
+      materialType: existingCollection.materialType || '',
+      gemstoneType: existingCollection.gemstoneType || '',
+      styleCategory: existingCollection.styleCategory || '',
+      collectionMode: existingCollection.collectionMode || 'manual',
       conditions: existingCollection.conditions || {
         groups: [],
-        operator: "AND",
+        operator: 'AND',
         isAutomatic: false,
         manualProductIds: [],
         excludedProductIds: [],
       },
       images: existingCollection.images || [],
-      bannerImage: existingCollection.bannerImage || "",
-      video: existingCollection.video || "",
+      bannerImage: existingCollection.bannerImage || '',
+      video: existingCollection.video || '',
       metadata: {
-        seoTitle: existingCollection.metadata?.seoTitle || "",
-        seoDescription: existingCollection.metadata?.seoDescription || "",
+        seoTitle: existingCollection.metadata?.seoTitle || '',
+        seoDescription: existingCollection.metadata?.seoDescription || '',
         keywords: existingCollection.metadata?.keywords || [],
         tags: existingCollection.metadata?.tags || [],
-        targetAudience: existingCollection.metadata?.targetAudience || "",
-        seasonality: existingCollection.metadata?.seasonality || "year-round",
+        targetAudience: existingCollection.metadata?.targetAudience || '',
+        seasonality: existingCollection.metadata?.seasonality || 'year-round',
         popularity: existingCollection.metadata?.popularity || 0,
         trendingScore: existingCollection.metadata?.trendingScore || 0,
       },
       isLimitedEdition: existingCollection.isLimitedEdition ?? false,
       availableFrom: existingCollection.availableFrom
-        ? new Date(existingCollection.availableFrom).toISOString().split("T")[0]
-        : "",
+        ? new Date(existingCollection.availableFrom).toISOString().split('T')[0]
+        : '',
       availableUntil: existingCollection.availableUntil
         ? new Date(existingCollection.availableUntil)
             .toISOString()
-            .split("T")[0]
-        : "",
+            .split('T')[0]
+        : '',
       sortOrder: existingCollection.sortOrder || 0,
     };
   };
 
   // Handle form submission
-  const handleFormSubmit = async (formData: any) => {
+  const handleFormSubmit = async (formData: {
+    name: string;
+    slug?: string;
+    description: string;
+    shortDescription?: string;
+    isActive: boolean;
+    isFeatured: boolean;
+    materialType?: string;
+    gemstoneType?: string;
+    styleCategory?: string;
+    collectionMode?: string;
+    selectedProducts?: string[];
+    conditions?: string[];
+    metadata?: {
+      seoTitle?: string;
+      seoDescription?: string;
+      keywords?: string[];
+      tags?: string[];
+      targetAudience?: string;
+      seasonality?: string;
+      popularity?: number;
+      trendingScore?: number;
+    };
+    isLimitedEdition: boolean;
+    availableFrom?: string;
+    availableUntil?: string;
+    sortOrder: number;
+    images?: (File | string)[];
+    bannerImage?: File | string;
+    video?: File | string;
+  }) => {
     try {
       // Create FormData object for multipart/form-data submission
       const formDataObj = new FormData();
 
       // Append basic fields
-      formDataObj.append("name", formData.name);
-      if (formData.slug) formDataObj.append("slug", formData.slug);
-      formDataObj.append("description", formData.description);
+      formDataObj.append('name', formData.name);
+      if (formData.slug) formDataObj.append('slug', formData.slug);
+      formDataObj.append('description', formData.description);
       if (formData.shortDescription)
-        formDataObj.append("shortDescription", formData.shortDescription);
-      formDataObj.append("isActive", String(formData.isActive));
-      formDataObj.append("isFeatured", String(formData.isFeatured));
+        formDataObj.append('shortDescription', formData.shortDescription);
+      formDataObj.append('isActive', String(formData.isActive));
+      formDataObj.append('isFeatured', String(formData.isFeatured));
 
       if (formData.materialType)
-        formDataObj.append("materialType", formData.materialType);
+        formDataObj.append('materialType', formData.materialType);
       if (formData.gemstoneType)
-        formDataObj.append("gemstoneType", formData.gemstoneType);
+        formDataObj.append('gemstoneType', formData.gemstoneType);
       if (formData.styleCategory)
-        formDataObj.append("styleCategory", formData.styleCategory);
+        formDataObj.append('styleCategory', formData.styleCategory);
       if (formData.collectionMode)
-        formDataObj.append("collectionMode", formData.collectionMode);
+        formDataObj.append('collectionMode', formData.collectionMode);
 
       // Handle selected products for manual collections
-      if (formData.selectedProducts && Array.isArray(formData.selectedProducts)) {
-        formDataObj.append("selectedProducts", JSON.stringify(formData.selectedProducts));
+      if (
+        formData.selectedProducts &&
+        Array.isArray(formData.selectedProducts)
+      ) {
+        formDataObj.append(
+          'selectedProducts',
+          JSON.stringify(formData.selectedProducts)
+        );
       }
 
       // Handle conditions array
@@ -104,32 +145,32 @@ const NewCollectionForm: React.FC = () => {
 
       // Handle metadata object
       if (formData.metadata) {
-        formDataObj.append("metadata", JSON.stringify(formData.metadata));
+        formDataObj.append('metadata', JSON.stringify(formData.metadata));
       }
 
-      formDataObj.append("isLimitedEdition", String(formData.isLimitedEdition));
+      formDataObj.append('isLimitedEdition', String(formData.isLimitedEdition));
 
       if (formData.availableFrom) {
         formDataObj.append(
-          "availableFrom",
+          'availableFrom',
           new Date(formData.availableFrom).toISOString()
         );
       }
       if (formData.availableUntil) {
         formDataObj.append(
-          "availableUntil",
+          'availableUntil',
           new Date(formData.availableUntil).toISOString()
         );
       }
 
-      formDataObj.append("sortOrder", String(formData.sortOrder));
+      formDataObj.append('sortOrder', String(formData.sortOrder));
 
       // Handle media files - append actual File objects instead of URLs
       if (formData.images && Array.isArray(formData.images)) {
         formData.images.forEach((image: File | string, index: number) => {
           if (image instanceof File) {
             formDataObj.append(`images`, image);
-          } else if (typeof image === "string" && image.trim() !== "") {
+          } else if (typeof image === 'string' && image.trim() !== '') {
             // For existing images (URLs), append as string
             formDataObj.append(`existingImages[${index}]`, image);
           }
@@ -138,46 +179,58 @@ const NewCollectionForm: React.FC = () => {
 
       if (formData.bannerImage) {
         if (formData.bannerImage instanceof File) {
-          formDataObj.append("bannerImage", formData.bannerImage);
+          formDataObj.append('bannerImage', formData.bannerImage);
         } else if (
-          typeof formData.bannerImage === "string" &&
-          formData.bannerImage.trim() !== ""
+          typeof formData.bannerImage === 'string' &&
+          formData.bannerImage.trim() !== ''
         ) {
-          formDataObj.append("existingBannerImage", formData.bannerImage);
+          formDataObj.append('existingBannerImage', formData.bannerImage);
         }
       }
 
       if (formData.video) {
         if (formData.video instanceof File) {
-          formDataObj.append("video", formData.video);
+          formDataObj.append('video', formData.video);
         } else if (
-          typeof formData.video === "string" &&
-          formData.video.trim() !== ""
+          typeof formData.video === 'string' &&
+          formData.video.trim() !== ''
         ) {
-          formDataObj.append("existingVideo", formData.video);
+          formDataObj.append('existingVideo', formData.video);
         }
       }
 
       if (isEdit && id) {
-        await updateCollectionMutation.mutateAsync({ id, body: formDataObj });
-        console.log("Collection updated successfully");
+        await updateCollectionMutation({ id, body: formDataObj });
+        console.log('Collection updated successfully');
       } else {
-        await createCollectionMutation.mutateAsync(formDataObj);
-        console.log("Collection created successfully");
+        await createCollectionMutation(formDataObj);
+        console.log('Collection created successfully');
       }
 
       // Navigate back to collections list
-      navigate("/collection");
+      navigate('/collection');
     } catch (error) {
-      console.error("Error saving collection:", error);
+      console.error('Error saving collection:', error);
       throw error; // Re-throw to let the form handle the error
     }
   };
 
   // Handle form cancellation
   const handleFormCancel = () => {
-    navigate("/collection");
+    navigate('/collection');
   };
+
+  if (createPending || updatePending) {
+    return (
+      <FormLoader
+        variant="overlay"
+        isLoading={createPending || updatePending}
+        message={
+          updatePending ? 'Updating collection...' : 'Creating collection...'
+        }
+      />
+    );
+  }
 
   // Show loading state while fetching existing collection data
   if (isEdit && isLoadingCollection) {
@@ -189,7 +242,6 @@ const NewCollectionForm: React.FC = () => {
         </div>
       </div>
     );
-    
   }
 
   return (

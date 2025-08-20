@@ -35,16 +35,16 @@ export function FormLoader({
 
   return (
     <div className={clsx(containerClasses, className)}>
-      <div className="bg-white dark:bg-gray-900 rounded-lg p-8 shadow-2xl border border-yellow-200 dark:border-yellow-800">
+      <div className="bg-white dark:bg-gray-900 rounded-lg p-8 px-16 shadow-2xl border border-macaroon dark:border-fade-orange">
         <div className="flex flex-col items-center space-y-4">
           {/* Gold spinning ring loader */}
           <div className="relative">
-            <div className="w-12 h-12 border-4 border-yellow-100 dark:border-yellow-900 rounded-full animate-spin">
-              <div className="absolute inset-0 border-4 border-transparent border-t-yellow-500 rounded-full animate-spin"></div>
+            <div className="w-12 h-12 border-4 border-yellow-100 dark:border-yellow rounded-full animate-spin">
+              <div className="absolute inset-0 border-4 border-transparent border-t-fade-yellow rounded-full animate-spin"></div>
             </div>
             {/* Inner pulsing dot */}
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
+              <div className="w-2 h-2 bg-macaroon rounded-full animate-pulse"></div>
             </div>
           </div>
 
@@ -55,9 +55,9 @@ export function FormLoader({
             </p>
             {/* Animated dots */}
             <div className="flex justify-center space-x-1 mt-2">
-              <div className="w-1 h-1 bg-yellow-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-              <div className="w-1 h-1 bg-yellow-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-              <div className="w-1 h-1 bg-yellow-500 rounded-full animate-bounce"></div>
+              <div className="w-1 h-1 bg-yellow rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+              <div className="w-1 h-1 bg-yellow rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+              <div className="w-1 h-1 bg-yellow rounded-full animate-bounce"></div>
             </div>
           </div>
         </div>

@@ -14,6 +14,7 @@ import {
 import { FieldError } from '../../auth/LoginPage';
 import { generateProfileValue, IProfileValue } from '../profileObj';
 import { get } from 'lodash';
+import { FormLoader } from '@/components/shared/FormLoader.component';
 
 const defaultValues = {
   _id: '',
@@ -45,7 +46,7 @@ const EditProfileForm = () => {
   const { mutate: updateProfile, isPending } =
     useUpdateCompanyDetailsMutation();
 
-  const { mutateAsync: createCompanyDetails } =
+  const { mutateAsync: createCompanyDetails, isPending: createPending } =
     useCreateCompanyDetailsMutation();
   const companyData: IFetchCompany = useMemo(() => {
     if (isSuccess) {
@@ -92,6 +93,18 @@ const EditProfileForm = () => {
       }
     },
   });
+
+  const isLoading = isPending || createPending;
+
+  if (isLoading) {
+    return (
+      <FormLoader
+        variant="overlay"
+        isLoading={isLoading}
+        message={isPending ? 'Updating profile...' : 'Creating profile...'}
+      />
+    );
+  }
 
   return (
     <div>
