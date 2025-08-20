@@ -105,9 +105,16 @@ const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
       closeModal();
     }
   }, [createSuccess, updateSuccess]);
-  console.log('form', form.state.errors);
+
+  const loader = createPending || updatePending;
+
   return (
-    <Modal classname="max-w-sm w-full" ref={modalRef}>
+    <Modal
+      classname="max-w-sm w-full"
+      blurChildren={loader}
+      showLoader={loader}
+      ref={modalRef}
+    >
       <form
         className="p-4"
         onSubmit={(e) => {
@@ -192,7 +199,7 @@ const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
                     }
                   }}
                   existingFile={form.getFieldValue('existingImage') as string}
-                  existingFileField="existingImage" 
+                  existingFileField="existingImage"
                   accept={{
                     'image/*': ['.png', '.jpg', '.jpeg', '.svg', '.webp'],
                   }}

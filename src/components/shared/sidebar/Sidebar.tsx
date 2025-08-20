@@ -173,6 +173,7 @@ const RouteItem: React.FC<{
     </div>
   );
 };
+
 const MobileToggleButton: React.FC = () => {
   const { toggleSidebar } = useSidebar();
 
@@ -211,9 +212,6 @@ const SectionDivider: React.FC<{ title: string; isCollapsed: boolean }> = ({
         {title}
       </p>
     );
-  // return <div className="w-3/4 mx-auto my-2 border-t border-gray-200" >
-  //   {title}
-  // </div>;
 
   return (
     <div className="flex items-center gap-2 px-6">
@@ -228,7 +226,8 @@ const SectionDivider: React.FC<{ title: string; isCollapsed: boolean }> = ({
 const Sidebar: React.FC<{ config: { sections: SidebarSection[] } }> = ({
   config,
 }) => {
-  const [expandedItems, setExpandedItems] = useState<number[]>([]);
+  // Changed to store only a single expanded item ID (or null)
+  const [expandedItem, setExpandedItem] = useState<number | null>(null);
   const { isSidebarOpen, isCollapsed } = useSidebar();
   const location = useLocation();
 
@@ -246,18 +245,15 @@ const Sidebar: React.FC<{ config: { sections: SidebarSection[] } }> = ({
     return -1;
   };
 
+  // Updated toggle function to auto-close previous items
   const toggleExpand = (id: number) => {
-    setExpandedItems((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
+    setExpandedItem((prev) => (prev === id ? null : id));
   };
 
   const currentParentId = findActiveParentId();
 
   return (
     <>
-      {/* <MobileToggleButton /> */}
-
       <Overlay />
 
       {/* Sidebar */}
@@ -290,7 +286,7 @@ const Sidebar: React.FC<{ config: { sections: SidebarSection[] } }> = ({
                       key={route.id}
                       route={route}
                       isActive={currentParentId === route.id}
-                      isExpanded={expandedItems.includes(route.id)}
+                      isExpanded={expandedItem === route.id}
                       onToggle={() => toggleExpand(route.id)}
                       currentPath={location.pathname}
                       isCollapsed={isCollapsed}

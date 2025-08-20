@@ -34,9 +34,13 @@ const ProductCategory: React.FC = () => {
     state: false,
     viewData: null,
   });
-  const modalRef = useOutsideClick(() =>
-    setIsModalOpen({ state: false, editData: null })
-  );
+  const modalRef = useOutsideClick(() => {
+    setIsModalOpen({ state: false, editData: null });
+    setIsViewModalOpen({
+      state: false,
+      viewData: null,
+    });
+  });
 
   const {
     data: categories,

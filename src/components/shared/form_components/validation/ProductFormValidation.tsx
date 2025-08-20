@@ -1,38 +1,38 @@
-import * as z from "zod";
+import * as z from 'zod';
 
 // Validation schemas for each form page
 
 // Wastage Schema
 export const wastageSchema = z.object({
-  type: z.enum(["fixed", "per"], {
-    required_error: "Wastage type is required",
+  type: z.enum(['fixed', 'per'], {
+    required_error: 'Wastage type is required',
   }),
-  value: z.number().min(0, "Wastage value cannot be negative"),
+  value: z.number().min(0, 'Wastage value cannot be negative'),
 });
 
 // Page 1: Basic Information Schema - Dynamic based on product type
 export const basicProductInformationSchema = z.object({
   name: z
     .string()
-    .min(1, "Product name is required")
-    .max(200, "Product name cannot exceed 200 characters")
+    .min(1, 'Product name is required')
+    .max(200, 'Product name cannot exceed 200 characters')
     .trim(),
   slug: z
     .string()
-    .min(1, "Slug is required")
+    .min(1, 'Slug is required')
     .regex(
       /^[a-z0-9-]+$/,
-      "Slug can only contain lowercase letters, numbers, and hyphens"
+      'Slug can only contain lowercase letters, numbers, and hyphens'
     )
     .trim()
     .optional(),
   description: z
     .string()
-    .min(1, "Description is required")
-    .max(2000, "Description cannot exceed 2000 characters")
+    .min(1, 'Description is required')
+    .max(2000, 'Description cannot exceed 2000 characters')
     .trim(),
-  productType: z.enum(["normal", "gold", "silver"], {
-    required_error: "Product type is required",
+  productType: z.enum(['normal', 'gold', 'silver'], {
+    required_error: 'Product type is required',
   }),
   category: z.string().optional(),
   subCategory: z.string().optional(),
@@ -40,25 +40,25 @@ export const basicProductInformationSchema = z.object({
 
 // Page 2: Product Specifications Schema
 export const productSpecificationsSchema = z.object({
-  length: z.number().min(0, "Length cannot be negative"),
+  length: z.number().min(0, 'Length cannot be negative'),
   claspType: z.string().optional(),
   rhodoumFinishes: z.boolean(),
-  shape: z.string().min(1, "Shape is required"),
-  quantity: z.number().min(0, "Quantity cannot be negative"),
-  totalCarat: z.number().min(0, "Total carat cannot be negative").optional(),
+  shape: z.string().min(1, 'Shape is required'),
+  quantity: z.number().min(0, 'Quantity cannot be negative'),
+  totalCarat: z.number().min(0, 'Total carat cannot be negative').optional(),
   color: z.string().optional(),
-  clarity: z.string().min(1, "Clarity is required"),
-  dimension: z.number().min(0, "Dimension cannot be negative"),
-  makingCharges: z.number().min(0, "Making charges cannot be negative"),
+  clarity: z.string().min(1, 'Clarity is required'),
+  dimension: z.number().min(0, 'Dimension cannot be negative'),
+  makingCharges: z.number().min(0, 'Making charges cannot be negative'),
 });
 
 // Product Variant Schema - Stock fields removed as they're not needed
 export const productVariantSchema = z.object({
   sku: z.string().optional(),
-  price: z.number().min(0.01, "Price is required and must be greater than 0"),
-  wt: z.number().min(0, "Weight cannot be negative"),
-  unit: z.enum(["grams", "kg", "pieces", "carats"]),
-  costPrice: z.number().min(0, "Cost price cannot be negative").optional(),
+  price: z.number().min(0.1, 'Price is required and must be greater than 0'),
+  wt: z.number().min(0.1, 'Weight is required & cannot be negative'),
+  unit: z.enum(['grams', 'kg', 'pieces', 'carats']),
+  costPrice: z.number().min(0, 'Cost price cannot be negative').optional(),
   isActive: z.boolean(),
 });
 
@@ -66,28 +66,28 @@ export const productVariantSchema = z.object({
 export const productVariantsSchema = z.object({
   variants: z
     .array(productVariantSchema)
-    .min(1, "At least one variant is required")
+    .min(1, 'At least one variant is required')
     .refine(
       (variants) => {
         // Check for duplicate SKUs
         const skus = variants
           .map((v) => v.sku)
-          .filter((sku) => sku && sku.trim() !== "");
+          .filter((sku) => sku && sku.trim() !== '');
         const uniqueSkus = new Set(skus);
         return skus.length === uniqueSkus.size;
       },
       {
-        message: "SKUs must be unique across all variants",
-        path: ["variants"],
+        message: 'SKUs must be unique across all variants',
+        path: ['variants'],
       }
     ),
 });
 
 // Product Stone Schema
 export const productStoneSchema = z.object({
-  stone: z.string().min(1, "Stone selection is required"),
-  quantity: z.number().min(1, "Stone quantity must be at least 1"),
-  totalPrice: z.number().min(0, "Stone price cannot be negative"),
+  stone: z.string().min(1, 'Stone selection is required'),
+  quantity: z.number().min(1, 'Stone quantity must be at least 1'),
+  totalPrice: z.number().min(0, 'Stone price cannot be negative'),
   isOptional: z.boolean(),
   isDefault: z.boolean(),
 });
@@ -101,39 +101,39 @@ export const stonesOccasionsSchema = z.object({
 // Page 5: Media Assets Schema
 export const productMediaAssetsSchema = z.object({
   images: z
-    .array(z.string().url("Invalid image URL"))
-    .max(10, "Maximum 10 images allowed")
+    .array(z.string().url('Invalid image URL'))
+    .max(10, 'Maximum 10 images allowed')
     .optional(),
 });
 
 // Page 6: SEO & Marketing Schema
 export const productSEOMarketingSchema = z.object({
   tags: z
-    .array(z.string().min(1, "Tag cannot be empty"))
-    .min(1, "At least one tag is required"),
+    .array(z.string().min(1, 'Tag cannot be empty'))
+    .min(1, 'At least one tag is required'),
   visibleAs: z.array(z.string()),
   metadata: z
     .object({
       seoTitle: z
         .string()
-        .max(60, "SEO title cannot exceed 60 characters")
+        .max(60, 'SEO title cannot exceed 60 characters')
         .optional(),
       seoDescription: z
         .string()
-        .max(160, "SEO description cannot exceed 160 characters")
+        .max(160, 'SEO description cannot exceed 160 characters')
         .optional(),
       keywords: z.array(z.string()).optional(),
       vendor: z
         .string()
-        .max(100, "Vendor name cannot exceed 100 characters")
+        .max(100, 'Vendor name cannot exceed 100 characters')
         .optional(),
       barcode: z
         .string()
-        .max(50, "Barcode cannot exceed 50 characters")
+        .max(50, 'Barcode cannot exceed 50 characters')
         .optional(),
       compareAtPrice: z
         .number()
-        .min(0, "Compare at price cannot be negative")
+        .min(0, 'Compare at price cannot be negative')
         .optional(),
     })
     .optional(),
@@ -162,8 +162,8 @@ export const completeProductFormSchema = basicProductInformationSchema
       return true;
     },
     {
-      message: "Featured products must be active",
-      path: ["isFeatured"],
+      message: 'Featured products must be active',
+      path: ['isFeatured'],
     }
   )
   .refine(
@@ -176,8 +176,8 @@ export const completeProductFormSchema = basicProductInformationSchema
       return true;
     },
     {
-      message: "Compare at price must be higher than the product price",
-      path: ["metadata", "compareAtPrice"],
+      message: 'Compare at price must be higher than the product price',
+      path: ['metadata', 'compareAtPrice'],
     }
   );
 
@@ -208,14 +208,14 @@ export const validateStep = (step: number, data: any) => {
       return {
         success: false,
         errors: error.errors.map((err) => ({
-          path: err.path.join("."),
+          path: err.path.join('.'),
           message: err.message,
         })),
       };
     }
     return {
       success: false,
-      errors: [{ path: "", message: "Validation error" }],
+      errors: [{ path: '', message: 'Validation error' }],
     };
   }
 };
@@ -224,30 +224,30 @@ export const validateStep = (step: number, data: any) => {
 export const getStepFields = (step: number): string[] => {
   switch (step) {
     case 1:
-      return ["name", "slug", "description", "category", "subCategory"];
+      return ['name', 'slug', 'description', 'category', 'subCategory'];
     case 2:
       return [
-        "length",
-        "claspType",
-        "rhodoumFinishes",
-        "shape",
-        "quantity",
-        "totalCarat",
-        "color",
-        "clarity",
-        "dimension",
-        "makingCharges",
+        'length',
+        'claspType',
+        'rhodoumFinishes',
+        'shape',
+        'quantity',
+        'totalCarat',
+        'color',
+        'clarity',
+        'dimension',
+        'makingCharges',
       ];
     case 3:
-      return ["variants"];
+      return ['variants'];
     case 4:
-      return ["stones", "occasions"];
+      return ['stones', 'occasions'];
     case 5:
-      return ["images"];
+      return ['images'];
     case 6:
-      return ["tags", "visibleAs", "metadata"];
+      return ['tags', 'visibleAs', 'metadata'];
     case 7:
-      return ["isActive", "isFeatured"];
+      return ['isActive', 'isFeatured'];
     default:
       return [];
   }
@@ -257,37 +257,37 @@ export const getStepFields = (step: number): string[] => {
 export const getStepInfo = (step: number) => {
   const stepInfo = {
     1: {
-      title: "Basic Information",
-      description: "Product name, description, and categorization",
+      title: 'Basic Information',
+      description: 'Product name, description, and categorization',
     },
     2: {
-      title: "Specifications",
-      description: "Physical properties and characteristics",
+      title: 'Specifications',
+      description: 'Physical properties and characteristics',
     },
     3: {
-      title: "Variants & Pricing",
-      description: "SKU, pricing, and inventory management",
+      title: 'Variants & Pricing',
+      description: 'SKU, pricing, and inventory management',
     },
     4: {
-      title: "Stones & Occasions",
-      description: "Gemstones and suitable occasions",
+      title: 'Stones & Occasions',
+      description: 'Gemstones and suitable occasions',
     },
     5: {
-      title: "Media Assets",
-      description: "Product images and media",
+      title: 'Media Assets',
+      description: 'Product images and media',
     },
     6: {
-      title: "SEO & Marketing",
-      description: "Search optimization and marketing",
+      title: 'SEO & Marketing',
+      description: 'Search optimization and marketing',
     },
     7: {
-      title: "Status & Review",
-      description: "Final settings and review",
+      title: 'Status & Review',
+      description: 'Final settings and review',
     },
   };
 
   return (
-    stepInfo[step as keyof typeof stepInfo] || { title: "", description: "" }
+    stepInfo[step as keyof typeof stepInfo] || { title: '', description: '' }
   );
 };
 
@@ -297,92 +297,92 @@ export const conditionalProductFormSchema = z
     // Basic fields that are always present
     name: z
       .string()
-      .min(1, "Product name is required")
-      .max(200, "Product name cannot exceed 200 characters")
+      .min(1, 'Product name is required')
+      .max(200, 'Product name cannot exceed 200 characters')
       .trim(),
-    productType: z.enum(["normal", "gold", "silver"], {
-      required_error: "Product type is required",
+    productType: z.enum(['normal', 'gold', 'silver', 'diamond', 'platinum'], {
+      required_error: 'Product type is required',
     }),
     description: z
       .string()
-      .min(1, "Description is required")
-      .max(2000, "Description cannot exceed 2000 characters")
+      .min(1, 'Description is required')
+      .max(2000, 'Description cannot exceed 2000 characters')
       .trim(),
 
     // Optional fields that may be required based on product type
     category: z.string().optional(),
     subCategory: z.string().optional(),
-    totalCarat: z.number().min(0, "Total carat cannot be negative").optional(),
+    totalCarat: z.number().min(0, 'Total carat cannot be negative').optional(),
     wastage: wastageSchema.optional(),
 
     // Variants array
     variants: z
       .array(productVariantSchema)
-      .min(1, "At least one variant is required"),
+      .min(1, 'At least one variant is required'),
   })
   .refine(
     (data) => {
       // For normal products: require price and product name (already covered above)
-      if (data.productType === "normal") {
+      if (data.productType === 'normal') {
         return true; // Basic validation already covers name and price in variants
       }
       return true;
     },
     {
-      message: "Normal products require product name and price",
-      path: ["productType"],
+      message: 'Normal products require product name and price',
+      path: ['productType'],
     }
   )
   .refine(
     (data) => {
       // For gold or silver products: require wastage
-      if (data.productType === "gold" || data.productType === "silver") {
+      if (data.productType === 'gold' || data.productType === 'silver') {
         return !!data.wastage;
       }
       return true;
     },
     {
-      message: "Wastage is required for gold/silver products",
-      path: ["wastage"],
+      message: 'Wastage is required for gold/silver products',
+      path: ['wastage'],
     }
   )
   .refine(
     (data) => {
       // For gold or silver products: require category
-      if (data.productType === "gold" || data.productType === "silver") {
-        return !!(data.category && data.category.trim() !== "");
+      if (data.productType === 'gold' || data.productType === 'silver') {
+        return !!(data.category && data.category.trim() !== '');
       }
       return true;
     },
     {
-      message: "Category is required for gold/silver products",
-      path: ["category"],
+      message: 'Category is required for gold/silver products',
+      path: ['category'],
     }
   )
   .refine(
     (data) => {
       // For gold or silver products: require subCategory
-      if (data.productType === "gold" || data.productType === "silver") {
-        return !!(data.subCategory && data.subCategory.trim() !== "");
+      if (data.productType === 'gold' || data.productType === 'silver') {
+        return !!(data.subCategory && data.subCategory.trim() !== '');
       }
       return true;
     },
     {
-      message: "Sub-category is required for gold/silver products",
-      path: ["subCategory"],
+      message: 'Sub-category is required for gold/silver products',
+      path: ['subCategory'],
     }
   )
   .refine(
     (data) => {
       // For gold or silver products: require totalCarat
-      if (data.productType === "gold" || data.productType === "silver") {
+      if (data.productType === 'gold' || data.productType === 'silver') {
         return !!(data.totalCarat && data.totalCarat > 0);
       }
       return true;
     },
     {
-      message: "Total carat is required for gold/silver products",
-      path: ["totalCarat"],
+      message: 'Total carat is required for gold/silver products',
+      path: ['totalCarat'],
     }
   );
 

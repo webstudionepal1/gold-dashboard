@@ -11,39 +11,39 @@
  * 7. Reusable event handlers for form updates
  */
 
-import React, { useState } from "react";
-import { Icon } from "@iconify/react/dist/iconify.js";
-import { ProductFormData } from "../../../components/shared/form_components/ProductFormContext";
-import { InputField } from "../../../components/shared/form_components/InputField";
-import { DropdownField } from "../../../components/shared/form_components/Dropdown";
-import { TextareaField } from "../../../components/shared/form_components/TextArea";
+import React, { useState } from 'react';
+import { Icon } from '@iconify/react/dist/iconify.js';
+import { ProductFormData } from '../../../components/shared/form_components/ProductFormContext';
+import { InputField } from '../../../components/shared/form_components/InputField';
+import { DropdownField } from '../../../components/shared/form_components/Dropdown';
+import { TextareaField } from '../../../components/shared/form_components/TextArea';
 import {
   useGetAllProductCategoriesQuery,
   useGetAllProductSubCategoriesQuery,
-} from "../../../server/api/productHooks";
-import { mainProductFormSchema } from "../../../components/shared/form_components/validation/ProductFormValidation";
-import { Form, FormikProvider, useFormik } from "formik";
-import { DropdownTagField } from "@/components/shared/form_components/DropdownTags";
+} from '../../../server/api/productHooks';
+import { mainProductFormSchema } from '../../../components/shared/form_components/validation/ProductFormValidation';
+import { Form, FormikProvider, useFormik } from 'formik';
+import { DropdownTagField } from '@/components/shared/form_components/DropdownTags';
 
 // Default Form Data
 const defaultFormData: ProductFormData = {
   // Basic Information
-  name: "",
-  slug: "",
-  description: "",
-  productType: "gold",
-  category: "",
-  subCategory: "",
+  name: '',
+  slug: '',
+  description: '',
+  productType: 'gold',
+  category: '',
+  subCategory: '',
 
   // Product Specifications
   length: 0,
-  claspType: "",
+  claspType: '',
   rhodoumFinishes: false,
-  shape: "",
+  shape: '',
   quantity: 0,
   totalCarat: 0,
-  color: "",
-  clarity: "",
+  color: '',
+  clarity: '',
   dimension: 0,
   gender: undefined,
   makingCharges: 0,
@@ -54,10 +54,10 @@ const defaultFormData: ProductFormData = {
   // Product Variants
   variants: [
     {
-      sku: "",
+      sku: '',
       price: 0,
       wt: 0,
-      unit: "grams",
+      unit: 'grams',
       isActive: true,
     },
   ],
@@ -76,11 +76,11 @@ const defaultFormData: ProductFormData = {
   tags: [],
   visibleAs: [],
   metadata: {
-    seoTitle: "",
-    seoDescription: "",
+    seoTitle: '',
+    seoDescription: '',
     keywords: [],
-    vendor: "",
-    barcode: "",
+    vendor: '',
+    barcode: '',
     compareAtPrice: 0,
   },
 
@@ -101,7 +101,7 @@ const FormSection: React.FC<FormSectionProps> = ({
   title,
   icon,
   children,
-  className = "",
+  className = '',
 }) => (
   <div
     className={`bg-white rounded-md border border-gray-200 shadow-sm ${className}`}
@@ -128,15 +128,15 @@ const FieldGroup: React.FC<FieldGroupProps> = ({ children, columns = 2 }) => {
   const getGridClasses = () => {
     switch (columns) {
       case 1:
-        return "grid-cols-1";
+        return 'grid-cols-1';
       case 2:
-        return "grid-cols-1 md:grid-cols-2";
+        return 'grid-cols-1 md:grid-cols-2';
       case 3:
-        return "grid-cols-1 md:grid-cols-2 lg:grid-cols-3";
+        return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
       case 4:
-        return "grid-cols-1 md:grid-cols-2 lg:grid-cols-4";
+        return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4';
       default:
-        return "grid-cols-1 md:grid-cols-2";
+        return 'grid-cols-1 md:grid-cols-2';
     }
   };
 
@@ -151,8 +151,11 @@ interface ErrorDisplayProps {
 const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ errors }) => (
   <>
     {errors.map((error, index) => (
-      <p key={index} className="text-red text-sm flex items-center gap-1 mt-1">
-        <Icon icon="material-symbols:error" className="w-4 h-4" />
+      <p
+        key={index}
+        className="text-red text-[11px] flex items-center gap-1 mt-1"
+      >
+        <Icon icon="material-symbols:error" className="w-3 h-3" />
         {error}
       </p>
     ))}
@@ -175,7 +178,7 @@ const CompactFormContent: React.FC<{
       if (!result.success) {
         const errors: any = {};
         result.error.errors.forEach((error) => {
-          const path = error.path.join(".");
+          const path = error.path.join('.');
           errors[path] = error.message;
         });
         return errors;
@@ -209,45 +212,45 @@ const CompactFormContent: React.FC<{
 
   const addVariant = () => {
     const newVariant = {
-      sku: "",
+      sku: '',
       price: 0,
       wt: 0,
-      unit: "grams" as const,
+      unit: 'grams' as const,
       isActive: true,
     };
-    formik.setFieldValue("variants", [...formik.values.variants, newVariant]);
+    formik.setFieldValue('variants', [...formik.values.variants, newVariant]);
   };
 
   const removeVariant = (index: number) => {
     if (formik.values.variants.length > 1) {
       const newVariants = formik.values.variants.filter((_, i) => i !== index);
-      formik.setFieldValue("variants", newVariants);
+      formik.setFieldValue('variants', newVariants);
     }
   };
 
   const updateVariant = (index: number, field: string, value: any) => {
     const newVariants = [...formik.values.variants];
     newVariants[index] = { ...newVariants[index], [field]: value };
-    formik.setFieldValue("variants", newVariants);
+    formik.setFieldValue('variants', newVariants);
   };
 
   // Stone management functions
   const addStone = () => {
     const newStone = {
-      name: "",
+      name: '',
       weight: 0,
       price: 0,
-      color: "",
+      color: '',
     };
     const currentStones = formik.values.stones || [];
-    formik.setFieldValue("stones", [...currentStones, newStone]);
+    formik.setFieldValue('stones', [...currentStones, newStone]);
   };
 
   const removeStone = (index: number) => {
     const currentStones = formik.values.stones || [];
     if (currentStones.length > 0) {
       const newStones = currentStones.filter((_, i) => i !== index);
-      formik.setFieldValue("stones", newStones);
+      formik.setFieldValue('stones', newStones);
     }
   };
 
@@ -255,24 +258,24 @@ const CompactFormContent: React.FC<{
     const currentStones = formik.values.stones || [];
     const newStones = [...currentStones];
     newStones[index] = { ...newStones[index], [field]: value };
-    formik.setFieldValue("stones", newStones);
+    formik.setFieldValue('stones', newStones);
   };
 
   // Other charges management functions
   const addOtherCharge = () => {
     const newCharge = {
-      name: "",
+      name: '',
       price: 0,
     };
     const currentCharges = formik.values.otherCharges || [];
-    formik.setFieldValue("otherCharges", [...currentCharges, newCharge]);
+    formik.setFieldValue('otherCharges', [...currentCharges, newCharge]);
   };
 
   const removeOtherCharge = (index: number) => {
     const currentCharges = formik.values.otherCharges || [];
     if (currentCharges.length > 0) {
       const newCharges = currentCharges.filter((_, i) => i !== index);
-      formik.setFieldValue("otherCharges", newCharges);
+      formik.setFieldValue('otherCharges', newCharges);
     }
   };
 
@@ -280,7 +283,7 @@ const CompactFormContent: React.FC<{
     const currentCharges = formik.values.otherCharges || [];
     const newCharges = [...currentCharges];
     newCharges[index] = { ...newCharges[index], [field]: value };
-    formik.setFieldValue("otherCharges", newCharges);
+    formik.setFieldValue('otherCharges', newCharges);
   };
 
   // Image upload functions
@@ -297,7 +300,7 @@ const CompactFormContent: React.FC<{
     // Store actual File objects in form data
     const existingImages = formik.values.images || [];
     const allImages = [...existingImages, ...filesToAdd];
-    formik.setFieldValue("images", allImages);
+    formik.setFieldValue('images', allImages);
   };
 
   // Handle file input change
@@ -312,9 +315,9 @@ const CompactFormContent: React.FC<{
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
+    if (e.type === 'dragenter' || e.type === 'dragover') {
       setDragActive(true);
-    } else if (e.type === "dragleave") {
+    } else if (e.type === 'dragleave') {
       setDragActive(false);
     }
   };
@@ -326,7 +329,7 @@ const CompactFormContent: React.FC<{
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const files = Array.from(e.dataTransfer.files).filter((file) =>
-        file.type.startsWith("image/")
+        file.type.startsWith('image/')
       );
       handleImageUpload(files);
     }
@@ -341,9 +344,9 @@ const CompactFormContent: React.FC<{
     const newFormImages = (formik.values.images || []).filter(
       (_, i) => i !== index
     );
-    formik.setFieldValue("images", newFormImages);
+    formik.setFieldValue('images', newFormImages);
   };
-  console.log("errors", formik.errors);
+  console.log('errors', formik.errors);
 
   return (
     <div className="min-h-screen bg-gray-50 relative">
@@ -357,7 +360,7 @@ const CompactFormContent: React.FC<{
                 className="w-6 h-6 text-[#DF8D28] animate-spin"
               />
               <p className="text-gray-900 font-medium">
-                {isEdit ? "Updating product..." : "Creating product..."}
+                {isEdit ? 'Updating product...' : 'Creating product...'}
               </p>
             </div>
           </div>
@@ -376,7 +379,7 @@ const CompactFormContent: React.FC<{
               </div>
               <div>
                 <h1 className="text-lg font-bold text-gray-900">
-                  {isEdit ? "Edit Product" : "Create New Product"}
+                  {isEdit ? 'Edit Product' : 'Create New Product'}
                 </h1>
                 <p className="text-xs text-gray-600">
                   Complete product information form
@@ -403,7 +406,7 @@ const CompactFormContent: React.FC<{
                     required
                     value={formik.values.name}
                     onChange={(e) => {
-                      formik.setFieldValue("name", e.target.value);
+                      formik.setFieldValue('name', e.target.value);
                     }}
                   />
                   {formik.errors.name && formik.touched.name && (
@@ -415,14 +418,16 @@ const CompactFormContent: React.FC<{
                     label="Product Type"
                     required
                     options={[
-                      { value: "", label: "Select Product Type" },
-                      { value: "normal", label: "Normal" },
-                      { value: "gold", label: "Gold" },
-                      { value: "silver", label: "Silver" },
+                      { value: 'normal', label: 'Normal' },
+                      { value: 'diamond', label: 'Diamond' },
+                      { value: 'platinum', label: 'Platinum' },
+
+                      { value: 'gold', label: 'Gold' },
+                      { value: 'silver', label: 'Silver' },
                     ]}
-                    value={formik.values.productType || ""}
+                    value={formik.values.productType || ''}
                     onChange={(e) => {
-                      formik.setFieldValue("productType", e.target.value);
+                      formik.setFieldValue('productType', e.target.value);
                     }}
                   />
                   {formik.errors.productType && formik.touched.productType && (
@@ -433,19 +438,17 @@ const CompactFormContent: React.FC<{
                 </div>
 
                 {/* Show additional fields only if product type is not 'normal' */}
-                {formik.values.productType !== "normal" && (
+                {formik.values.productType !== 'normal' && (
                   <>
                     <div>
                       <DropdownField
                         label="Category"
                         required
-                        options={[
-                          { value: "", label: "Select Category" },
-                          ...categoryOptions,
-                        ]}
+                        firstInput="Select Category"
+                        options={categoryOptions}
                         value={formik.values.category}
                         onChange={(e) => {
-                          formik.setFieldValue("category", e.target.value);
+                          formik.setFieldValue('category', e.target.value);
                         }}
                       />
                       {formik.errors.category && formik.touched.category && (
@@ -459,13 +462,10 @@ const CompactFormContent: React.FC<{
                       <DropdownField
                         label="Sub Category"
                         required
-                        options={[
-                          { value: "", label: "Select Sub Category" },
-                          ...subCategoryOptions,
-                        ]}
+                        options={[...subCategoryOptions]}
                         value={formik.values.subCategory}
                         onChange={(e) => {
-                          formik.setFieldValue("subCategory", e.target.value);
+                          formik.setFieldValue('subCategory', e.target.value);
                         }}
                       />
                       {formik.errors.subCategory &&
@@ -480,14 +480,13 @@ const CompactFormContent: React.FC<{
                       <DropdownField
                         label="Gender"
                         options={[
-                          { value: "", label: "Select Gender" },
-                          { value: "male", label: "Male" },
-                          { value: "female", label: "Female" },
-                          { value: "unisex", label: "Unisex" },
+                          { value: 'male', label: 'Male' },
+                          { value: 'female', label: 'Female' },
+                          { value: 'unisex', label: 'Unisex' },
                         ]}
-                        value={formik.values.gender || ""}
+                        value={formik.values.gender}
                         onChange={(e) =>
-                          formik.setFieldValue("gender", e.target.value)
+                          formik.setFieldValue('gender', e.target.value)
                         }
                       />
                     </div>
@@ -503,7 +502,7 @@ const CompactFormContent: React.FC<{
                   rows={2}
                   value={formik.values.description}
                   onChange={(e) => {
-                    formik.setFieldValue("description", e.target.value);
+                    formik.setFieldValue('description', e.target.value);
                   }}
                   showCharCount
                   maxLength={2000}
@@ -517,7 +516,7 @@ const CompactFormContent: React.FC<{
             </FormSection>
 
             {/* Product Specifications - Hide for normal products */}
-            {formik.values.productType !== "normal" && (
+            {formik.values.productType !== 'normal' && (
               <FormSection
                 title="Specifications"
                 icon="material-symbols:straighten"
@@ -531,7 +530,7 @@ const CompactFormContent: React.FC<{
                       placeholder="0.0"
                       numberValue={formik.values.length || 0}
                       onNumberChange={(value) =>
-                        formik.setFieldValue("length", value)
+                        formik.setFieldValue('length', value)
                       }
                       allowNegative={false}
                       clearZeroOnFocus
@@ -546,7 +545,7 @@ const CompactFormContent: React.FC<{
                       placeholder="0.0"
                       numberValue={formik.values.dimension || 0}
                       onNumberChange={(value) =>
-                        formik.setFieldValue("dimension", value)
+                        formik.setFieldValue('dimension', value)
                       }
                       allowNegative={false}
                       clearZeroOnFocus
@@ -561,7 +560,7 @@ const CompactFormContent: React.FC<{
                       placeholder="0.00"
                       numberValue={formik.values.makingCharges || 0}
                       onNumberChange={(value) =>
-                        formik.setFieldValue("makingCharges", value)
+                        formik.setFieldValue('makingCharges', value)
                       }
                       allowNegative={false}
                       clearZeroOnFocus
@@ -572,22 +571,22 @@ const CompactFormContent: React.FC<{
                     <InputField
                       label="Color"
                       placeholder="Enter color"
-                      value={formik.values.color || ""}
+                      value={formik.values.color || ''}
                       onChange={(e) =>
-                        formik.setFieldValue("color", e.target.value)
+                        formik.setFieldValue('color', e.target.value)
                       }
                     />
                   </div>
 
                   {/* Show clarity only for diamond products */}
-                  {formik.values.productType === "diamond" && (
+                  {formik.values.productType === 'diamond' && (
                     <div>
                       <InputField
                         label="Clarity"
                         placeholder="Enter clarity"
                         value={formik.values.clarity}
                         onChange={(e) =>
-                          formik.setFieldValue("clarity", e.target.value)
+                          formik.setFieldValue('clarity', e.target.value)
                         }
                       />
                     </div>
@@ -597,11 +596,12 @@ const CompactFormContent: React.FC<{
                     <InputField
                       label="Total Karat"
                       type="number"
+                      required
                       step="0.01"
                       placeholder="0.00"
                       numberValue={formik.values.totalCarat || 0}
                       onNumberChange={(value) => {
-                        formik.setFieldValue("totalCarat", value);
+                        formik.setFieldValue('totalCarat', value);
                       }}
                       allowNegative={false}
                       clearZeroOnFocus
@@ -620,7 +620,7 @@ const CompactFormContent: React.FC<{
                         checked={formik.values.rhodoumFinishes}
                         onChange={(e) =>
                           formik.setFieldValue(
-                            "rhodoumFinishes",
+                            'rhodoumFinishes',
                             e.target.checked
                           )
                         }
@@ -640,18 +640,18 @@ const CompactFormContent: React.FC<{
                     <div>
                       <DropdownField
                         label="Wastage Type"
+                        required
                         options={[
-                          { value: "", label: "Select Type" },
-                          { value: "per", label: "Percentage (%)" },
-                          { value: "fixed", label: "Flat Amount" },
+                          { value: 'per', label: 'Percentage (%)' },
+                          { value: 'fixed', label: 'Flat Amount' },
                         ]}
-                        value={formik.values.wastage?.type || ""}
+                        value={formik.values.wastage?.type || ''}
                         onChange={(e) => {
                           const newWastage = {
-                            type: e.target.value as "fixed" | "per",
+                            type: e.target.value as 'fixed' | 'per',
                             value: formik.values.wastage?.value || 0,
                           };
-                          formik.setFieldValue("wastage", newWastage);
+                          formik.setFieldValue('wastage', newWastage);
                         }}
                       />
                     </div>
@@ -659,9 +659,9 @@ const CompactFormContent: React.FC<{
                     <div>
                       <InputField
                         label={
-                          formik.values.wastage?.type === "per"
-                            ? "Percentage (%)"
-                            : "Amount"
+                          formik.values.wastage?.type === 'per'
+                            ? 'Percentage (%)'
+                            : 'Amount'
                         }
                         type="number"
                         step="0.01"
@@ -669,10 +669,10 @@ const CompactFormContent: React.FC<{
                         numberValue={formik.values.wastage?.value || 0}
                         onNumberChange={(value) => {
                           const newWastage = {
-                            type: formik.values.wastage?.type || "fixed",
+                            type: formik.values.wastage?.type || 'fixed',
                             value: value,
                           };
-                          formik.setFieldValue("wastage", newWastage);
+                          formik.setFieldValue('wastage', newWastage);
                         }}
                         allowNegative={false}
                         clearZeroOnFocus
@@ -689,13 +689,13 @@ const CompactFormContent: React.FC<{
             {/* Product Variants - Show simplified version for normal products */}
             <FormSection
               title={
-                formik.values.productType === "normal"
-                  ? "Pricing"
-                  : "Variants & Pricing"
+                formik.values.productType === 'normal'
+                  ? 'Pricing'
+                  : 'Variants & Pricing'
               }
               icon="material-symbols:inventory"
             >
-              {formik.values.productType === "normal" ? (
+              {formik.values.productType === 'normal' ? (
                 // Simplified pricing for normal products
                 <div className="space-y-3">
                   <div className="bg-gray-50 rounded p-3 border border-gray-200">
@@ -710,17 +710,17 @@ const CompactFormContent: React.FC<{
                         placeholder="0.00"
                         numberValue={formik.values.variants[0]?.price || 0}
                         onNumberChange={(value) =>
-                          updateVariant(0, "price", value)
+                          updateVariant(0, 'price', value)
                         }
                         allowNegative={false}
                         clearZeroOnFocus
                       />
-                      {(formik.errors as any)["variants.0.price"] &&
+                      {(formik.errors as any)['variants.0.price'] &&
                         formik.touched.variants?.[0]?.price && (
                           <ErrorDisplay
                             errors={[
                               (formik.errors as any)[
-                                "variants.0.price"
+                                'variants.0.price'
                               ] as string,
                             ]}
                           />
@@ -738,7 +738,7 @@ const CompactFormContent: React.FC<{
                       </p>
                       <p className="text-xs text-gray-500">
                         {formik.values.variants.length} variant
-                        {formik.values.variants.length !== 1 ? "s" : ""}
+                        {formik.values.variants.length !== 1 ? 's' : ''}
                       </p>
                     </div>
                     <button
@@ -769,11 +769,11 @@ const CompactFormContent: React.FC<{
                               <p className="text-xs text-gray-500">
                                 {variant.price > 0
                                   ? `₹${variant.price}`
-                                  : "No price"}{" "}
-                                •{" "}
+                                  : 'No price'}{' '}
+                                •{' '}
                                 {variant.wt > 0
                                   ? `${variant.wt} ${variant.unit}`
-                                  : "No weight"}
+                                  : 'No weight'}
                               </p>
                             </div>
                           </div>
@@ -797,41 +797,65 @@ const CompactFormContent: React.FC<{
                             <InputField
                               label="Weight"
                               type="number"
+                              required
                               step="0.01"
                               placeholder="0.00"
                               numberValue={variant.wt}
                               onNumberChange={(value) =>
-                                updateVariant(index, "wt", value)
+                                updateVariant(index, 'wt', value)
                               }
                               allowNegative={false}
                               clearZeroOnFocus
                             />
+
+                            {(formik.errors as any)[`variants.${index}.wt`] &&
+                              formik.touched.variants?.[index]?.wt && (
+                                <ErrorDisplay
+                                  errors={[
+                                    (formik.errors as any)[
+                                      `variants.${index}.wt`
+                                    ] as string,
+                                  ]}
+                                />
+                              )}
                           </div>
 
                           <div>
                             <DropdownField
                               label="Unit"
+                              required
                               options={[
-                                { value: "grams", label: "Grams" },
-                                { value: "kg", label: "Kilograms" },
-                                { value: "pieces", label: "Pieces" },
-                                { value: "carats", label: "Carats" },
+                                { value: 'grams', label: 'Grams' },
+                                { value: 'kg', label: 'Kilograms' },
+                                { value: 'pieces', label: 'Pieces' },
+                                { value: 'carats', label: 'Carats' },
                               ]}
                               value={variant.unit}
                               onChange={(e) =>
-                                updateVariant(index, "unit", e.target.value)
+                                updateVariant(index, 'unit', e.target.value)
                               }
                             />
+                            {(formik.errors as any)[`variants.${index}.unit`] &&
+                              formik.touched.variants?.[index]?.unit && (
+                                <ErrorDisplay
+                                  errors={[
+                                    (formik.errors as any)[
+                                      `variants.${index}.unit`
+                                    ] as string,
+                                  ]}
+                                />
+                              )}
                           </div>
                           <div>
                             <InputField
                               label="Price"
+                              required
                               type="number"
                               step="0.01"
                               placeholder="0.00"
                               numberValue={variant.price}
                               onNumberChange={(value) =>
-                                updateVariant(index, "price", value)
+                                updateVariant(index, 'price', value)
                               }
                               allowNegative={false}
                               clearZeroOnFocus
@@ -859,7 +883,7 @@ const CompactFormContent: React.FC<{
                               onChange={(e) =>
                                 updateVariant(
                                   index,
-                                  "isActive",
+                                  'isActive',
                                   e.target.checked
                                 )
                               }
@@ -876,7 +900,7 @@ const CompactFormContent: React.FC<{
             </FormSection>
 
             {/* Gemstones - Hide for normal products */}
-            {formik.values.productType !== "normal" && (
+            {formik.values.productType !== 'normal' && (
               <FormSection title="Gemstones" icon="material-symbols:diamond">
                 <div className="space-y-3">
                   {formik.values.stones && formik.values.stones.length > 0 ? (
@@ -907,9 +931,9 @@ const CompactFormContent: React.FC<{
                             <InputField
                               label="Stone Name"
                               placeholder="Enter stone name"
-                              value={stone.name || ""}
+                              value={stone.name || ''}
                               onChange={(e) =>
-                                updateStone(index, "name", e.target.value)
+                                updateStone(index, 'name', e.target.value)
                               }
                             />
                           </div>
@@ -922,7 +946,7 @@ const CompactFormContent: React.FC<{
                               placeholder="0.00"
                               numberValue={stone.weight || 0}
                               onNumberChange={(value) =>
-                                updateStone(index, "weight", value)
+                                updateStone(index, 'weight', value)
                               }
                               allowNegative={false}
                               clearZeroOnFocus
@@ -937,7 +961,7 @@ const CompactFormContent: React.FC<{
                               placeholder="0.00"
                               numberValue={stone.price || 0}
                               onNumberChange={(value) =>
-                                updateStone(index, "price", value)
+                                updateStone(index, 'price', value)
                               }
                               allowNegative={false}
                               clearZeroOnFocus
@@ -948,9 +972,9 @@ const CompactFormContent: React.FC<{
                             <InputField
                               label="Color"
                               placeholder="Enter color"
-                              value={stone.color || ""}
+                              value={stone.color || ''}
                               onChange={(e) =>
-                                updateStone(index, "color", e.target.value)
+                                updateStone(index, 'color', e.target.value)
                               }
                             />
                           </div>
@@ -976,7 +1000,7 @@ const CompactFormContent: React.FC<{
             )}
 
             {/* Other Charges - Hide for normal products */}
-            {formik.values.productType !== "normal" && (
+            {formik.values.productType !== 'normal' && (
               <FormSection
                 title="Other Charges"
                 icon="material-symbols:receipt-long"
@@ -1011,9 +1035,9 @@ const CompactFormContent: React.FC<{
                             <InputField
                               label="Charge Name"
                               placeholder="Enter charge name"
-                              value={charge.name || ""}
+                              value={charge.name || ''}
                               onChange={(e) =>
-                                updateOtherCharge(index, "name", e.target.value)
+                                updateOtherCharge(index, 'name', e.target.value)
                               }
                             />
                           </div>
@@ -1026,7 +1050,7 @@ const CompactFormContent: React.FC<{
                               placeholder="0.00"
                               numberValue={charge.price || 0}
                               onNumberChange={(value) =>
-                                updateOtherCharge(index, "price", value)
+                                updateOtherCharge(index, 'price', value)
                               }
                               allowNegative={false}
                               clearZeroOnFocus
@@ -1064,15 +1088,15 @@ const CompactFormContent: React.FC<{
                 <div
                   className={`border-2 border-dashed rounded p-4 text-center transition-colors cursor-pointer ${
                     dragActive
-                      ? "border-[#DF8D28] bg-[#DF8D28]/5"
-                      : "border-gray-300 hover:border-[#DF8D28] hover:bg-gray-50"
+                      ? 'border-[#DF8D28] bg-[#DF8D28]/5'
+                      : 'border-gray-300 hover:border-[#DF8D28] hover:bg-gray-50'
                   }`}
                   onDragEnter={handleDrag}
                   onDragLeave={handleDrag}
                   onDragOver={handleDrag}
                   onDrop={handleDrop}
                   onClick={() =>
-                    document.getElementById("file-upload")?.click()
+                    document.getElementById('file-upload')?.click()
                   }
                 >
                   <input
@@ -1161,7 +1185,7 @@ const CompactFormContent: React.FC<{
             </FormSection>
 
             {/* Status & Visibility Settings - Hide for normal products */}
-            {formik.values.productType !== "normal" && (
+            {formik.values.productType !== 'normal' && (
               <FormSection
                 title="Status & Visibility"
                 icon="material-symbols:settings"
@@ -1186,17 +1210,17 @@ const CompactFormContent: React.FC<{
                     <DropdownTagField
                       required
                       options={[
-                        { value: "normal", label: "Normal" },
-                        { value: "featured", label: "Featured" },
-                        { value: "bestSellers", label: "Best Sellers" },
-                        { value: "newArrivals", label: "New Arrivals" },
-                        { value: "popular", label: "Popular" },
-                        { value: "trending", label: "Trending" },
+                        { value: 'normal', label: 'Normal' },
+                        { value: 'featured', label: 'Featured' },
+                        { value: 'bestSellers', label: 'Best Sellers' },
+                        { value: 'newArrivals', label: 'New Arrivals' },
+                        { value: 'popular', label: 'Popular' },
+                        { value: 'trending', label: 'Trending' },
                       ]}
                       label="Visible As"
                       values={formik.values.visibleAs}
                       onChange={(newValues) => {
-                        formik.setFieldValue("visibleAs", newValues);
+                        formik.setFieldValue('visibleAs', newValues);
                       }}
                     />
                   </div>
@@ -1207,7 +1231,7 @@ const CompactFormContent: React.FC<{
                         type="checkbox"
                         checked={formik.values.isActive}
                         onChange={(e) =>
-                          formik.setFieldValue("isActive", e.target.checked)
+                          formik.setFieldValue('isActive', e.target.checked)
                         }
                         className="rounded border-gray-300 text-[#DF8D28] focus:ring-[#DF8D28] w-3 h-3"
                       />
@@ -1221,7 +1245,7 @@ const CompactFormContent: React.FC<{
                         type="checkbox"
                         checked={formik.values.isFeatured}
                         onChange={(e) =>
-                          formik.setFieldValue("isFeatured", e.target.checked)
+                          formik.setFieldValue('isFeatured', e.target.checked)
                         }
                         className="rounded border-gray-300 text-[#DF8D28] focus:ring-[#DF8D28] w-3 h-3"
                       />
@@ -1238,7 +1262,7 @@ const CompactFormContent: React.FC<{
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   <div>
                     <p className="text-sm font-medium text-gray-900">
-                      Ready to {isEdit ? "update" : "create"} product?
+                      Ready to {isEdit ? 'update' : 'create'} product?
                     </p>
                     <p className="text-xs text-gray-600">
                       Review all information before submitting
@@ -1268,12 +1292,12 @@ const CompactFormContent: React.FC<{
                       <Icon
                         icon={
                           isEdit
-                            ? "material-symbols:edit"
-                            : "material-symbols:add"
+                            ? 'material-symbols:edit'
+                            : 'material-symbols:add'
                         }
                         className="w-3 h-3"
                       />
-                      {isEdit ? "Update" : "Create"}
+                      {isEdit ? 'Update' : 'Create'}
                     </button>
                   </div>
                 </div>
