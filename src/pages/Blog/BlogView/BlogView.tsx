@@ -398,7 +398,7 @@ const BlogView: React.FC = () => {
                           onClick={() => openImageModal(index)}
                         >
                           <img
-                            src={image}
+                            src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${image}`}
                             alt={`Additional image ${index + 1}`}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
@@ -430,7 +430,7 @@ const BlogView: React.FC = () => {
                           />
                         </button>
                         <img
-                          src={blog.images[selectedImageIndex]}
+                          src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${blog.images[selectedImageIndex]}`}
                           alt={`Image ${selectedImageIndex + 1}`}
                           className="max-w-full max-h-full object-contain"
                         />
@@ -693,7 +693,7 @@ const BlogView: React.FC = () => {
                           {relatedBlog.featuredImage && (
                             <div className="aspect-video overflow-hidden">
                               <img
-                                src={relatedBlog.featuredImage}
+                                src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${relatedBlog.featuredImage}`}
                                 alt={relatedBlog.title}
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                               />

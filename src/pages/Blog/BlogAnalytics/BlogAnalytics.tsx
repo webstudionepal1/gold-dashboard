@@ -148,7 +148,7 @@ const BlogAnalytics: React.FC = () => {
                       <div className="flex-shrink-0">
                         {blog.featuredImage ? (
                           <img
-                            src={blog.featuredImage}
+                            src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${blog.featuredImage}`}
                             alt={blog.title}
                             className="w-12 h-12 rounded-lg object-cover"
                           />
