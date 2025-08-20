@@ -21,6 +21,7 @@ import {
 import { cleanObject } from '../../../utils/cleanObject';
 import { bannerStore } from './bannerStore';
 import { generateBannerFormDefaultValue } from './bannerobj';
+import { FormLoader } from '@/components/shared/FormLoader.component';
 
 const AddBannerSchema = z
   .object({
@@ -178,8 +179,17 @@ const AddBannerForm = () => {
     }
   }, [bannerSuccess, bannerUpdateSuccess]);
 
-  console.log('formisks', form.state.errors);
-  console.log('values', form.state.values);
+  if (bannerUpdatePending || bannerPending) {
+    return (
+      <FormLoader
+        variant="overlay"
+        isLoading={bannerUpdatePending || bannerPending}
+        message={
+          bannerUpdatePending ? 'Updating banner...' : 'Creating banner...'
+        }
+      />
+    );
+  }
   return (
     <div className="">
       <div className="flex items-center justify-between">
