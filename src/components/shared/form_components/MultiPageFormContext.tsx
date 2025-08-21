@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useCallback } from "react";
-import { ISmartCollectionConditions } from "../../../server/api/collectionHooks";
+import React, { createContext, useContext, useState, useCallback } from 'react';
+import { ISmartCollectionConditions } from '../../../server/api/collectionHooks';
 
 // Form Data Interface
 export interface CollectionFormData {
@@ -19,11 +19,11 @@ export interface CollectionFormData {
   styleCategory: string;
 
   // Page 3: Smart Collection Rules
-  collectionMode: "manual" | "automatic" | "hybrid";
+  collectionMode: 'manual' | 'automatic' | 'hybrid';
   conditions: ISmartCollectionConditions;
 
   // Page 3.5: Product Selection (for manual collections)
-  selectedProducts: string[];
+  selectedProduct: string[];
 
   // Page 4: Media and Assets
   images: (File | string)[];
@@ -36,8 +36,8 @@ export interface CollectionFormData {
     seoDescription: string;
     keywords: string[];
     tags: string[];
-    targetAudience: "men" | "women" | "unisex" | "children" | "";
-    seasonality: "spring" | "summer" | "autumn" | "winter" | "year-round";
+    targetAudience: 'men' | 'women' | 'unisex' | 'children' | '';
+    seasonality: 'spring' | 'summer' | 'autumn' | 'winter' | 'year-round';
     popularity: number;
     trendingScore: number;
   };
@@ -95,32 +95,32 @@ interface MultiPageFormContextType {
 // Default Form Data
 const defaultFormData: CollectionFormData = {
   // Page 1: Basic Information
-  name: "",
-  slug: "",
-  description: "",
-  shortDescription: "",
+  name: '',
+  slug: '',
+  description: '',
+  shortDescription: '',
   isActive: true,
   isFeatured: false,
-  collectionType: "custom",
+  collectionType: 'custom',
   sortOrder: 0,
 
   // Page 2: Collection Properties
-  materialType: "",
-  gemstoneType: "",
-  styleCategory: "",
+  materialType: '',
+  gemstoneType: '',
+  styleCategory: '',
 
   // Page 3: Smart Collection Rules
-  collectionMode: "manual",
+  collectionMode: 'manual',
   conditions: {
     groups: [],
-    operator: "AND",
+    operator: 'AND',
     isAutomatic: false,
     manualProductIds: [],
     excludedProductIds: [],
   },
 
   // Page 3.5: Product Selection (for manual collections)
-  selectedProducts: [],
+  selectedProduct: [],
 
   // Page 4: Media and Assets
   images: [],
@@ -129,20 +129,20 @@ const defaultFormData: CollectionFormData = {
 
   // Page 5: SEO and Marketing
   metadata: {
-    seoTitle: "",
-    seoDescription: "",
+    seoTitle: '',
+    seoDescription: '',
     keywords: [],
     tags: [],
-    targetAudience: "unisex",
-    seasonality: "year-round",
+    targetAudience: 'unisex',
+    seasonality: 'year-round',
     popularity: 0,
     trendingScore: 0,
   },
 
   // Page 6: Availability and Timing
   isLimitedEdition: false,
-  availableFrom: "",
-  availableUntil: "",
+  availableFrom: '',
+  availableUntil: '',
 };
 
 // Create Context
@@ -288,7 +288,7 @@ export const useMultiPageForm = (): MultiPageFormContextType => {
   const context = useContext(MultiPageFormContext);
   if (!context) {
     throw new Error(
-      "useMultiPageForm must be used within a MultiPageFormProvider"
+      'useMultiPageForm must be used within a MultiPageFormProvider'
     );
   }
   return context;
@@ -298,17 +298,17 @@ export const useMultiPageForm = (): MultiPageFormContextType => {
 const getStepFields = (step: number): string[] => {
   switch (step) {
     case 1:
-      return ["name", "slug", "shortDescription", "description"];
+      return ['name', 'slug', 'shortDescription', 'description'];
     case 2:
-      return ["materialType", "gemstoneType", "styleCategory"];
+      return ['materialType', 'gemstoneType', 'styleCategory'];
     case 3:
-      return ["collectionMode", "conditions"];
+      return ['collectionMode', 'conditions'];
     case 4:
-      return ["images", "bannerImage"];
+      return ['images', 'bannerImage'];
     case 5:
-      return ["metadata.seoTitle", "metadata.seoDescription"];
+      return ['metadata.seoTitle', 'metadata.seoDescription'];
     case 6:
-      return ["sortOrder"];
+      return ['sortOrder'];
     default:
       return [];
   }

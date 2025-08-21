@@ -1,6 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiClient } from "../utils/ApiGateway";
-import { toast } from "react-toastify";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { apiClient } from '../utils/ApiGateway';
+import { toast } from 'react-toastify';
 
 export interface IParams {
   [key: string]: string | number | boolean;
@@ -10,33 +10,33 @@ export interface IParams {
 export interface IConditionRule {
   field: string;
   operator:
-    | "equals"
-    | "not_equals"
-    | "contains"
-    | "not_contains"
-    | "starts_with"
-    | "ends_with"
-    | "greater_than"
-    | "less_than"
-    | "greater_than_or_equal"
-    | "less_than_or_equal"
-    | "in"
-    | "not_in"
-    | "exists"
-    | "not_exists"
-    | "between";
+    | 'equals'
+    | 'not_equals'
+    | 'contains'
+    | 'not_contains'
+    | 'starts_with'
+    | 'ends_with'
+    | 'greater_than'
+    | 'less_than'
+    | 'greater_than_or_equal'
+    | 'less_than_or_equal'
+    | 'in'
+    | 'not_in'
+    | 'exists'
+    | 'not_exists'
+    | 'between';
   value: any;
-  valueType: "string" | "number" | "boolean" | "array" | "date";
+  valueType: 'string' | 'number' | 'boolean' | 'array' | 'date';
 }
 
 export interface IConditionGroup {
   rules: IConditionRule[];
-  operator: "AND" | "OR";
+  operator: 'AND' | 'OR';
 }
 
 export interface ISmartCollectionConditions {
   groups: IConditionGroup[];
-  operator: "AND" | "OR";
+  operator: 'AND' | 'OR';
   isAutomatic: boolean;
   manualProductIds?: string[];
   excludedProductIds?: string[];
@@ -52,21 +52,22 @@ export interface IFetchCollection {
   isActive: boolean;
   isFeatured: boolean;
   sortOrder: number;
+  selectedProduct: string[];
 
   // Collection type and categorization
   collectionType:
-    | "material"
-    | "gemstone"
-    | "style"
-    | "occasion"
-    | "product_type"
-    | "designer"
-    | "price_range"
-    | "seasonal"
-    | "custom";
+    | 'material'
+    | 'gemstone'
+    | 'style'
+    | 'occasion'
+    | 'product_type'
+    | 'designer'
+    | 'price_range'
+    | 'seasonal'
+    | 'custom';
 
   // Smart Collection System
-  collectionMode: "manual" | "automatic" | "hybrid";
+  collectionMode: 'manual' | 'automatic' | 'hybrid';
   conditions?: ISmartCollectionConditions;
 
   // Visual assets
@@ -76,31 +77,31 @@ export interface IFetchCollection {
 
   // Collection properties specific to jewelry
   materialType?:
-    | "gold"
-    | "silver"
-    | "platinum"
-    | "rose_gold"
-    | "white_gold"
-    | "mixed"
-    | "other";
+    | 'gold'
+    | 'silver'
+    | 'platinum'
+    | 'rose_gold'
+    | 'white_gold'
+    | 'mixed'
+    | 'other';
   gemstoneType?:
-    | "diamond"
-    | "ruby"
-    | "emerald"
-    | "sapphire"
-    | "pearl"
-    | "mixed"
-    | "none"
-    | "other";
+    | 'diamond'
+    | 'ruby'
+    | 'emerald'
+    | 'sapphire'
+    | 'pearl'
+    | 'mixed'
+    | 'none'
+    | 'other';
   styleCategory?:
-    | "vintage"
-    | "modern"
-    | "classic"
-    | "contemporary"
-    | "minimalist"
-    | "bohemian"
-    | "luxury"
-    | "other";
+    | 'vintage'
+    | 'modern'
+    | 'classic'
+    | 'contemporary'
+    | 'minimalist'
+    | 'bohemian'
+    | 'luxury'
+    | 'other';
 
   // Price range for collection
   priceRange?: {
@@ -120,8 +121,8 @@ export interface IFetchCollection {
     seoDescription?: string;
     keywords?: string[];
     tags?: string[];
-    targetAudience?: "men" | "women" | "unisex" | "children";
-    seasonality?: "spring" | "summer" | "autumn" | "winter" | "year-round";
+    targetAudience?: 'men' | 'women' | 'unisex' | 'children';
+    seasonality?: 'spring' | 'summer' | 'autumn' | 'winter' | 'year-round';
     popularity?: number;
     trendingScore?: number;
   };
@@ -136,10 +137,10 @@ export interface IFetchCollection {
 // Get all collections
 export const useGetAllCollectionsQuery = (params: IParams = {}) => {
   return useQuery({
-    queryKey: ["collections", params],
+    queryKey: ['collections', params],
     queryFn: async () => {
       const res = await apiClient.get<{ data: IFetchCollection[] }>(
-        "collection",
+        'collection',
         {
           params,
         }
@@ -152,7 +153,7 @@ export const useGetAllCollectionsQuery = (params: IParams = {}) => {
 // Get collection by ID
 export const useGetCollectionByIdQuery = (id: string) => {
   return useQuery({
-    queryKey: ["collection", id],
+    queryKey: ['collection', id],
     queryFn: async () => {
       const res = await apiClient.get<{ data: IFetchCollection }>(
         `collection/${id}`
@@ -166,7 +167,7 @@ export const useGetCollectionByIdQuery = (id: string) => {
 // Get featured collections
 export const useGetFeaturedCollectionsQuery = (limit: number = 10) => {
   return useQuery({
-    queryKey: ["collections", "featured", limit],
+    queryKey: ['collections', 'featured', limit],
     queryFn: async () => {
       const res = await apiClient.get<{ data: IFetchCollection[] }>(
         `collection/featured?limit=${limit}`
@@ -179,7 +180,7 @@ export const useGetFeaturedCollectionsQuery = (limit: number = 10) => {
 // Get collections by type
 export const useGetCollectionsByTypeQuery = (type: string) => {
   return useQuery({
-    queryKey: ["collections", "by-type", type],
+    queryKey: ['collections', 'by-type', type],
     queryFn: async () => {
       const res = await apiClient.get<{ data: IFetchCollection[] }>(
         `collection/by-type/${type}`
@@ -193,7 +194,7 @@ export const useGetCollectionsByTypeQuery = (type: string) => {
 // Get collections by material
 export const useGetCollectionsByMaterialQuery = (material: string) => {
   return useQuery({
-    queryKey: ["collections", "by-material", material],
+    queryKey: ['collections', 'by-material', material],
     queryFn: async () => {
       const res = await apiClient.get<{ data: IFetchCollection[] }>(
         `collection/by-material/${material}`
@@ -207,7 +208,7 @@ export const useGetCollectionsByMaterialQuery = (material: string) => {
 // Get collections by gemstone
 export const useGetCollectionsByGemstoneQuery = (gemstone: string) => {
   return useQuery({
-    queryKey: ["collections", "by-gemstone", gemstone],
+    queryKey: ['collections', 'by-gemstone', gemstone],
     queryFn: async () => {
       const res = await apiClient.get<{ data: IFetchCollection[] }>(
         `collection/by-gemstone/${gemstone}`
@@ -221,7 +222,7 @@ export const useGetCollectionsByGemstoneQuery = (gemstone: string) => {
 // Get collections by style
 export const useGetCollectionsByStyleQuery = (style: string) => {
   return useQuery({
-    queryKey: ["collections", "by-style", style],
+    queryKey: ['collections', 'by-style', style],
     queryFn: async () => {
       const res = await apiClient.get<{ data: IFetchCollection[] }>(
         `collection/by-style/${style}`
@@ -235,7 +236,7 @@ export const useGetCollectionsByStyleQuery = (style: string) => {
 // Get trending collections
 export const useGetTrendingCollectionsQuery = (limit: number = 10) => {
   return useQuery({
-    queryKey: ["collections", "trending", limit],
+    queryKey: ['collections', 'trending', limit],
     queryFn: async () => {
       const res = await apiClient.get<{ data: IFetchCollection[] }>(
         `collection/trending?limit=${limit}`
@@ -248,10 +249,10 @@ export const useGetTrendingCollectionsQuery = (limit: number = 10) => {
 // Get available collections
 export const useGetAvailableCollectionsQuery = () => {
   return useQuery({
-    queryKey: ["collections", "available"],
+    queryKey: ['collections', 'available'],
     queryFn: async () => {
       const res = await apiClient.get<{ data: IFetchCollection[] }>(
-        "collection/available"
+        'collection/available'
       );
       return res?.data?.data;
     },
@@ -261,10 +262,10 @@ export const useGetAvailableCollectionsQuery = () => {
 // Get limited edition collections
 export const useGetLimitedEditionCollectionsQuery = () => {
   return useQuery({
-    queryKey: ["collections", "limited-edition"],
+    queryKey: ['collections', 'limited-edition'],
     queryFn: async () => {
       const res = await apiClient.get<{ data: IFetchCollection[] }>(
-        "collection/limited-edition"
+        'collection/limited-edition'
       );
       return res?.data?.data;
     },
@@ -275,22 +276,22 @@ export const useGetLimitedEditionCollectionsQuery = () => {
 export const useCreateCollectionMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["collections"],
+    mutationKey: ['collections'],
     mutationFn: async (body: FormData) => {
-      const res = await apiClient.post("collection", body, {
+      const res = await apiClient.post('collection', body, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          'Content-Type': 'multipart/form-data',
         },
       });
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Collection created successfully");
-      queryClient.invalidateQueries({ queryKey: ["collections"] });
+      toast.success('Collection created successfully');
+      queryClient.invalidateQueries({ queryKey: ['collections'] });
     },
     onError(err: any) {
       // toast.error(err?.response?.data?.message || "Error creating collection");
-      toast.error("Error creating collection");
+      toast.error('Error creating collection');
     },
   });
 };
@@ -299,22 +300,22 @@ export const useCreateCollectionMutation = () => {
 export const useUpdateCollectionMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["collections"],
+    mutationKey: ['collections'],
     mutationFn: async ({ id, body }: { id: string; body: FormData }) => {
       const res = await apiClient.patch(`collection/${id}`, body, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          'Content-Type': 'multipart/form-data',
         },
       });
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Collection updated successfully");
-      queryClient.invalidateQueries({ queryKey: ["collections"] });
+      toast.success('Collection updated successfully');
+      queryClient.invalidateQueries({ queryKey: ['collections'] });
     },
     onError(err: any) {
       // toast.error(err?.response?.data?.message || "Error updating collection");
-      toast.error("Error updating collection");
+      toast.error('Error updating collection');
     },
   });
 };
@@ -323,7 +324,7 @@ export const useUpdateCollectionMutation = () => {
 export const useCalculateCollectionPriceRangeMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["collections", "calculate-price-range"],
+    mutationKey: ['collections', 'calculate-price-range'],
     mutationFn: async (collectionId: string) => {
       const res = await apiClient.post(
         `collection/${collectionId}/calculate-price-range`
@@ -331,14 +332,14 @@ export const useCalculateCollectionPriceRangeMutation = () => {
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Price range calculated successfully");
-      queryClient.invalidateQueries({ queryKey: ["collections"] });
+      toast.success('Price range calculated successfully');
+      queryClient.invalidateQueries({ queryKey: ['collections'] });
     },
     onError(err: any) {
       // toast.error(
       //   err?.response?.data?.message || "Error calculating price range"
       // );
-      toast.error("Error calculating price range");
+      toast.error('Error calculating price range');
     },
   });
 };
@@ -347,20 +348,20 @@ export const useCalculateCollectionPriceRangeMutation = () => {
 export const useCalculateAllCollectionsPriceRangesMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["collections", "calculate-all-price-ranges"],
+    mutationKey: ['collections', 'calculate-all-price-ranges'],
     mutationFn: async () => {
-      const res = await apiClient.post("collection/calculate-all-price-ranges");
+      const res = await apiClient.post('collection/calculate-all-price-ranges');
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("All collection price ranges calculated successfully");
-      queryClient.invalidateQueries({ queryKey: ["collections"] });
+      toast.success('All collection price ranges calculated successfully');
+      queryClient.invalidateQueries({ queryKey: ['collections'] });
     },
     onError(err: any) {
       // toast.error(
       //   err?.response?.data?.message || "Error calculating price ranges"
       // );
-      toast.error("Error calculating price ranges");
+      toast.error('Error calculating price ranges');
     },
   });
 };
@@ -369,18 +370,18 @@ export const useCalculateAllCollectionsPriceRangesMutation = () => {
 export const useDeleteCollectionMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["collections"],
+    mutationKey: ['collections'],
     mutationFn: async (id: string) => {
       const res = await apiClient.delete(`collection/${id}`);
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Collection deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["collections"] });
+      toast.success('Collection deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ['collections'] });
     },
     onError(err: any) {
       // toast.error(err?.response?.data?.message || "Error deleting collection");
-      toast.error("Error deleting collection");
+      toast.error('Error deleting collection');
     },
   });
 };
@@ -389,20 +390,20 @@ export const useDeleteCollectionMutation = () => {
 export const useUpdateCollectionProductsMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["collections"],
+    mutationKey: ['collections'],
     mutationFn: async (id: string) => {
       const res = await apiClient.post(`collection/${id}/update-products`);
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success("Collection products updated successfully");
-      queryClient.invalidateQueries({ queryKey: ["collections"] });
+      toast.success('Collection products updated successfully');
+      queryClient.invalidateQueries({ queryKey: ['collections'] });
     },
     onError(err: any) {
       // toast.error(
       //   err?.response?.data?.message || "Error updating collection products"
       // );
-      toast.error("Error updating collection products");
+      toast.error('Error updating collection products');
     },
   });
 };
@@ -410,7 +411,7 @@ export const useUpdateCollectionProductsMutation = () => {
 // Preview collection products
 export const usePreviewCollectionProductsMutation = () => {
   return useMutation({
-    mutationKey: ["collections", "preview-products"],
+    mutationKey: ['collections', 'preview-products'],
     mutationFn: async ({
       collectionId,
       conditions,
@@ -428,7 +429,7 @@ export const usePreviewCollectionProductsMutation = () => {
 
       // For new collections, use the new endpoint that accepts conditions directly
       const res = await apiClient.post(
-        "collection/preview-products-by-conditions",
+        'collection/preview-products-by-conditions',
         {
           conditions,
         }
@@ -436,7 +437,7 @@ export const usePreviewCollectionProductsMutation = () => {
       return res?.data?.data;
     },
     onError(err: any) {
-      console.error("Error previewing collection products:", err);
+      console.error('Error previewing collection products:', err);
     },
   });
 };
@@ -444,10 +445,10 @@ export const usePreviewCollectionProductsMutation = () => {
 // Get collection condition fields
 export const useGetCollectionConditionFieldsQuery = () => {
   return useQuery({
-    queryKey: ["collection-condition-fields"],
+    queryKey: ['collection-condition-fields'],
     queryFn: async () => {
       const res = await apiClient.get<{ data: any[] }>(
-        "collection/condition-fields"
+        'collection/condition-fields'
       );
       return res?.data?.data;
     },

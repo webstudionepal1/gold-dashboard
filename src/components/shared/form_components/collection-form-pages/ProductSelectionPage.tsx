@@ -182,7 +182,7 @@ export const ProductSelectionPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedProducts, setSelectedProducts] = useState<string[]>(
-    formData.selectedProducts || []
+    formData.selectedProduct || []
   );
 
   // State for hybrid mode - automatically matched products
@@ -283,7 +283,7 @@ export const ProductSelectionPage: React.FC = () => {
 
         setSelectedProducts(newSelectedProducts);
         updateFormData({
-          selectedProducts: newSelectedProducts,
+          selectedProduct: newSelectedProducts,
           conditions: {
             ...formData.conditions,
             manualProductIds: newSelectedProducts,
@@ -297,7 +297,7 @@ export const ProductSelectionPage: React.FC = () => {
         : [...selectedProducts, productId];
 
       setSelectedProducts(newSelectedProducts);
-      updateFormData({ selectedProducts: newSelectedProducts });
+      updateFormData({ selectedProduct: newSelectedProducts });
     }
   };
 
@@ -307,17 +307,17 @@ export const ProductSelectionPage: React.FC = () => {
       (product: IFetchProduct) => product._id
     );
     setSelectedProducts(allProductIds);
-    updateFormData({ selectedProducts: allProductIds });
+    updateFormData({ selectedProduct: allProductIds });
   };
 
   const handleSelectNone = () => {
     setSelectedProducts([]);
-    updateFormData({ selectedProducts: [] });
+    updateFormData({ selectedProduct: [] });
   };
 
   // Update form data when selectedProducts changes
   useEffect(() => {
-    updateFormData({ selectedProducts });
+    updateFormData({ selectedProduct: selectedProducts });
   }, [selectedProducts, updateFormData]);
 
   if (isLoadingProducts) {

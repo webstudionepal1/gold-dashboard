@@ -7,6 +7,7 @@ import {
   useGetCollectionByIdQuery,
 } from '../../../server/api/collectionHooks';
 import { FormLoader } from '@/components/shared/FormLoader.component';
+import { CollectionFormData } from '@/components/shared/form_components/MultiPageFormContext';
 
 const NewCollectionForm: React.FC = () => {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ const NewCollectionForm: React.FC = () => {
     useGetCollectionByIdQuery(id || '');
 
   // Transform existing collection data for the form
-  const getInitialData = () => {
+  const getInitialData = (): Partial<CollectionFormData> | undefined => {
     if (!isEdit || !existingCollection) return undefined;
 
     return {
@@ -36,6 +37,8 @@ const NewCollectionForm: React.FC = () => {
       gemstoneType: existingCollection.gemstoneType || '',
       styleCategory: existingCollection.styleCategory || '',
       collectionMode: existingCollection.collectionMode || 'manual',
+      selectedProduct: existingCollection.selectedProduct || [],
+
       conditions: existingCollection.conditions || {
         groups: [],
         operator: 'AND',
@@ -70,37 +73,7 @@ const NewCollectionForm: React.FC = () => {
   };
 
   // Handle form submission
-  const handleFormSubmit = async (formData: {
-    name: string;
-    slug?: string;
-    description: string;
-    shortDescription?: string;
-    isActive: boolean;
-    isFeatured: boolean;
-    materialType?: string;
-    gemstoneType?: string;
-    styleCategory?: string;
-    collectionMode?: string;
-    selectedProducts?: string[];
-    conditions?: string[];
-    metadata?: {
-      seoTitle?: string;
-      seoDescription?: string;
-      keywords?: string[];
-      tags?: string[];
-      targetAudience?: string;
-      seasonality?: string;
-      popularity?: number;
-      trendingScore?: number;
-    };
-    isLimitedEdition: boolean;
-    availableFrom?: string;
-    availableUntil?: string;
-    sortOrder: number;
-    images?: (File | string)[];
-    bannerImage?: File | string;
-    video?: File | string;
-  }) => {
+  const handleFormSubmit = async (formData: CollectionFormData) => {
     try {
       // Create FormData object for multipart/form-data submission
       const formDataObj = new FormData();
@@ -124,16 +97,13 @@ const NewCollectionForm: React.FC = () => {
         formDataObj.append('collectionMode', formData.collectionMode);
 
       // Handle selected products for manual collections
-      if (
-        formData.selectedProducts &&
-        Array.isArray(formData.selectedProducts)
-      ) {
+      if (formData.selectedProduct && Array.isArray(formData.selectedProduct)) {
         // formDataObj.append(
         //   'selectedProducts',
         //   JSON.stringify(formData.selectedProducts)
         // );
-        formData.selectedProducts?.map((product, index) => {
-          formDataObj.append(`selectedProducts[${index}]`, product);
+        formData.selectedProduct.map((product, index) => {
+          formDataObj.append(`selectedProduct[${index}]`, product);
         });
       }
 
