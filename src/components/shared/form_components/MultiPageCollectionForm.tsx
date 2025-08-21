@@ -1,60 +1,61 @@
-import React, { useEffect, useMemo } from "react";
-import { Icon } from "@iconify/react/dist/iconify.js";
+import React, { useEffect, useMemo } from 'react';
+import { Icon } from '@iconify/react/dist/iconify.js';
 import {
   FormStepper,
   ProgressBar,
   StepperNavigation,
   StepperStep,
-} from "./FormStepper";
+} from './FormStepper';
 import {
+  CollectionFormData,
   MultiPageFormProvider,
   useMultiPageForm,
-} from "./MultiPageFormContext";
-import { BasicInformationPage } from "./collection-form-pages/BasicInformationPage";
-import { CollectionPropertiesPage } from "./collection-form-pages/CollectionPropertiesPage";
-import { SmartCollectionRulesPage } from "./collection-form-pages/SmartCollectionRulesPage";
-import { ProductSelectionPage } from "./collection-form-pages/ProductSelectionPage";
-import { MediaAssetsPage } from "./collection-form-pages/MediaAssetsPage";
+} from './MultiPageFormContext';
+import { BasicInformationPage } from './collection-form-pages/BasicInformationPage';
+import { CollectionPropertiesPage } from './collection-form-pages/CollectionPropertiesPage';
+import { SmartCollectionRulesPage } from './collection-form-pages/SmartCollectionRulesPage';
+import { ProductSelectionPage } from './collection-form-pages/ProductSelectionPage';
+import { MediaAssetsPage } from './collection-form-pages/MediaAssetsPage';
 
-import { AvailabilityTimingPage } from "./collection-form-pages/AvailabilityTimingPage";
+import { AvailabilityTimingPage } from './collection-form-pages/AvailabilityTimingPage';
 
 // Define the steps for the stepper
 const FORM_STEPS: StepperStep[] = [
   {
     id: 1,
-    title: "Basic Info",
-    description: "Name & Description",
-    icon: "material-symbols:info",
+    title: 'Basic Info',
+    description: 'Name & Description',
+    icon: 'material-symbols:info',
   },
   {
     id: 2,
-    title: "Properties",
-    description: "Material & Style",
-    icon: "material-symbols:diamond",
+    title: 'Properties',
+    description: 'Material & Style',
+    icon: 'material-symbols:diamond',
   },
   {
     id: 3,
-    title: "Collection Rules",
-    description: "Product Management",
-    icon: "material-symbols:smart-toy",
+    title: 'Collection Rules',
+    description: 'Product Management',
+    icon: 'material-symbols:smart-toy',
   },
   {
     id: 4,
-    title: "Media",
-    description: "Images & Videos",
-    icon: "material-symbols:image",
+    title: 'Media',
+    description: 'Images & Videos',
+    icon: 'material-symbols:image',
   },
   {
     id: 5,
-    title: "Availability",
-    description: "Timing & Review",
-    icon: "material-symbols:schedule",
+    title: 'Availability',
+    description: 'Timing & Review',
+    icon: 'material-symbols:schedule',
   },
 ];
 
 // Form Content Component (needs to be inside the provider)
 const MultiPageFormContent: React.FC<{
-  onSubmit: (data: any) => void;
+  onSubmit: (data: CollectionFormData) => void;
   onCancel?: () => void;
   isEdit?: boolean;
 }> = ({ onSubmit, onCancel, isEdit = false }) => {
@@ -73,7 +74,9 @@ const MultiPageFormContent: React.FC<{
   } = useMultiPageForm();
 
   // Determine if we should show the product selection step
-  const shouldShowProductSelection = formData.collectionMode === "manual" || formData.collectionMode === "hybrid";
+  const shouldShowProductSelection =
+    formData.collectionMode === 'manual' ||
+    formData.collectionMode === 'hybrid';
 
   // Dynamic steps based on collection mode
   const dynamicSteps = useMemo(() => {
@@ -83,9 +86,9 @@ const MultiPageFormContent: React.FC<{
       // Insert product selection step after collection rules
       const productSelectionStep: StepperStep = {
         id: 3.5,
-        title: "Select Products",
-        description: "Choose Products",
-        icon: "material-symbols:inventory-2",
+        title: 'Select Products',
+        description: 'Choose Products',
+        icon: 'material-symbols:inventory-2',
       };
 
       // Insert at index 3 (after collection rules)
@@ -152,7 +155,7 @@ const MultiPageFormContent: React.FC<{
     try {
       await onSubmit(formData);
     } catch (error) {
-      console.error("Form submission error:", error);
+      console.error('Form submission error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -209,7 +212,7 @@ const MultiPageFormContent: React.FC<{
                 className="w-8 h-8 text-[#DF8D28]"
               />
               <h1 className="text-xl font-semibold text-gray-900">
-                {isEdit ? "Edit Collection" : "Create New Collection"}
+                {isEdit ? 'Edit Collection' : 'Create New Collection'}
               </h1>
             </div>
 
@@ -273,9 +276,9 @@ const MultiPageFormContent: React.FC<{
 
 // Main Component with Provider
 interface MultiPageCollectionFormProps {
-  onSubmit: (data: any) => void;
+  onSubmit: (data: CollectionFormData) => void;
   onCancel?: () => void;
-  initialData?: any;
+  initialData?: Partial<CollectionFormData>;
   isEdit?: boolean;
 }
 
