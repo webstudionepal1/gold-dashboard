@@ -228,40 +228,40 @@ const CollectionForm = () => {
     },
     onSubmit: async ({ value }) => {
       try {
+        const { metadata, ...rest } = value;
+
         // Prepare conditions based on collection mode
         let conditions = undefined;
         if (
-          value.collectionMode === "automatic" ||
-          value.collectionMode === "hybrid"
+          rest.collectionMode === "automatic" ||
+          rest.collectionMode === "hybrid"
         ) {
           conditions = {
-            ...value.conditions,
+            ...rest.conditions,
             isAutomatic:
-              value.collectionMode === "automatic" ||
-              value.collectionMode === "hybrid",
+              rest.collectionMode === "automatic" ||
+              rest.collectionMode === "hybrid",
           };
         }
 
         // Prepare the data for submission
         const dataToSubmit = {
-          ...value,
+          ...rest, // 👈 metadata excluded here
           images: uploadedImages,
           bannerImage: uploadedBannerImage,
           video: uploadedVideo,
           conditions,
-          // Convert date strings to Date objects if they exist
-          availableFrom: value.availableFrom
-            ? new Date(value.availableFrom)
+          availableFrom: rest.availableFrom
+            ? new Date(rest.availableFrom)
             : undefined,
-          availableUntil: value.availableUntil
-            ? new Date(value.availableUntil)
+          availableUntil: rest.availableUntil
+            ? new Date(rest.availableUntil)
             : undefined,
         };
 
         // Create FormData object for multipart upload
         const submissionData = new FormData();
 
-        // Append all fields to FormData
         Object.entries(dataToSubmit).forEach(([key, value]) => {
           if (value !== undefined && value !== null) {
             if (Array.isArray(value)) {
@@ -327,37 +327,37 @@ const CollectionForm = () => {
         );
       }
 
-      if (collectionData.metadata) {
-        form.setFieldValue(
-          "metadata.seoTitle",
-          collectionData.metadata.seoTitle || ""
-        );
-        form.setFieldValue(
-          "metadata.seoDescription",
-          collectionData.metadata.seoDescription || ""
-        );
-        form.setFieldValue(
-          "metadata.keywords",
-          collectionData.metadata.keywords || []
-        );
-        form.setFieldValue("metadata.tags", collectionData.metadata.tags || []);
-        form.setFieldValue(
-          "metadata.targetAudience",
-          collectionData.metadata.targetAudience || ""
-        );
-        form.setFieldValue(
-          "metadata.seasonality",
-          collectionData.metadata.seasonality || "year-round"
-        );
-        form.setFieldValue(
-          "metadata.popularity",
-          collectionData.metadata.popularity || 0
-        );
-        form.setFieldValue(
-          "metadata.trendingScore",
-          collectionData.metadata.trendingScore || 0
-        );
-      }
+      // if (collectionData.metadata) {
+      //   form.setFieldValue(
+      //     "metadata.seoTitle",
+      //     collectionData.metadata.seoTitle || ""
+      //   );
+      //   form.setFieldValue(
+      //     "metadata.seoDescription",
+      //     collectionData.metadata.seoDescription || ""
+      //   );
+      //   form.setFieldValue(
+      //     "metadata.keywords",
+      //     collectionData.metadata.keywords || []
+      //   );
+      //   form.setFieldValue("metadata.tags", collectionData.metadata.tags || []);
+      //   form.setFieldValue(
+      //     "metadata.targetAudience",
+      //     collectionData.metadata.targetAudience || ""
+      //   );
+      //   form.setFieldValue(
+      //     "metadata.seasonality",
+      //     collectionData.metadata.seasonality || "year-round"
+      //   );
+      //   form.setFieldValue(
+      //     "metadata.popularity",
+      //     collectionData.metadata.popularity || 0
+      //   );
+      //   form.setFieldValue(
+      //     "metadata.trendingScore",
+      //     collectionData.metadata.trendingScore || 0
+      //   );
+      // }
 
       // Load conditions if they exist
       if (collectionData.conditions) {
@@ -406,14 +406,16 @@ const CollectionForm = () => {
             e.stopPropagation();
             form.handleSubmit();
           }}
-          className="space-y-8">
+          className="space-y-8"
+        >
           {/* Basic Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <form.Field
               name="name"
               validators={{
                 onChange: collectionSchema.shape.name,
-              }}>
+              }}
+            >
               {(field) => (
                 <div>
                   <InputField
@@ -442,7 +444,8 @@ const CollectionForm = () => {
               name="slug"
               validators={{
                 onChange: collectionSchema.shape.slug,
-              }}>
+              }}
+            >
               {(field) => (
                 <div>
                   <InputField
@@ -463,7 +466,8 @@ const CollectionForm = () => {
             name="description"
             validators={{
               onChange: collectionSchema.shape.description,
-            }}>
+            }}
+          >
             {(field) => (
               <div>
                 <TextareaField
@@ -508,7 +512,8 @@ const CollectionForm = () => {
               name="collectionMode"
               validators={{
                 onChange: collectionSchema.shape.collectionMode,
-              }}>
+              }}
+            >
               {(field) => (
                 <div>
                   <DropdownField
@@ -574,7 +579,8 @@ const CollectionForm = () => {
               name="collectionType"
               validators={{
                 onChange: collectionSchema.shape.collectionType,
-              }}>
+              }}
+            >
               {(field) => (
                 <div>
                   <DropdownField
@@ -605,7 +611,8 @@ const CollectionForm = () => {
               name="sortOrder"
               validators={{
                 onChange: collectionSchema.shape.sortOrder,
-              }}>
+              }}
+            >
               {(field) => (
                 <div>
                   <InputField
@@ -709,7 +716,8 @@ const CollectionForm = () => {
                     />
                     <label
                       htmlFor="isActive"
-                      className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                      className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                    >
                       <Icon
                         icon="material-symbols:visibility"
                         className="w-4 h-4"
@@ -732,7 +740,8 @@ const CollectionForm = () => {
                     />
                     <label
                       htmlFor="isFeatured"
-                      className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                      className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                    >
                       <Icon icon="material-symbols:star" className="w-4 h-4" />
                       Featured Collection
                     </label>
@@ -752,7 +761,8 @@ const CollectionForm = () => {
                     />
                     <label
                       htmlFor="isLimitedEdition"
-                      className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                      className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                    >
                       <Icon
                         icon="material-symbols:schedule"
                         className="w-4 h-4"
@@ -808,7 +818,8 @@ const CollectionForm = () => {
                       type="button"
                       onClick={() => calculatePriceRangeMutation.mutate(id!)}
                       disabled={calculatePriceRangeMutation.isPending}
-                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    >
                       {calculatePriceRangeMutation.isPending && (
                         <Icon icon="eos-icons:loading" className="w-4 h-4" />
                       )}
@@ -1049,7 +1060,8 @@ const CollectionForm = () => {
             <button
               type="button"
               onClick={() => navigate("/collection")}
-              className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+              className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+            >
               Cancel
             </button>
             <button
@@ -1058,7 +1070,8 @@ const CollectionForm = () => {
                 createCollectionMutation.isPending ||
                 updateCollectionMutation.isPending
               }
-              className="px-6 py-2 bg-[#DF8D28] text-white rounded-lg hover:bg-[#DF8D28]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+              className="px-6 py-2 bg-[#DF8D28] text-white rounded-lg hover:bg-[#DF8D28]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
               {(createCollectionMutation.isPending ||
                 updateCollectionMutation.isPending) && (
                 <Icon icon="eos-icons:loading" className="w-4 h-4" />

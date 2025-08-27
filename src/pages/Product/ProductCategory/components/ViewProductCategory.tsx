@@ -35,7 +35,7 @@ const ViewProductCategory: React.FC<ViewProductCategoryProps> = ({
           </button>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-1">
           <div className="bg-gray-50 p-4 rounded-lg">
             <h3 className="text-sm font-semibold text-gray-600">
               Category Name
@@ -63,14 +63,15 @@ const ViewProductCategory: React.FC<ViewProductCategoryProps> = ({
             </p>
           </div>
 
-          {/* {viewData.subCategory && viewData.subCategory.length > 0 && (
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h3 className="text-sm font-semibold text-gray-600">Subcategories</h3>
-              <p className="text-gray-700">
-                {viewData.subCategory.map((sub) => get(sub, 'name', '')).join(', ')}
-              </p>
-            </div>
-          )} */}
+          <img
+            src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${get(
+              viewData,
+              "images[0]",
+              ""
+            )}`}
+            alt={get(viewData, "name", "Category Image")}
+            className="mt-4 rounded-lg shadow-md aspect-video"
+          />
         </div>
 
         <div className="mt-6 flex justify-end">
