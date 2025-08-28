@@ -459,7 +459,7 @@ const BlogEditor: React.FC = () => {
             console.log('🔍 Form valid:', formik.isValid);
             console.log('🔍 Form errors:', formik.errors);
             console.log('🔍 Form values:', formik.values);
-            formik.handleSubmit(e);
+            formik.handleSubmit(e as any);
           }}
           className="space-y-3"
         >
