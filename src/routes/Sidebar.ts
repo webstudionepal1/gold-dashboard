@@ -51,23 +51,9 @@ export const SidebarConfig = {
         },
         {
           id: 25,
-          path: '#',
+          path: FrontendRoutes.COLLECTION,
           title: 'Collections',
           icon: 'bi:collection',
-          children: [
-            {
-              id: 250,
-              path: FrontendRoutes.COLLECTION,
-              title: 'Collection List',
-              icon: '',
-            },
-            {
-              id: 251,
-              path: FrontendRoutes.ADDCOLLECTION,
-              title: 'Add Collection',
-              icon: '',
-            },
-          ],
         },
         {
           id: 3,
@@ -85,12 +71,6 @@ export const SidebarConfig = {
               id: 38,
               path: FrontendRoutes.CONFIRMEDORDER,
               title: 'Confirmed Order',
-            },
-            {
-              id: 30,
-              path: FrontendRoutes.ASSIGNEDORDER,
-              title: 'Assigned Order',
-              icon: '',
             },
             {
               id: 32,

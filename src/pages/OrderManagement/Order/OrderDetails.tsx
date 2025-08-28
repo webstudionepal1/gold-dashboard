@@ -210,8 +210,6 @@ const OrderDetails: React.FC = () => {
           navigate("/order/confirmed-order");
         }
       } else if (page === "confirmed-order-details")
-        navigate("/order/assigned-order");
-      else if (page === "assigned-order-details")
         navigate("/order/completed-order");
     }
   }, [isSuccess, navigate, page, order?.orderStatus]);
@@ -551,7 +549,7 @@ const OrderDetails: React.FC = () => {
                 </>
               )}
 
-              {page === "confirmed-order-details" && (
+              {/* {page === "confirmed-order-details" && (
                 <button
                   onClick={() => handleOrderStatusUpdate("assigned")}
                   disabled={isPending}
@@ -564,8 +562,8 @@ const OrderDetails: React.FC = () => {
                 >
                   {isPending ? "Processing..." : "Assign Delivery"}
                 </button>
-              )}
-              {page === "assigned-order-details" && (
+              )} */}
+              {page === "confirmed-order-details" && (
                 <button
                   onClick={() =>
                     handleOrderStatusUpdate("delivered", {

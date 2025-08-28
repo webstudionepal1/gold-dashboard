@@ -452,7 +452,7 @@ const BlogEditor: React.FC = () => {
       </Header>
 
       <div className="max-full mx-auto">
-        <form
+        <div
           id="blog-form"
           onSubmit={(e) => {
             console.log('🔘 Form submit event triggered!');
@@ -1052,7 +1052,7 @@ const BlogEditor: React.FC = () => {
               </div>
             </div>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );
