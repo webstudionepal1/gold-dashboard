@@ -277,8 +277,8 @@ const MasterTable: React.FC<MasterTableProps> = memo(({
 
         <div
           className={clsx(
-            'flex items-center gap-2',
-            tabsOptions ? 'md:justify-end  w-fit' : 'justify-between ',
+            'flex items-center gap-2 sm:flex-row flex-col',
+            tabsOptions ? 'md:justify-end  w-fit' : 'sm:justify-between ',
             (filterSection || canSearch) && 'w-full'
           )}
         >
