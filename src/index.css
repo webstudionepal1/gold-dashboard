@@ -87,6 +87,7 @@ ul {
 html,
 body {
   height: 100%;
+  overflow-y: hidden;
 }
 body {
   line-height: 1.5;
