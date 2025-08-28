@@ -113,7 +113,7 @@ const EditProfileForm = () => {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex sm:flex-row flex-col mb-6 sm:mb-0 sm:items-center sm:justify-between">
         <Header text="Edit Shop Profile" />
         <Breadcrumbs />
       </div>

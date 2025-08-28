@@ -194,7 +194,7 @@ const Overlay: React.FC = () => {
   return (
     <div
       className={clsx(
-        'fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity duration-300',
+        'fixed inset-0 bg-black/50 z-[9999] md:hidden transition-opacity duration-300',
         isSidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
       )}
       onClick={closeSidebar}
@@ -259,7 +259,7 @@ const Sidebar: React.FC<{ config: { sections: SidebarSection[] } }> = ({
       {/* Sidebar */}
       <aside
         className={clsx(
-          'flex flex-col h-screen  border-r border-gray-200 transition-all duration-300 bg-white ease-in-out z-50',
+          'flex flex-col z-[999999999] h-screen  border-r border-gray-200 transition-all duration-300 bg-white ease-in-out',
           'fixed md:static md:translate-x-0',
           isCollapsed ? 'md:w-16 min-w-16' : 'md:w-72 md:min-w-72',
           'w-72 max-w-72',
