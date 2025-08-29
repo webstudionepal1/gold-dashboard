@@ -190,7 +190,7 @@ export const useGetProductByIdQuery = (
   options?: { enabled?: boolean }
 ) => {
   return useQuery({
-    queryKey: ['product', id],
+    queryKey: ['products', id],
     queryFn: async () => {
       const res = await apiClient.get<{ data: IFetchProduct }>(`product/${id}`);
       return res?.data;
