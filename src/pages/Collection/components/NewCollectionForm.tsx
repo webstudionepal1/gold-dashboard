@@ -26,6 +26,10 @@ const NewCollectionForm: React.FC = () => {
   const getInitialData = (): Partial<CollectionFormData> | undefined => {
     if (!isEdit || !existingCollection) return undefined;
 
+    const productId = existingCollection?.selectedProduct?.map(
+      (item) => item?._id
+    );
+
     return {
       name: existingCollection.name || '',
       slug: existingCollection.slug || '',
@@ -37,7 +41,7 @@ const NewCollectionForm: React.FC = () => {
       gemstoneType: existingCollection.gemstoneType || '',
       styleCategory: existingCollection.styleCategory || '',
       collectionMode: existingCollection.collectionMode || 'manual',
-      selectedProduct: existingCollection.selectedProduct || [],
+      selectedProduct: productId || [],
 
       conditions: existingCollection.conditions || {
         groups: [],

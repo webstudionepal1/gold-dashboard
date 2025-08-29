@@ -1,7 +1,11 @@
 import React from 'react';
 import { useImageWithFallback } from '../../hooks/useImageWithFallback';
 
-interface SafeImageProps extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, 'src' | 'onLoad' | 'onError'> {
+interface SafeImageProps
+  extends Omit<
+    React.ImgHTMLAttributes<HTMLImageElement>,
+    'src' | 'onLoad' | 'onError'
+  > {
   src: string;
   fallbackSrc?: string;
   showLoadingPlaceholder?: boolean;
@@ -19,11 +23,11 @@ const SafeImage: React.FC<SafeImageProps> = ({
   alt = '',
   ...props
 }) => {
-  const { imageSrc, isLoading, hasError, handleLoad, handleError } = useImageWithFallback({
-    src,
-    fallbackSrc
-  });
-
+  const { imageSrc, isLoading, hasError, handleLoad, handleError } =
+    useImageWithFallback({
+      src,
+      fallbackSrc,
+    });
   if (hasError && errorComponent) {
     return <>{errorComponent}</>;
   }
@@ -32,9 +36,11 @@ const SafeImage: React.FC<SafeImageProps> = ({
     if (loadingComponent) {
       return <>{loadingComponent}</>;
     }
-    
+
     return (
-      <div className={`bg-gray-200 animate-pulse flex items-center justify-center ${className}`}>
+      <div
+        className={`bg-gray-200 animate-pulse flex items-center justify-center ${className}`}
+      >
         <svg
           className="w-6 h-6 text-gray-400"
           fill="none"

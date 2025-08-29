@@ -1,9 +1,9 @@
-import { Icon } from "@iconify/react/dist/iconify.js";
-import { useNavigate, useParams } from "react-router-dom";
-import { useGetCollectionByIdQuery } from "../../../server/api/collectionHooks";
-import Breadcrumbs from "../../../components/shared/Breadcrumb";
-import { format } from "date-fns";
-import SafeImage from "../../../components/ui/SafeImage";
+import { Icon } from '@iconify/react/dist/iconify.js';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useGetCollectionByIdQuery } from '../../../server/api/collectionHooks';
+import Breadcrumbs from '../../../components/shared/Breadcrumb';
+import { format } from 'date-fns';
+import SafeImage from '../../../components/ui/SafeImage';
 
 const CollectionDetails = () => {
   const navigate = useNavigate();
@@ -13,7 +13,9 @@ const CollectionDetails = () => {
     data: collection,
     isLoading,
     error,
-  } = useGetCollectionByIdQuery(id || "");
+  } = useGetCollectionByIdQuery(id || '');
+
+  console.log(collection, 'collection');
 
   if (isLoading) {
     return (
@@ -38,8 +40,9 @@ const CollectionDetails = () => {
             The collection you're looking for doesn't exist or has been removed.
           </p>
           <button
-            onClick={() => navigate("/collection")}
-            className="px-6 py-2 bg-[#DF8D28] text-white rounded-lg hover:bg-[#DF8D28]/90 transition-colors">
+            onClick={() => navigate('/collection')}
+            className="px-6 py-2 bg-[#DF8D28] text-white rounded-lg hover:bg-[#DF8D28]/90 transition-colors"
+          >
             Back to Collections
           </button>
         </div>
@@ -151,8 +154,8 @@ const CollectionDetails = () => {
                       />
                       <span className="text-gray-500">Type:</span>
                       <span className="font-medium text-gray-700 capitalize">
-                        {collection.collectionType?.replace("_", " ") ||
-                          "Custom"}
+                        {collection.collectionType?.replace('_', ' ') ||
+                          'Custom'}
                       </span>
                     </div>
                   </div>
@@ -161,13 +164,15 @@ const CollectionDetails = () => {
               <div className="flex gap-2">
                 <button
                   onClick={() => navigate(`/collection/edit/${collection._id}`)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm">
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm"
+                >
                   <Icon icon="material-symbols:edit" className="w-4 h-4" />
                   Edit
                 </button>
                 <button
-                  onClick={() => navigate("/collection")}
-                  className="px-3 py-2 bg-[#DF8D28] text-white rounded-lg hover:bg-[#DF8D28]/90 transition-colors text-sm">
+                  onClick={() => navigate('/collection')}
+                  className="px-3 py-2 bg-[#DF8D28] text-white rounded-lg hover:bg-[#DF8D28]/90 transition-colors text-sm"
+                >
                   Back
                 </button>
               </div>
@@ -225,12 +230,13 @@ const CollectionDetails = () => {
                     </span>
                     <span
                       className={`text-xs px-2 py-1 rounded-full font-medium ${
-                        collection.collectionMode === "automatic"
-                          ? "bg-green-100 text-green-700"
-                          : collection.collectionMode === "hybrid"
-                          ? "bg-yellow-100 text-yellow-700"
-                          : "bg-gray-100 text-gray-700"
-                      }`}>
+                        collection.collectionMode === 'automatic'
+                          ? 'bg-green-100 text-green-700'
+                          : collection.collectionMode === 'hybrid'
+                          ? 'bg-yellow-100 text-yellow-700'
+                          : 'bg-gray-100 text-gray-700'
+                      }`}
+                    >
                       {collection.collectionMode}
                     </span>
                   </div>
@@ -279,7 +285,7 @@ const CollectionDetails = () => {
                         Material:
                       </span>
                       <span className="font-medium text-sm capitalize">
-                        {collection.materialType?.replace("_", " ") ||
+                        {collection.materialType?.replace('_', ' ') ||
                           collection.materialType}
                       </span>
                     </div>
@@ -287,7 +293,7 @@ const CollectionDetails = () => {
                 </div>
                 <div className="space-y-3">
                   {collection.gemstoneType &&
-                    collection.gemstoneType !== "none" && (
+                    collection.gemstoneType !== 'none' && (
                       <div className="flex items-center justify-between py-2 border-b border-gray-100">
                         <span className="text-gray-600 text-sm flex items-center gap-2">
                           <Icon
@@ -328,8 +334,8 @@ const CollectionDetails = () => {
                           Price Range:
                         </span>
                         <span className="font-medium text-sm">
-                          {collection.priceRange.currency}{" "}
-                          {collection.priceRange.min} -{" "}
+                          {collection.priceRange.currency}{' '}
+                          {collection.priceRange.min} -{' '}
                           {collection.priceRange.max}
                         </span>
                       </div>
@@ -367,7 +373,7 @@ const CollectionDetails = () => {
                       Created:
                     </span>
                     <span className="font-medium text-sm">
-                      {format(new Date(collection.createdAt), "MMM dd, yyyy")}
+                      {format(new Date(collection.createdAt), 'MMM dd, yyyy')}
                     </span>
                   </div>
                 )}
@@ -381,7 +387,7 @@ const CollectionDetails = () => {
                       Updated:
                     </span>
                     <span className="font-medium text-sm">
-                      {format(new Date(collection.updatedAt), "MMM dd, yyyy")}
+                      {format(new Date(collection.updatedAt), 'MMM dd, yyyy')}
                     </span>
                   </div>
                 )}
@@ -413,7 +419,7 @@ const CollectionDetails = () => {
                       <span className="font-medium text-sm">
                         {format(
                           new Date(collection.availableFrom),
-                          "MMM dd, yyyy"
+                          'MMM dd, yyyy'
                         )}
                       </span>
                     </div>
@@ -430,7 +436,7 @@ const CollectionDetails = () => {
                       <span className="font-medium text-sm">
                         {format(
                           new Date(collection.availableUntil),
-                          "MMM dd, yyyy"
+                          'MMM dd, yyyy'
                         )}
                       </span>
                     </div>
@@ -454,8 +460,8 @@ const CollectionDetails = () => {
               </h2>
               {collection.images && collection.images.length > 0 && (
                 <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-md">
-                  {collection.images.length}{" "}
-                  {collection.images.length === 1 ? "image" : "images"}
+                  {collection.images.length}{' '}
+                  {collection.images.length === 1 ? 'image' : 'images'}
                 </span>
               )}
             </div>
@@ -468,10 +474,12 @@ const CollectionDetails = () => {
                     {collection.images.slice(0, 16).map((image, index) => (
                       <SafeImage
                         key={`${collection._id}-image-${index}`}
-                        src={image}
+                        src={`https://ridhisiddhi-api.webstudiomatrix.com${
+                          image || `/no-image.png`
+                        }`}
                         alt={`${collection.name} ${index + 1}`}
                         className="w-full h-16 object-cover rounded-lg border border-gray-200 hover:shadow-md transition-all duration-200 cursor-pointer hover:scale-105"
-                        showLoadingPlaceholder={true}
+                        showLoadingPlaceholder={isLoading}
                       />
                     ))}
                     {collection.images.length > 16 && (
@@ -489,13 +497,15 @@ const CollectionDetails = () => {
               {collection.video && (
                 <div
                   className={
-                    collection.images?.length > 0 ? "" : "lg:col-span-3"
-                  }>
+                    collection.images?.length > 0 ? '' : 'lg:col-span-3'
+                  }
+                >
                   <div className="relative">
                     <video
                       src={collection.video}
                       controls
-                      className="w-full max-h-48 rounded-lg border border-gray-200 shadow-sm">
+                      className="w-full max-h-48 rounded-lg border border-gray-200 shadow-sm"
+                    >
                       Your browser does not support the video tag.
                     </video>
                     <div className="absolute top-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded-md">
@@ -548,7 +558,8 @@ const CollectionDetails = () => {
                           (group, groupIndex) => (
                             <div
                               key={groupIndex}
-                              className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                              className="border border-gray-200 rounded-lg p-4 bg-gray-50"
+                            >
                               <div className="flex items-center gap-2 mb-3">
                                 <Icon
                                   icon="material-symbols:folder"
@@ -558,7 +569,7 @@ const CollectionDetails = () => {
                                   Group {groupIndex + 1}
                                 </span>
                                 <span className="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded-md">
-                                  Rules combined with:{" "}
+                                  Rules combined with:{' '}
                                   {group.operator.toUpperCase()}
                                 </span>
                               </div>
@@ -566,7 +577,8 @@ const CollectionDetails = () => {
                                 {group.rules.map((rule, ruleIndex) => (
                                   <div
                                     key={ruleIndex}
-                                    className="text-sm bg-white p-3 rounded-md border border-gray-200 flex items-center gap-2">
+                                    className="text-sm bg-white p-3 rounded-md border border-gray-200 flex items-center gap-2"
+                                  >
                                     <Icon
                                       icon="material-symbols:rule"
                                       className="w-4 h-4 text-gray-400"
@@ -579,7 +591,7 @@ const CollectionDetails = () => {
                                     </span>
                                     <span className="font-medium text-gray-800 bg-yellow-50 px-2 py-1 rounded text-xs">
                                       {Array.isArray(rule.value)
-                                        ? rule.value.join(", ")
+                                        ? rule.value.join(', ')
                                         : rule.value}
                                     </span>
                                   </div>
