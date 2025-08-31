@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useFormik } from 'formik';
+import { Form, FormikProvider, useFormik } from 'formik';
 import * as Yup from 'yup';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import './BlogEditor.css';
 import { Icon } from '@iconify/react/dist/iconify.js';
 import { toast } from 'react-toastify';
-
 import { Button } from '../../../components/ui/button';
 import Header from '../../../components/shared/table_heading/Header';
 import FileDropInput from '../../../components/shared/form_components/FileDropInput';
@@ -248,7 +247,6 @@ const BlogEditor: React.FC = () => {
   useEffect(() => {
     return () => {
       imagePreviews.forEach((url) => URL.revokeObjectURL(url));
-      console.log('🧹 Cleaned up blob URLs for images');
     };
   }, [imagePreviews]);
 
@@ -432,14 +430,6 @@ const BlogEditor: React.FC = () => {
             form="blog-form"
             disabled={isCreating || isUpdating}
             className="bg-customorange hover:bg-customorangedark text-white"
-            onClick={() => {
-              console.log('🔘 Submit button clicked!');
-              console.log(
-                '🔍 Button disabled:',
-                isCreating || isUpdating || !formik.isValid
-              );
-              console.log('🔍 Form valid:', formik.isValid);
-            }}
           >
             {isCreating || isUpdating ? (
               <Icon icon="svg-spinners:ring-resize" className="w-4 h-4 mr-2" />
@@ -452,63 +442,60 @@ const BlogEditor: React.FC = () => {
       </Header>
 
       <div className="max-full mx-auto">
-        <div
-          id="blog-form"
-          onSubmit={(e) => {
-            console.log('🔘 Form submit event triggered!');
-            console.log('🔍 Form valid:', formik.isValid);
-            console.log('🔍 Form errors:', formik.errors);
-            console.log('🔍 Form values:', formik.values);
-            formik.handleSubmit(e as any);
-          }}
-          className="space-y-3"
-        >
-          {/* Main Content Area */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-            {/* Left Column - Main Content */}
-            <div className="lg:col-span-2 space-y-3">
-              {/* Title, Author and Slug Card */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="p-1 bg-customorange/10 rounded">
-                    <Icon
-                      icon="material-symbols:title"
-                      className="w-4 h-4 text-customorange"
-                    />
-                  </div>
-                  <h3 className="text-sm font-semibold text-gray-900">
-                    Blog Title, Author & URL
-                  </h3>
-                </div>
-
-                <div className="space-y-3">
-                  {/* Title Input */}
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
-                      Title *
-                    </label>
-                    <input
-                      type="text"
-                      name="title"
-                      value={formik.values.title}
-                      onChange={handleTitleChange}
-                      onBlur={formik.handleBlur}
-                      className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-customorange focus:border-transparent text-sm"
-                      placeholder="Enter an engaging blog title..."
-                    />
-                    {formik.touched.title && formik.errors.title && (
-                      <p className="mt-1 text-xs text-red flex items-center gap-1">
-                        <Icon
-                          icon="material-symbols:error"
-                          className="w-3 h-3"
-                        />
-                        {formik.errors.title}
-                      </p>
-                    )}
+        <FormikProvider value={formik}>
+          <Form
+            id="blog-form"
+            onSubmit={(e) => {
+              formik.handleSubmit(e as any);
+            }}
+            className="space-y-3"
+          >
+            {/* Main Content Area */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+              {/* Left Column - Main Content */}
+              <div className="lg:col-span-2 space-y-3">
+                {/* Title, Author and Slug Card */}
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="p-1 bg-customorange/10 rounded">
+                      <Icon
+                        icon="material-symbols:title"
+                        className="w-4 h-4 text-customorange"
+                      />
+                    </div>
+                    <h3 className="text-sm font-semibold text-gray-900">
+                      Blog Title, Author & URL
+                    </h3>
                   </div>
 
-                  {/* Author Input */}
-                  {/* <div>
+                  <div className="space-y-3">
+                    {/* Title Input */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                        Title *
+                      </label>
+                      <input
+                        type="text"
+                        name="title"
+                        value={formik.values.title}
+                        onChange={handleTitleChange}
+                        onBlur={formik.handleBlur}
+                        className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-customorange focus:border-transparent text-sm"
+                        placeholder="Enter an engaging blog title..."
+                      />
+                      {formik.touched.title && formik.errors.title && (
+                        <p className="mt-1 text-xs text-red flex items-center gap-1">
+                          <Icon
+                            icon="material-symbols:error"
+                            className="w-3 h-3"
+                          />
+                          {formik.errors.title}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Author Input */}
+                    {/* <div>
                     <label className="block text-xs font-medium text-gray-700 mb-1">
                       Author *
                     </label>
@@ -532,527 +519,541 @@ const BlogEditor: React.FC = () => {
                     )}
                   </div> */}
 
-                  {/* Slug Input */}
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="block text-xs font-medium text-gray-700">
-                        URL Slug *
-                      </label>
-                      {isSlugManuallyEdited && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setIsSlugManuallyEdited(false);
-                            const autoSlug = generateSlug(formik.values.title);
-                            formik.setFieldValue('slug', autoSlug);
-                            formik.validateField('slug');
-                            const canonicalUrl = autoSlug
-                              ? `${BASE_URL}/blog/${autoSlug}`
-                              : '';
-                            formik.setFieldValue(
-                              'metadata.canonicalUrl',
-                              canonicalUrl
-                            );
-                            formik.validateField('metadata.canonicalUrl');
-                            console.log(
-                              '🔄 Reset to auto-generated slug:',
-                              autoSlug
-                            );
-                          }}
-                          className="text-xs text-customorange hover:text-customorangedark font-medium"
-                        >
-                          Reset to Auto
-                        </button>
-                      )}
+                    {/* Slug Input */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="block text-xs font-medium text-gray-700">
+                          URL Slug *
+                        </label>
+                        {isSlugManuallyEdited && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsSlugManuallyEdited(false);
+                              const autoSlug = generateSlug(
+                                formik.values.title
+                              );
+                              formik.setFieldValue('slug', autoSlug);
+                              formik.validateField('slug');
+                              const canonicalUrl = autoSlug
+                                ? `${BASE_URL}/blog/${autoSlug}`
+                                : '';
+                              formik.setFieldValue(
+                                'metadata.canonicalUrl',
+                                canonicalUrl
+                              );
+                              formik.validateField('metadata.canonicalUrl');
+                              console.log(
+                                '🔄 Reset to auto-generated slug:',
+                                autoSlug
+                              );
+                            }}
+                            className="text-xs text-customorange hover:text-customorangedark font-medium"
+                          >
+                            Reset to Auto
+                          </button>
+                        )}
+                      </div>
+                      <div className="flex items-center">
+                        <span className="text-xs text-gray-500 bg-gray-50 px-2 py-2 border border-r-0 border-gray-300 rounded-l">
+                          /blog/
+                        </span>
+                        <input
+                          type="text"
+                          name="slug"
+                          value={formik.values.slug}
+                          onChange={handleSlugChange}
+                          onBlur={formik.handleBlur}
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-r focus:outline-none focus:ring-1 focus:ring-customorange focus:border-transparent text-sm"
+                          placeholder="url-friendly-slug"
+                        />
+                      </div>
+                      <div className="flex items-center justify-between mt-1">
+                        {formik.touched.slug && formik.errors.slug && (
+                          <p className="text-xs text-red flex items-center gap-1">
+                            <Icon
+                              icon="material-symbols:error"
+                              className="w-3 h-3"
+                            />
+                            {formik.errors.slug}
+                          </p>
+                        )}
+                        {!isSlugManuallyEdited && formik.values.title && (
+                          <p className="text-xs text-green-600 ml-auto flex items-center gap-1">
+                            <Icon
+                              icon="material-symbols:auto-awesome"
+                              className="w-3 h-3"
+                            />
+                            Auto-generated from title
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex items-center">
-                      <span className="text-xs text-gray-500 bg-gray-50 px-2 py-2 border border-r-0 border-gray-300 rounded-l">
-                        /blog/
-                      </span>
-                      <input
-                        type="text"
-                        name="slug"
-                        value={formik.values.slug}
-                        onChange={handleSlugChange}
-                        onBlur={formik.handleBlur}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-r focus:outline-none focus:ring-1 focus:ring-customorange focus:border-transparent text-sm"
-                        placeholder="url-friendly-slug"
+                  </div>
+                </div>
+
+                {/* Content Editor Card */}
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="p-1 bg-customorange/10 rounded">
+                      <Icon
+                        icon="material-symbols:edit-document"
+                        className="w-4 h-4 text-customorange"
                       />
                     </div>
-                    <div className="flex items-center justify-between mt-1">
-                      {formik.touched.slug && formik.errors.slug && (
-                        <p className="text-xs text-red flex items-center gap-1">
-                          <Icon
-                            icon="material-symbols:error"
-                            className="w-3 h-3"
-                          />
-                          {formik.errors.slug}
-                        </p>
-                      )}
-                      {!isSlugManuallyEdited && formik.values.title && (
-                        <p className="text-xs text-green-600 ml-auto flex items-center gap-1">
-                          <Icon
-                            icon="material-symbols:auto-awesome"
-                            className="w-3 h-3"
-                          />
-                          Auto-generated from title
-                        </p>
-                      )}
-                    </div>
+                    <h3 className="text-sm font-semibold text-gray-900">
+                      Blog Content
+                    </h3>
                   </div>
-                </div>
-              </div>
-
-              {/* Content Editor Card */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="p-1 bg-customorange/10 rounded">
-                    <Icon
-                      icon="material-symbols:edit-document"
-                      className="w-4 h-4 text-customorange"
-                    />
-                  </div>
-                  <h3 className="text-sm font-semibold text-gray-900">
-                    Blog Content
-                  </h3>
-                </div>
-                <div className="border border-gray-300 rounded overflow-hidden">
-                  <ReactQuill
-                    theme="snow"
-                    value={formik.values.content}
-                    onChange={(content) => {
-                      formik.setFieldValue('content', content);
-                      formik.validateField('content');
-                    }}
-                    modules={quillModules}
-                    formats={quillFormats}
-                    placeholder="Write your blog content here..."
-                    style={{
-                      minHeight: '280px',
-                    }}
-                  />
-                </div>
-                {formik.touched.content && formik.errors.content && (
-                  <p className="mt-1 text-xs text-red flex items-center gap-1">
-                    <Icon icon="material-symbols:error" className="w-3 h-3" />
-                    {formik.errors.content}
-                  </p>
-                )}
-              </div>
-
-              {/* Excerpt Card */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="p-1 bg-customorange/10 rounded">
-                    <Icon
-                      icon="material-symbols:description"
-                      className="w-4 h-4 text-customorange"
-                    />
-                  </div>
-                  <h3 className="text-sm font-semibold text-gray-900">
-                    Blog Excerpt
-                  </h3>
-                </div>
-                <textarea
-                  name="excerpt"
-                  value={formik.values.excerpt}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-customorange focus:border-transparent resize-none text-sm"
-                  placeholder="Write a brief, engaging description of your blog post..."
-                  maxLength={500}
-                />
-                <div className="flex justify-between mt-1">
-                  {formik.touched.excerpt && formik.errors.excerpt && (
-                    <p className="text-xs text-red flex items-center gap-1">
-                      <Icon icon="material-symbols:error" className="w-3 h-3" />
-                      {formik.errors.excerpt}
-                    </p>
-                  )}
-                  <span className="text-xs text-gray-400 ml-auto">
-                    {formik.values.excerpt.length}/500
-                  </span>
-                </div>
-              </div>
-
-              {/* Featured Image Card */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="p-1 bg-customorange/10 rounded">
-                    <Icon
-                      icon="material-symbols:image"
-                      className="w-4 h-4 text-customorange"
-                    />
-                  </div>
-                  <h3 className="text-sm font-semibold text-gray-900">
-                    Featured Image
-                  </h3>
-                </div>
-                <FileDropInput
-                  multiple={false}
-                  value={formik.values.featuredImage}
-                  onChange={(file) =>
-                    formik.setFieldValue('featuredImage', file)
-                  }
-                  label="Upload Featured Image"
-                />
-              </div>
-
-              {/* Additional Images Card */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="p-1 bg-customorange/10 rounded">
-                    <Icon
-                      icon="material-symbols:photo-library"
-                      className="w-4 h-4 text-customorange"
-                    />
-                  </div>
-                  <h3 className="text-sm font-semibold text-gray-900">
-                    Additional Images
-                  </h3>
-                </div>
-                <FileDropInput
-                  multiple={true}
-                  value={formik.values.images}
-                  onChange={(files) => formik.setFieldValue('images', files)}
-                  label="Upload Additional Images"
-                  maxFiles={10}
-                />
-                {imagePreviews.length > 0 && (
-                  <div className="mt-3 grid grid-cols-3 gap-2">
-                    {imagePreviews.map((url, index) => (
-                      <div key={index} className="relative">
-                        <img
-                          src={url}
-                          alt={`Additional ${index + 1}`}
-                          className="w-full h-16 object-cover rounded"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const newImages = formik.values.images.filter(
-                              (_, i) => i !== index
-                            );
-                            formik.setFieldValue('images', newImages);
-                          }}
-                          className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs hover:bg-red-600"
-                        >
-                          ×
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Right Column - Sidebar */}
-            <div className="lg:col-span-1 space-y-3">
-              {/* Publish Settings Card */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="p-1 bg-customorange/10 rounded">
-                    <Icon
-                      icon="material-symbols:publish"
-                      className="w-4 h-4 text-customorange"
-                    />
-                  </div>
-                  <h3 className="text-sm font-semibold text-gray-900">
-                    Publish Settings
-                  </h3>
-                </div>
-
-                <div className="space-y-3">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
-                      Status
-                    </label>
-                    <select
-                      name="status"
-                      value={formik.values.status}
-                      onChange={(e) => {
-                        formik.handleChange(e);
-                        formik.validateField('status');
+                  <div className="border border-gray-300 rounded overflow-hidden">
+                    <ReactQuill
+                      theme="snow"
+                      value={formik.values.content}
+                      onChange={(content) => {
+                        formik.setFieldValue('content', content);
+                        formik.validateField('content');
                       }}
-                      className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-customorange focus:border-transparent text-sm"
-                    >
-                      <option value="draft">📝 Draft</option>
-                      <option value="published">🚀 Published</option>
-                      <option value="archived">📦 Archived</option>
-                    </select>
-                  </div>
-
-                  <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                    <div>
-                      <p className="text-xs font-medium text-gray-900">
-                        Featured Blog
-                      </p>
-                      <p className="text-xs text-gray-500">Show prominently</p>
-                    </div>
-                    <input
-                      type="checkbox"
-                      name="isFeatured"
-                      checked={formik.values.isFeatured}
-                      onChange={formik.handleChange}
-                      className="h-4 w-4 text-customorange focus:ring-customorange border-gray-300 rounded"
+                      modules={quillModules}
+                      formats={quillFormats}
+                      placeholder="Write your blog content here..."
+                      style={{
+                        minHeight: '280px',
+                      }}
                     />
                   </div>
-                </div>
-              </div>
-
-              {/* Tags Card */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="p-1 bg-customorange/10 rounded">
-                    <Icon
-                      icon="material-symbols:tag"
-                      className="w-4 h-4 text-customorange"
-                    />
-                  </div>
-                  <h3 className="text-sm font-semibold text-gray-900">Tags</h3>
-                </div>
-                <div className="flex gap-2 mb-3">
-                  <input
-                    type="text"
-                    value={tagInput}
-                    onChange={(e) => setTagInput(e.target.value)}
-                    onKeyPress={(e) =>
-                      e.key === 'Enter' && (e.preventDefault(), addTag())
-                    }
-                    className="flex-1 px-2 py-1.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-customorange focus:border-transparent text-sm"
-                    placeholder="Add tag..."
-                  />
-                  <Button
-                    type="button"
-                    size="sm"
-                    onClick={addTag}
-                    className="bg-customorange hover:bg-customorangedark px-2"
-                  >
-                    <Icon icon="material-symbols:add" className="w-3 h-3" />
-                  </Button>
-                </div>
-                <div className="flex flex-wrap gap-1">
-                  {formik.values.tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-customorange/10 text-customorange border border-customorange/20"
-                    >
-                      #{tag}
-                      <button
-                        type="button"
-                        onClick={() => removeTag(tag)}
-                        className="ml-1 text-customorange hover:text-customorangedark"
-                      >
-                        <Icon
-                          icon="material-symbols:close"
-                          className="w-2.5 h-2.5"
-                        />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Categories Card */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="p-1 bg-customorange/10 rounded">
-                    <Icon
-                      icon="material-symbols:category"
-                      className="w-4 h-4 text-customorange"
-                    />
-                  </div>
-                  <h3 className="text-sm font-semibold text-gray-900">
-                    Categories
-                  </h3>
-                </div>
-                <div className="flex gap-2 mb-3">
-                  <input
-                    type="text"
-                    value={categoryInput}
-                    onChange={(e) => setCategoryInput(e.target.value)}
-                    onKeyPress={(e) =>
-                      e.key === 'Enter' && (e.preventDefault(), addCategory())
-                    }
-                    className="flex-1 px-2 py-1.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-customorange focus:border-transparent text-sm"
-                    placeholder="Add category..."
-                  />
-                  <Button
-                    type="button"
-                    size="sm"
-                    onClick={addCategory}
-                    className="bg-customorange hover:bg-customorangedark px-2"
-                  >
-                    <Icon icon="material-symbols:add" className="w-3 h-3" />
-                  </Button>
-                </div>
-                <div className="flex flex-wrap gap-1">
-                  {formik.values.categories.map((category, index) => (
-                    <span
-                      key={index}
-                      className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200"
-                    >
-                      {category}
-                      <button
-                        type="button"
-                        onClick={() => removeCategory(category)}
-                        className="ml-1 text-blue-700 hover:text-blue-900"
-                      >
-                        <Icon
-                          icon="material-symbols:close"
-                          className="w-2.5 h-2.5"
-                        />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Video Card */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="p-1 bg-customorange/10 rounded">
-                    <Icon
-                      icon="material-symbols:video-library"
-                      className="w-4 h-4 text-customorange"
-                    />
-                  </div>
-                  <h3 className="text-sm font-semibold text-gray-900">
-                    Video (Optional)
-                  </h3>
-                </div>
-                <VideoUploadField
-                  value={formik.values.video}
-                  onChange={(file) => formik.setFieldValue('video', file)}
-                  label="Upload Video"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* SEO Section */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="p-1 bg-customorange/10 rounded">
-                <Icon
-                  icon="material-symbols:search"
-                  className="w-4 h-4 text-customorange"
-                />
-              </div>
-              <h3 className="text-sm font-semibold text-gray-900">
-                SEO Settings
-              </h3>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
-                  SEO Title
-                </label>
-                <input
-                  type="text"
-                  name="metadata.seoTitle"
-                  value={formik.values.metadata.seoTitle}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-customorange focus:border-transparent text-sm"
-                  placeholder="SEO optimized title..."
-                  maxLength={60}
-                />
-                <span className="text-xs text-gray-400 mt-1 block">
-                  {formik.values.metadata.seoTitle.length}/60 characters
-                </span>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
-                  Canonical URL (Auto-generated)
-                </label>
-                <input
-                  type="url"
-                  name="metadata.canonicalUrl"
-                  value={formik.values.metadata.canonicalUrl}
-                  readOnly
-                  className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-50 text-gray-600 text-sm"
-                  placeholder="Will be generated from slug"
-                />
-                {formik.touched.metadata?.canonicalUrl &&
-                  formik.errors.metadata?.canonicalUrl && (
+                  {formik.touched.content && formik.errors.content && (
                     <p className="mt-1 text-xs text-red flex items-center gap-1">
                       <Icon icon="material-symbols:error" className="w-3 h-3" />
-                      {formik.errors.metadata.canonicalUrl}
+                      {formik.errors.content}
                     </p>
                   )}
-              </div>
-
-              <div className="lg:col-span-2">
-                <label className="block text-xs font-medium text-gray-700 mb-1">
-                  SEO Description
-                </label>
-                <textarea
-                  name="metadata.seoDescription"
-                  value={formik.values.metadata.seoDescription}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-customorange focus:border-transparent resize-none text-sm"
-                  placeholder="SEO meta description..."
-                  maxLength={160}
-                />
-                <span className="text-xs text-gray-400 mt-1 block">
-                  {formik.values.metadata.seoDescription.length}/160 characters
-                </span>
-              </div>
-
-              <div className="lg:col-span-2">
-                <label className="block text-xs font-medium text-gray-700 mb-1">
-                  SEO Keywords
-                </label>
-                <div className="flex gap-2 mb-3">
-                  <input
-                    type="text"
-                    value={keywordInput}
-                    onChange={(e) => setKeywordInput(e.target.value)}
-                    onKeyPress={(e) =>
-                      e.key === 'Enter' && (e.preventDefault(), addKeyword())
-                    }
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-customorange focus:border-transparent text-sm"
-                    placeholder="Add SEO keyword..."
-                  />
-                  <Button
-                    type="button"
-                    size="sm"
-                    onClick={addKeyword}
-                    className="bg-customorange hover:bg-customorangedark px-2"
-                  >
-                    <Icon icon="material-symbols:add" className="w-3 h-3" />
-                  </Button>
                 </div>
-                <div className="flex flex-wrap gap-1">
-                  {formik.values.metadata.keywords.map((keyword, index) => (
-                    <span
-                      key={index}
-                      className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200"
-                    >
-                      {keyword}
-                      <button
-                        type="button"
-                        onClick={() => removeKeyword(keyword)}
-                        className="ml-1 text-green-700 hover:text-green-900"
-                      >
+
+                {/* Excerpt Card */}
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="p-1 bg-customorange/10 rounded">
+                      <Icon
+                        icon="material-symbols:description"
+                        className="w-4 h-4 text-customorange"
+                      />
+                    </div>
+                    <h3 className="text-sm font-semibold text-gray-900">
+                      Blog Excerpt
+                    </h3>
+                  </div>
+                  <textarea
+                    name="excerpt"
+                    value={formik.values.excerpt}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-customorange focus:border-transparent resize-none text-sm"
+                    placeholder="Write a brief, engaging description of your blog post..."
+                    maxLength={500}
+                  />
+                  <div className="flex justify-between mt-1">
+                    {formik.touched.excerpt && formik.errors.excerpt && (
+                      <p className="text-xs text-red flex items-center gap-1">
                         <Icon
-                          icon="material-symbols:close"
-                          className="w-2.5 h-2.5"
+                          icon="material-symbols:error"
+                          className="w-3 h-3"
                         />
-                      </button>
+                        {formik.errors.excerpt}
+                      </p>
+                    )}
+                    <span className="text-xs text-gray-400 ml-auto">
+                      {formik.values.excerpt.length}/500
                     </span>
-                  ))}
+                  </div>
+                </div>
+
+                {/* Featured Image Card */}
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="p-1 bg-customorange/10 rounded">
+                      <Icon
+                        icon="material-symbols:image"
+                        className="w-4 h-4 text-customorange"
+                      />
+                    </div>
+                    <h3 className="text-sm font-semibold text-gray-900">
+                      Featured Image
+                    </h3>
+                  </div>
+                  <FileDropInput
+                    multiple={false}
+                    value={formik.values.featuredImage}
+                    onChange={(file) =>
+                      formik.setFieldValue('featuredImage', file)
+                    }
+                    label="Upload Featured Image"
+                  />
+                </div>
+
+                {/* Additional Images Card */}
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="p-1 bg-customorange/10 rounded">
+                      <Icon
+                        icon="material-symbols:photo-library"
+                        className="w-4 h-4 text-customorange"
+                      />
+                    </div>
+                    <h3 className="text-sm font-semibold text-gray-900">
+                      Additional Images
+                    </h3>
+                  </div>
+                  <FileDropInput
+                    multiple={true}
+                    value={formik.values.images}
+                    onChange={(files) => formik.setFieldValue('images', files)}
+                    label="Upload Additional Images"
+                    maxFiles={10}
+                  />
+                  {imagePreviews.length > 0 && (
+                    <div className="mt-3 grid grid-cols-3 gap-2">
+                      {imagePreviews.map((url, index) => (
+                        <div key={index} className="relative">
+                          <img
+                            src={url}
+                            alt={`Additional ${index + 1}`}
+                            className="w-full h-16 object-cover rounded"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newImages = formik.values.images.filter(
+                                (_, i) => i !== index
+                              );
+                              formik.setFieldValue('images', newImages);
+                            }}
+                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs hover:bg-red-600"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Right Column - Sidebar */}
+              <div className="lg:col-span-1 space-y-3">
+                {/* Publish Settings Card */}
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="p-1 bg-customorange/10 rounded">
+                      <Icon
+                        icon="material-symbols:publish"
+                        className="w-4 h-4 text-customorange"
+                      />
+                    </div>
+                    <h3 className="text-sm font-semibold text-gray-900">
+                      Publish Settings
+                    </h3>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                        Status
+                      </label>
+                      <select
+                        name="status"
+                        value={formik.values.status}
+                        onChange={(e) => {
+                          formik.handleChange(e);
+                          formik.validateField('status');
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-customorange focus:border-transparent text-sm"
+                      >
+                        <option value="draft">📝 Draft</option>
+                        <option value="published">🚀 Published</option>
+                        <option value="archived">📦 Archived</option>
+                      </select>
+                    </div>
+
+                    <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                      <div>
+                        <p className="text-xs font-medium text-gray-900">
+                          Featured Blog
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Show prominently
+                        </p>
+                      </div>
+                      <input
+                        type="checkbox"
+                        name="isFeatured"
+                        checked={formik.values.isFeatured}
+                        onChange={formik.handleChange}
+                        className="h-4 w-4 text-customorange focus:ring-customorange border-gray-300 rounded"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tags Card */}
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="p-1 bg-customorange/10 rounded">
+                      <Icon
+                        icon="material-symbols:tag"
+                        className="w-4 h-4 text-customorange"
+                      />
+                    </div>
+                    <h3 className="text-sm font-semibold text-gray-900">
+                      Tags
+                    </h3>
+                  </div>
+                  <div className="flex gap-2 mb-3">
+                    <input
+                      type="text"
+                      value={tagInput}
+                      onChange={(e) => setTagInput(e.target.value)}
+                      onKeyPress={(e) =>
+                        e.key === 'Enter' && (e.preventDefault(), addTag())
+                      }
+                      className="flex-1 px-2 py-1.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-customorange focus:border-transparent text-sm"
+                      placeholder="Add tag..."
+                    />
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={addTag}
+                      className="bg-customorange hover:bg-customorangedark px-2"
+                    >
+                      <Icon icon="material-symbols:add" className="w-3 h-3" />
+                    </Button>
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    {formik.values.tags.map((tag, index) => (
+                      <span
+                        key={index}
+                        className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-customorange/10 text-customorange border border-customorange/20"
+                      >
+                        #{tag}
+                        <button
+                          type="button"
+                          onClick={() => removeTag(tag)}
+                          className="ml-1 text-customorange hover:text-customorangedark"
+                        >
+                          <Icon
+                            icon="material-symbols:close"
+                            className="w-2.5 h-2.5"
+                          />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Categories Card */}
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="p-1 bg-customorange/10 rounded">
+                      <Icon
+                        icon="material-symbols:category"
+                        className="w-4 h-4 text-customorange"
+                      />
+                    </div>
+                    <h3 className="text-sm font-semibold text-gray-900">
+                      Categories
+                    </h3>
+                  </div>
+                  <div className="flex gap-2 mb-3">
+                    <input
+                      type="text"
+                      value={categoryInput}
+                      onChange={(e) => setCategoryInput(e.target.value)}
+                      onKeyPress={(e) =>
+                        e.key === 'Enter' && (e.preventDefault(), addCategory())
+                      }
+                      className="flex-1 px-2 py-1.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-customorange focus:border-transparent text-sm"
+                      placeholder="Add category..."
+                    />
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={addCategory}
+                      className="bg-customorange hover:bg-customorangedark px-2"
+                    >
+                      <Icon icon="material-symbols:add" className="w-3 h-3" />
+                    </Button>
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    {formik.values.categories.map((category, index) => (
+                      <span
+                        key={index}
+                        className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200"
+                      >
+                        {category}
+                        <button
+                          type="button"
+                          onClick={() => removeCategory(category)}
+                          className="ml-1 text-blue-700 hover:text-blue-900"
+                        >
+                          <Icon
+                            icon="material-symbols:close"
+                            className="w-2.5 h-2.5"
+                          />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Video Card */}
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="p-1 bg-customorange/10 rounded">
+                      <Icon
+                        icon="material-symbols:video-library"
+                        className="w-4 h-4 text-customorange"
+                      />
+                    </div>
+                    <h3 className="text-sm font-semibold text-gray-900">
+                      Video (Optional)
+                    </h3>
+                  </div>
+                  <VideoUploadField
+                    value={formik.values.video}
+                    onChange={(file) => formik.setFieldValue('video', file)}
+                    label="Upload Video"
+                  />
                 </div>
               </div>
             </div>
-          </div>
-        </div>
+
+            {/* SEO Section */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="p-1 bg-customorange/10 rounded">
+                  <Icon
+                    icon="material-symbols:search"
+                    className="w-4 h-4 text-customorange"
+                  />
+                </div>
+                <h3 className="text-sm font-semibold text-gray-900">
+                  SEO Settings
+                </h3>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    SEO Title
+                  </label>
+                  <input
+                    type="text"
+                    name="metadata.seoTitle"
+                    value={formik.values.metadata.seoTitle}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-customorange focus:border-transparent text-sm"
+                    placeholder="SEO optimized title..."
+                    maxLength={60}
+                  />
+                  <span className="text-xs text-gray-400 mt-1 block">
+                    {formik.values.metadata.seoTitle.length}/60 characters
+                  </span>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    Canonical URL (Auto-generated)
+                  </label>
+                  <input
+                    type="url"
+                    name="metadata.canonicalUrl"
+                    value={formik.values.metadata.canonicalUrl}
+                    readOnly
+                    className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-50 text-gray-600 text-sm"
+                    placeholder="Will be generated from slug"
+                  />
+                  {formik.touched.metadata?.canonicalUrl &&
+                    formik.errors.metadata?.canonicalUrl && (
+                      <p className="mt-1 text-xs text-red flex items-center gap-1">
+                        <Icon
+                          icon="material-symbols:error"
+                          className="w-3 h-3"
+                        />
+                        {formik.errors.metadata.canonicalUrl}
+                      </p>
+                    )}
+                </div>
+
+                <div className="lg:col-span-2">
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    SEO Description
+                  </label>
+                  <textarea
+                    name="metadata.seoDescription"
+                    value={formik.values.metadata.seoDescription}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-customorange focus:border-transparent resize-none text-sm"
+                    placeholder="SEO meta description..."
+                    maxLength={160}
+                  />
+                  <span className="text-xs text-gray-400 mt-1 block">
+                    {formik.values.metadata.seoDescription.length}/160
+                    characters
+                  </span>
+                </div>
+
+                <div className="lg:col-span-2">
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    SEO Keywords
+                  </label>
+                  <div className="flex gap-2 mb-3">
+                    <input
+                      type="text"
+                      value={keywordInput}
+                      onChange={(e) => setKeywordInput(e.target.value)}
+                      onKeyPress={(e) =>
+                        e.key === 'Enter' && (e.preventDefault(), addKeyword())
+                      }
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-customorange focus:border-transparent text-sm"
+                      placeholder="Add SEO keyword..."
+                    />
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={addKeyword}
+                      className="bg-customorange hover:bg-customorangedark px-2"
+                    >
+                      <Icon icon="material-symbols:add" className="w-3 h-3" />
+                    </Button>
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    {formik.values.metadata.keywords.map((keyword, index) => (
+                      <span
+                        key={index}
+                        className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200"
+                      >
+                        {keyword}
+                        <button
+                          type="button"
+                          onClick={() => removeKeyword(keyword)}
+                          className="ml-1 text-green-700 hover:text-green-900"
+                        >
+                          <Icon
+                            icon="material-symbols:close"
+                            className="w-2.5 h-2.5"
+                          />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Form>
+        </FormikProvider>
       </div>
     </div>
   );
