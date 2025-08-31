@@ -73,6 +73,8 @@ const defaultFormData: ProductFormData = {
 
   // Media Assets
   images: [],
+  video: null,
+  existingVideo: null,
 
   // SEO & Marketing
   tags: [],
@@ -106,8 +108,7 @@ const FormSection: React.FC<FormSectionProps> = ({
   className = "",
 }) => (
   <div
-    className={`bg-white rounded-md border border-gray-200 shadow-sm ${className}`}
-  >
+    className={`bg-white rounded-md border border-gray-200 shadow-sm ${className}`}>
     <div className="px-4 py-2 border-b border-gray-100 bg-gray-50 rounded-t-md">
       <div className="flex items-center gap-2">
         <div className="p-1 bg-[#DF8D28]/10 rounded">
@@ -352,8 +353,7 @@ const CompactFormContent: React.FC<{
       <FormikProvider value={formik}>
         <Form
           onSubmit={formik.handleSubmit}
-          className="max-w-7xl mx-auto md:px-0 px-2 py-2"
-        >
+          className="max-w-7xl mx-auto md:px-0 px-2 py-2">
           <div className="space-y-4 pb-16">
             {/* Basic Information */}
             <FormSection title="Basic Information" icon="material-symbols:info">
@@ -483,8 +483,7 @@ const CompactFormContent: React.FC<{
             {formik.values.productType !== "normal" && (
               <FormSection
                 title="Specifications"
-                icon="material-symbols:straighten"
-              >
+                icon="material-symbols:straighten">
                 <FieldGroup columns={3}>
                   <div>
                     <InputField
@@ -656,8 +655,7 @@ const CompactFormContent: React.FC<{
                   ? "Pricing"
                   : "Variants & Pricing"
               }
-              icon="material-symbols:inventory"
-            >
+              icon="material-symbols:inventory">
               {formik.values.productType === "normal" ? (
                 // Simplified pricing for normal products
                 <div className="space-y-3">
@@ -707,8 +705,7 @@ const CompactFormContent: React.FC<{
                     <button
                       type="button"
                       onClick={addVariant}
-                      className="flex items-center gap-1 px-3 py-1.5 bg-[#DF8D28] text-white rounded text-xs font-medium hover:bg-[#B8691A] transition-colors"
-                    >
+                      className="flex items-center gap-1 px-3 py-1.5 bg-[#DF8D28] text-white rounded text-xs font-medium hover:bg-[#B8691A] transition-colors">
                       <Icon icon="material-symbols:add" className="w-3 h-3" />
                       Add
                     </button>
@@ -718,8 +715,7 @@ const CompactFormContent: React.FC<{
                     {formik.values.variants.map((variant, index) => (
                       <div
                         key={index}
-                        className="bg-gray-50 rounded p-3 border border-gray-200"
-                      >
+                        className="bg-gray-50 rounded p-3 border border-gray-200">
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-2">
                             <div className="w-6 h-6 bg-[#DF8D28] text-white rounded-full flex items-center justify-center text-xs font-medium">
@@ -733,12 +729,14 @@ const CompactFormContent: React.FC<{
                                 {variant.price > 0
                                   ? `₹${variant.price}`
                                   : "No price"}
-                                {formik.values.productType !== "normal" && variant.wt > 0 && variant.unit && (
-                                  <>
-                                    {" "}•{" "}
-                                    {variant.wt} {variant.unit}
-                                  </>
-                                )}
+                                {formik.values.productType !== "normal" &&
+                                  variant.wt > 0 &&
+                                  variant.unit && (
+                                    <>
+                                      {" "}
+                                      • {variant.wt} {variant.unit}
+                                    </>
+                                  )}
                               </p>
                             </div>
                           </div>
@@ -747,8 +745,7 @@ const CompactFormContent: React.FC<{
                               type="button"
                               onClick={() => removeVariant(index)}
                               className="text-red hover:text-red-700 p-1 rounded hover:bg-red-50 transition-colors"
-                              title="Remove variant"
-                            >
+                              title="Remove variant">
                               <Icon
                                 icon="material-symbols:delete"
                                 className="w-3 h-3"
@@ -757,7 +754,10 @@ const CompactFormContent: React.FC<{
                           )}
                         </div>
 
-                        <FieldGroup columns={formik.values.productType === "normal" ? 1 : 3}>
+                        <FieldGroup
+                          columns={
+                            formik.values.productType === "normal" ? 1 : 3
+                          }>
                           {/* Show weight and unit only for non-normal products */}
                           {formik.values.productType !== "normal" && (
                             <>
@@ -793,7 +793,7 @@ const CompactFormContent: React.FC<{
                               </div>
                             </>
                           )}
-                          
+
                           <div>
                             <InputField
                               label="Price"
@@ -854,8 +854,7 @@ const CompactFormContent: React.FC<{
                     formik.values.stones.map((stone, index) => (
                       <div
                         key={index}
-                        className="bg-gray-50 rounded p-3 border border-gray-200"
-                      >
+                        className="bg-gray-50 rounded p-3 border border-gray-200">
                         <div className="flex items-center justify-between mb-3">
                           <h4 className="text-sm font-medium text-gray-900">
                             Stone {index + 1}
@@ -864,8 +863,7 @@ const CompactFormContent: React.FC<{
                             type="button"
                             onClick={() => removeStone(index)}
                             className="text-red hover:text-red-700 p-1 rounded hover:bg-red-50 transition-colors"
-                            title="Remove stone"
-                          >
+                            title="Remove stone">
                             <Icon
                               icon="material-symbols:delete"
                               className="w-3 h-3"
@@ -937,8 +935,7 @@ const CompactFormContent: React.FC<{
                   <button
                     type="button"
                     onClick={addStone}
-                    className="flex items-center gap-1 px-3 py-1.5 bg-[#DF8D28] text-white rounded text-xs font-medium hover:bg-[#B8691A] transition-colors w-full justify-center"
-                  >
+                    className="flex items-center gap-1 px-3 py-1.5 bg-[#DF8D28] text-white rounded text-xs font-medium hover:bg-[#B8691A] transition-colors w-full justify-center">
                     <Icon icon="material-symbols:add" className="w-3 h-3" />
                     Add Gemstone
                   </button>
@@ -950,16 +947,14 @@ const CompactFormContent: React.FC<{
             {formik.values.productType !== "normal" && (
               <FormSection
                 title="Other Charges"
-                icon="material-symbols:receipt-long"
-              >
+                icon="material-symbols:receipt-long">
                 <div className="space-y-3">
                   {formik.values.otherCharges &&
                   formik.values.otherCharges.length > 0 ? (
                     formik.values.otherCharges.map((charge, index) => (
                       <div
                         key={index}
-                        className="bg-gray-50 rounded p-3 border border-gray-200"
-                      >
+                        className="bg-gray-50 rounded p-3 border border-gray-200">
                         <div className="flex items-center justify-between mb-3">
                           <h4 className="text-sm font-medium text-gray-900">
                             Charge {index + 1}
@@ -968,8 +963,7 @@ const CompactFormContent: React.FC<{
                             type="button"
                             onClick={() => removeOtherCharge(index)}
                             className="text-red hover:text-red-700 p-1 rounded hover:bg-red-50 transition-colors"
-                            title="Remove charge"
-                          >
+                            title="Remove charge">
                             <Icon
                               icon="material-symbols:delete"
                               className="w-3 h-3"
@@ -1015,8 +1009,7 @@ const CompactFormContent: React.FC<{
                   <button
                     type="button"
                     onClick={addOtherCharge}
-                    className="flex items-center gap-1 px-3 py-1.5 bg-[#DF8D28] text-white rounded text-xs font-medium hover:bg-[#B8691A] transition-colors w-full justify-center"
-                  >
+                    className="flex items-center gap-1 px-3 py-1.5 bg-[#DF8D28] text-white rounded text-xs font-medium hover:bg-[#B8691A] transition-colors w-full justify-center">
                     <Icon icon="material-symbols:add" className="w-3 h-3" />
                     Add Other Charge
                   </button>
@@ -1029,6 +1022,7 @@ const CompactFormContent: React.FC<{
               <ProductMediaPage
                 selectedImages={selectedImages}
                 setSelectedImages={setSelectedImages}
+                existingImages={formik.values.existingImages || []}
                 dragActive={dragActive}
                 setDragActive={setDragActive}
                 handleDrag={handleDrag}
@@ -1045,7 +1039,8 @@ const CompactFormContent: React.FC<{
             <FormSection title="Tags" icon="material-symbols:label">
               <div className="space-y-3">
                 <p className="text-xs text-gray-600">
-                  Add tags to help customers find your product (at least one required)
+                  Add tags to help customers find your product (at least one
+                  required)
                 </p>
                 <DropdownTagField
                   required
@@ -1077,8 +1072,7 @@ const CompactFormContent: React.FC<{
             {formik.values.productType !== "normal" && (
               <FormSection
                 title="Status & Visibility"
-                icon="material-symbols:settings"
-              >
+                icon="material-symbols:settings">
                 <FieldGroup columns={3}>
                   <div>
                     {/* <DropdownField
@@ -1162,16 +1156,14 @@ const CompactFormContent: React.FC<{
                     <button
                       type="button"
                       onClick={onCancel}
-                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded text-sm hover:bg-gray-50 transition-colors"
-                    >
+                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded text-sm hover:bg-gray-50 transition-colors">
                       Cancel
                     </button>
 
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className="px-6 py-2 bg-[#DF8D28] text-white rounded hover:bg-[#B8691A] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1 text-sm font-medium"
-                    >
+                      className="px-6 py-2 bg-[#DF8D28] text-white rounded hover:bg-[#B8691A] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1 text-sm font-medium">
                       {isLoading && (
                         <Icon
                           icon="material-symbols:refresh"

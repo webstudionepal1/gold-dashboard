@@ -98,9 +98,10 @@ export interface IFetchProduct {
   tags: string[];
   visibleAs: string;
   images: string[];
+  video?: string[];
   isActive: boolean;
   wastage?: {
-    type: 'fixed' | 'per';
+    type: "fixed" | "per";
     value: number;
   };
   stones?: Array<{

@@ -66,6 +66,8 @@ export interface ProductFormData {
 
   // Page 5: Media Assets
   images: (string | File)[];
+  video?: File | null;
+  existingVideo?: string | string[] | null;
 
   // Page 6: SEO & Marketing
   tags: string[];

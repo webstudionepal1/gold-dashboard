@@ -98,7 +98,22 @@ ol,
 ul {
   list-style: none;
   margin: 0;
-  padding: 0;
+}
+
+/* Custom animations for product media tabs */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
 }
 
 html,
@@ -123,25 +138,6 @@ button,
 textarea,
 select {
   font: inherit;
-  max-width: 100%;
-}
-blockquote,
-dl,
-dd,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-hr,
-figure,
-p,
-pre {
-  word-wrap: break-word;
-  margin: 0;
-  box-sizing: border-box;
-  text-decoration: none !important;
   max-width: 100%;
 }
 blockquote,

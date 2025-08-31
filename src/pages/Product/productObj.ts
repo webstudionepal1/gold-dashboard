@@ -50,6 +50,8 @@ export interface IProductFormValues {
   tags: string[];
   images: File | null; // Changed from 'image' to 'images' to match form field
   existingImage?: string;
+  video?: File | null; // Video field
+  existingVideo?: string | null; // Existing video field
 }
 
 export interface UploadedImage {
@@ -90,6 +92,10 @@ export const productFormSchema = z
     // Image - Fixed field name
     images: z.instanceof(File).nullable(),
     existingImage: z.string().optional(),
+
+    // Video - Optional video upload
+    video: z.instanceof(File).nullable(),
+    existingVideo: z.string().optional().nullable(),
 
     // Visibility Option (single selection) - Fixed enum
     visibleAs: z.enum([
@@ -148,6 +154,8 @@ export const generateProductDefaultValue = (state: string, editData?: any) => {
       visibleAs: "featured" as VisibilityType,
       tags: ["Featured"],
       images: null, // Changed from 'image' to 'images'
+      video: null, // Video field
+      existingVideo: null, // Existing video field
     };
   } else {
     const data = {
@@ -179,6 +187,8 @@ export const generateProductDefaultValue = (state: string, editData?: any) => {
       tags: get(editData, "tags", ["Featured"]),
       images: null, // Changed from 'image' to 'images'
       existingImage: get(editData, "images[0]", undefined),
+      video: null, // Video field
+      existingVideo: get(editData, "video", null), // Existing video field
     };
     return data;
   }
@@ -187,6 +197,7 @@ export const generateProductDefaultValue = (state: string, editData?: any) => {
 export const productListColumns = [
   { title: "S.N", key: "sn" },
   { title: "Image", key: "image" },
+  { title: "Video", key: "video" },
   { title: "Product", key: "product" },
   { title: "Category", key: "categ" },
   { title: "Sub Category", key: "subCate" },

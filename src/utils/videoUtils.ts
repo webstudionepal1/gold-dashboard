@@ -19,10 +19,18 @@ export const getVideoStreamUrl = (objectPath: string): string => {
     return "";
   }
 
+  // Clean the video path for streaming
+  let cleanPath = objectPath;
+
+  // Remove /ridisidi/ prefix if present
+  if (cleanPath.startsWith("/ridisidi/")) {
+    cleanPath = cleanPath.substring("/ridisidi/".length);
+  }
+
   // Remove leading slash if present
-  const cleanPath = objectPath.startsWith("/")
-    ? objectPath.slice(1)
-    : objectPath;
+  if (cleanPath.startsWith("/")) {
+    cleanPath = cleanPath.slice(1);
+  }
 
   // Construct the streaming URL
   const baseUrl = getApiBaseUrl();
@@ -35,7 +43,7 @@ export const getVideoStreamUrl = (objectPath: string): string => {
  * @returns True if it's already a streaming URL
  */
 export const isStreamingUrl = (url: string | null | undefined): boolean => {
-  if (!url || typeof url !== 'string') {
+  if (!url || typeof url !== "string") {
     return false;
   }
   return url.includes("/video/stream/");
@@ -46,8 +54,10 @@ export const isStreamingUrl = (url: string | null | undefined): boolean => {
  * @param urlOrPath - Either a full URL or an object path
  * @returns The proper streaming URL
  */
-export const ensureStreamingUrl = (urlOrPath: string | null | undefined): string => {
-  if (!urlOrPath || typeof urlOrPath !== 'string') {
+export const ensureStreamingUrl = (
+  urlOrPath: string | null | undefined
+): string => {
+  if (!urlOrPath || typeof urlOrPath !== "string") {
     return "";
   }
 
@@ -75,8 +85,21 @@ export const ensureStreamingUrl = (urlOrPath: string | null | undefined): string
     }
   }
 
+  // Clean the path and convert to streaming URL
+  let cleanPath = urlOrPath;
+
+  // Remove /ridisidi/ prefix if present
+  if (cleanPath.startsWith("/ridisidi/")) {
+    cleanPath = cleanPath.substring("/ridisidi/".length);
+  }
+
+  // Remove leading slash if present
+  if (cleanPath.startsWith("/")) {
+    cleanPath = cleanPath.slice(1);
+  }
+
   // Assume it's an object path and convert to streaming URL
-  return getVideoStreamUrl(urlOrPath);
+  return getVideoStreamUrl(cleanPath);
 };
 
 /**
@@ -101,8 +124,10 @@ export const getVideoMetadataUrl = (objectPath: string): string => {
  * @param streamingUrl - The streaming URL
  * @returns The object path
  */
-export const extractObjectPath = (streamingUrl: string | null | undefined): string => {
-  if (!streamingUrl || typeof streamingUrl !== 'string') {
+export const extractObjectPath = (
+  streamingUrl: string | null | undefined
+): string => {
+  if (!streamingUrl || typeof streamingUrl !== "string") {
     return "";
   }
   const match = streamingUrl.match(/\/video\/stream\/(.+)$/);

@@ -65,12 +65,23 @@ const NewProductForm: React.FC = () => {
       ]),
 
       // Stones and Occasions
-      stones: get(product, "stones", []).map((stone: { name: string; weight: string; price: string; color: string }) => ({
-        name: stone.name,
-        weight: parseFloat(stone.weight) || 0,
-        price: parseFloat(stone.price) || 0,
-        color: stone.color
-      })),
+      stones: get(product, "stones", []).map(
+        (stone: {
+          name: string;
+          weight: string;
+          price: string;
+          color: string;
+        }) => ({
+          name: stone.name,
+          weight: parseFloat(stone.weight) || 0,
+          price: parseFloat(stone.price) || 0,
+          color: stone.color,
+        })
+      ),
+      occasions: get(product, "occasions", []).map(
+        (occasion: any) => occasion._id || occasion
+      ),
+      tags: get(product, "tags", []),
       otherCharges: get(product, "others", []).map(
         (item: { name: string; value: number }) => ({
           name: item.name,
@@ -80,6 +91,8 @@ const NewProductForm: React.FC = () => {
       existingImages: get(product, "images", []),
       // Media
       images: [],
+      video: null,
+      existingVideo: get(product, "video", null),
 
       visibleAs: Array.isArray(product.visibleAs)
         ? product.visibleAs
@@ -192,6 +205,20 @@ const NewProductForm: React.FC = () => {
       });
     }
 
+    // Handle occasions - All product types can have occasions
+    if (formData.occasions && formData.occasions.length > 0) {
+      formData.occasions.forEach((occasion, index) => {
+        formDataObj.append(`occasions[${index}]`, occasion);
+      });
+    }
+
+    // Handle tags - All product types can have tags
+    if (formData.tags && formData.tags.length > 0) {
+      formData.tags.forEach((tag, index) => {
+        formDataObj.append(`tags[${index}]`, tag);
+      });
+    }
+
     // Status & Visibility - Only for non-normal products
     if (formData.productType !== "normal") {
       if (formData.visibleAs)
@@ -211,15 +238,21 @@ const NewProductForm: React.FC = () => {
       if (isEdit) {
         // When updating, only send new images (Files)
         // Existing images that weren't removed will be preserved on the server
-        const newImages = formData.images.filter(image => image instanceof File);
+        const newImages = formData.images.filter(
+          (image) => image instanceof File
+        );
         newImages.forEach((image: File) => {
           formDataObj.append(`images`, image);
         });
-        
+
         // If there are no new images but existing images were removed,
         // we need to indicate that images should be cleared
-        if (newImages.length === 0 && formData.existingImages && formData.existingImages.length === 0) {
-          formDataObj.append(`clearImages`, 'true');
+        if (
+          newImages.length === 0 &&
+          formData.existingImages &&
+          formData.existingImages.length === 0
+        ) {
+          formDataObj.append(`clearImages`, "true");
         }
       } else {
         // For new products, send all images
@@ -229,6 +262,15 @@ const NewProductForm: React.FC = () => {
           }
         });
       }
+    }
+
+    // Handle video - All product types can have videos
+    if (formData.video) {
+      // New video selected - this replaces any existing video
+      formDataObj.append("video", formData.video);
+    } else if (isEdit && formData.existingVideo) {
+      // For updates without new video, keep existing video
+      formDataObj.append("existingVideo", formData.existingVideo);
     }
 
     return formDataObj;

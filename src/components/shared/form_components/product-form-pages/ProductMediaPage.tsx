@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useProductForm } from "../ProductFormContext";
+import VideoUploader from "../VideoUploader";
 
 interface ProductMediaPageProps {
   // Props for CompactProductForm integration
@@ -20,11 +21,11 @@ interface ProductMediaPageProps {
 export const ProductMediaPage: React.FC<ProductMediaPageProps> = (props) => {
   // Check if we're being used in CompactProductForm or standalone
   const isStandalone = !props.formik;
-  
+
   if (isStandalone) {
     return <StandaloneProductMediaPage />;
   }
-  
+
   return <CompactProductMediaPage {...props} />;
 };
 
@@ -122,9 +123,9 @@ const StandaloneProductMediaPage: React.FC = () => {
 
     // Update form data
     const allImages = [...newExistingImages, ...selectedImages];
-    updateFormData({ 
+    updateFormData({
       images: allImages,
-      existingImages: newExistingImages 
+      existingImages: newExistingImages,
     });
 
     // Clear validation errors if we're now within limits
@@ -154,9 +155,9 @@ const StandaloneProductMediaPage: React.FC = () => {
 
     // Update form data
     const allImages = [...newExistingImages, ...selectedImages];
-    updateFormData({ 
+    updateFormData({
       images: allImages,
-      existingImages: newExistingImages 
+      existingImages: newExistingImages,
     });
   };
 
@@ -202,8 +203,7 @@ const StandaloneProductMediaPage: React.FC = () => {
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
             onDragOver={handleDrag}
-            onDrop={handleDrop}
-          >
+            onDrop={handleDrop}>
             <input
               type="file"
               multiple
@@ -216,11 +216,8 @@ const StandaloneProductMediaPage: React.FC = () => {
             <label
               htmlFor="product-images"
               className={`cursor-pointer ${
-                totalImageCount >= 10
-                  ? "cursor-not-allowed opacity-50"
-                  : ""
-              }`}
-            >
+                totalImageCount >= 10 ? "cursor-not-allowed opacity-50" : ""
+              }`}>
               <div className="flex flex-col items-center gap-3">
                 <Icon
                   icon="material-symbols:add-photo-alternate"
@@ -281,9 +278,10 @@ const StandaloneProductMediaPage: React.FC = () => {
                           {index > 0 && (
                             <button
                               type="button"
-                              onClick={() => moveExistingImage(index, index - 1)}
-                              className="bg-white text-gray-700 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors"
-                            >
+                              onClick={() =>
+                                moveExistingImage(index, index - 1)
+                              }
+                              className="bg-white text-gray-700 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors">
                               <Icon
                                 icon="material-symbols:chevron-left"
                                 className="w-4 h-4"
@@ -295,9 +293,10 @@ const StandaloneProductMediaPage: React.FC = () => {
                           {index < existingImages.length - 1 && (
                             <button
                               type="button"
-                              onClick={() => moveExistingImage(index, index + 1)}
-                              className="bg-white text-gray-700 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors"
-                            >
+                              onClick={() =>
+                                moveExistingImage(index, index + 1)
+                              }
+                              className="bg-white text-gray-700 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors">
                               <Icon
                                 icon="material-symbols:chevron-right"
                                 className="w-4 h-4"
@@ -310,8 +309,7 @@ const StandaloneProductMediaPage: React.FC = () => {
                             type="button"
                             onClick={() => removeExistingImage(index)}
                             className="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors"
-                            title="Remove image"
-                          >
+                            title="Remove image">
                             <Icon
                               icon="material-symbols:close"
                               className="w-4 h-4"
@@ -326,9 +324,7 @@ const StandaloneProductMediaPage: React.FC = () => {
                       <p className="text-xs text-gray-500 truncate">
                         Existing Image {index + 1}
                       </p>
-                      <p className="text-xs text-gray-400">
-                        Click to remove
-                      </p>
+                      <p className="text-xs text-gray-400">Click to remove</p>
                     </div>
                   </div>
                 ))}
@@ -371,8 +367,7 @@ const StandaloneProductMediaPage: React.FC = () => {
                             <button
                               type="button"
                               onClick={() => moveNewImage(index, index - 1)}
-                              className="bg-white text-gray-700 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors"
-                            >
+                              className="bg-white text-gray-700 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors">
                               <Icon
                                 icon="material-symbols:chevron-left"
                                 className="w-4 h-4"
@@ -385,8 +380,7 @@ const StandaloneProductMediaPage: React.FC = () => {
                             <button
                               type="button"
                               onClick={() => moveNewImage(index, index + 1)}
-                              className="bg-white text-gray-700 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors"
-                            >
+                              className="bg-white text-gray-700 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors">
                               <Icon
                                 icon="material-symbols:chevron-right"
                                 className="w-4 h-4"
@@ -399,8 +393,7 @@ const StandaloneProductMediaPage: React.FC = () => {
                             type="button"
                             onClick={() => removeNewImage(index)}
                             className="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors"
-                            title="Remove image"
-                          >
+                            title="Remove image">
                             <Icon
                               icon="material-symbols:close"
                               className="w-4 h-4"
@@ -430,8 +423,9 @@ const StandaloneProductMediaPage: React.FC = () => {
             <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
               <p className="text-sm text-blue-700 flex items-center gap-2">
                 <Icon icon="material-symbols:info" className="w-4 h-4" />
-                The first image will be used as the primary product image.
-                Drag images to reorder them. New images will replace old ones when updating.
+                The first image will be used as the primary product image. Drag
+                images to reorder them. New images will replace old ones when
+                updating.
               </p>
             </div>
           )}
@@ -440,8 +434,7 @@ const StandaloneProductMediaPage: React.FC = () => {
           {validationState.images?.errors.map((error, index) => (
             <div
               key={index}
-              className="mt-4 p-3 bg-red-50 rounded-lg border border-red-200"
-            >
+              className="mt-4 p-3 bg-red-50 rounded-lg border border-red-200">
               <p className="text-red-600 text-sm flex items-center gap-2">
                 <Icon icon="material-symbols:error" className="w-4 h-4" />
                 {error}
@@ -487,6 +480,54 @@ const StandaloneProductMediaPage: React.FC = () => {
           </div>
         </div>
 
+        {/* Video Upload Section */}
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <Icon
+              icon="material-symbols:video-library"
+              className="w-5 h-5 text-customorange"
+            />
+            Product Video
+          </h3>
+
+          <div className="space-y-4">
+            <p className="text-sm text-gray-600">
+              Upload a video to showcase your product in action. This helps
+              customers better understand the product features and quality.
+            </p>
+
+            <VideoUploader
+              label="Product Video (Optional)"
+              value={formData.video || null}
+              existingFile={
+                Array.isArray(formData.existingVideo)
+                  ? formData.existingVideo[0] || null
+                  : formData.existingVideo || null
+              }
+              onChange={(file) => {
+                updateFormData({ video: file });
+              }}
+              onExistingFileChange={(url) => {
+                updateFormData({ existingVideo: url });
+              }}
+              maxSize={200}
+            />
+
+            <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+              <h4 className="font-medium text-blue-900 mb-2">
+                Video Guidelines
+              </h4>
+              <ul className="text-sm text-blue-700 space-y-1">
+                <li>• Maximum file size: 200MB</li>
+                <li>• Supported formats: MP4, WebM, OGG, AVI, MOV</li>
+                <li>• Recommended duration: 15-60 seconds</li>
+                <li>• Show product from multiple angles</li>
+                <li>• Include close-up shots of important details</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
         {/* Help Section */}
         <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
           <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center gap-2">
@@ -518,7 +559,8 @@ const StandaloneProductMediaPage: React.FC = () => {
               maintaining quality (recommended: under 2MB each)
             </p>
             <p>
-              • <strong>Image Replacement:</strong> When updating a product, new images will replace old ones
+              • <strong>Image Replacement:</strong> When updating a product, new
+              images will replace old ones
             </p>
           </div>
         </div>
@@ -539,13 +581,16 @@ const CompactProductMediaPage: React.FC<ProductMediaPageProps> = ({
   removeImage,
   formik,
   isEdit = false,
-  isLoading = false
+  isLoading = false,
 }) => {
   const [existingImages, setExistingImages] = useState<string[]>([]);
 
   // Initialize existing images when form data changes
   useEffect(() => {
-    if (formik?.values?.existingImages && Array.isArray(formik.values.existingImages)) {
+    if (
+      formik?.values?.existingImages &&
+      Array.isArray(formik.values.existingImages)
+    ) {
       setExistingImages(formik.values.existingImages);
     }
   }, [formik?.values?.existingImages]);
@@ -553,7 +598,7 @@ const CompactProductMediaPage: React.FC<ProductMediaPageProps> = ({
   // Handle multiple image uploads
   const handleImageUpload = async (files: File[]) => {
     if (!setSelectedImages) return;
-    
+
     // Limit to 10 images total (new + existing)
     const maxImages = 10;
     const currentTotalCount = selectedImages.length + existingImages.length;
@@ -571,7 +616,9 @@ const CompactProductMediaPage: React.FC<ProductMediaPageProps> = ({
   };
 
   // Handle file input change
-  const handleFileInputChangeLocal = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileInputChangeLocal = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
       handleImageUpload(files);
@@ -605,7 +652,7 @@ const CompactProductMediaPage: React.FC<ProductMediaPageProps> = ({
   // Remove new image
   const removeNewImage = (index: number) => {
     if (!setSelectedImages) return;
-    
+
     const newImages = selectedImages.filter((_, i) => i !== index);
     setSelectedImages(newImages);
 
@@ -634,9 +681,7 @@ const CompactProductMediaPage: React.FC<ProductMediaPageProps> = ({
 
   return (
     <div className="space-y-3">
-      <p className="text-xs text-gray-600">
-        Upload product images (Max 10)
-      </p>
+      <p className="text-xs text-gray-600">Upload product images (Max 10)</p>
 
       {/* Upload Area */}
       <div
@@ -649,10 +694,7 @@ const CompactProductMediaPage: React.FC<ProductMediaPageProps> = ({
         onDragLeave={handleDragLocal}
         onDragOver={handleDragLocal}
         onDrop={handleDropLocal}
-        onClick={() =>
-          document.getElementById("file-upload")?.click()
-        }
-      >
+        onClick={() => document.getElementById("file-upload")?.click()}>
         <input
           id="file-upload"
           type="file"
@@ -669,7 +711,9 @@ const CompactProductMediaPage: React.FC<ProductMediaPageProps> = ({
           />
           <div>
             <p className="text-sm font-medium text-gray-900">
-              {totalImageCount >= 10 ? "Maximum images reached" : "Click to upload or drag and drop"}
+              {totalImageCount >= 10
+                ? "Maximum images reached"
+                : "Click to upload or drag and drop"}
             </p>
             <p className="text-xs text-gray-500">
               PNG, JPG, GIF up to 10MB each
@@ -689,7 +733,9 @@ const CompactProductMediaPage: React.FC<ProductMediaPageProps> = ({
               <div key={`existing-${index}`} className="relative group">
                 <div className="relative aspect-square">
                   <img
-                    src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${imageUrl}`}
+                    src={`${
+                      import.meta.env.VITE_API_IMAGE_BASE_URL
+                    }${imageUrl}`}
                     alt={`Existing Product ${index + 1}`}
                     className="w-full h-full object-cover rounded border border-gray-200"
                   />
@@ -702,12 +748,8 @@ const CompactProductMediaPage: React.FC<ProductMediaPageProps> = ({
                     type="button"
                     onClick={() => removeExistingImage(index)}
                     className="absolute top-1 right-1 bg-red text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                    title="Remove image"
-                  >
-                    <Icon
-                      icon="material-symbols:close"
-                      className="w-3 h-3"
-                    />
+                    title="Remove image">
+                    <Icon icon="material-symbols:close" className="w-3 h-3" />
                   </button>
                 </div>
               </div>
@@ -740,18 +782,12 @@ const CompactProductMediaPage: React.FC<ProductMediaPageProps> = ({
                     type="button"
                     onClick={() => removeNewImage(index)}
                     className="absolute top-1 right-1 bg-red text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                    title="Remove image"
-                  >
-                    <Icon
-                      icon="material-symbols:close"
-                      className="w-3 h-3"
-                    />
+                    title="Remove image">
+                    <Icon icon="material-symbols:close" className="w-3 h-3" />
                   </button>
                 </div>
                 <div className="mt-1 text-center">
-                  <p className="text-xs text-gray-500 truncate">
-                    {file.name}
-                  </p>
+                  <p className="text-xs text-gray-500 truncate">{file.name}</p>
                   <p className="text-xs text-gray-400">
                     {(file.size / 1024 / 1024).toFixed(1)} MB
                   </p>
@@ -766,11 +802,51 @@ const CompactProductMediaPage: React.FC<ProductMediaPageProps> = ({
       {(existingImages.length > 0 || selectedImages.length > 0) && (
         <div className="mt-3 p-2 bg-blue-50 rounded border border-blue-200">
           <p className="text-xs text-blue-700">
-            The first image will be used as the primary product image. 
-            New images will replace old ones when updating.
+            The first image will be used as the primary product image. New
+            images will replace old ones when updating.
           </p>
         </div>
       )}
+
+      {/* Video Upload Section */}
+      <div className="mt-4">
+        <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
+          <Icon
+            icon="material-symbols:video-library"
+            className="w-4 h-4 text-customorange"
+          />
+          Product Video (Optional)
+        </h4>
+        <VideoUploader
+          label=""
+          value={formik?.values?.video || null}
+          existingFile={
+            Array.isArray(formik?.values?.existingVideo)
+              ? formik.values.existingVideo[0] || null
+              : formik?.values?.existingVideo || null
+          }
+          onChange={(file) => {
+            if (formik) {
+              formik.setFieldValue("video", file);
+              if (file) {
+                formik.setFieldValue("existingVideo", undefined);
+              }
+            }
+          }}
+          onExistingFileChange={(url) => {
+            if (formik) {
+              formik.setFieldValue("existingVideo", url);
+            }
+          }}
+          maxSize={200}
+        />
+        <div className="mt-2 p-2 bg-blue-50 rounded border border-blue-200">
+          <p className="text-xs text-blue-700">
+            Upload a video to showcase your product. Maximum 200MB, formats:
+            MP4, WebM, OGG, AVI, MOV
+          </p>
+        </div>
+      </div>
     </div>
   );
 };

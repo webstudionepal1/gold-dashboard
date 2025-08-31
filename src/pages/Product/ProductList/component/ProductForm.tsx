@@ -1,11 +1,11 @@
-import { Icon } from '@iconify/react/dist/iconify.js';
-import { useForm, useStore } from '@tanstack/react-form';
-import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { DropdownField } from '../../../../components/shared/form_components/Dropdown';
-import MultiImageUploader from '../../../../components/shared/form_components/FileDropInput';
-import { InputField } from '../../../../components/shared/form_components/InputField';
-import Header from '../../../../components/shared/table_heading/Header';
+import { Icon } from "@iconify/react/dist/iconify.js";
+import { useForm, useStore } from "@tanstack/react-form";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { DropdownField } from "../../../../components/shared/form_components/Dropdown";
+import MultiImageUploader from "../../../../components/shared/form_components/FileDropInput";
+import { InputField } from "../../../../components/shared/form_components/InputField";
+import Header from "../../../../components/shared/table_heading/Header";
 import {
   useCreateProductsMutation,
   useGetAllProductCategoriesQuery,
@@ -13,18 +13,20 @@ import {
   useGetAllProductOccasionsQuery,
   useGetAllProductSubCategoriesQuery,
   useGetAllStonesQuery,
-  useUpdateProductsMutation
-} from '../../../../server/api/productHooks';
-import { productStore } from '../../../../store/productStore';
-import { cleanObject } from '../../../../utils/cleanObject';
-import { useClearableNumberInput } from '../../../../utils/numberInputHelpers';
-import { FieldError } from '../../../auth/LoginPage';
-import { PriceInputField } from '../../../OrderManagement/Order/components/PriceInputField';
-import ChipInputInside from '../../ProductCategory/components/ChipInputInside';
+  useUpdateProductsMutation,
+} from "../../../../server/api/productHooks";
+import { productStore } from "../../../../store/productStore";
+import { cleanObject } from "../../../../utils/cleanObject";
+import { useClearableNumberInput } from "../../../../utils/numberInputHelpers";
+import { FieldError } from "../../../auth/LoginPage";
+import { PriceInputField } from "../../../OrderManagement/Order/components/PriceInputField";
+import ChipInputInside from "../../ProductCategory/components/ChipInputInside";
 import {
   generateProductDefaultValue,
-  type IProductFormValues
-} from '../../productObj';
+  type IProductFormValues,
+  type IProductStone,
+} from "../../productObj";
+import VideoUploader from "../../../../components/shared/form_components/VideoUploader";
 
 const ProductForm = () => {
   const { id } = useParams();
@@ -67,7 +69,7 @@ const ProductForm = () => {
   );
 
   // Get current category value from form state
-  const [currentCategory, setCurrentCategory] = useState('');
+  const [currentCategory, setCurrentCategory] = useState("");
 
   const subCategoriesList = useMemo(
     () =>
@@ -90,14 +92,14 @@ const ProductForm = () => {
   );
 
   const visibilityOptions = [
-    { value: 'featured', label: 'Featured' },
-    { value: 'bestsellers', label: 'Best Sellers' },
-    { value: 'popular', label: 'Popular' },
-    { value: 'newarrivals', label: 'New Arrivals' },
-    { value: 'recommended', label: 'Recommended for you' },
+    { value: "featured", label: "Featured" },
+    { value: "bestsellers", label: "Best Sellers" },
+    { value: "popular", label: "Popular" },
+    { value: "newarrivals", label: "New Arrivals" },
+    { value: "recommended", label: "Recommended for you" },
   ];
 
-  const formstate = id ?? 'add';
+  const formstate = id ?? "add";
 
   const form = useForm({
     defaultValues: generateProductDefaultValue(
@@ -112,49 +114,94 @@ const ProductForm = () => {
         const formData = new FormData();
         const formattedData = cleanObject(value);
         // delete formattedData["image"];
-        delete formattedData['existingImage'];
-        formData.append('name', value.name);
-        formData.append('description', value.description);
-        formData.append('category', value.category);
+        delete formattedData["existingImage"];
+        formData.append("name", value.name);
+        formData.append("description", value.description);
+        formData.append("category", value.category);
 
-        if (value.subCategory && value.subCategory.trim() !== '') {
-          formData.append('subCategory', value.subCategory);
+        if (value.subCategory && value.subCategory.trim() !== "") {
+          formData.append("subCategory", value.subCategory);
         }
 
         value.variant.forEach((v, index: number) => {
           formData.append(`variant[${index}][price]`, String(v.price));
           formData.append(`variant[${index}][wt]`, v.wt.toString());
-          formData.append(`variant[${index}][unit]`, v.unit ?? 'gm');
+          formData.append(`variant[${index}][unit]`, v.unit ?? "gm");
         });
 
-        formData.append('length', String(value.length));
-        if (value.claspType) formData.append('claspType', value.claspType);
-        formData.append('rhodoumFinishes', String(value.rhodoumFinishes));
-        formData.append('shape', value.shape);
-        formData.append('clarity', value.clarity);
-        formData.append('dimension', String(value.dimension));
+        formData.append("length", String(value.length));
+        if (value.claspType) formData.append("claspType", value.claspType);
+        formData.append("rhodoumFinishes", String(value.rhodoumFinishes));
+        formData.append("shape", value.shape);
+        formData.append("clarity", value.clarity);
+        formData.append("dimension", String(value.dimension));
+
+        // Handle optional fields
+        if (value.quantity) formData.append("quantity", String(value.quantity));
+        if (value.totalCarat)
+          formData.append("totalCarat", String(value.totalCarat));
+        if (value.color) formData.append("color", value.color);
         // formData.append("visibleAs", value.visibleAs);
 
         value.tags.forEach((tag: string, index: number) => {
           formData.append(`tags[${index}]`, tag);
         });
 
+        // Handle stones
+        if (value.stones && value.stones.length > 0) {
+          value.stones.forEach((stone: IProductStone, index: number) => {
+            formData.append(`stones[${index}][stone]`, stone.stone);
+            formData.append(
+              `stones[${index}][quantity]`,
+              String(stone.quantity)
+            );
+            formData.append(
+              `stones[${index}][totalPrice]`,
+              String(stone.totalPrice)
+            );
+            formData.append(
+              `stones[${index}][isOptional]`,
+              String(stone.isOptional)
+            );
+            formData.append(
+              `stones[${index}][isDefault]`,
+              String(stone.isDefault)
+            );
+          });
+        }
+
+        // Handle occasions
+        if (value.occasions && value.occasions.length > 0) {
+          value.occasions.forEach((occasion: string, index: number) => {
+            formData.append(`occasions[${index}]`, occasion);
+          });
+        }
+
         // Handle image upload - Fix the field name mismatch
         if (value.images) {
           // New image selected - this replaces any existing image
-          formData.append('images', value.images);
-        } else if (formstate !== 'add' && value.existingImage) {
+          formData.append("images", value.images);
+        } else if (formstate !== "add" && value.existingImage) {
           // For updates without new image, keep existing image
-          formData.append('existingImage', value.existingImage);
+          formData.append("existingImage", value.existingImage);
         }
 
-        if (formstate !== 'add') {
+        // Handle video upload
+        if (value.video) {
+          // New video selected - this replaces any existing video
+          formData.append("video", value.video);
+        } else if (formstate !== "add" && value.existingVideo) {
+          // For updates without new video, keep existing video
+          formData.append("existingVideo", value.existingVideo);
+        }
+
+        if (formstate !== "add") {
           updateProduct({ id: productData._id, body: formData });
         } else {
           createProduct(formData);
         }
       } catch (error) {
-        console.error('Form submission error:', error);
+        console.error("Form submission error:", error);
       }
     },
   });
@@ -162,7 +209,7 @@ const ProductForm = () => {
   useEffect(() => {
     if (productCreateSuccess || productUpdateSuccess) {
       form.reset();
-      navigate('/product/product-list');
+      navigate("/product/product-list");
     }
   }, [productCreateSuccess, productUpdateSuccess]);
 
@@ -175,7 +222,7 @@ const ProductForm = () => {
 
   return (
     <div className="p-2">
-      <Header text={id === 'add' ? 'Add Product' : 'Edit Product'} />
+      <Header text={id === "add" ? "Add Product" : "Edit Product"} />
 
       {/* Debug Panel - Remove in production */}
       {/* <div className="mb-4 p-4 bg-gray-100 rounded">
@@ -197,8 +244,7 @@ const ProductForm = () => {
           e.stopPropagation();
           form.handleSubmit();
         }}
-        className="grid grid-cols-1 gap-4 lg:grid-cols-3"
-      >
+        className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         {/* Left Column */}
         <div className="col-span-2 bg-white border rounded-md">
           <div className="col-span-2">
@@ -219,9 +265,9 @@ const ProductForm = () => {
                         onChange={(e) => field.handleChange(e.target.value)}
                       />
                       <FieldError field={field} />
-                      {getFieldError('name').length > 0 && (
+                      {getFieldError("name").length > 0 && (
                         <div className="text-red-500 text-sm mt-1">
-                          {getFieldError('name').join(', ')}
+                          {getFieldError("name").join(", ")}
                         </div>
                       )}
                     </div>
@@ -244,9 +290,9 @@ const ProductForm = () => {
                         />
                       </div>
                       <FieldError field={field} />
-                      {getFieldError('description').length > 0 && (
+                      {getFieldError("description").length > 0 && (
                         <div className="text-red-500 text-sm mt-1">
-                          {getFieldError('description').join(', ')}
+                          {getFieldError("description").join(", ")}
                         </div>
                       )}
                     </div>
@@ -266,13 +312,13 @@ const ProductForm = () => {
                           onChange={(e) => {
                             field.handleChange(e.target.value);
                             // Reset subcategory when category changes
-                            form.setFieldValue('subCategory', '');
+                            form.setFieldValue("subCategory", "");
                           }}
                         />
                         <FieldError field={field} />
-                        {getFieldError('category').length > 0 && (
+                        {getFieldError("category").length > 0 && (
                           <div className="text-red-500 text-sm mt-1">
-                            {getFieldError('category').join(', ')}
+                            {getFieldError("category").join(", ")}
                           </div>
                         )}
                       </div>
@@ -291,9 +337,9 @@ const ProductForm = () => {
                           disabled={!currentCategory}
                         />
                         <FieldError field={field} />
-                        {getFieldError('subCategory').length > 0 && (
+                        {getFieldError("subCategory").length > 0 && (
                           <div className="text-red-500 text-sm mt-1">
-                            {getFieldError('subCategory').join(', ')}
+                            {getFieldError("subCategory").join(", ")}
                           </div>
                         )}
                       </div>
@@ -317,26 +363,24 @@ const ProductForm = () => {
                           field.pushValue({
                             price: 0,
                             wt: 0,
-                            unit: 'grams',
+                            unit: "grams",
                           })
                         }
                         type="button"
-                        className="flex bg-[#DF8D28] rounded-md text-white items-center gap-2 px-3 py-2"
-                      >
+                        className="flex bg-[#DF8D28] rounded-md text-white items-center gap-2 px-3 py-2">
                         <Icon icon="ep:plus" width="18" height="18" />
                         Add Variant
                       </button>
                     </div>
-                    {getFieldError('variant').length > 0 && (
+                    {getFieldError("variant").length > 0 && (
                       <div className="text-red-500 text-sm mb-2">
-                        {getFieldError('variant').join(', ')}
+                        {getFieldError("variant").join(", ")}
                       </div>
                     )}
                     {(field.state.value as any[]).map((_, i: number) => (
                       <div
                         key={i.toString()}
-                        className="border rounded-md p-3 mb-2"
-                      >
+                        className="border rounded-md p-3 mb-2">
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                           <form.Field name={`variant[${i}].price`}>
                             {(subField) => {
@@ -358,7 +402,7 @@ const ProductForm = () => {
                                     0 && (
                                     <div className="text-red-500 text-sm mt-1">
                                       {getFieldError(`variant.${i}.price`).join(
-                                        ', '
+                                        ", "
                                       )}
                                     </div>
                                   )}
@@ -389,7 +433,7 @@ const ProductForm = () => {
                                     0 && (
                                     <div className="text-red-500 text-sm mt-1">
                                       {getFieldError(`variant.${i}.wt`).join(
-                                        ', '
+                                        ", "
                                       )}
                                     </div>
                                   )}
@@ -403,8 +447,7 @@ const ProductForm = () => {
                             <button
                               type="button"
                               onClick={() => field.removeValue(i)}
-                              className="flex items-center gap-2 px-3 py-1 text-sm text-red-600 border border-red-600 rounded-md"
-                            >
+                              className="flex items-center gap-2 px-3 py-1 text-sm text-red-600 border border-red-600 rounded-md">
                               <Icon
                                 icon="mdi:delete"
                                 className="text-red"
@@ -445,9 +488,9 @@ const ProductForm = () => {
                           {...lengthInput}
                         />
                         <FieldError field={field} />
-                        {getFieldError('length').length > 0 && (
+                        {getFieldError("length").length > 0 && (
                           <div className="text-red-500 text-sm mt-1">
-                            {getFieldError('length').join(', ')}
+                            {getFieldError("length").join(", ")}
                           </div>
                         )}
                       </div>
@@ -466,9 +509,9 @@ const ProductForm = () => {
                         onChange={(e) => field.handleChange(e.target.value)}
                       />
                       <FieldError field={field} />
-                      {getFieldError('claspType').length > 0 && (
+                      {getFieldError("claspType").length > 0 && (
                         <div className="text-red-500 text-sm mt-1">
-                          {getFieldError('claspType').join(', ')}
+                          {getFieldError("claspType").join(", ")}
                         </div>
                       )}
                     </div>
@@ -483,18 +526,18 @@ const ProductForm = () => {
                         required
                         firstInput="Select finish"
                         options={[
-                          { value: 'true', label: 'Yes' },
-                          { value: 'false', label: 'No' },
+                          { value: "true", label: "Yes" },
+                          { value: "false", label: "No" },
                         ]}
                         value={String(field.state.value)}
                         onChange={(e) =>
-                          field.handleChange(e.target.value === 'true')
+                          field.handleChange(e.target.value === "true")
                         }
                       />
                       <FieldError field={field} />
-                      {getFieldError('rhodoumFinishes').length > 0 && (
+                      {getFieldError("rhodoumFinishes").length > 0 && (
                         <div className="text-red-500 text-sm mt-1">
-                          {getFieldError('rhodoumFinishes').join(', ')}
+                          {getFieldError("rhodoumFinishes").join(", ")}
                         </div>
                       )}
                     </div>
@@ -520,9 +563,9 @@ const ProductForm = () => {
                         onChange={(e) => field.handleChange(e.target.value)}
                       />
                       <FieldError field={field} />
-                      {getFieldError('shape').length > 0 && (
+                      {getFieldError("shape").length > 0 && (
                         <div className="text-red-500 text-sm mt-1">
-                          {getFieldError('shape').join(', ')}
+                          {getFieldError("shape").join(", ")}
                         </div>
                       )}
                     </div>
@@ -540,9 +583,9 @@ const ProductForm = () => {
                         onChange={(e) => field.handleChange(e.target.value)}
                       />
                       <FieldError field={field} />
-                      {getFieldError('clarity').length > 0 && (
+                      {getFieldError("clarity").length > 0 && (
                         <div className="text-red-500 text-sm mt-1">
-                          {getFieldError('clarity').join(', ')}
+                          {getFieldError("clarity").join(", ")}
                         </div>
                       )}
                     </div>
@@ -566,9 +609,9 @@ const ProductForm = () => {
                           {...dimensionInput}
                         />
                         <FieldError field={field} />
-                        {getFieldError('dimension').length > 0 && (
+                        {getFieldError("dimension").length > 0 && (
                           <div className="text-red-500 text-sm mt-1">
-                            {getFieldError('dimension').join(', ')}
+                            {getFieldError("dimension").join(", ")}
                           </div>
                         )}
                       </div>
@@ -594,7 +637,7 @@ const ProductForm = () => {
                         value: occasion._id,
                         label: occasion.name,
                       }))}
-                      value={field.state.value?.[0] || ''}
+                      value={field.state.value?.[0] || ""}
                       onChange={(e) => {
                         const selectedValue = e.target.value;
                         if (
@@ -621,14 +664,12 @@ const ProductForm = () => {
                               return (
                                 <span
                                   key={occasionId}
-                                  className="inline-flex items-center px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full"
-                                >
+                                  className="inline-flex items-center px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
                                   {occasion?.name || occasionId}
                                   <button
                                     type="button"
                                     onClick={() => field.removeValue(index)}
-                                    className="ml-1 text-blue-600 hover:text-blue-800"
-                                  >
+                                    className="ml-1 text-blue-600 hover:text-blue-800">
                                     <Icon
                                       icon="mdi:close"
                                       className="w-3 h-3"
@@ -673,15 +714,14 @@ const ProductForm = () => {
                         type="button"
                         onClick={() =>
                           field.pushValue({
-                            stone: '',
+                            stone: "",
                             quantity: 1,
                             totalPrice: 0,
                             isOptional: true,
                             isDefault: false,
                           })
                         }
-                        className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
-                      >
+                        className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600">
                         <Icon icon="mdi:plus" className="inline mr-1" />
                         Add Stone
                       </button>
@@ -691,8 +731,7 @@ const ProductForm = () => {
                       field.state.value.map((stone: any, index: number) => (
                         <div
                           key={index}
-                          className="border rounded p-3 mb-3 bg-gray-50"
-                        >
+                          className="border rounded p-3 mb-3 bg-gray-50">
                           <div className="flex justify-between items-center mb-2">
                             <h4 className="font-medium text-gray-700">
                               Stone {index + 1}
@@ -700,8 +739,7 @@ const ProductForm = () => {
                             <button
                               type="button"
                               onClick={() => field.removeValue(index)}
-                              className="text-red-500 hover:text-red-700"
-                            >
+                              className="text-red-500 hover:text-red-700">
                               <Icon icon="mdi:delete" className="w-4 h-4" />
                             </button>
                           </div>
@@ -715,14 +753,14 @@ const ProductForm = () => {
                                     required
                                     firstInput={
                                       (stones || []).length > 0
-                                        ? 'Select stone'
-                                        : 'No stones available'
+                                        ? "Select stone"
+                                        : "No stones available"
                                     }
                                     options={(stones || []).map((stone) => ({
                                       value: stone._id,
                                       label: stone.name,
                                     }))}
-                                    value={String(subField.state.value || '')}
+                                    value={String(subField.state.value || "")}
                                     onChange={(e) =>
                                       subField.handleChange(e.target.value)
                                     }
@@ -864,9 +902,9 @@ const ProductForm = () => {
               {(field) => (
                 <div>
                   <ChipInputInside field={field} />
-                  {getFieldError('tags').length > 0 && (
+                  {getFieldError("tags").length > 0 && (
                     <div className="text-red-500 text-sm mt-1">
-                      {getFieldError('tags').join(', ')}
+                      {getFieldError("tags").join(", ")}
                     </div>
                   )}
                 </div>
@@ -890,16 +928,48 @@ const ProductForm = () => {
                     value={field.state.value}
                     existingFileField="existingImage"
                     accept={{
-                      'image/*': ['.png', '.jpg', '.jpeg', '.svg', '.webp'],
+                      "image/*": [".png", ".jpg", ".jpeg", ".svg", ".webp"],
                     }}
-                    existingFile={form.getFieldValue('existingImage')}
+                    existingFile={form.getFieldValue("existingImage")}
                     onChange={(file) => {
                       field.handleChange(file);
                       // When a new image is selected, clear the existing image
                       if (file) {
-                        form.setFieldValue('existingImage', undefined);
+                        form.setFieldValue("existingImage", undefined);
                       }
                     }}
+                  />
+                )}
+              </form.Field>
+            </div>
+          </div>
+
+          {/* Video Upload Section */}
+          <div className="bg-[#ffffff] border-[#eeeeee] border-2 shadow-lg rounded-xl w-full mt-4">
+            <div className="mx-6 my-4">
+              <div>
+                <h1 className="text-xl font-semibold">
+                  Upload Product Video (Optional)
+                </h1>
+                <div className="border-b border-[#dedde2] w-full my-2"></div>
+              </div>
+              <form.Field name="video">
+                {(field) => (
+                  <VideoUploader
+                    label=""
+                    value={field.state.value}
+                    existingFile={form.getFieldValue("existingVideo")}
+                    onChange={(file) => {
+                      field.handleChange(file);
+                      // When a new video is selected, clear the existing video
+                      if (file) {
+                        form.setFieldValue("existingVideo", undefined);
+                      }
+                    }}
+                    onExistingFileChange={(url) => {
+                      form.setFieldValue("existingVideo", url);
+                    }}
+                    maxSize={200}
                   />
                 )}
               </form.Field>
@@ -911,12 +981,11 @@ const ProductForm = () => {
             <button
               type="submit"
               disabled={pendingAddition || pendingUpdate}
-              className="px-6 py-2 text-white rounded-md min-w-32 bg-orange hover:bg-orange-600 disabled:opacity-50"
-            >
+              className="px-6 py-2 text-white rounded-md min-w-32 bg-orange hover:bg-orange-600 disabled:opacity-50">
               {pendingAddition || pendingUpdate ? (
                 <Icon icon="nrk:spinner" width={18} height={18} />
               ) : (
-                'Save Product'
+                "Save Product"
               )}
             </button>
           </div>

@@ -73,7 +73,9 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
   const stones = get(product, "stones", []);
 
   // Check product type
-  const productType = (get(product, "productType", "gold") || "gold").toLowerCase();
+  const productType = (
+    get(product, "productType", "gold") || "gold"
+  ).toLowerCase();
   const isNormalProduct = productType === "normal";
   const isGoldOrSilver = productType === "gold" || productType === "silver";
   const hasGemstones = stones && stones.length > 0;
@@ -101,14 +103,16 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
                     get(product, "isActive", true)
                       ? "bg-green-100 text-green-800"
                       : "bg-red-100 text-red-800"
-                  }`}
-                >
+                  }`}>
                   {get(product, "isActive", true) ? "Active" : "Inactive"}
                 </span>
               </div>
               <div className="flex items-center gap-3 text-sm">
                 <span className="font-medium text-blue-600">
-                  <Icon icon="mdi:package-variant" className="w-4 h-4 inline mr-1" />
+                  <Icon
+                    icon="mdi:package-variant"
+                    className="w-4 h-4 inline mr-1"
+                  />
                   Normal Product
                 </span>
                 <span className="text-gray-600">
@@ -192,9 +196,10 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
 
   // Get wastage info
   const wastageInfo = get(product, "wastage");
-  const wastageDisplay = wastageInfo && wastageInfo.value !== undefined && wastageInfo.type
-    ? `${wastageInfo.value}${wastageInfo.type === "per" ? "%" : " (flat)"}`
-    : "-";
+  const wastageDisplay =
+    wastageInfo && wastageInfo.value !== undefined && wastageInfo.type
+      ? `${wastageInfo.value}${wastageInfo.type === "per" ? "%" : " (flat)"}`
+      : "-";
 
   // Get other charges
   const otherCharges = get(product, "others", []) as OtherCharge[];
@@ -215,8 +220,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
                     get(product, "isActive", true)
                       ? "bg-green-100 text-green-800"
                       : "bg-red-100 text-red-800"
-                  }`}
-                >
+                  }`}>
                   {get(product, "isActive", true) ? "Active" : "Inactive"}
                 </span>
                 {get(product, "isFeatured", false) && (
@@ -234,7 +238,10 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
               </span>
               {get(product, "subCategory.name") && (
                 <span className="text-gray-600">
-                  <Icon icon="mdi:tag-outline" className="w-4 h-4 inline mr-1" />
+                  <Icon
+                    icon="mdi:tag-outline"
+                    className="w-4 h-4 inline mr-1"
+                  />
                   {get(product, "subCategory.name")}
                 </span>
               )}
@@ -256,28 +263,35 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
         {/* Compact Tags and Wastage in same row */}
         <div className="flex items-center justify-between gap-4">
           {/* Tags */}
-          {product.tags && Array.isArray(product.tags) && product.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {product.tags.slice(0, 4).map((tag, index) => (
-                <span
-                  key={index}
-                  className="px-2 py-1 text-xs font-medium text-blue-700 bg-blue-50 rounded-full"
-                >
-                  #{tag && typeof tag === 'string' ? tag.replace(/\s+/g, "") : 'tag'}
-                </span>
-              ))}
-              {product.tags.length > 4 && (
-                <span className="px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-full">
-                  +{product.tags.length - 4}
-                </span>
-              )}
-            </div>
-          )}
+          {product.tags &&
+            Array.isArray(product.tags) &&
+            product.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {product.tags.slice(0, 4).map((tag, index) => (
+                  <span
+                    key={index}
+                    className="px-2 py-1 text-xs font-medium text-blue-700 bg-blue-50 rounded-full">
+                    #
+                    {tag && typeof tag === "string"
+                      ? tag.replace(/\s+/g, "")
+                      : "tag"}
+                  </span>
+                ))}
+                {product.tags.length > 4 && (
+                  <span className="px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-full">
+                    +{product.tags.length - 4}
+                  </span>
+                )}
+              </div>
+            )}
 
           {/* Wastage Info */}
           {wastageDisplay !== "-" && (
             <div className="flex items-center gap-1 bg-yellow-50 px-2 py-1 rounded-lg">
-              <Icon icon="mdi:information" className="w-4 h-4 text-yellow-600" />
+              <Icon
+                icon="mdi:information"
+                className="w-4 h-4 text-yellow-600"
+              />
               <span className="text-xs font-medium text-yellow-800">
                 Wastage: {wastageDisplay}
               </span>
@@ -303,8 +317,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
                 (item: ProductVariant, index: number) => (
                   <div
                     key={item?.sku || `variant-${index}`}
-                    className="bg-gray-50 border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-all duration-200"
-                  >
+                    className="bg-gray-50 border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-all duration-200">
                     {/* Compact Price and Status */}
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
@@ -312,15 +325,19 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
                           ₹{item?.price?.toLocaleString() || 0}
                         </div>
                         <div className="text-sm font-semibold text-gray-900">
-                          {item?.wt || 0} <span className="text-xs text-gray-600">{item?.unit || "units"}</span>
+                          {item?.wt || 0}{" "}
+                          <span className="text-xs text-gray-600">
+                            {item?.unit || "units"}
+                          </span>
                         </div>
                       </div>
                       <div className="flex gap-1">
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                          get(item, "isActive", true)
-                            ? "bg-green text-green-800"
-                            : "bg-gray-100 text-gray-800"
-                        }`}>
+                        <span
+                          className={`px-2 py-1 text-xs font-medium rounded-full ${
+                            get(item, "isActive", true)
+                              ? "bg-green text-green-800"
+                              : "bg-gray-100 text-gray-800"
+                          }`}>
                           {get(item, "isActive", true) ? "Active" : "Inactive"}
                         </span>
                       </div>
@@ -337,7 +354,10 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
         <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
           <div className="p-3 border-b border-gray-100">
             <h3 className="text-base font-semibold text-gray-800 flex items-center gap-2">
-              <Icon icon="mdi:diamond-stone" className="w-4 h-4 text-purple-600" />
+              <Icon
+                icon="mdi:diamond-stone"
+                className="w-4 h-4 text-purple-600"
+              />
               Stones & Gems
               <span className="px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded-full">
                 {stones.length}
@@ -349,21 +369,27 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
               {stones.map((stone: ProductStone, index: number) => (
                 <div
                   key={index}
-                  className="bg-gray-50 border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-all duration-200"
-                >
+                  className="bg-gray-50 border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-all duration-200">
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="font-semibold text-gray-800 capitalize text-sm">
-                      {stone.name || 'Unnamed Stone'}
+                      {stone.name || "Unnamed Stone"}
                     </h4>
                     <span className="px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded-full">
-                      {stone.color || 'N/A'}
+                      {stone.color || "N/A"}
                     </span>
                   </div>
                   <div className="flex justify-between text-xs">
                     <span className="text-gray-600">
-                      Weight: <span className="font-medium text-gray-900">{stone.weight ? stone.weight.toString().concat(' Carat') : 'N/A'}</span>
+                      Weight:{" "}
+                      <span className="font-medium text-gray-900">
+                        {stone.weight
+                          ? stone.weight.toString().concat(" Carat")
+                          : "N/A"}
+                      </span>
                     </span>
-                    <span className="font-medium text-green-600">₹{stone.price || 'N/A'}</span>
+                    <span className="font-medium text-green-600">
+                      ₹{stone.price || "N/A"}
+                    </span>
                   </div>
                 </div>
               ))}
@@ -389,11 +415,10 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
               {otherCharges.map((charge: OtherCharge, index: number) => (
                 <div
                   key={index}
-                  className="bg-gray-50 border border-gray-200 rounded-lg p-2 hover:shadow-sm transition-all duration-200"
-                >
+                  className="bg-gray-50 border border-gray-200 rounded-lg p-2 hover:shadow-sm transition-all duration-200">
                   <div className="flex items-center justify-between">
                     <span className="font-medium text-gray-800 capitalize text-sm">
-                      {charge.name || 'Unnamed Charge'}
+                      {charge.name || "Unnamed Charge"}
                     </span>
                     <span className="font-bold text-green-600 text-sm">
                       ₹{(charge.value || 0).toLocaleString()}
@@ -408,7 +433,14 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
                   Total Additional Charges:
                 </span>
                 <span className="font-bold text-base text-green-600">
-                  ₹{otherCharges.reduce((sum: number, charge: OtherCharge) => sum + (charge.value || 0), 0).toLocaleString()}
+                  ₹
+                  {otherCharges
+                    .reduce(
+                      (sum: number, charge: OtherCharge) =>
+                        sum + (charge.value || 0),
+                      0
+                    )
+                    .toLocaleString()}
                 </span>
               </div>
             </div>
@@ -434,6 +466,113 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
           } Information`}
           data={gemstoneInfo}
         />
+      )}
+
+      {/* Product Video Section */}
+      {(() => {
+        console.log("Product video data:", product.video);
+        return product.video && product.video.length > 0;
+      })() ? (
+        <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
+          <div className="p-3 border-b border-gray-100">
+            <h3 className="text-base font-semibold text-gray-800 flex items-center gap-2">
+              <Icon
+                icon="material-symbols:video-library"
+                className="w-4 h-4 text-blue-600"
+              />
+              Product Video
+              <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                {product.video.length}
+              </span>
+            </h3>
+          </div>
+          <div className="p-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {product.video.map((videoPath, index) => {
+                console.log(`Video ${index}:`, videoPath);
+
+                // Clean the video path for streaming
+                const cleanVideoPath = videoPath.startsWith("/ridisidi/")
+                  ? videoPath.substring("/ridisidi/".length)
+                  : videoPath.startsWith("/")
+                  ? videoPath.substring(1)
+                  : videoPath;
+
+                const baseUrl =
+                  import.meta.env.VITE_API_LOCAL_URL ||
+                  "http://localhost:8080/api/v1/en/";
+                const videoStreamUrl = `${baseUrl}video/stream/${cleanVideoPath}`;
+
+                console.log(`Video ${index} stream URL:`, videoStreamUrl);
+
+                return (
+                  <div
+                    key={index}
+                    className="bg-gray-50 border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-all duration-200">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-semibold text-gray-800 text-sm">
+                        Video {index + 1}
+                      </h4>
+                      <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                        Product Demo
+                      </span>
+                    </div>
+                    <div className="mb-2 text-xs text-gray-500">
+                      <p>Path: {videoPath}</p>
+                      <p>Stream URL: {videoStreamUrl}</p>
+                    </div>
+                    <video
+                      src={videoStreamUrl}
+                      controls
+                      className="w-full rounded-lg"
+                      preload="metadata"
+                      onError={(e) => {
+                        console.error("Video loading error:", e);
+                        console.error("Video URL:", videoStreamUrl);
+                        console.error("Original path:", videoPath);
+                      }}
+                      onLoadStart={() => {
+                        console.log("Video loading started:", videoStreamUrl);
+                      }}
+                      onCanPlay={() => {
+                        console.log("Video can play:", videoStreamUrl);
+                      }}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      ) : (
+        // Show message when no videos are available
+        <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
+          <div className="p-3 border-b border-gray-100">
+            <h3 className="text-base font-semibold text-gray-800 flex items-center gap-2">
+              <Icon
+                icon="material-symbols:video-library"
+                className="w-4 h-4 text-gray-400"
+              />
+              Product Video
+            </h3>
+          </div>
+          <div className="p-6 text-center">
+            <div className="flex flex-col items-center gap-3">
+              <Icon
+                icon="material-symbols:video-library"
+                className="w-12 h-12 text-gray-300"
+              />
+              <div>
+                <p className="text-sm font-medium text-gray-700">
+                  No video available
+                </p>
+                <p className="text-xs text-gray-500">
+                  This product doesn't have any videos uploaded yet
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -1,4 +1,4 @@
-import { get } from 'lodash';
+import { get } from "lodash";
 
 export interface IBannerFormData {
   title: string;
@@ -11,37 +11,47 @@ export interface IBannerFormData {
   existingMobImage?: string;
   mobImage: File | null; // Changed to File | null for single file
   locations: string[];
+  video: File | null; // Video file
+  existingVideo?: string | null;
+  videoThumbnail: File | null; // Video thumbnail file
+  existingVideoThumbnail?: string | null;
 }
 
 export const generateBannerFormDefaultValue = (
   state: string,
   editData?: any
 ): IBannerFormData => {
-  if (state === 'add') {
+  if (state === "add") {
     return {
       // General Information
-      title: '',
-      description: '',
-      category: '',
-      subCategory: '',
+      title: "",
+      description: "",
+      category: "",
+      subCategory: "",
       // Price
       priority: 0,
       image: null, // Null for new form, single file
       mobImage: null, // Null for new form, single file
+      video: null, // Null for new form, single file
+      videoThumbnail: null, // Null for new form, single file
       locations: [],
     };
   } else {
     return {
-      title: get(editData, 'title', ''),
-      description: get(editData, 'description', ''),
-      category: get(editData, 'category', ''),
-      subCategory: get(editData, 'subCategory', ''),
-      priority: get(editData, 'priority', 0),
+      title: get(editData, "title", ""),
+      description: get(editData, "description", ""),
+      category: get(editData, "category", ""),
+      subCategory: get(editData, "subCategory", ""),
+      priority: get(editData, "priority", 0),
       image: null, // Null for edit, new file will be uploaded
-      existingImage: get(editData, 'image[0]'),
+      existingImage: get(editData, "image[0]"),
       mobImage: null, // Null for edit, new file will be uploaded
-      existingMobImage: get(editData, 'mobImage[0]'),
-      locations: get(editData, 'locations', []),
+      existingMobImage: get(editData, "mobImage[0]"),
+      video: null, // Null for edit, new file will be uploaded
+      existingVideo: get(editData, "video[0]"),
+      videoThumbnail: null, // Null for edit, new file will be uploaded
+      existingVideoThumbnail: get(editData, "videoThumbnail[0]"),
+      locations: get(editData, "locations", []),
     };
   }
 };
