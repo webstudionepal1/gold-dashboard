@@ -1,17 +1,17 @@
-import React from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { CompactProductForm } from "./CompactProductForm";
-import get from "lodash/get";
+import React from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { CompactProductForm } from './CompactProductForm';
+import get from 'lodash/get';
 import {
   useCreateProductsMutation,
   useUpdateProductsMutation,
   useGetProductByIdQuery,
-} from "../../../server/api/productHooks";
+} from '../../../server/api/productHooks';
 import {
   ProductFormData,
   ProductStone,
-} from "../../../components/shared/form_components/ProductFormContext";
-import { FormLoader } from "@/components/shared/FormLoader.component";
+} from '../../../components/shared/form_components/ProductFormContext';
+import { FormLoader } from '@/components/shared/FormLoader.component';
 
 const NewProductForm: React.FC = () => {
   const navigate = useNavigate();
@@ -24,7 +24,7 @@ const NewProductForm: React.FC = () => {
   const { mutateAsync: updateProductMutation, isPending } =
     useUpdateProductsMutation();
   const { data: existingProduct, isLoading: isLoadingProduct } =
-    useGetProductByIdQuery(id || "", { enabled: isEdit });
+    useGetProductByIdQuery(id || '', { enabled: isEdit });
 
   // Transform API data to form data format
   const getInitialData = (): Partial<ProductFormData> => {
@@ -36,40 +36,41 @@ const NewProductForm: React.FC = () => {
 
     return {
       // Basic Information
-      name: get(product, "name", ""),
-      slug: "",
-      description: get(product, "description", ""),
-      productType: get(product, "productType", "gold"),
-      dimension: get(product, "dimension", 0),
-      category: get(product, "category._id", ""),
-      subCategory: get(product, "subCategory._id", ""),
+      name: get(product, 'name', ''),
+      slug: '',
+      description: get(product, 'description', ''),
+      productType: get(product, 'productType', 'gold'),
+      dimension: get(product, 'dimension', 0),
+      category: get(product, 'category._id', ''),
+      subCategory: get(product, 'subCategory._id', ''),
+      tags: get(product, 'tags', []),
 
       // Specifications
-      length: get(product, "length", 0),
-      rhodoumFinishes: get(product, "rhodoumFinishes", false),
-      totalCarat: get(product, "totalCarat", 0),
-      color: get(product, "color", ""),
-      clarity: get(product, "clarity", ""),
-      gender: get(product, "gender", "male") as
-        | "male"
-        | "female"
-        | "unisex"
+      length: get(product, 'length', 0),
+      rhodoumFinishes: get(product, 'rhodoumFinishes', false),
+      totalCarat: get(product, 'totalCarat', 0),
+      color: get(product, 'color', ''),
+      clarity: get(product, 'clarity', ''),
+      gender: get(product, 'gender', 'male') as
+        | 'male'
+        | 'female'
+        | 'unisex'
         | undefined,
-      makingCharges: Number(get(product, "makingCharges", 0)),
+      makingCharges: Number(get(product, 'makingCharges', 0)),
 
-      wastage: get(product, "wastage"), // Will be set by user
+      wastage: get(product, 'wastage'), // Will be set by user
 
-      variants: get(product, "variant", [
+      variants: get(product, 'variant', [
         {
           price: 0,
           wt: 0,
-          unit: "grams" as "grams" | "kg" | "pieces" | "carats",
+          unit: 'grams' as 'grams' | 'kg' | 'pieces' | 'carats',
           isActive: true,
         },
       ]),
 
       // Stones and Occasions
-      stones: get(product, "stones", []).map(
+      stones: get(product, 'stones', []).map(
         (
           stone: ProductStone
         ): {
@@ -84,13 +85,13 @@ const NewProductForm: React.FC = () => {
           color: stone.color,
         })
       ),
-      otherCharges: get(product, "others", []).map(
+      otherCharges: get(product, 'others', []).map(
         (item: { name: string; value: number }) => ({
           name: item.name,
           price: item.value,
         })
       ),
-      existingImages: get(product, "images", []),
+      existingImages: get(product, 'images', []),
       // Media
       images: [],
 
@@ -101,8 +102,8 @@ const NewProductForm: React.FC = () => {
         ? [product.visibleAs]
         : [],
       // Status
-      isActive: get(product, "isActive", true),
-      isFeatured: get(product, "isFeatured", false),
+      isActive: get(product, 'isActive', true),
+      isFeatured: get(product, 'isFeatured', false),
     };
   };
 
@@ -122,9 +123,9 @@ const NewProductForm: React.FC = () => {
       }
 
       // Navigate back to products list on success
-      navigate("/product/product-list");
+      navigate('/product/product-list');
     } catch (error) {
-      console.error("Error saving product:", error);
+      console.error('Error saving product:', error);
       // Handle error (show toast, etc.)
     }
   };
@@ -134,39 +135,39 @@ const NewProductForm: React.FC = () => {
     const formDataObj = new FormData();
 
     // Basic Information - Always present
-    formDataObj.append("name", formData.name);
-    formDataObj.append("description", formData.description);
+    formDataObj.append('name', formData.name);
+    formDataObj.append('description', formData.description);
     if (formData.productType)
-      formDataObj.append("productType", formData.productType);
+      formDataObj.append('productType', formData.productType);
 
     // Only add these fields if product type is not 'normal'
-    if (formData.productType !== "normal") {
-      if (formData.category) formDataObj.append("category", formData.category);
+    if (formData.productType !== 'normal') {
+      if (formData.category) formDataObj.append('category', formData.category);
       if (formData.subCategory)
-        formDataObj.append("subCategory", formData.subCategory);
-      if (formData.gender) formDataObj.append("gender", formData.gender);
+        formDataObj.append('subCategory', formData.subCategory);
+      if (formData.gender) formDataObj.append('gender', formData.gender);
 
       // Specifications - only for non-normal products
       if (formData.length)
-        formDataObj.append("length", formData.length.toString());
+        formDataObj.append('length', formData.length.toString());
       if (formData.dimension)
-        formDataObj.append("dimension", formData.dimension.toString());
+        formDataObj.append('dimension', formData.dimension.toString());
       if (formData.makingCharges)
-        formDataObj.append("makingCharges", formData.makingCharges.toString());
-      if (formData.color) formDataObj.append("color", formData.color);
-      if (formData.clarity) formDataObj.append("clarity", formData.clarity);
+        formDataObj.append('makingCharges', formData.makingCharges.toString());
+      if (formData.color) formDataObj.append('color', formData.color);
+      if (formData.clarity) formDataObj.append('clarity', formData.clarity);
       if (formData.totalCarat)
-        formDataObj.append("totalCarat", formData.totalCarat.toString());
+        formDataObj.append('totalCarat', formData.totalCarat.toString());
       if (formData.rhodoumFinishes)
         formDataObj.append(
-          "rhodoumFinishes",
+          'rhodoumFinishes',
           formData.rhodoumFinishes.toString()
         );
 
       // Wastage - only for non-normal products
       if (formData.wastage) {
-        formDataObj.append("wastage[type]", formData.wastage.type);
-        formDataObj.append("wastage[value]", formData.wastage.value.toString());
+        formDataObj.append('wastage[type]', formData.wastage.type);
+        formDataObj.append('wastage[value]', formData.wastage.value.toString());
       }
     }
 
@@ -175,7 +176,7 @@ const NewProductForm: React.FC = () => {
       formDataObj.append(`variant[${index}][price]`, variant.price.toString());
 
       // Only add weight and unit for non-normal products
-      if (formData.productType !== "normal") {
+      if (formData.productType !== 'normal') {
         formDataObj.append(`variant[${index}][wt]`, variant.wt.toString());
         formDataObj.append(`variant[${index}][unit]`, variant.unit);
         formDataObj.append(
@@ -185,8 +186,12 @@ const NewProductForm: React.FC = () => {
       }
     });
 
+    formData.tags.forEach((tag, index) => {
+      formDataObj.append(`tags[${index}]`, tag);
+    });
+
     // Stones - Only for non-normal products
-    if (formData.productType !== "normal" && formData.stones) {
+    if (formData.productType !== 'normal' && formData.stones) {
       formData.stones.forEach((stone, index) => {
         formDataObj.append(`stones[${index}][name]`, stone.name);
         formDataObj.append(`stones[${index}][weight]`, stone.weight.toString());
@@ -196,7 +201,7 @@ const NewProductForm: React.FC = () => {
     }
 
     // Other Charges - Only for non-normal products
-    if (formData.productType !== "normal" && formData.otherCharges) {
+    if (formData.productType !== 'normal' && formData.otherCharges) {
       formData.otherCharges.forEach((charge, index) => {
         formDataObj.append(`others[${index}][name]`, charge.name);
         formDataObj.append(`others[${index}][value]`, charge.price.toString());
@@ -204,15 +209,15 @@ const NewProductForm: React.FC = () => {
     }
 
     // Status & Visibility - Only for non-normal products
-    if (formData.productType !== "normal") {
+    if (formData.productType !== 'normal') {
       if (formData.visibleAs)
         formData.visibleAs.forEach((element, index) => {
           formDataObj.append(`visibleAs[${index}]`, element);
         });
       if (formData.isActive !== undefined)
-        formDataObj.append("isActive", formData.isActive.toString());
+        formDataObj.append('isActive', formData.isActive.toString());
       if (formData.isFeatured !== undefined)
-        formDataObj.append("isFeatured", formData.isFeatured.toString());
+        formDataObj.append('isFeatured', formData.isFeatured.toString());
     }
 
     // Handle images - All product types can have images
@@ -220,7 +225,7 @@ const NewProductForm: React.FC = () => {
       formData.images.forEach((image: File | string, index: number) => {
         if (image instanceof File) {
           formDataObj.append(`images`, image);
-        } else if (typeof image === "string" && image.trim() !== "") {
+        } else if (typeof image === 'string' && image.trim() !== '') {
           // For existing images (URLs), append as string
           formDataObj.append(`existingImages[${index}]`, image);
         }
@@ -232,7 +237,7 @@ const NewProductForm: React.FC = () => {
 
   // Handle form cancellation
   const handleFormCancel = () => {
-    navigate("/product/product-list");
+    navigate('/product/product-list');
   };
 
   // Show loading state while fetching existing product data
