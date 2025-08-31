@@ -271,8 +271,8 @@
 //   );
 // };
 
-import React, { useRef, useEffect, useState, useCallback } from "react";
-import { twMerge } from "tailwind-merge";
+import React, { useRef, useEffect, useState, useCallback } from 'react';
+import { twMerge } from 'tailwind-merge';
 
 interface Option {
   value: string;
@@ -294,12 +294,12 @@ export const DropdownTagField: React.FC<CustomDropdownProps> = ({
   required = false,
   options = [],
   inputClassname,
-  placeholder = "Type and press Enter",
+  placeholder = 'Type and press Enter',
   values = [], // Default to empty array
   onChange,
 }) => {
   const [showDropdown, setShowDropdown] = useState(false);
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState('');
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -347,7 +347,7 @@ export const DropdownTagField: React.FC<CustomDropdownProps> = ({
   // Scroll to highlighted option
   useEffect(() => {
     if (highlightedIndex >= 0 && showDropdown && dropdownRef.current) {
-      const dropdown = dropdownRef.current.querySelector("ul");
+      const dropdown = dropdownRef.current.querySelector('ul');
       const highlightedOption = optionRefs.current.get(highlightedIndex);
 
       if (dropdown && highlightedOption) {
@@ -378,14 +378,14 @@ export const DropdownTagField: React.FC<CustomDropdownProps> = ({
         setShowDropdown(false);
       }
     };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
   }, []);
 
   // Handle keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     switch (e.key) {
-      case "Enter":
+      case 'Enter':
         e.preventDefault();
         if (
           highlightedIndex >= 0 &&
@@ -394,19 +394,19 @@ export const DropdownTagField: React.FC<CustomDropdownProps> = ({
           const selectedOption = filteredOptions[highlightedIndex];
           if (!safeValues.includes(selectedOption.value)) {
             onChange?.([...safeValues, selectedOption.value]);
-            setInputValue("");
+            setInputValue('');
             setHighlightedIndex(-1);
           }
         } else if (inputValue.trim()) {
           const trimmed = inputValue.trim();
           if (!safeValues.includes(trimmed)) {
             onChange?.([...safeValues, trimmed]);
-            setInputValue("");
+            setInputValue('');
           }
         }
         break;
 
-      case "ArrowDown":
+      case 'ArrowDown':
         e.preventDefault();
         if (filteredOptions.length > 0) {
           setShowDropdown(true);
@@ -416,7 +416,7 @@ export const DropdownTagField: React.FC<CustomDropdownProps> = ({
         }
         break;
 
-      case "ArrowUp":
+      case 'ArrowUp':
         e.preventDefault();
         if (filteredOptions.length > 0) {
           setShowDropdown(true);
@@ -426,14 +426,14 @@ export const DropdownTagField: React.FC<CustomDropdownProps> = ({
         }
         break;
 
-      case "Escape":
+      case 'Escape':
         e.preventDefault();
         setShowDropdown(false);
         setHighlightedIndex(-1);
         break;
 
-      case "Backspace":
-        if (inputValue === "" && safeValues.length > 0) {
+      case 'Backspace':
+        if (inputValue === '' && safeValues.length > 0) {
           onChange?.(safeValues.slice(0, -1));
         }
         break;
@@ -443,7 +443,7 @@ export const DropdownTagField: React.FC<CustomDropdownProps> = ({
   const handleSelect = (option: Option) => {
     if (!safeValues.includes(option.value)) {
       onChange?.([...safeValues, option.value]);
-      setInputValue("");
+      setInputValue('');
       setHighlightedIndex(-1);
     }
   };
@@ -464,7 +464,7 @@ export const DropdownTagField: React.FC<CustomDropdownProps> = ({
       <div className="relative">
         <div
           className={twMerge(
-            "w-full min-h-[44px] border border-grey-200 py-2 px-4 rounded-xl bg-[#f6f8f8] flex items-center gap-2",
+            'w-full min-h-[44px] border border-grey-200 py-2 px-4 rounded-xl bg-[#f6f8f8] flex items-center gap-2',
             inputClassname
           )}
         >
@@ -498,22 +498,27 @@ export const DropdownTagField: React.FC<CustomDropdownProps> = ({
             ref={inputRef}
             type="text"
             className="flex-1 min-w-[100px] outline-none bg-transparent text-sm"
-            placeholder={safeValues.length === 0 ? placeholder : ""}
+            placeholder={safeValues.length === 0 ? placeholder : ''}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
-            onFocus={() => setShowDropdown(true)}
+            // onFocus={() => setShowDropdown(true)}
             onClick={(e) => {
               e.stopPropagation();
-              setShowDropdown(true);
+              setShowDropdown((prev) => !prev);
               inputRef.current?.focus();
             }}
           />
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className={`w-4 h-4 text-[#95949a] transition-transform duration-200 ${
-              showDropdown ? "rotate-180" : ""
+              showDropdown ? 'rotate-180' : ''
             }`}
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowDropdown((prev) => !prev);
+              inputRef.current?.focus();
+            }}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -539,17 +544,17 @@ export const DropdownTagField: React.FC<CustomDropdownProps> = ({
                   className="px-4 py-2 cursor-pointer transition-colors"
                   style={
                     highlightedIndex === idx
-                      ? { backgroundColor: "#d58524", color: "#ffffff" }
+                      ? { backgroundColor: '#d58524', color: '#ffffff' }
                       : {}
                   }
                   onMouseOver={(e) => {
                     if (highlightedIndex !== idx) {
-                      e.currentTarget.style.backgroundColor = "#f3f4f6";
+                      e.currentTarget.style.backgroundColor = '#f3f4f6';
                     }
                   }}
                   onMouseOut={(e) => {
                     if (highlightedIndex !== idx) {
-                      e.currentTarget.style.backgroundColor = "transparent";
+                      e.currentTarget.style.backgroundColor = 'transparent';
                     }
                   }}
                 >
