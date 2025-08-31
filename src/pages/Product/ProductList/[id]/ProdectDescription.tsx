@@ -1,16 +1,16 @@
-import React from "react";
-import { useParams } from "react-router-dom";
-import { useGetProductById } from "../../../../server/api/productHooks";
-import { ProductDetails } from "./components/ProductDetails";
-import { ProductImage } from "./components/ProductImage";
-import { ReviewsSection } from "./components/ReviewSection";
-import { useGetAllReviews } from "../../../../server/api/reviewHooks";
-import Header from "../../../../components/shared/table_heading/Header";
+import React from 'react';
+import { useParams } from 'react-router-dom';
+import { useGetProductById } from '../../../../server/api/productHooks';
+import { ProductDetails } from './components/ProductDetails';
+import { ProductImage } from './components/ProductImage';
+import { ReviewsSection } from './components/ReviewSection';
+import { useGetAllReviews } from '../../../../server/api/reviewHooks';
+import Header from '../../../../components/shared/table_heading/Header';
 
 const ProductDescription: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { data: product, isLoading, error } = useGetProductById(id ?? "");
-  const { data: review } = useGetAllReviews({ product: id ?? "" });
+  const { data: product, isLoading, error } = useGetProductById(id ?? '');
+  const { data: review } = useGetAllReviews({ product: id ?? '' });
 
   if (isLoading) return <div className="text-center">Loading...</div>;
   if (error)
@@ -24,6 +24,8 @@ const ProductDescription: React.FC = () => {
   const images = (product.images || []).map(
     (item) => `${import.meta.env.VITE_API_IMAGE_BASE_URL}${item}`
   );
+
+  console.log(images, 'images');
   return (
     <div>
       <Header text="Product Description" />

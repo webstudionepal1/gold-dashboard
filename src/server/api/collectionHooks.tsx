@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../utils/ApiGateway';
 import { toast } from 'react-toastify';
+import { IFetchProduct } from './productHooks';
 
 export interface IParams {
   [key: string]: string | number | boolean;
@@ -52,7 +53,7 @@ export interface IFetchCollection {
   isActive: boolean;
   isFeatured: boolean;
   sortOrder: number;
-  selectedProduct: string[];
+  selectedProduct: IFetchProduct[];
 
   // Collection type and categorization
   collectionType:
@@ -153,7 +154,7 @@ export const useGetAllCollectionsQuery = (params: IParams = {}) => {
 // Get collection by ID
 export const useGetCollectionByIdQuery = (id: string) => {
   return useQuery({
-    queryKey: ['collection', id],
+    queryKey: ['collections', id],
     queryFn: async () => {
       const res = await apiClient.get<{ data: IFetchCollection }>(
         `collection/${id}`
