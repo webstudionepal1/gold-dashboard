@@ -1,39 +1,39 @@
-import { FrontendRoutes } from './routes';
+import { FrontendRoutes } from "./routes";
 
 export const SidebarConfig = {
   sections: [
     {
-      title: 'main',
+      title: "main",
       routes: [
         {
           id: 1,
           path: FrontendRoutes.HOME,
-          title: 'Dashboard',
-          icon: 'ic:outline-dashboard-customize',
+          title: "Dashboard",
+          icon: "ic:outline-dashboard-customize",
         },
         {
           id: 2,
-          path: '#',
-          title: 'Products',
-          icon: 'raphael:package',
+          path: "#",
+          title: "Products",
+          icon: "raphael:package",
           children: [
             {
               id: 20,
               path: FrontendRoutes.PRODUCTLIST,
-              title: 'Product List',
-              icon: '',
+              title: "Product List",
+              icon: "",
             },
             {
               id: 21,
               path: FrontendRoutes.PRODUCTCATEGORY,
-              title: 'Product Category',
-              icon: '',
+              title: "Product Category",
+              icon: "",
             },
             {
               id: 22,
               path: FrontendRoutes.PRODUCTSUBCATEGORY,
-              title: 'Product Sub Category',
-              icon: '',
+              title: "Product Sub Category",
+              icon: "",
             },
             // {
             //   id: 23,
@@ -52,35 +52,41 @@ export const SidebarConfig = {
         {
           id: 25,
           path: FrontendRoutes.COLLECTION,
-          title: 'Collections',
-          icon: 'bi:collection',
+          title: "Collections",
+          icon: "bi:collection",
+        },
+        {
+          id: 16,
+          path: FrontendRoutes.GIFTS,
+          title: "Gifts & Packages",
+          icon: "tabler:gift",
         },
         {
           id: 3,
-          path: '#',
-          title: 'Order',
-          icon: 'lets-icons:order',
+          path: "#",
+          title: "Order",
+          icon: "lets-icons:order",
           children: [
             {
               id: 34,
               path: FrontendRoutes.ORDER,
-              title: 'Orders',
+              title: "Orders",
             },
 
             {
               id: 38,
               path: FrontendRoutes.CONFIRMEDORDER,
-              title: 'Confirmed Order',
+              title: "Confirmed Order",
             },
             {
               id: 32,
               path: FrontendRoutes.COMPLETEDORDER,
-              title: 'Completed Order',
+              title: "Completed Order",
             },
             {
               id: 33,
               path: FrontendRoutes.CANCELLEDORDER,
-              title: 'Cancelled Order',
+              title: "Cancelled Order",
             },
           ],
         },
@@ -185,14 +191,14 @@ export const SidebarConfig = {
 
         {
           id: 13,
-          path: '#',
-          title: 'Settings',
-          icon: 'mdi-light:settings',
+          path: "#",
+          title: "Settings",
+          icon: "mdi-light:settings",
           children: [
             {
               id: 107,
-              path: '/settings/profile-config',
-              title: 'Profile config',
+              path: "/settings/profile-config",
+              title: "Profile config",
             },
             // {
             //   id: 108,
@@ -209,8 +215,8 @@ export const SidebarConfig = {
         {
           id: 15,
           path: FrontendRoutes.BANNER,
-          title: 'Banner',
-          icon: 'fluent:content-view-32-regular',
+          title: "Banner",
+          icon: "fluent:content-view-32-regular",
         },
         // {
         //   id: 16,
@@ -226,27 +232,27 @@ export const SidebarConfig = {
         // },
         {
           id: 20,
-          path: '#',
-          title: 'Blog',
-          icon: 'material-symbols:article-outline',
+          path: "#",
+          title: "Blog",
+          icon: "material-symbols:article-outline",
           children: [
             {
               id: 201,
               path: FrontendRoutes.BLOGLIST,
-              title: 'Blog List',
-              icon: '',
+              title: "Blog List",
+              icon: "",
             },
             {
               id: 202,
               path: FrontendRoutes.ADDBLOG,
-              title: 'Create Blog',
-              icon: '',
+              title: "Create Blog",
+              icon: "",
             },
             {
               id: 203,
               path: FrontendRoutes.BLOGANALYTICS,
-              title: 'Blog Analytics',
-              icon: '',
+              title: "Blog Analytics",
+              icon: "",
             },
           ],
         },
