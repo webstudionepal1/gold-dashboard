@@ -11,7 +11,8 @@ export interface IFetchBanner {
   description?: string;
   image?: string[];
   mobImage?: string[];
-  video?: string;
+  video?: string[];
+  videoThumbnail?: string[];
   category?: string;
   subCategory?: string;
   priority?: number;

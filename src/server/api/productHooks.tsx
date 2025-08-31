@@ -99,6 +99,7 @@ export interface IFetchProduct {
   visibleAs: string;
   images: string[];
   video?: string[];
+  videoThumbnail?: string[];
   isActive: boolean;
   wastage?: {
     type: "fixed" | "per";

@@ -1022,7 +1022,6 @@ const CompactFormContent: React.FC<{
               <ProductMediaPage
                 selectedImages={selectedImages}
                 setSelectedImages={setSelectedImages}
-                existingImages={formik.values.existingImages || []}
                 dragActive={dragActive}
                 setDragActive={setDragActive}
                 handleDrag={handleDrag}

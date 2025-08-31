@@ -258,9 +258,9 @@ const BannerIndex: React.FC = () => {
             No Image
           </div>
         ),
-        video: banner.video?.length ? (
+        video: banner.video && banner.video.length > 0 ? (
           <div className="flex justify-center items-center size-5 mx-auto">
-            {banner.video.map((item, index) => {
+            {banner.video.map((item: string, index: number) => {
               // Clean the video path for streaming
               const cleanVideoPath = item.startsWith("/ridisidi/")
                 ? item.substring("/ridisidi/".length)
@@ -283,7 +283,7 @@ const BannerIndex: React.FC = () => {
                   className="rounded-lg object-contain object-center cursor-pointer hover:opacity-80 transition-opacity"
                   preload="metadata"
                   muted
-                  onClick={() => handleVideoClick(videoStreamUrl, banner.title)}
+                  onClick={() => handleVideoClick(videoStreamUrl, banner.title || '')}
                   onError={async (e) => {
                     console.error("Video loading error:", e);
                     console.log("Video URL:", videoStreamUrl);

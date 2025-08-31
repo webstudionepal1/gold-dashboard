@@ -270,7 +270,13 @@ const NewProductForm: React.FC = () => {
       formDataObj.append("video", formData.video);
     } else if (isEdit && formData.existingVideo) {
       // For updates without new video, keep existing video
-      formDataObj.append("existingVideo", formData.existingVideo);
+      if (Array.isArray(formData.existingVideo)) {
+        formData.existingVideo.forEach((video, index) => {
+          formDataObj.append(`existingVideo[${index}]`, video);
+        });
+      } else {
+        formDataObj.append("existingVideo", formData.existingVideo as string);
+      }
     }
 
     return formDataObj;

@@ -482,13 +482,13 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
               />
               Product Video
               <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
-                {product.video.length}
+                {product.video?.length || 0}
               </span>
             </h3>
           </div>
           <div className="p-3">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {product.video.map((videoPath, index) => {
+              {product.video?.map((videoPath, index) => {
                 console.log(`Video ${index}:`, videoPath);
 
                 // Clean the video path for streaming
