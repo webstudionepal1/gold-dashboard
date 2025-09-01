@@ -8,6 +8,7 @@ interface SingleFileProps {
   onChange: (file: File | null) => void;
   existingFile?: string | null;
   existingFileField?: string;
+  removeExistingFile?: (index?: number, isExisting?: boolean) => void;
   existingImageUrl?: string;
   showPreview?: boolean;
 }
@@ -17,6 +18,7 @@ interface MultiFileProps {
   value: File[] | string[];
   onChange: (files: File[]) => void;
   existingFiles?: string[];
+  removeExistingFile?: (index?: number, isExisting?: boolean) => void;
   existingFileField?: string;
   showPreview?: boolean;
 }
@@ -42,6 +44,7 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
     placeholder,
     maxFiles = 10,
     showPreview = true,
+    removeExistingFile,
   } = props;
 
   const defaultPlaceholder = props.multiple
@@ -92,6 +95,7 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
       }
     } else {
       props.onChange(null);
+      removeExistingFile?.(index, true);
     }
   };
 
@@ -108,12 +112,10 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
         form.setFieldValue(props.existingFileField, newFiles);
         setLocalExistingFiles(newFiles);
       }
-    } else if (
-      !props.multiple &&
-      'existingFile' in props &&
-      props.existingFileField
-    ) {
-      form.setFieldValue(props.existingFileField, null);
+    } else if (!props.multiple && props.existingFileField) {
+      removeExistingFile?.(index, true);
+      form?.setFieldValue(props.existingFileField, '');
+      console.log('here');
     }
   };
 
@@ -197,6 +199,9 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
       const singleProps = props as SingleFileProps & BaseProps;
       let existingImage =
         singleProps.existingFile || singleProps.existingImageUrl;
+
+      console.log(singleProps, 'single props');
+      console.log(existingImage, 'existing image');
 
       if (
         existingImage &&
