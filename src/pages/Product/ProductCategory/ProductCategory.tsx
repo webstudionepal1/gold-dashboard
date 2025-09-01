@@ -77,7 +77,6 @@ const ProductCategory: React.FC = () => {
                   : '-'}
               </p>
             ),
-            totalProducts: get(item, 'totalProducts', 0),
             status: (
               <span
                 className={`px-2 py-1 text-xs font-medium rounded-full ${

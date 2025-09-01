@@ -414,6 +414,7 @@ export const MediaAssetsPage: React.FC = () => {
 
   // Handle removing a specific image
   const handleRemoveImage = (index: number, isExisting: boolean) => {
+    console.log('hello');
     const existingImages = Array.isArray(formData.images)
       ? formData.images
       : [];

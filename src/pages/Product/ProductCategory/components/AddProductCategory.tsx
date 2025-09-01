@@ -60,7 +60,8 @@ const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
       name: editData ? get(editData, 'name', '') : '',
       description: editData
         ? typeof editData?.description === 'object'
-          ? (editData?.description as { props: { children: string } })?.props?.children
+          ? (editData?.description as { props: { children: string } })?.props
+              ?.children
           : get(editData, 'description', '')
         : '',
       image: null,
@@ -197,6 +198,7 @@ const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
                       form.setFieldValue('existingImage', undefined);
                     }
                   }}
+                  removeExistingFile={() => form.setFieldValue('image', null)}
                   existingFile={form.getFieldValue('existingImage') as string}
                   existingFileField="existingImage"
                   accept={{
