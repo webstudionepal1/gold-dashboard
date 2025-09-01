@@ -6,11 +6,9 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import './BlogEditor.css';
 import { Icon } from '@iconify/react/dist/iconify.js';
-import { toast } from 'react-toastify';
 import { Button } from '../../../components/ui/button';
 import Header from '../../../components/shared/table_heading/Header';
 import FileDropInput from '../../../components/shared/form_components/FileDropInput';
-import VideoUploadField from '../../../components/shared/form_components/VideoUploadField';
 
 import {
   useCreateBlogMutation,
@@ -154,7 +152,16 @@ const BlogEditor: React.FC = () => {
         formData.append('author', userData?._id);
         formData.append('tags', JSON.stringify(values.tags));
         formData.append('categories', JSON.stringify(values.categories));
-        formData.append('metadata', JSON.stringify(values.metadata));
+        // formData.append('metadata', JSON.stringify(values.metadata));
+        formData.append('metadata[seoTitle]', values.metadata.seoTitle);
+        formData.append(
+          'metadata[seoDescription]',
+          values.metadata.seoDescription
+        );
+        formData.append('metadata[canonicalUrl]', values.metadata.canonicalUrl);
+        values.metadata.keywords.forEach((keyword, index) => {
+          formData.append(`metadata[keywords][${index}]`, keyword);
+        });
 
         if (values.featuredImage) {
           formData.append('featuredImage', values.featuredImage);
@@ -220,7 +227,7 @@ const BlogEditor: React.FC = () => {
         excerpt: existingBlog.excerpt || '',
         tags: existingBlog.tags || [],
         categories: existingBlog.categories || [],
-        featuredImage: null,
+        featuredImage: existingBlog.featuredImage || null,
         images: [],
         video: null,
         status: existingBlog.status || 'draft',
@@ -239,7 +246,9 @@ const BlogEditor: React.FC = () => {
   // Memoize image blob URLs with immediate cleanup
   const imagePreviews = useMemo(() => {
     console.log('🔍 Computing imagePreviews for images:', formik.values.images);
-    const urls = formik.values.images.map((file) => URL.createObjectURL(file));
+    const urls = formik.values.images.map((file: any) =>
+      URL.createObjectURL(file)
+    );
     return urls;
   }, [formik.values.images]);
 
@@ -692,7 +701,7 @@ const BlogEditor: React.FC = () => {
                 </div>
 
                 {/* Additional Images Card */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+                {/* <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="p-1 bg-customorange/10 rounded">
                       <Icon
@@ -711,32 +720,7 @@ const BlogEditor: React.FC = () => {
                     label="Upload Additional Images"
                     maxFiles={10}
                   />
-                  {imagePreviews.length > 0 && (
-                    <div className="mt-3 grid grid-cols-3 gap-2">
-                      {imagePreviews.map((url, index) => (
-                        <div key={index} className="relative">
-                          <img
-                            src={url}
-                            alt={`Additional ${index + 1}`}
-                            className="w-full h-16 object-cover rounded"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const newImages = formik.values.images.filter(
-                                (_, i) => i !== index
-                              );
-                              formik.setFieldValue('images', newImages);
-                            }}
-                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs hover:bg-red-600"
-                          >
-                            ×
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                </div> */}
               </div>
 
               {/* Right Column - Sidebar */}
@@ -906,7 +890,7 @@ const BlogEditor: React.FC = () => {
                 </div>
 
                 {/* Video Card */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+                {/* <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="p-1 bg-customorange/10 rounded">
                       <Icon
@@ -923,7 +907,7 @@ const BlogEditor: React.FC = () => {
                     onChange={(file) => formik.setFieldValue('video', file)}
                     label="Upload Video"
                   />
-                </div>
+                </div> */}
               </div>
             </div>
 

@@ -21,7 +21,7 @@ export interface IBlog {
   featuredImage?: string;
   images?: string[];
   video?: string;
-  status: "draft" | "published" | "archived";
+  status: 'draft' | 'published' | 'archived';
   publishedAt?: Date;
   readTime?: number; // estimated read time in minutes
   views: number;
@@ -44,7 +44,7 @@ export interface IBlogCreateRequest {
   featuredImage?: string;
   images?: string[];
   video?: string;
-  status: "draft" | "published" | "archived";
+  status: 'draft' | 'published' | 'archived';
   isFeatured?: boolean;
   metadata: IBlogMetadata;
 }
@@ -70,14 +70,14 @@ export interface IBlogSearchParams {
   search?: string;
   category?: string;
   tag?: string;
-  status?: "draft" | "published" | "archived";
+  status?: 'draft' | 'published' | 'archived';
   featured?: boolean;
   q?: string;
   author?: string;
   dateFrom?: string;
   dateTo?: string;
   sortBy?: string;
-  sortOrder?: "asc" | "desc";
+  sortOrder?: 'asc' | 'desc';
 }
 
 export interface IBlogAnalytics {
@@ -104,11 +104,11 @@ export interface IBlogFormData {
   excerpt: string;
   tags: string[];
   categories: string[];
-  featuredImage: File | null;
+  featuredImage: File | null | string;
   author: string;
-  images: File[];
+  images: File[] | string[];
   video: File | null;
-  status: "draft" | "published" | "archived";
+  status: 'draft' | 'published' | 'archived';
   isFeatured: boolean;
   metadata: {
     seoTitle: string;
@@ -122,7 +122,7 @@ export interface IBlogFilters {
   search: string;
   category: string;
   tag: string;
-  status: "all" | "draft" | "published" | "archived";
+  status: 'all' | 'draft' | 'published' | 'archived';
   featured: boolean | null;
   dateRange: {
     from: Date | null;
