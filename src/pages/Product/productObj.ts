@@ -119,7 +119,7 @@ export const categoryColumns = [
   { title: "S.N", key: "sn" },
   { title: "Name", key: "name" },
   { title: "Description", key: "description" },
-  { title: "Total Products", key: "totalProducts" },
+  // { title: "Total Products", key: "totalProducts" },
 ];
 
 export const subCategoryColumns = [
@@ -127,7 +127,7 @@ export const subCategoryColumns = [
   { title: "Name", key: "name" },
   // { title: "Category", key: "category" },
   { title: "Description", key: "description" },
-  { title: "Total Products", key: "totalProducts" },
+  // { title: "Total Products", key: "totalProducts" },
 ];
 
 export const generateProductDefaultValue = (state: string, editData?: any) => {

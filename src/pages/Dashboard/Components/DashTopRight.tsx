@@ -164,7 +164,7 @@ const DashTopRight = ({ dashboardData }: DashTopRightProps) => {
 
     return () => clearInterval(interval); // Clean up
   }, [todaysPriceData.length]);
-
+  console.log();
   // Handle the case when there are no metal prices data available
   const { img, price, title, bgColor } =
     todaysPriceData.length > 0
@@ -176,9 +176,10 @@ const DashTopRight = ({ dashboardData }: DashTopRightProps) => {
           bgColor: "bg-[#FCF6EA]",
         } as PriceDataItem);
 
+  console.log("databoardddddd", dashboardData);
   // Map top customers from API with fallback for missing data
   const topCustomers = (dashboardData.topCustomers || []).map((customer) => ({
-    img: customer.image || TopCustomer, // Fallback to default image
+    img: customer.image || '/no-image.png', // Fallback to default image
     price: customer.orderCount || 0,
     name: customer.name || "Unknown Customer",
   }));
@@ -191,25 +192,38 @@ const DashTopRight = ({ dashboardData }: DashTopRightProps) => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="flex items-center justify-center w-8 h-8 bg-amber-100 rounded-lg">
-                <Icon icon="material-symbols:price-check" className="w-4 h-4 text-amber-600" />
+                <Icon
+                  icon="material-symbols:price-check"
+                  className="w-4 h-4 text-amber-600"
+                />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-slate-800">Today's Prices</h2>
+                <h2 className="text-lg font-semibold text-slate-800">
+                  Today's Prices
+                </h2>
                 <p className="text-sm text-slate-500">Live metal prices</p>
               </div>
             </div>
-            {dashboardData.metalPrices && dashboardData.metalPrices.goldPrice && (
-              <div className="flex items-center text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-lg">
-                <Icon icon="material-symbols:schedule" className="mr-1 w-3 h-3" />
-                <span>
-                  {new Date(dashboardData.metalPrices.goldPrice.timestamp).toLocaleTimeString()}
-                </span>
-              </div>
-            )}
+            {dashboardData.metalPrices &&
+              dashboardData.metalPrices.goldPrice && (
+                <div className="flex items-center text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-lg">
+                  <Icon
+                    icon="material-symbols:schedule"
+                    className="mr-1 w-3 h-3"
+                  />
+                  <span>
+                    {new Date(
+                      dashboardData.metalPrices.goldPrice.timestamp
+                    ).toLocaleTimeString()}
+                  </span>
+                </div>
+              )}
           </div>
         </div>
         <div className="p-6">
-          <div className={`${bgColor} rounded-xl p-4 transition-all duration-300 ease-in-out hover:shadow-md border border-amber-200/50`}>
+          <div
+            className={`${bgColor} rounded-xl p-4 transition-all duration-300 ease-in-out hover:shadow-md border border-amber-200/50`}
+          >
             <div className="flex items-center space-x-4">
               <div className="flex-shrink-0">
                 <div className="w-12 h-12 bg-white rounded-lg shadow-sm flex items-center justify-center">
@@ -222,16 +236,15 @@ const DashTopRight = ({ dashboardData }: DashTopRightProps) => {
               </div>
 
               <div className="flex-1 min-w-0">
-                <div className="text-lg font-bold text-slate-800">
-                  {price}
-                </div>
-                <div className="text-sm text-slate-600 truncate">
-                  {title}
-                </div>
+                <div className="text-lg font-bold text-slate-800">{price}</div>
+                <div className="text-sm text-slate-600 truncate">{title}</div>
               </div>
 
               <div className="flex-shrink-0">
-                <Icon icon="material-symbols:trending-up" className="w-5 h-5 text-green-500" />
+                <Icon
+                  icon="material-symbols:trending-up"
+                  className="w-5 h-5 text-green-500"
+                />
               </div>
             </div>
           </div>
@@ -242,10 +255,15 @@ const DashTopRight = ({ dashboardData }: DashTopRightProps) => {
         <div className="px-6 py-4 bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200">
           <div className="flex items-center space-x-3">
             <div className="flex items-center justify-center w-8 h-8 bg-purple-100 rounded-lg">
-              <Icon icon="material-symbols:pie-chart" className="w-4 h-4 text-purple-600" />
+              <Icon
+                icon="material-symbols:pie-chart"
+                className="w-4 h-4 text-purple-600"
+              />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-slate-800">Total Sales</h2>
+              <h2 className="text-lg font-semibold text-slate-800">
+                Total Sales
+              </h2>
               <p className="text-sm text-slate-500">Sales by category</p>
             </div>
           </div>
@@ -260,9 +278,14 @@ const DashTopRight = ({ dashboardData }: DashTopRightProps) => {
             ) : (
               <div className="flex flex-col items-center justify-center h-40 space-y-3">
                 <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center">
-                  <Icon icon="material-symbols:pie-chart-outline" className="w-6 h-6 text-slate-400" />
+                  <Icon
+                    icon="material-symbols:pie-chart-outline"
+                    className="w-6 h-6 text-slate-400"
+                  />
                 </div>
-                <p className="text-sm text-slate-500">No sales data available</p>
+                <p className="text-sm text-slate-500">
+                  No sales data available
+                </p>
               </div>
             )}
           </div>
@@ -271,13 +294,19 @@ const DashTopRight = ({ dashboardData }: DashTopRightProps) => {
           <div className="flex flex-wrap justify-center gap-3">
             {(dashboardData.salesMetrics?.totalSalesByCategory || []).map(
               (category, index) => (
-                <div key={index} className="flex items-center space-x-2 px-3 py-1 bg-slate-50 rounded-lg">
+                <div
+                  key={index}
+                  className="flex items-center space-x-2 px-3 py-1 bg-slate-50 rounded-lg"
+                >
                   <span
                     className="w-3 h-3 rounded-full"
                     style={{
                       backgroundColor: chartColors[index % chartColors.length],
-                    }}></span>
-                  <span className="text-sm font-medium text-slate-700">{category.category}</span>
+                    }}
+                  ></span>
+                  <span className="text-sm font-medium text-slate-700">
+                    {category.category}
+                  </span>
                 </div>
               )
             )}
@@ -290,10 +319,15 @@ const DashTopRight = ({ dashboardData }: DashTopRightProps) => {
         <div className="px-6 py-4 bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200">
           <div className="flex items-center space-x-3">
             <div className="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-lg">
-              <Icon icon="material-symbols:bar-chart" className="w-4 h-4 text-blue-600" />
+              <Icon
+                icon="material-symbols:bar-chart"
+                className="w-4 h-4 text-blue-600"
+              />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-slate-800">Total Orders</h2>
+              <h2 className="text-lg font-semibold text-slate-800">
+                Total Orders
+              </h2>
               <p className="text-sm text-slate-500">Daily order volume</p>
             </div>
           </div>
@@ -306,9 +340,14 @@ const DashTopRight = ({ dashboardData }: DashTopRightProps) => {
             ) : (
               <div className="flex flex-col items-center justify-center h-full space-y-3">
                 <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center">
-                  <Icon icon="material-symbols:bar-chart" className="w-6 h-6 text-slate-400" />
+                  <Icon
+                    icon="material-symbols:bar-chart"
+                    className="w-6 h-6 text-slate-400"
+                  />
                 </div>
-                <p className="text-sm text-slate-500">No order data available</p>
+                <p className="text-sm text-slate-500">
+                  No order data available
+                </p>
               </div>
             )}
           </div>
@@ -320,10 +359,15 @@ const DashTopRight = ({ dashboardData }: DashTopRightProps) => {
         <div className="px-6 py-4 bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200">
           <div className="flex items-center space-x-3">
             <div className="flex items-center justify-center w-8 h-8 bg-indigo-100 rounded-lg">
-              <Icon icon="material-symbols:person-star" className="w-4 h-4 text-indigo-600" />
+              <Icon
+                icon="material-symbols:person-star"
+                className="w-4 h-4 text-indigo-600"
+              />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-slate-800">Top Customers</h2>
+              <h2 className="text-lg font-semibold text-slate-800">
+                Top Customers
+              </h2>
               <p className="text-sm text-slate-500">Most valued customers</p>
             </div>
           </div>
@@ -336,10 +380,11 @@ const DashTopRight = ({ dashboardData }: DashTopRightProps) => {
                 {topCustomers.map((customer, index) => (
                   <div
                     key={index}
-                    className="mx-3 bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4 flex flex-col items-center text-center min-w-[140px] hover:shadow-md transition-shadow duration-200">
+                    className="mx-3 bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4 flex flex-col items-center text-center min-w-[140px] hover:shadow-md transition-shadow duration-200"
+                  >
                     <div className="w-12 h-12 mb-3 overflow-hidden rounded-full ring-2 ring-amber-200">
                       <img
-                        src={customer.img}
+                        src={customer.img|| `/no-images.png`}
                         alt={customer.name}
                         className="object-cover w-full h-full"
                       />
@@ -356,9 +401,14 @@ const DashTopRight = ({ dashboardData }: DashTopRightProps) => {
             ) : (
               <div className="flex flex-col items-center justify-center h-24 space-y-3">
                 <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center">
-                  <Icon icon="material-symbols:person-off" className="w-6 h-6 text-slate-400" />
+                  <Icon
+                    icon="material-symbols:person-off"
+                    className="w-6 h-6 text-slate-400"
+                  />
                 </div>
-                <p className="text-sm text-slate-500">No customer data available</p>
+                <p className="text-sm text-slate-500">
+                  No customer data available
+                </p>
               </div>
             )}
           </div>

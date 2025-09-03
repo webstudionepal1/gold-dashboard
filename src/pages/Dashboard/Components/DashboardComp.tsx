@@ -54,7 +54,7 @@ const DashboardComp = () => {
     topCustomers: [],
     metalPrices: undefined,
   };
-
+console.log('sldfkjsldfkjsafdkajpoweiurwe', dashboardData)
   // Combine dashboard data with metal prices or use empty data if none available
   const combinedData = dashboardData
     ? {

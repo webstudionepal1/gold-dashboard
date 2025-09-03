@@ -23,12 +23,12 @@ const DashBottom = ({ dashboardData }: DashBottomProps) => {
                 <p className="text-sm text-slate-500">Latest payment activities</p>
               </div>
             </div>
-            <Link
+            {/* <Link
               to={FrontendRoutes.TRANSACTION}
               className="inline-flex items-center px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded-lg transition-colors duration-200 shadow-sm">
               <span>View All</span>
               <Icon icon="material-symbols:arrow-forward" className="ml-1 w-3 h-3" />
-            </Link>
+            </Link> */}
           </div>
         </div>
         <div className="max-h-80 overflow-y-auto">
