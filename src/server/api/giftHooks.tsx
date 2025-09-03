@@ -14,7 +14,13 @@ export interface IParams {
   sort?: string;
   type?: "gift" | "package";
   occasion?: string;
-  setType?: "necklace_set" | "bridal_set" | "earring_set" | "bracelet_set" | "ring_set" | "custom";
+  setType?:
+    | "necklace_set"
+    | "bridal_set"
+    | "earring_set"
+    | "bracelet_set"
+    | "ring_set"
+    | "custom";
   minPrice?: number;
   maxPrice?: number;
   isActive?: boolean;
@@ -54,6 +60,7 @@ export interface IProductVariant {
   price: number;
   wt: number;
   unit: string;
+  isActive: boolean;
 }
 
 export interface IFetchProduct {
@@ -78,6 +85,21 @@ export interface IFetchProduct {
   images: string[];
   averageRating: number;
   numberOfReviews: number;
+  isActive: boolean;
+  wastage?: {
+    type: "fixed" | "per";
+    value: number;
+  };
+  stones?: Array<{
+    name: string;
+    weight: string;
+    price: string;
+    color: string;
+  }>;
+  others?: Array<{
+    name: string;
+    value: number;
+  }>;
   createdAt: string;
   updatedAt: string;
 }
@@ -113,7 +135,13 @@ export interface IFetchGift {
   tags: string[];
 
   // Set-specific features
-  setType?: "necklace_set" | "bridal_set" | "earring_set" | "bracelet_set" | "ring_set" | "custom";
+  setType?:
+    | "necklace_set"
+    | "bridal_set"
+    | "earring_set"
+    | "bracelet_set"
+    | "ring_set"
+    | "custom";
   complementaryProducts?: string[]; // Suggested additional product IDs
   setTheme?: string; // e.g., "Traditional", "Modern", "Vintage"
   metalType?: string; // e.g., "Gold", "Silver", "Platinum"
@@ -206,7 +234,13 @@ export interface ICreateGiftData {
   tags?: string[];
 
   // Set-specific features
-  setType?: "necklace_set" | "bridal_set" | "earring_set" | "bracelet_set" | "ring_set" | "custom";
+  setType?:
+    | "necklace_set"
+    | "bridal_set"
+    | "earring_set"
+    | "bracelet_set"
+    | "ring_set"
+    | "custom";
   complementaryProducts?: string[]; // Suggested additional product IDs
   setTheme?: string; // e.g., "Traditional", "Modern", "Vintage"
   metalType?: string; // e.g., "Gold", "Silver", "Platinum"
@@ -267,10 +301,13 @@ export const useGetAllGiftsQuery = (params: IParams = {}) => {
     queryKey: ["gifts", params],
     queryFn: async () => {
       try {
-        const res = await apiClient.get<IGiftResponse | { success: boolean; message: string; data: IFetchGift[] }>("gift", {
+        const res = await apiClient.get<
+          | IGiftResponse
+          | { success: boolean; message: string; data: IFetchGift[] }
+        >("gift", {
           params,
         });
-        
+
         // Handle both response formats
         if (res?.data) {
           // If data is directly an array (new format)
@@ -279,17 +316,46 @@ export const useGetAllGiftsQuery = (params: IParams = {}) => {
               success: res.data.success,
               message: res.data.message,
               data: res.data.data,
-              pagination: { currentPage: 1, totalPages: 1, totalItems: res.data.data.length, itemsPerPage: res.data.data.length }
+              pagination: {
+                currentPage: 1,
+                totalPages: 1,
+                totalItems: res.data.data.length,
+                itemsPerPage: res.data.data.length,
+              },
             };
           }
           // If data has gifts property (old format)
           return res.data;
         }
-        
-        return { data: { gifts: [], pagination: { currentPage: 1, totalPages: 0, totalItems: 0, itemsPerPage: 20 } }, success: false, message: "No data" };
+
+        return {
+          data: {
+            gifts: [],
+            pagination: {
+              currentPage: 1,
+              totalPages: 0,
+              totalItems: 0,
+              itemsPerPage: 20,
+            },
+          },
+          success: false,
+          message: "No data",
+        };
       } catch (error) {
         console.error("Error fetching gifts:", error);
-        return { data: { gifts: [], pagination: { currentPage: 1, totalPages: 0, totalItems: 0, itemsPerPage: 20 } }, success: false, message: "Error fetching gifts" };
+        return {
+          data: {
+            gifts: [],
+            pagination: {
+              currentPage: 1,
+              totalPages: 0,
+              totalItems: 0,
+              itemsPerPage: 20,
+            },
+          },
+          success: false,
+          message: "Error fetching gifts",
+        };
       }
     },
   });
@@ -311,8 +377,12 @@ export const useGetGiftByIdQuery = (id: string) => {
 export const useCreateGiftMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: ICreateGiftData) => {
-      const res = await apiClient.post<{ data: IFetchGift }>("gift", data);
+    mutationFn: async (data: FormData) => {
+      const res = await apiClient.post<{ data: IFetchGift }>("gift", data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       return res?.data;
     },
     onSuccess: (data) => {
@@ -329,8 +399,16 @@ export const useCreateGiftMutation = () => {
 export const useUpdateGiftMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: Partial<ICreateGiftData> }) => {
-      const res = await apiClient.patch<{ data: IFetchGift }>(`gift/${id}`, data);
+    mutationFn: async ({ id, data }: { id: string; data: FormData }) => {
+      const res = await apiClient.patch<{ data: IFetchGift }>(
+        `gift/${id}`,
+        data,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
       return res?.data;
     },
     onSuccess: (data) => {

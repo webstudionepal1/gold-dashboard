@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { Icon } from "@iconify/react/dist/iconify.js";
-import { useProductForm } from "../ProductFormContext";
+import React, { useState, useEffect } from 'react';
+import { Icon } from '@iconify/react/dist/iconify.js';
+import { useProductForm } from '../ProductFormContext';
 
 interface ProductMediaPageProps {
   // Props for CompactProductForm integration
@@ -20,11 +20,11 @@ interface ProductMediaPageProps {
 export const ProductMediaPage: React.FC<ProductMediaPageProps> = (props) => {
   // Check if we're being used in CompactProductForm or standalone
   const isStandalone = !props.formik;
-  
+
   if (isStandalone) {
     return <StandaloneProductMediaPage />;
   }
-  
+
   return <CompactProductMediaPage {...props} />;
 };
 
@@ -32,7 +32,6 @@ export const ProductMediaPage: React.FC<ProductMediaPageProps> = (props) => {
 const StandaloneProductMediaPage: React.FC = () => {
   const { formData, updateFormData, updateValidation, validationState } =
     useProductForm();
-  console.log("formDataaaaaaaaaaaaaaaaaaaaaaaaaaaa", formData);
 
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
@@ -54,7 +53,7 @@ const StandaloneProductMediaPage: React.FC = () => {
     const filesToAdd = files.slice(0, availableSlots);
 
     if (filesToAdd.length < files.length) {
-      updateValidation("images", false, [
+      updateValidation('images', false, [
         `Maximum ${maxImages} images allowed. Only ${filesToAdd.length} images were added.`,
       ]);
     }
@@ -65,7 +64,7 @@ const StandaloneProductMediaPage: React.FC = () => {
     // Update form data with both new files and existing image URLs
     const allImages = [...existingImages, ...newImages];
     updateFormData({ images: allImages });
-    updateValidation("images", true, []);
+    updateValidation('images', true, []);
   };
 
   // Handle file input change
@@ -80,9 +79,9 @@ const StandaloneProductMediaPage: React.FC = () => {
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
+    if (e.type === 'dragenter' || e.type === 'dragover') {
       setDragActive(true);
-    } else if (e.type === "dragleave") {
+    } else if (e.type === 'dragleave') {
       setDragActive(false);
     }
   };
@@ -94,7 +93,7 @@ const StandaloneProductMediaPage: React.FC = () => {
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const files = Array.from(e.dataTransfer.files).filter((file) =>
-        file.type.startsWith("image/")
+        file.type.startsWith('image/')
       );
       handleImageUpload(files);
     }
@@ -111,7 +110,7 @@ const StandaloneProductMediaPage: React.FC = () => {
 
     // Clear validation errors if we're now within limits
     if (allImages.length <= 10) {
-      updateValidation("images", true, []);
+      updateValidation('images', true, []);
     }
   };
 
@@ -122,14 +121,14 @@ const StandaloneProductMediaPage: React.FC = () => {
 
     // Update form data
     const allImages = [...newExistingImages, ...selectedImages];
-    updateFormData({ 
+    updateFormData({
       images: allImages,
-      existingImages: newExistingImages 
+      existingImages: newExistingImages,
     });
 
     // Clear validation errors if we're now within limits
     if (allImages.length <= 10) {
-      updateValidation("images", true, []);
+      updateValidation('images', true, []);
     }
   };
 
@@ -154,9 +153,9 @@ const StandaloneProductMediaPage: React.FC = () => {
 
     // Update form data
     const allImages = [...newExistingImages, ...selectedImages];
-    updateFormData({ 
+    updateFormData({
       images: allImages,
-      existingImages: newExistingImages 
+      existingImages: newExistingImages,
     });
   };
 
@@ -196,8 +195,8 @@ const StandaloneProductMediaPage: React.FC = () => {
           <div
             className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
               dragActive
-                ? "border-customorange bg-blue-50"
-                : "border-customorange hover:border-customorangedark"
+                ? 'border-customorange bg-blue-50'
+                : 'border-customorange hover:border-customorangedark'
             }`}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
@@ -216,9 +215,7 @@ const StandaloneProductMediaPage: React.FC = () => {
             <label
               htmlFor="product-images"
               className={`cursor-pointer ${
-                totalImageCount >= 10
-                  ? "cursor-not-allowed opacity-50"
-                  : ""
+                totalImageCount >= 10 ? 'cursor-not-allowed opacity-50' : ''
               }`}
             >
               <div className="flex flex-col items-center gap-3">
@@ -229,13 +226,13 @@ const StandaloneProductMediaPage: React.FC = () => {
                 <div>
                   <p className="text-lg font-medium text-gray-700">
                     {totalImageCount >= 10
-                      ? "Maximum images reached"
-                      : "Upload Product Images"}
+                      ? 'Maximum images reached'
+                      : 'Upload Product Images'}
                   </p>
                   <p className="text-sm text-gray-500">
                     {totalImageCount >= 10
-                      ? "Remove some images to add more"
-                      : "Click to select or drag and drop images here"}
+                      ? 'Remove some images to add more'
+                      : 'Click to select or drag and drop images here'}
                   </p>
                   <p className="text-xs text-gray-400 mt-1">
                     Maximum 10 images • JPG, PNG, WebP • Max 5MB each
@@ -281,7 +278,9 @@ const StandaloneProductMediaPage: React.FC = () => {
                           {index > 0 && (
                             <button
                               type="button"
-                              onClick={() => moveExistingImage(index, index - 1)}
+                              onClick={() =>
+                                moveExistingImage(index, index - 1)
+                              }
                               className="bg-white text-gray-700 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors"
                             >
                               <Icon
@@ -295,7 +294,9 @@ const StandaloneProductMediaPage: React.FC = () => {
                           {index < existingImages.length - 1 && (
                             <button
                               type="button"
-                              onClick={() => moveExistingImage(index, index + 1)}
+                              onClick={() =>
+                                moveExistingImage(index, index + 1)
+                              }
                               className="bg-white text-gray-700 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors"
                             >
                               <Icon
@@ -326,9 +327,7 @@ const StandaloneProductMediaPage: React.FC = () => {
                       <p className="text-xs text-gray-500 truncate">
                         Existing Image {index + 1}
                       </p>
-                      <p className="text-xs text-gray-400">
-                        Click to remove
-                      </p>
+                      <p className="text-xs text-gray-400">Click to remove</p>
                     </div>
                   </div>
                 ))}
@@ -430,8 +429,9 @@ const StandaloneProductMediaPage: React.FC = () => {
             <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
               <p className="text-sm text-blue-700 flex items-center gap-2">
                 <Icon icon="material-symbols:info" className="w-4 h-4" />
-                The first image will be used as the primary product image.
-                Drag images to reorder them. New images will replace old ones when updating.
+                The first image will be used as the primary product image. Drag
+                images to reorder them. New images will replace old ones when
+                updating.
               </p>
             </div>
           )}
@@ -518,7 +518,8 @@ const StandaloneProductMediaPage: React.FC = () => {
               maintaining quality (recommended: under 2MB each)
             </p>
             <p>
-              • <strong>Image Replacement:</strong> When updating a product, new images will replace old ones
+              • <strong>Image Replacement:</strong> When updating a product, new
+              images will replace old ones
             </p>
           </div>
         </div>
@@ -539,13 +540,16 @@ const CompactProductMediaPage: React.FC<ProductMediaPageProps> = ({
   removeImage,
   formik,
   isEdit = false,
-  isLoading = false
+  isLoading = false,
 }) => {
   const [existingImages, setExistingImages] = useState<string[]>([]);
 
   // Initialize existing images when form data changes
   useEffect(() => {
-    if (formik?.values?.existingImages && Array.isArray(formik.values.existingImages)) {
+    if (
+      formik?.values?.existingImages &&
+      Array.isArray(formik.values.existingImages)
+    ) {
       setExistingImages(formik.values.existingImages);
     }
   }, [formik?.values?.existingImages]);
@@ -553,7 +557,7 @@ const CompactProductMediaPage: React.FC<ProductMediaPageProps> = ({
   // Handle multiple image uploads
   const handleImageUpload = async (files: File[]) => {
     if (!setSelectedImages) return;
-    
+
     // Limit to 10 images total (new + existing)
     const maxImages = 10;
     const currentTotalCount = selectedImages.length + existingImages.length;
@@ -566,12 +570,14 @@ const CompactProductMediaPage: React.FC<ProductMediaPageProps> = ({
     // Update formik form data
     if (formik) {
       const allImages = [...existingImages, ...newImages];
-      formik.setFieldValue("images", allImages);
+      formik.setFieldValue('images', allImages);
     }
   };
 
   // Handle file input change
-  const handleFileInputChangeLocal = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileInputChangeLocal = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
       handleImageUpload(files);
@@ -582,9 +588,9 @@ const CompactProductMediaPage: React.FC<ProductMediaPageProps> = ({
   const handleDragLocal = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
+    if (e.type === 'dragenter' || e.type === 'dragover') {
       setDragActive?.(true);
-    } else if (e.type === "dragleave") {
+    } else if (e.type === 'dragleave') {
       setDragActive?.(false);
     }
   };
@@ -596,7 +602,7 @@ const CompactProductMediaPage: React.FC<ProductMediaPageProps> = ({
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const files = Array.from(e.dataTransfer.files).filter((file) =>
-        file.type.startsWith("image/")
+        file.type.startsWith('image/')
       );
       handleImageUpload(files);
     }
@@ -605,14 +611,14 @@ const CompactProductMediaPage: React.FC<ProductMediaPageProps> = ({
   // Remove new image
   const removeNewImage = (index: number) => {
     if (!setSelectedImages) return;
-    
+
     const newImages = selectedImages.filter((_, i) => i !== index);
     setSelectedImages(newImages);
 
     // Update formik form data
     if (formik) {
       const allImages = [...existingImages, ...newImages];
-      formik.setFieldValue("images", allImages);
+      formik.setFieldValue('images', allImages);
     }
   };
 
@@ -624,8 +630,8 @@ const CompactProductMediaPage: React.FC<ProductMediaPageProps> = ({
     // Update formik form data
     if (formik) {
       const allImages = [...newExistingImages, ...selectedImages];
-      formik.setFieldValue("images", allImages);
-      formik.setFieldValue("existingImages", newExistingImages);
+      formik.setFieldValue('images', allImages);
+      formik.setFieldValue('existingImages', newExistingImages);
     }
   };
 
@@ -634,24 +640,20 @@ const CompactProductMediaPage: React.FC<ProductMediaPageProps> = ({
 
   return (
     <div className="space-y-3">
-      <p className="text-xs text-gray-600">
-        Upload product images (Max 10)
-      </p>
+      <p className="text-xs text-gray-600">Upload product images (Max 10)</p>
 
       {/* Upload Area */}
       <div
         className={`border-2 border-dashed rounded p-4 text-center transition-colors cursor-pointer ${
           dragActive
-            ? "border-[#DF8D28] bg-[#DF8D28]/5"
-            : "border-gray-300 hover:border-[#DF8D28] hover:bg-gray-50"
+            ? 'border-[#DF8D28] bg-[#DF8D28]/5'
+            : 'border-gray-300 hover:border-[#DF8D28] hover:bg-gray-50'
         }`}
         onDragEnter={handleDragLocal}
         onDragLeave={handleDragLocal}
         onDragOver={handleDragLocal}
         onDrop={handleDropLocal}
-        onClick={() =>
-          document.getElementById("file-upload")?.click()
-        }
+        onClick={() => document.getElementById('file-upload')?.click()}
       >
         <input
           id="file-upload"
@@ -669,7 +671,9 @@ const CompactProductMediaPage: React.FC<ProductMediaPageProps> = ({
           />
           <div>
             <p className="text-sm font-medium text-gray-900">
-              {totalImageCount >= 10 ? "Maximum images reached" : "Click to upload or drag and drop"}
+              {totalImageCount >= 10
+                ? 'Maximum images reached'
+                : 'Click to upload or drag and drop'}
             </p>
             <p className="text-xs text-gray-500">
               PNG, JPG, GIF up to 10MB each
@@ -689,7 +693,9 @@ const CompactProductMediaPage: React.FC<ProductMediaPageProps> = ({
               <div key={`existing-${index}`} className="relative group">
                 <div className="relative aspect-square">
                   <img
-                    src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${imageUrl}`}
+                    src={`${
+                      import.meta.env.VITE_API_IMAGE_BASE_URL
+                    }${imageUrl}`}
                     alt={`Existing Product ${index + 1}`}
                     className="w-full h-full object-cover rounded border border-gray-200"
                   />
@@ -704,10 +710,7 @@ const CompactProductMediaPage: React.FC<ProductMediaPageProps> = ({
                     className="absolute top-1 right-1 bg-red text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                     title="Remove image"
                   >
-                    <Icon
-                      icon="material-symbols:close"
-                      className="w-3 h-3"
-                    />
+                    <Icon icon="material-symbols:close" className="w-3 h-3" />
                   </button>
                 </div>
               </div>
@@ -742,16 +745,11 @@ const CompactProductMediaPage: React.FC<ProductMediaPageProps> = ({
                     className="absolute top-1 right-1 bg-red text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                     title="Remove image"
                   >
-                    <Icon
-                      icon="material-symbols:close"
-                      className="w-3 h-3"
-                    />
+                    <Icon icon="material-symbols:close" className="w-3 h-3" />
                   </button>
                 </div>
                 <div className="mt-1 text-center">
-                  <p className="text-xs text-gray-500 truncate">
-                    {file.name}
-                  </p>
+                  <p className="text-xs text-gray-500 truncate">{file.name}</p>
                   <p className="text-xs text-gray-400">
                     {(file.size / 1024 / 1024).toFixed(1)} MB
                   </p>
@@ -766,8 +764,8 @@ const CompactProductMediaPage: React.FC<ProductMediaPageProps> = ({
       {(existingImages.length > 0 || selectedImages.length > 0) && (
         <div className="mt-3 p-2 bg-blue-50 rounded border border-blue-200">
           <p className="text-xs text-blue-700">
-            The first image will be used as the primary product image. 
-            New images will replace old ones when updating.
+            The first image will be used as the primary product image. New
+            images will replace old ones when updating.
           </p>
         </div>
       )}

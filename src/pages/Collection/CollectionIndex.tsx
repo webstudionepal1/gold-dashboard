@@ -132,40 +132,40 @@ const CollectionIndex: React.FC = () => {
             <span className="text-gray-400">-</span>
           ),
       },
-      {
-        key: "isActive",
-        title: "Status",
-        width: "8%",
-        render: (value: boolean) => (
-          <span
-            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-              value ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-            }`}
-          >
-            {value ? "Active" : "Inactive"}
-          </span>
-        ),
-      },
-      {
-        key: "isFeatured",
-        title: "Featured",
-        width: "8%",
-        render: (value: boolean) => (
-          <div className="flex justify-center">
-            {value ? (
-              <Icon
-                icon="material-symbols:star"
-                className="w-5 h-5 text-yellow-500"
-              />
-            ) : (
-              <Icon
-                icon="material-symbols:star-outline"
-                className="w-5 h-5 text-gray-300"
-              />
-            )}
-          </div>
-        ),
-      },
+      // {
+      //   key: 'isActive',
+      //   title: 'Status',
+      //   width: '8%',
+      //   render: (value: boolean) => (
+      //     <span
+      //       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+      //         value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+      //       }`}
+      //     >
+      //       {value ? 'Active' : 'Inactive'}
+      //     </span>
+      //   ),
+      // },
+      // {
+      //   key: 'isFeatured',
+      //   title: 'Featured',
+      //   width: '8%',
+      //   render: (value: boolean) => (
+      //     <div className="flex justify-center">
+      //       {value ? (
+      //         <Icon
+      //           icon="material-symbols:star"
+      //           className="w-5 h-5 text-yellow-500"
+      //         />
+      //       ) : (
+      //         <Icon
+      //           icon="material-symbols:star-outline"
+      //           className="w-5 h-5 text-gray-300"
+      //         />
+      //       )}
+      //     </div>
+      //   ),
+      // },
       {
         key: "isLimitedEdition",
         title: "Limited",
