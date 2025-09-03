@@ -292,7 +292,7 @@ const BlogView: React.FC = () => {
           <article className="lg:col-span-3 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
             {/* Featured Image */}
             {blog.featuredImage && (
-              <div className="aspect-video w-full overflow-hidden">
+              <div className="aspect-[2/1] w-full overflow-hidden">
                 <img
                   src={
                     blog.featuredImage
