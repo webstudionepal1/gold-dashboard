@@ -125,13 +125,13 @@ export const ProductImage: React.FC<ProductImageProps> = ({
 
           {/* Main Image */}
           <div
-            className={`relative overflow-hidden transition-all duration-500 ${
+            className={`relative overflow-hidden transition-all aspect-square duration-500 ${
               isZoomed ? "cursor-zoom-out" : "cursor-zoom-in"
             }`}>
             <img
               src={images[selectedImage]}
               alt={`Product image ${selectedImage + 1}`}
-              className={`w-full h-auto object-cover transition-all duration-500 ${
+              className={`w-full h-auto object-cover object-center transition-all duration-500 ${
                 isZoomed ? "scale-150" : "scale-100 hover:scale-105"
               } ${isLoading ? "opacity-0" : "opacity-100"}`}
               onLoad={handleImageLoad}

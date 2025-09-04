@@ -31,23 +31,32 @@ const AddBannerSchema = z
     subCategory: z.string().min(1, "Sub Category is required"),
     priority: z.number().min(0, "Price must be a positive number"),
     locations: z.array(z.string()).min(1, "Location is required"),
+
+    // Images
     image: z.instanceof(File).nullable(),
-    mobImage: z.instanceof(File).nullable(), // Mobile image is optional
-    existingImage: z.string().optional().nullable(), // Track existing image
-    existingMobImage: z.string().optional(), // Track existing mobile image
-    video: z.instanceof(File).nullable(), // Video is optional
-    existingVideo: z.string().optional().nullable(), // Track existing video
-    videoThumbnail: z.instanceof(File).nullable(), // Video thumbnail is optional
-    existingVideoThumbnail: z.string().optional().nullable(), // Track existing video thumbnail
+    mobImage: z.instanceof(File).nullable(),
+    existingImage: z.string().optional().nullable(),
+    existingMobImage: z.string().optional(), // Update this line
+
+    // Video
+    video: z.instanceof(File).nullable(),
+    existingVideo: z.string().optional().nullable(),
+
+    // Video thumbnail
+    videoThumbnail: z.instanceof(File).nullable(),
+    existingVideoThumbnail: z.string().optional().nullable(),
   })
   .refine(
     (data) => {
-      // Custom validation: require either a new image file or an existing image
-      return data.image !== null || data.existingImage;
+      const hasVideo = data.video !== null || !!data.existingVideo;
+      if (hasVideo) return true;
+      const hasWebImage = data.image !== null || !!data.existingImage;
+      const hasMobImage = data.mobImage !== null || !!data.existingMobImage;
+      return hasWebImage && hasMobImage;
     },
     {
-      message: "Web image is required",
-      path: ["image"], // Show error on the image field
+      message: "Either video OR both web and mobile images are required",
+      path: ["image"],
     }
   );
 
@@ -96,6 +105,7 @@ const AddBannerForm = () => {
     defaultValues: generateBannerFormDefaultValue(formState, bannerData),
     validators: {
       onSubmit: AddBannerSchema,
+      onChange: AddBannerSchema,
     },
 
     onSubmit: async ({ value }) => {
@@ -208,12 +218,14 @@ const AddBannerForm = () => {
       <div className="grid grid-cols-1 lg:grid-cols-4 lg:space-y-0 lg:space-x-4 space-x-0 space-y-4 ">
         <div className="bg-[#ffffff] col-span-3 border-[#eeeeee] border-2 shadow-lg rounded-xl w-full">
           <form
+            id="banner-form"
             className="flex flex-col gap-4 mx-4 my-6"
             onSubmit={(e) => {
               e.preventDefault();
               e.stopPropagation();
               form.handleSubmit();
-            }}>
+            }}
+          >
             <div>
               <h1 className="text-xl font-semibold">General Information</h1>
               <div className="border-b border-[#dedde2] w-full my-2"></div>
@@ -333,7 +345,8 @@ const AddBannerForm = () => {
             <button
               type="submit"
               disabled={bannerPending || bannerUpdatePending}
-              className="self-end bg-[#df8d29] text-white px-7 py-2 rounded-xl disabled:opacity-50">
+              className="self-end sm:block hidden bg-[#df8d29] text-white px-7 py-2 rounded-xl disabled:opacity-50"
+            >
               {bannerPending || bannerUpdatePending ? "Saving..." : "Save"}
             </button>
           </form>
@@ -343,9 +356,7 @@ const AddBannerForm = () => {
           <div className="bg-[#ffffff] border-[#eeeeee] border-2 shadow-lg rounded-xl w-full">
             <div className="mx-6 my-4">
               <div>
-                <h1 className="text-xl font-semibold">
-                  Upload Web Image <span style={{ color: "#ef4444" }}>*</span>
-                </h1>
+                <h1 className="text-xl font-semibold">Upload Web Image</h1>
                 <div className="border-b border-[#dedde2] w-full my-2"></div>
               </div>
 
@@ -377,10 +388,7 @@ const AddBannerForm = () => {
             </div>
             <div className="mx-6 my-4">
               <div>
-                <h1 className="text-xl font-semibold">
-                  Upload Mobile Image{" "}
-                  <span style={{ color: "#ef4444" }}>*</span>
-                </h1>
+                <h1 className="text-xl font-semibold">Upload Mobile Image </h1>
                 <div className="border-b border-[#dedde2] w-full my-2"></div>
               </div>
 
@@ -443,6 +451,16 @@ const AddBannerForm = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div className="flex justify-end items-center mt-4 sm:hidden">
+        <button
+          form="banner-form"
+          type="submit"
+          disabled={bannerPending || bannerUpdatePending}
+          className="self-end block sm:hidden bg-[#df8d29] text-white px-7 py-2 rounded-xl disabled:opacity-50"
+        >
+          {bannerPending || bannerUpdatePending ? "Saving..." : "Save"}
+        </button>
       </div>
     </div>
   );

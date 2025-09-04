@@ -1,5 +1,5 @@
-import axios from 'axios';
-import Cookies from 'js-cookie';
+import axios from "axios";
+import Cookies from "js-cookie";
 // Configure base URL from environment variables
 export const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}`;
 // export const API_BASE_URL = `${import.meta.env.VITE_API_LOCAL_URL}`;
@@ -20,7 +20,7 @@ const controllers = new Map<string, AbortController>();
 apiClient.interceptors.request.use(
   (config) => {
     // Get token from localStorage
-    const token = Cookies.get('_UPLFMMATRIX');
+    const token = Cookies.get("_UPLFMMATRIX");
 
     // Only add authorization header if token exists
     if (token) {
@@ -55,7 +55,7 @@ apiClient.interceptors.response.use(
   (error) => {
     // console.log("error", error);
     // Handle unauthorized access
-    console.log('error', error)
+    console.log("error", error);
     if (error.response?.status === 401) {
       console.log(error);
       localStorage.clear();
@@ -72,9 +72,9 @@ apiClient.interceptors.response.use(
     const errorMessage =
       error.response?.data?.message ||
       error.message ||
-      'An unexpected error occurred';
+      "An unexpected error occurred";
     // const errorMessage = "heelo";
-
+    console.log("errror message", errorMessage);
     return Promise.reject(errorMessage);
   }
 );

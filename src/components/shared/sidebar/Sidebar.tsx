@@ -264,7 +264,7 @@ const Sidebar: React.FC<{ config: { sections: SidebarSection[] } }> = ({
       {/* Sidebar */}
       <aside
         className={clsx(
-          "flex flex-col h-screen  border-r border-gray-200 transition-all duration-300 bg-white ease-in-out z-50",
+          "flex flex-col z-[99999] h-screen  border-r border-gray-200 transition-all duration-300 bg-white ease-in-out",
           "fixed md:static md:translate-x-0",
           isCollapsed ? "md:w-16 min-w-16" : "md:w-72 md:min-w-72",
           "w-72 max-w-72",

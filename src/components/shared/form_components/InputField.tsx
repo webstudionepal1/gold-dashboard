@@ -108,6 +108,7 @@ export const InputField = React.forwardRef<
             ref={ref}
             step={step}
             type={type}
+            onWheel={(e) => type === 'number' && e.currentTarget.blur()} 
             placeholder={placeholder}
             {...inputProps}
             onBlur={(e) => {

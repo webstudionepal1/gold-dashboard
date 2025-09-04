@@ -1,18 +1,17 @@
-import { Icon } from '@iconify/react/dist/iconify.js';
-import { get } from 'lodash';
-import React, { useMemo, useState } from 'react';
-import MasterTable from '../../../components/shared/MasterTable';
-import Header from '../../../components/shared/table_heading/Header';
-import { useOutsideClick } from '../../../hooks/UseOutsideClick';
+import { Icon } from "@iconify/react/dist/iconify.js";
+import { get } from "lodash";
+import React, { useMemo, useState } from "react";
+import MasterTable from "../../../components/shared/MasterTable";
+import Header from "../../../components/shared/table_heading/Header";
+import { useOutsideClick } from "../../../hooks/UseOutsideClick";
 import {
   IFetchCategory,
   useDeleteProductCategoriesMutation,
   useGetAllProductCategoriesQuery,
-  useUpdateProductCategoriesMutation,
-} from '../../../server/api/productHooks';
-import { categoryColumns } from '../productObj';
-import AddProductCategory from './components/AddProductCategory';
-import ViewProductCategory from './components/ViewProductCategory';
+} from "../../../server/api/productHooks";
+import { categoryColumns } from "../productObj";
+import AddProductCategory from "./components/AddProductCategory";
+import ViewProductCategory from "./components/ViewProductCategory";
 // import { AddProductCategory } from "./components/AddProductCategory";
 
 interface IEditModal {
@@ -44,45 +43,33 @@ const ProductCategory: React.FC = () => {
     isLoading,
   } = useGetAllProductCategoriesQuery();
   const { mutate: deleteCategory } = useDeleteProductCategoriesMutation();
-  const { mutate: updateCategory } = useUpdateProductCategoriesMutation();
 
-  const handleStatusToggle = async (categoryId: string, newStatus: boolean) => {
-    const formData = new FormData();
-    formData.append('isActive', newStatus.toString());
-    updateCategory(
-      {
-        id: categoryId,
-        body: formData,
-      },
-      {
-        onError: (err) => console.error('Update failed:', err),
-      }
-    );
-  };
   const categoriesData = useMemo(
     () =>
       isSuccess
         ? categories?.map((item, index) => ({
             ...item,
             sn: index + 1,
-            rawDescription: get(item, 'description', ''),
+            rawDescription: get(item, "description", ""),
             description: (
               <p className=" truncate max-w-xl text-center">
-                {get(item, 'description', '') !== ''
-                  ? get(item, 'description')
-                  : '-'}
+                {get(item, "description", "").length > 20
+                  ? `${get(item, "description", "").slice(0, 17)}...`
+                  : get(item, "description", "") !== ""
+                  ? get(item, "description")
+                  : "-"}
               </p>
             ),
-            totalProducts: get(item, 'totalProducts', 0),
+            totalProducts: get(item, "totalProducts", 0),
             status: (
               <span
                 className={`px-2 py-1 text-xs font-medium rounded-full ${
-                  get(item, 'isActive', true)
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-red-100 text-red-800'
+                  get(item, "isActive", true)
+                    ? "bg-green-100 text-green-800"
+                    : "bg-red-100 text-red-800"
                 }`}
               >
-                {get(item, 'isActive', true) ? 'Active' : 'Inactive'}
+                {get(item, "isActive", true) ? "Active" : "Inactive"}
               </span>
             ),
           }))

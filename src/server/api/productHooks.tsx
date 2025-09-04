@@ -323,6 +323,7 @@ export const useCreateProductCategoriesMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["category"] });
     },
     onError(err: any) {
+      console.log(err, "error");
       const errorMessage =
         err ||
         err?.data?.message ||
@@ -378,7 +379,7 @@ export const useDeleteProductCategoriesMutation = () => {
     },
     onError(err: string) {
       // toast.error(err || "Error deleting product category");
-      toast.error("Error deleting product category");
+      toast.error(err);
     },
   });
 };
@@ -415,8 +416,12 @@ export const useCreateProductSubCategoryMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["subcategory"] });
     },
     onError(err: string) {
+      console.log("err", err);
       // toast.error(err || "Error creating product subcategory");
-      toast.error("Error creating product subcategory");
+      toast.error(err);
+    },
+    onMutate() {
+      toast.dismiss();
     },
   });
 };
@@ -441,7 +446,10 @@ export const useUpdateProductSubCategoryMutation = () => {
     },
     onError(err: string) {
       // toast.error(err || "Error updating product subcategory");
-      toast.error("Error updating product subcategory");
+      toast.error(err);
+    },
+    onMutate() {
+      toast.dismiss();
     },
   });
 };
@@ -460,8 +468,11 @@ export const useDeleteProductSubCategoryMutation = () => {
     },
     onError(err: string) {
       // toast.error(err || "Error deleting product subcategory");
-      toast.error("Error deleting product subcategory");
+      toast.error(err);
     },
+      onMutate(){
+      toast.dismiss();
+    }
   });
 };
 // Product clasp

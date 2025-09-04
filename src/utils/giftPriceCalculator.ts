@@ -38,7 +38,7 @@ export const calculateGiftPrices = (gift: IFetchGift): GiftPriceCalculation => {
       savings: 0,
       hasValidProducts: false,
       productBreakdown: [],
-      pricingIssue: "No products found in gift"
+      pricingIssue: "No products found in gift",
     };
   }
 
@@ -49,7 +49,7 @@ export const calculateGiftPrices = (gift: IFetchGift): GiftPriceCalculation => {
   // Calculate total price from all products
   gift.products.forEach((giftProduct) => {
     const { product, quantity, isOptional } = giftProduct;
-    
+
     if (!product) {
       productBreakdown.push({
         productId: "unknown",
@@ -64,7 +64,7 @@ export const calculateGiftPrices = (gift: IFetchGift): GiftPriceCalculation => {
         pricePerUnit: 0,
         totalPrice: 0,
         status: "no_price",
-        reason: "Product object is null or undefined"
+        reason: "Product object is null or undefined",
       });
       return;
     }
@@ -83,7 +83,7 @@ export const calculateGiftPrices = (gift: IFetchGift): GiftPriceCalculation => {
         pricePerUnit: 0,
         totalPrice: 0,
         status: "inactive",
-        reason: "Product is inactive"
+        reason: "Product is inactive",
       });
       return;
     }
@@ -102,12 +102,13 @@ export const calculateGiftPrices = (gift: IFetchGift): GiftPriceCalculation => {
         pricePerUnit: 0,
         totalPrice: 0,
         status: "no_variant",
-        reason: "No product variants found"
+        reason: "No product variants found",
       });
       return;
     }
 
-    const activeVariant = product.variant.find(v => v.isActive) || product.variant[0];
+    const activeVariant =
+      product.variant.find((v) => v.isActive) || product.variant[0];
     if (!activeVariant || !activeVariant.price) {
       productBreakdown.push({
         productId: product._id,
@@ -122,46 +123,53 @@ export const calculateGiftPrices = (gift: IFetchGift): GiftPriceCalculation => {
         pricePerUnit: 0,
         totalPrice: 0,
         status: "no_price",
-        reason: "No active variant with price found"
+        reason: "No active variant with price found",
       });
       return;
     }
 
     // Calculate base price from variant
     const basePrice = activeVariant.price;
-    
+
     // Add making charges
     const makingCharges = product.makingCharges || 0;
-    
+
     // Calculate wastage cost if available
     let wastageCost = 0;
     if (product.wastage) {
-      if (product.wastage.type === 'fixed') {
+      if (product.wastage.type === "fixed") {
         wastageCost = product.wastage.value || 0;
-      } else if (product.wastage.type === 'per') {
+      } else if (product.wastage.type === "per") {
         wastageCost = (basePrice * (product.wastage.value || 0)) / 100;
       }
     }
-    
+
     // Add stones cost if available
-    const stonesCost = (product.stones || []).reduce((total: number, stone: { price: string }) => {
-      return total + (parseFloat(stone.price) || 0);
-    }, 0);
-    
+    const stonesCost = (product.stones || []).reduce(
+      (total: number, stone: { price: string }) => {
+        return total + (parseFloat(stone.price) || 0);
+      },
+      0
+    );
+
     // Add others cost if available
-    const othersCost = (product.others || []).reduce((total: number, other: { name: string; value: number }) => {
-      return total + (other.value || 0);
-    }, 0);
-    
+    const othersCost = (product.others || []).reduce(
+      (total: number, other: { name: string; value: number }) => {
+        return total + (other.value || 0);
+      },
+      0
+    );
+
     // Calculate total price per unit
-    const pricePerUnit = basePrice + makingCharges + wastageCost + stonesCost + othersCost;
-    
+    const pricePerUnit =
+      basePrice + makingCharges + wastageCost + stonesCost + othersCost;
+
     // Calculate total price for this product
     const totalProductPrice = pricePerUnit * quantity;
-    
+
     totalOriginalPrice += totalProductPrice;
     hasValidProducts = true;
-    
+
     productBreakdown.push({
       productId: product._id,
       productName: product.name,
@@ -175,13 +183,14 @@ export const calculateGiftPrices = (gift: IFetchGift): GiftPriceCalculation => {
       pricePerUnit,
       totalPrice: totalProductPrice,
       status: "calculated",
-      reason: "Price calculated successfully"
+      reason: "Price calculated successfully",
     });
   });
 
   // Apply discount if available
   const discountPercentage = gift.discountPercentage || 0;
-  const totalDiscountedPrice = totalOriginalPrice * (1 - discountPercentage / 100);
+  const totalDiscountedPrice =
+    totalOriginalPrice * (1 - discountPercentage / 100);
   const savings = totalOriginalPrice - totalDiscountedPrice;
 
   return {
@@ -190,7 +199,9 @@ export const calculateGiftPrices = (gift: IFetchGift): GiftPriceCalculation => {
     savings,
     hasValidProducts,
     productBreakdown,
-    pricingIssue: !hasValidProducts ? "No valid products to calculate price" : undefined
+    pricingIssue: !hasValidProducts
+      ? "No valid products to calculate price"
+      : undefined,
   };
 };
 
@@ -200,9 +211,9 @@ export const calculateGiftPrices = (gift: IFetchGift): GiftPriceCalculation => {
  * @returns Formatted price string
  */
 export const formatPrice = (price: number): string => {
-  return new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "NPR",
     minimumFractionDigits: 0,
   }).format(price);
 };
@@ -214,10 +225,18 @@ export const formatPrice = (price: number): string => {
  */
 export const getGiftPricingSummary = (calculation: GiftPriceCalculation) => {
   const totalProducts = calculation.productBreakdown.length;
-  const calculatedProducts = calculation.productBreakdown.filter(p => p.status === "calculated").length;
-  const inactiveProducts = calculation.productBreakdown.filter(p => p.status === "inactive").length;
-  const noPriceProducts = calculation.productBreakdown.filter(p => p.status === "no_price").length;
-  const noVariantProducts = calculation.productBreakdown.filter(p => p.status === "no_variant").length;
+  const calculatedProducts = calculation.productBreakdown.filter(
+    (p) => p.status === "calculated"
+  ).length;
+  const inactiveProducts = calculation.productBreakdown.filter(
+    (p) => p.status === "inactive"
+  ).length;
+  const noPriceProducts = calculation.productBreakdown.filter(
+    (p) => p.status === "no_price"
+  ).length;
+  const noVariantProducts = calculation.productBreakdown.filter(
+    (p) => p.status === "no_variant"
+  ).length;
 
   return {
     totalProducts,
@@ -228,6 +247,6 @@ export const getGiftPricingSummary = (calculation: GiftPriceCalculation) => {
     hasIssues: !calculation.hasValidProducts,
     totalValue: calculation.totalOriginalPrice,
     finalValue: calculation.totalDiscountedPrice,
-    savings: calculation.savings
+    savings: calculation.savings,
   };
 };

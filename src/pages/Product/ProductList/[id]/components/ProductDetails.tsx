@@ -2,6 +2,7 @@ import { get } from "lodash";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { IFetchProduct } from "../../../../../server/api/productHooks";
 import { DropdownSection } from "./DropDownSection";
+import { ReviewsSection } from "./ReviewSection";
 
 // Type for product variant
 interface ProductVariant {
@@ -33,6 +34,7 @@ interface Wastage {
 }
 
 interface ProductDetailsProps {
+  review?: any;
   product: IFetchProduct & {
     productType?: string;
     gender?: string;
@@ -42,7 +44,10 @@ interface ProductDetailsProps {
     isFeatured?: boolean;
   };
 }
-export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
+export const ProductDetails: React.FC<ProductDetailsProps> = ({
+  product,
+  review,
+}) => {
   // Add safety checks for product data
   if (!product) {
     return (
@@ -87,6 +92,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
     get(product, "clarity");
 
   // For normal products, show simplified view
+  console.log("reiew", review);
   if (isNormalProduct) {
     return (
       <div className="space-y-3 col-span-2">
@@ -103,7 +109,8 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
                     get(product, "isActive", true)
                       ? "bg-green-100 text-green-800"
                       : "bg-red-100 text-red-800"
-                  }`}>
+                  }`}
+                >
                   {get(product, "isActive", true) ? "Active" : "Inactive"}
                 </span>
               </div>
@@ -136,6 +143,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
             </p>
           )}
         </div>
+        <ReviewsSection product={product} reviews={review} />
       </div>
     );
   }
@@ -220,7 +228,8 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
                     get(product, "isActive", true)
                       ? "bg-green-100 text-green-800"
                       : "bg-red-100 text-red-800"
-                  }`}>
+                  }`}
+                >
                   {get(product, "isActive", true) ? "Active" : "Inactive"}
                 </span>
                 {get(product, "isFeatured", false) && (
@@ -270,7 +279,8 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
                 {product.tags.slice(0, 4).map((tag, index) => (
                   <span
                     key={index}
-                    className="px-2 py-1 text-xs font-medium text-blue-700 bg-blue-50 rounded-full">
+                    className="px-2 py-1 text-xs font-medium text-blue-700 bg-blue-50 rounded-full"
+                  >
                     #
                     {tag && typeof tag === "string"
                       ? tag.replace(/\s+/g, "")
@@ -317,7 +327,8 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
                 (item: ProductVariant, index: number) => (
                   <div
                     key={item?.sku || `variant-${index}`}
-                    className="bg-gray-50 border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-all duration-200">
+                    className="bg-gray-50 border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-all duration-200"
+                  >
                     {/* Compact Price and Status */}
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
@@ -337,7 +348,8 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
                             get(item, "isActive", true)
                               ? "bg-green text-green-800"
                               : "bg-gray-100 text-gray-800"
-                          }`}>
+                          }`}
+                        >
                           {get(item, "isActive", true) ? "Active" : "Inactive"}
                         </span>
                       </div>
@@ -369,7 +381,8 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
               {stones.map((stone: ProductStone, index: number) => (
                 <div
                   key={index}
-                  className="bg-gray-50 border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-all duration-200">
+                  className="bg-gray-50 border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-all duration-200"
+                >
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="font-semibold text-gray-800 capitalize text-sm">
                       {stone.name || "Unnamed Stone"}
@@ -415,7 +428,8 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
               {otherCharges.map((charge: OtherCharge, index: number) => (
                 <div
                   key={index}
-                  className="bg-gray-50 border border-gray-200 rounded-lg p-2 hover:shadow-sm transition-all duration-200">
+                  className="bg-gray-50 border border-gray-200 rounded-lg p-2 hover:shadow-sm transition-all duration-200"
+                >
                   <div className="flex items-center justify-between">
                     <span className="font-medium text-gray-800 capitalize text-sm">
                       {charge.name || "Unnamed Charge"}
@@ -466,113 +480,6 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
           } Information`}
           data={gemstoneInfo}
         />
-      )}
-
-      {/* Product Video Section */}
-      {(() => {
-        console.log("Product video data:", product.video);
-        return product.video && product.video.length > 0;
-      })() ? (
-        <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-          <div className="p-3 border-b border-gray-100">
-            <h3 className="text-base font-semibold text-gray-800 flex items-center gap-2">
-              <Icon
-                icon="material-symbols:video-library"
-                className="w-4 h-4 text-blue-600"
-              />
-              Product Video
-              <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
-                {product.video?.length || 0}
-              </span>
-            </h3>
-          </div>
-          <div className="p-3">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {product.video?.map((videoPath, index) => {
-                console.log(`Video ${index}:`, videoPath);
-
-                // Clean the video path for streaming
-                const cleanVideoPath = videoPath.startsWith("/ridisidi/")
-                  ? videoPath.substring("/ridisidi/".length)
-                  : videoPath.startsWith("/")
-                  ? videoPath.substring(1)
-                  : videoPath;
-
-                const baseUrl =
-                  import.meta.env.VITE_API_LOCAL_URL ||
-                  "http://localhost:8080/api/v1/en/";
-                const videoStreamUrl = `${baseUrl}video/stream/${cleanVideoPath}`;
-
-                console.log(`Video ${index} stream URL:`, videoStreamUrl);
-
-                return (
-                  <div
-                    key={index}
-                    className="bg-gray-50 border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-all duration-200">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-semibold text-gray-800 text-sm">
-                        Video {index + 1}
-                      </h4>
-                      <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
-                        Product Demo
-                      </span>
-                    </div>
-                    <div className="mb-2 text-xs text-gray-500">
-                      <p>Path: {videoPath}</p>
-                      <p>Stream URL: {videoStreamUrl}</p>
-                    </div>
-                    <video
-                      src={videoStreamUrl}
-                      controls
-                      className="w-full rounded-lg"
-                      preload="metadata"
-                      onError={(e) => {
-                        console.error("Video loading error:", e);
-                        console.error("Video URL:", videoStreamUrl);
-                        console.error("Original path:", videoPath);
-                      }}
-                      onLoadStart={() => {
-                        console.log("Video loading started:", videoStreamUrl);
-                      }}
-                      onCanPlay={() => {
-                        console.log("Video can play:", videoStreamUrl);
-                      }}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      ) : (
-        // Show message when no videos are available
-        <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-          <div className="p-3 border-b border-gray-100">
-            <h3 className="text-base font-semibold text-gray-800 flex items-center gap-2">
-              <Icon
-                icon="material-symbols:video-library"
-                className="w-4 h-4 text-gray-400"
-              />
-              Product Video
-            </h3>
-          </div>
-          <div className="p-6 text-center">
-            <div className="flex flex-col items-center gap-3">
-              <Icon
-                icon="material-symbols:video-library"
-                className="w-12 h-12 text-gray-300"
-              />
-              <div>
-                <p className="text-sm font-medium text-gray-700">
-                  No video available
-                </p>
-                <p className="text-xs text-gray-500">
-                  This product doesn't have any videos uploaded yet
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
       )}
     </div>
   );

@@ -244,12 +244,12 @@ export const SidebarConfig = {
               title: 'Blog List',
               icon: '',
             },
-            {
-              id: 202,
-              path: FrontendRoutes.ADDBLOG,
-              title: 'Create Blog',
-              icon: '',
-            },
+            // {
+            //   id: 202,
+            //   path: FrontendRoutes.ADDBLOG,
+            //   title: 'Create Blog',
+            //   icon: '',
+            // },
             {
               id: 203,
               path: FrontendRoutes.BLOGANALYTICS,
