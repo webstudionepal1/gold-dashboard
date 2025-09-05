@@ -41,7 +41,6 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
     maxFiles = 10,
   } = props;
 
-  console.log(props, 'props');
   const defaultPlaceholder = props.multiple
     ? "Drag 'n' drop files here, or click to select files"
     : "Drag 'n' drop a file here, or click to select a file";
@@ -90,7 +89,6 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
   }, [props.multiple, 'existingFiles' in props ? props.existingFiles : []]);
 
   const handleRemoveFile = (index?: number) => {
-    console.log(index, 'object');
     if (props.multiple) {
       if (typeof index === 'number') {
         const newFiles = [...props.value];
@@ -165,7 +163,6 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
       }
     }
 
-    console.log(previewUrl);
 
     return (
       <div
@@ -198,8 +195,6 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
       const singleProps = props as SingleFileProps & BaseProps;
       let existingImage =
         singleProps.existingFile || singleProps.existingImageUrl;
-
-      console.log(singleProps.value, 'exis');
       if (
         existingImage &&
         typeof existingImage === 'object' &&

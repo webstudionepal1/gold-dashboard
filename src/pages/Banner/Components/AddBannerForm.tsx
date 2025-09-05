@@ -36,7 +36,7 @@ const AddBannerSchema = z
     image: z.instanceof(File).nullable(),
     mobImage: z.instanceof(File).nullable(),
     existingImage: z.string().optional().nullable(),
-    existingMobImage: z.string().optional(), // Update this line
+    existingMobImage: z.string().optional().nullable(),
 
     // Video
     video: z.instanceof(File).nullable(),
@@ -49,14 +49,17 @@ const AddBannerSchema = z
   .refine(
     (data) => {
       const hasVideo = data.video !== null || !!data.existingVideo;
-      if (hasVideo) return true;
+
+      if (hasVideo) return true; // video exists → images optional
+
+      // Only require web image
       const hasWebImage = data.image !== null || !!data.existingImage;
-      const hasMobImage = data.mobImage !== null || !!data.existingMobImage;
-      return hasWebImage && hasMobImage;
+
+      return hasWebImage; // mobImage is optional
     },
     {
-      message: "Either video OR both web and mobile images are required",
-      path: ["image"],
+      message: "Either provide a video OR a web image is required",
+      path: ["image"], // show error on image field
     }
   );
 
@@ -105,7 +108,7 @@ const AddBannerForm = () => {
     defaultValues: generateBannerFormDefaultValue(formState, bannerData),
     validators: {
       onSubmit: AddBannerSchema,
-      onChange: AddBannerSchema,
+      // onChange: AddBannerSchema,
     },
 
     onSubmit: async ({ value }) => {
@@ -113,7 +116,6 @@ const AddBannerForm = () => {
       try {
         const formData = new FormData();
         const formattedData = cleanObject(value);
-
         delete formattedData["image"];
         delete formattedData["existingImage"];
         delete formattedData["mobImage"];
@@ -122,7 +124,6 @@ const AddBannerForm = () => {
         delete formattedData["existingVideo"];
         delete formattedData["videoThumbnail"];
         delete formattedData["existingVideoThumbnail"];
-
         formData.append("title", value.title);
         formData.append("description", value.description ?? "");
         formData.append("category", value.category);
@@ -206,7 +207,7 @@ const AddBannerForm = () => {
     }
   }, [bannerSuccess, bannerUpdateSuccess]);
 
-  console.log("formisks", form.state.errors);
+  console.log("formisksslkdjslkf", form.state.errors);
   console.log("values", form.state.values);
   return (
     <div className="">

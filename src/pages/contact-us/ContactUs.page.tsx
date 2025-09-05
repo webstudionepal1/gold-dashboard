@@ -31,23 +31,6 @@ export const ContactUs = () => {
     isLoading,
   } = useGetAllContactUsQuery(paginationParams);
 
-  // Extract pagination data from API response
-  //   const paginationData = useMemo(() => {
-  //     if (contactList?.pagination) {
-  //       return {
-  //         currentPage: contactList.pagination.currentPage,
-  //         totalPages: contactList.pagination.totalPages,
-  //         totalCount: contactList.pagination.totalCount,
-  //         limit: contactList.pagination.limit,
-  //         hasNextPage: contactList.pagination.hasNextPage,
-  //         hasPrevPage: contactList.pagination.hasPrevPage,
-  //         nextPage: contactList.pagination.nextPage,
-  //         prevPage: contactList.pagination.prevPage,
-  //       };
-  //     }
-  //     return null;
-  //   }, [contactList?.pagination]);
-
   const handlePageChange = useCallback((page: number, pageSize: number) => {
     setPaginationParams((prev) => ({
       ...prev,
@@ -65,14 +48,13 @@ export const ContactUs = () => {
   ];
 
   const tableData = contactList?.map((product: IContact, index: number) => {
-    // Calculate serial number based on current page and limit
-    // const currentPage = paginationData?.currentPage || 1;
-    // const limit = paginationData?.limit || 10;
-    // const serialNumber = (currentPage - 1) * limit + index + 1;
+    const currentPage = paginationParams.page || 1;
+    const limit = paginationParams.limit || 10;
+    const serialNumber = (currentPage - 1) * limit + index + 1;
 
     return {
       ...product,
-      sn: index + 1,
+      sn: index,
 
       user: get(product, "name", ""),
       email: get(product, "email", "-"),

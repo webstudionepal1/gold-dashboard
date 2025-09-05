@@ -8,7 +8,7 @@ export interface IBannerFormData {
   priority: number;
   image: File | null; // Changed to File | null for single file
   existingImage?: string | null;
-  existingMobImage?: string;
+  existingMobImage?: string | null;
   mobImage: File | null; // Changed to File | null for single file
   locations: string[];
   video: File | null; // Video file

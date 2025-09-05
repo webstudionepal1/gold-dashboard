@@ -189,8 +189,8 @@ const ProductList: React.FC = () => {
           </div>
         ),
         product: get(product, "name", ""),
-        categ: get(product, "category.name", "-"),
-        subCate: get(product, "subCategory.name", "-"),
+        categ: product.productType !== "normal" ? get(product, "category.name", "-") : "-",
+        subCate: product.productType !== "normal" ? get(product, "subCategory.name", "-") : "-",
         price: get(product, "price", 0),
         stock: get(product, "variant[0].remainingStock", 0),
         sold: get(product, "variant[0].usedStock", 0),

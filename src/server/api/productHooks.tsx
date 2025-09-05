@@ -97,6 +97,7 @@ export interface IFetchProduct {
   dimension: number;
   tags: string[];
   visibleAs: string;
+  productType?: string;
   images: string[];
   video?: string[];
   videoThumbnail?: string[];
@@ -470,9 +471,9 @@ export const useDeleteProductSubCategoryMutation = () => {
       // toast.error(err || "Error deleting product subcategory");
       toast.error(err);
     },
-      onMutate(){
+    onMutate() {
       toast.dismiss();
-    }
+    },
   });
 };
 // Product clasp
