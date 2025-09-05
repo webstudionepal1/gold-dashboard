@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { format } from 'date-fns';
-import { Icon } from '@iconify/react/dist/iconify.js';
-import DOMPurify from 'dompurify';
-import { toast } from 'react-toastify';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { format } from "date-fns";
+import { Icon } from "@iconify/react/dist/iconify.js";
+import DOMPurify from "dompurify";
+import { toast } from "react-toastify";
 
-import { Text } from '../../../components/shared/Text';
-import '../BlogEditor/BlogEditor.css';
-import { Button } from '../../../components/ui/button';
+import { Text } from "../../../components/shared/Text";
+import "../BlogEditor/BlogEditor.css";
+import { Button } from "../../../components/ui/button";
 import {
   useGetBlogByIdQuery,
   useLikeBlogMutation,
   useGetAllBlogsQuery,
-} from '../../../server/api/blogHooks';
-import { FrontendRoutes } from '../../../routes/routes';
+} from "../../../server/api/blogHooks";
+import { FrontendRoutes } from "../../../routes/routes";
 
 const BlogView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -32,7 +32,7 @@ const BlogView: React.FC = () => {
   const { mutate: likeBlog, isPending: isLiking } = useLikeBlogMutation();
   const { data: relatedBlogs } = useGetAllBlogsQuery({
     limit: 4,
-    status: 'published',
+    status: "published",
   });
 
   // Enhanced functionality
@@ -47,11 +47,11 @@ const BlogView: React.FC = () => {
     };
 
     // Check if blog is bookmarked (from localStorage)
-    const bookmarked = localStorage.getItem(`bookmark_${id}`) === 'true';
+    const bookmarked = localStorage.getItem(`bookmark_${id}`) === "true";
     setIsBookmarked(bookmarked);
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [id]);
 
   // Handle like with enhanced feedback
@@ -67,14 +67,14 @@ const BlogView: React.FC = () => {
     setIsBookmarked(newBookmarkState);
     localStorage.setItem(`bookmark_${id}`, newBookmarkState.toString());
     toast.success(
-      newBookmarkState ? 'Blog bookmarked! 📖' : 'Bookmark removed'
+      newBookmarkState ? "Blog bookmarked! 📖" : "Bookmark removed"
     );
   };
 
   // Handle social sharing
   const handleShare = (platform: string) => {
     const url = window.location.href;
-    const title = blog?.title || 'Check out this blog';
+    const title = blog?.title || "Check out this blog";
 
     const shareUrls = {
       twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(
@@ -90,11 +90,11 @@ const BlogView: React.FC = () => {
       copy: url,
     };
 
-    if (platform === 'copy') {
+    if (platform === "copy") {
       navigator.clipboard.writeText(url);
-      toast.success('Link copied to clipboard! 📋');
+      toast.success("Link copied to clipboard! 📋");
     } else {
-      window.open(shareUrls[platform as keyof typeof shareUrls], '_blank');
+      window.open(shareUrls[platform as keyof typeof shareUrls], "_blank");
     }
   };
 
@@ -188,14 +188,14 @@ const BlogView: React.FC = () => {
                 size="sm"
                 onClick={handleBookmark}
                 className={`${
-                  isBookmarked ? 'text-customorange' : 'text-gray-600'
+                  isBookmarked ? "text-customorange" : "text-gray-600"
                 }`}
               >
                 <Icon
                   icon={
                     isBookmarked
-                      ? 'material-symbols:bookmark'
-                      : 'material-symbols:bookmark-outline'
+                      ? "material-symbols:bookmark"
+                      : "material-symbols:bookmark-outline"
                   }
                   className="w-5 h-5"
                 />
@@ -209,7 +209,7 @@ const BlogView: React.FC = () => {
                 <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                   <div className="p-2">
                     <button
-                      onClick={() => handleShare('twitter')}
+                      onClick={() => handleShare("twitter")}
                       className="w-full flex items-center gap-3 px-3 py-2 text-sm hover:bg-gray-50 rounded"
                     >
                       <Icon
@@ -219,7 +219,7 @@ const BlogView: React.FC = () => {
                       Share on Twitter
                     </button>
                     <button
-                      onClick={() => handleShare('facebook')}
+                      onClick={() => handleShare("facebook")}
                       className="w-full flex items-center gap-3 px-3 py-2 text-sm hover:bg-gray-50 rounded"
                     >
                       <Icon
@@ -229,7 +229,7 @@ const BlogView: React.FC = () => {
                       Share on Facebook
                     </button>
                     <button
-                      onClick={() => handleShare('linkedin')}
+                      onClick={() => handleShare("linkedin")}
                       className="w-full flex items-center gap-3 px-3 py-2 text-sm hover:bg-gray-50 rounded"
                     >
                       <Icon
@@ -239,7 +239,7 @@ const BlogView: React.FC = () => {
                       Share on LinkedIn
                     </button>
                     <button
-                      onClick={() => handleShare('whatsapp')}
+                      onClick={() => handleShare("whatsapp")}
                       className="w-full flex items-center gap-3 px-3 py-2 text-sm hover:bg-gray-50 rounded"
                     >
                       <Icon
@@ -249,7 +249,7 @@ const BlogView: React.FC = () => {
                       Share on WhatsApp
                     </button>
                     <button
-                      onClick={() => handleShare('copy')}
+                      onClick={() => handleShare("copy")}
                       className="w-full flex items-center gap-3 px-3 py-2 text-sm hover:bg-gray-50 rounded"
                     >
                       <Icon
@@ -263,7 +263,7 @@ const BlogView: React.FC = () => {
               </div>
 
               {/* Status Badges */}
-              {blog.status === 'published' && (
+              {blog.status === "published" && (
                 <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
                   Published
                 </span>
@@ -274,7 +274,7 @@ const BlogView: React.FC = () => {
                 </span>
               )}
 
-              <Link to={FrontendRoutes.EDITBLOG.replace(':id', blog._id)}>
+              <Link to={FrontendRoutes.EDITBLOG.replace(":id", blog._id)}>
                 <Button size="sm" variant="outline">
                   <Icon icon="material-symbols:edit-outline" className="mr-2" />
                   Edit
@@ -292,17 +292,17 @@ const BlogView: React.FC = () => {
           <article className="lg:col-span-3 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
             {/* Featured Image */}
             {blog.featuredImage && (
-              <div className="aspect-video w-full overflow-hidden">
+              <div className="aspect-[2/1] w-full overflow-hidden">
                 <img
                   src={
                     blog.featuredImage
                       ? `${import.meta.env.VITE_API_IMAGE_BASE_URL}${
                           blog.featuredImage
                         }`
-                      : '/no-image.png'
+                      : "/no-image.png"
                   }
                   alt={blog.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                 />
               </div>
             )}
@@ -323,13 +323,13 @@ const BlogView: React.FC = () => {
                 <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600 mb-3">
                   <div className="flex items-center gap-2">
                     <Icon icon="material-symbols:person-outline" />
-                    <span>By {blog.author?.name || 'Unknown Author'}</span>
+                    <span>By {blog.author?.name || "Unknown Author"}</span>
                   </div>
 
                   <div className="flex items-center gap-2">
                     <Icon icon="material-symbols:calendar-today-outline" />
                     <span>
-                      {format(new Date(blog.createdAt), 'MMMM dd, yyyy')}
+                      {format(new Date(blog.createdAt), "MMMM dd, yyyy")}
                     </span>
                   </div>
 
@@ -354,10 +354,10 @@ const BlogView: React.FC = () => {
                       <Icon
                         icon={
                           isLiking
-                            ? 'svg-spinners:ring-resize'
-                            : 'material-symbols:favorite-outline'
+                            ? "svg-spinners:ring-resize"
+                            : "material-symbols:favorite-outline"
                         }
-                        className={isLiking ? 'animate-spin' : ''}
+                        className={isLiking ? "animate-spin" : ""}
                       />
                       <span>{blog.likes}</span>
                     </button>
@@ -398,7 +398,9 @@ const BlogView: React.FC = () => {
                           onClick={() => openImageModal(index)}
                         >
                           <img
-                            src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${image}`}
+                            src={`${
+                              import.meta.env.VITE_API_IMAGE_BASE_URL
+                            }${image}`}
                             alt={`Additional image ${index + 1}`}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
@@ -430,7 +432,9 @@ const BlogView: React.FC = () => {
                           />
                         </button>
                         <img
-                          src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${blog.images[selectedImageIndex]}`}
+                          src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${
+                            blog.images[selectedImageIndex]
+                          }`}
                           alt={`Image ${selectedImageIndex + 1}`}
                           className="max-w-full max-h-full object-contain"
                         />
@@ -487,7 +491,7 @@ const BlogView: React.FC = () => {
                           <div>
                             <Text size="body-xs-lg">Keywords:</Text>
                             <Text size="body-xs-default" variant="grey-500">
-                              {blog.metadata.keywords.join(', ')}
+                              {blog.metadata.keywords.join(", ")}
                             </Text>
                           </div>
                         )}
@@ -496,7 +500,7 @@ const BlogView: React.FC = () => {
 
                 {/* Last Updated */}
                 <div className="mt-6 text-sm text-gray-500">
-                  Last updated:{' '}
+                  Last updated:{" "}
                   {format(
                     new Date(blog.updatedAt),
                     "MMMM dd, yyyy 'at' h:mm a"
@@ -564,7 +568,7 @@ const BlogView: React.FC = () => {
                     <span className="text-sm">Published</span>
                   </div>
                   <span className="font-semibold text-green-500 text-xs">
-                    {format(new Date(blog.createdAt), 'MMM dd, yyyy')}
+                    {format(new Date(blog.createdAt), "MMM dd, yyyy")}
                   </span>
                 </div>
               </div>
@@ -589,20 +593,20 @@ const BlogView: React.FC = () => {
                   <Icon
                     icon={
                       isLiking
-                        ? 'svg-spinners:ring-resize'
-                        : 'material-symbols:favorite'
+                        ? "svg-spinners:ring-resize"
+                        : "material-symbols:favorite"
                     }
                     className="w-4 h-4 mr-2"
                   />
-                  {isLiking ? 'Liking...' : 'Like Blog'}
+                  {isLiking ? "Liking..." : "Like Blog"}
                 </Button>
 
                 <Button
                   onClick={handleBookmark}
                   className={`w-full ${
                     isBookmarked
-                      ? 'bg-customorange/10 hover:bg-customorange/20 text-customorange border-customorange/30'
-                      : 'bg-gray-50 hover:bg-gray-100 text-gray-600 border-gray-200'
+                      ? "bg-customorange/10 hover:bg-customorange/20 text-customorange border-customorange/30"
+                      : "bg-gray-50 hover:bg-gray-100 text-gray-600 border-gray-200"
                   }`}
                   variant="outline"
                   size="sm"
@@ -610,12 +614,12 @@ const BlogView: React.FC = () => {
                   <Icon
                     icon={
                       isBookmarked
-                        ? 'material-symbols:bookmark'
-                        : 'material-symbols:bookmark-outline'
+                        ? "material-symbols:bookmark"
+                        : "material-symbols:bookmark-outline"
                     }
                     className="w-4 h-4 mr-2"
                   />
-                  {isBookmarked ? 'Bookmarked' : 'Bookmark'}
+                  {isBookmarked ? "Bookmarked" : "Bookmark"}
                 </Button>
               </div>
             </div>
@@ -684,7 +688,7 @@ const BlogView: React.FC = () => {
                       <Link
                         key={relatedBlog._id}
                         to={FrontendRoutes.BLOGDETAILS.replace(
-                          ':id',
+                          ":id",
                           relatedBlog._id
                         )}
                         className="group"
@@ -693,7 +697,9 @@ const BlogView: React.FC = () => {
                           {relatedBlog.featuredImage && (
                             <div className="aspect-video overflow-hidden">
                               <img
-                                src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${relatedBlog.featuredImage}`}
+                                src={`${
+                                  import.meta.env.VITE_API_IMAGE_BASE_URL
+                                }${relatedBlog.featuredImage}`}
                                 alt={relatedBlog.title}
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                               />
@@ -710,7 +716,7 @@ const BlogView: React.FC = () => {
                               <span>
                                 {format(
                                   new Date(relatedBlog.createdAt),
-                                  'MMM dd'
+                                  "MMM dd"
                                 )}
                               </span>
                               <div className="flex items-center gap-2">

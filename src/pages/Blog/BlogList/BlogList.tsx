@@ -141,14 +141,14 @@ const BlogList: React.FC = () => {
   const BlogCard: React.FC<{ blog: IBlog }> = ({ blog }) => (
     <div className="bg-white rounded-lg border hover:shadow-lg transition-all duration-200 overflow-hidden group">
       {/* Featured Image */}
-      <div className="aspect-video w-full overflow-hidden bg-gray-100">
+      <div className="aspect-[2/1] w-full overflow-hidden bg-gray-100">
         {blog.featuredImage ? (
           <img
             src={String(import.meta.env.VITE_API_IMAGE_BASE_URL).concat(
               blog.featuredImage
             )}
             alt={blog.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+            className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-200"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">

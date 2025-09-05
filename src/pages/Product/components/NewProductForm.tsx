@@ -35,7 +35,11 @@ const NewProductForm: React.FC = () => {
       name: get(product, "name", ""),
       slug: "",
       description: get(product, "description", ""),
-      productType: get(product, "productType", "gold"),
+      productType: get(product, "productType", "gold") as
+        | "normal"
+        | "diamond"
+        | "gold"
+        | "silver",
       dimension: get(product, "dimension", 0),
       category: get(product, "category._id", ""),
       subCategory: get(product, "subCategory._id", ""),

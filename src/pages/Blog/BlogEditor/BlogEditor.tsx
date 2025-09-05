@@ -693,7 +693,7 @@ const BlogEditor: React.FC = () => {
               </div>
 
               {/* Additional Images Card */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+              {/* <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="p-1 bg-customorange/10 rounded">
                     <Icon
@@ -737,7 +737,7 @@ const BlogEditor: React.FC = () => {
                     ))}
                   </div>
                 )}
-              </div>
+              </div> */}
             </div>
 
             {/* Right Column - Sidebar */}
