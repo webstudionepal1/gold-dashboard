@@ -1,11 +1,11 @@
-import { Icon } from '@iconify/react/dist/iconify.js';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { useAuth, useLogout } from '../../hooks/useAuth';
-import { useOutsideClick } from '../../hooks/UseOutsideClick';
-import { Text } from './Text';
-import { useSidebar } from './sidebar/SidebarHooks';
+import { Icon } from "@iconify/react/dist/iconify.js";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { useAuth, useLogout } from "../../hooks/useAuth";
+import { useOutsideClick } from "../../hooks/UseOutsideClick";
+import { Text } from "./Text";
+import { useSidebar } from "./sidebar/SidebarHooks";
 
 /*eslint-disable @typescript-eslint/no-explicit-any*/
 export const Navbar = () => {
@@ -45,12 +45,12 @@ export const Navbar = () => {
 
   const handleLogout = () => {
     logout();
-    toast.success('Logged out successfully');
+    toast.success("Logged out successfully");
     setShowLogout(false);
   };
 
   const handleViewAllClick = () => {
-    navigate('/notification');
+    navigate("/notification");
   };
 
   //   const handleNotificationClick = (type: string, _id: string) => {
@@ -159,9 +159,15 @@ export const Navbar = () => {
             </section>
           </div>
           <section className="relative">
-            <Icon icon="oui:arrow-down" fontSize={16} />
+            <Icon
+              icon="oui:arrow-down"
+              className={`transition-transform duration-300 ${
+                showLogout ? "rotate-180" : "rotate-0"
+              }`}
+              fontSize={16}
+            />
             {showLogout && (
-              <div className="absolute -right-6  top-8 w-[15rem] h-fit bg-white shadow-sm border rounded-lg">
+              <div className="absolute -right-6  top-8 min-w-[15rem] h-fit bg-white shadow-sm border rounded-lg">
                 <div className="flex flex-col items-center justify-center gap-2 p-4">
                   <div className="w-16 h-16 rounded-full">
                     <img
@@ -200,8 +206,8 @@ export const Navbar = () => {
           <Icon
             icon={
               isSidebarOpen
-                ? 'oui:cross'
-                : 'iconamoon:menu-burger-horizontal-light'
+                ? "oui:cross"
+                : "iconamoon:menu-burger-horizontal-light"
             }
             onClick={toggleSidebar}
             fontSize={24}

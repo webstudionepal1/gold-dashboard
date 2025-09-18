@@ -58,11 +58,6 @@ export const LoginPage = () => {
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-900 via-indigo-800 to-indigo-700">
       <div className="flex flex-col gap-4 p-8 border shadow-xl bg-white/10 backdrop-blur-md rounded-2xl w-80 border-white/30">
         <div className="flex justify-center items-center">
-          {/* <CompanyLogo
-            size="xl"
-            className="h-20 w-20 bg-white/20 rounded-lg p-2"
-            showLoadingState={true}
-          /> */}
           <img
             src={Constants.companyLogo}
             className="size-20 rounded-md aspect-square"
