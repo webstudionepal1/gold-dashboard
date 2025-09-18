@@ -21,6 +21,7 @@ const CompanyLogo: React.FC<CompanyLogoProps> = ({
 
   // Get the company logo URL
   const getLogoUrl = () => {
+    console.log("company", company);
     if (company?.logo && company.logo.length > 0) {
       const logoPath = company.logo[0];
       // Check if it's already a full URL or needs the base URL
@@ -57,7 +58,7 @@ const CompanyLogo: React.FC<CompanyLogoProps> = ({
 
   return (
     <img
-      src={getLogoUrl()}
+      src={'/componyLogo.png'}
       alt={alt || company?.companyName || company?.name || "Company Logo"}
       className={clsx(
         "object-contain transition-all duration-300",

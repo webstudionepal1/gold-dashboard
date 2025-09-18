@@ -6,6 +6,7 @@ import { useSidebar } from "./SidebarHooks";
 import { Text } from "./SidebarText";
 import { COLORS } from "./sidebarConstants";
 import CompanyLogo from "../CompanyLogo";
+import { Constants } from "@/utils/constants";
 
 interface SidebarInsetProps {
   children: React.ReactNode;
@@ -42,11 +43,11 @@ const SidebarHeader: React.FC = () => {
       )}
     >
       <img
-        src="/logo.png"
+        src={Constants.companyLogo}
         alt="company-logo"
         className={clsx(
-          isCollapsed ? "h-[50px] w-[44px]" : "w-28",
-          "transition-all duration-300 mx-auto aspect-video"
+          isCollapsed ? "size-[50px]" : "w-28",
+          "transition-all duration-300 mx-auto aspect-square"
         )}
       />
     </section>

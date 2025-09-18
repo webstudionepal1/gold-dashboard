@@ -1,3 +1,4 @@
+import { Constants } from "@/utils/constants";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useForm } from "@tanstack/react-form";
 import { useQueryClient } from "@tanstack/react-query";
@@ -6,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 import { twMerge } from "tailwind-merge";
 import * as z from "zod";
 import { useGetLoginMutation } from "../../server/api/authHooks";
-import CompanyLogo from "../../components/shared/CompanyLogo";
 export const FieldError = ({ field }: { field: any }) => {
   if (field.state.meta.errors.length > 0) {
     const error = field.state.meta.errors[0];
@@ -57,11 +57,16 @@ export const LoginPage = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-900 via-indigo-800 to-indigo-700">
       <div className="flex flex-col gap-4 p-8 border shadow-xl bg-white/10 backdrop-blur-md rounded-2xl w-80 border-white/30">
-        <div className="flex justify-center mb-4">
-          <CompanyLogo
+        <div className="flex justify-center items-center">
+          {/* <CompanyLogo
             size="xl"
             className="h-20 w-20 bg-white/20 rounded-lg p-2"
             showLoadingState={true}
+          /> */}
+          <img
+            src={Constants.companyLogo}
+            className="size-20 rounded-md aspect-square"
+            alt="compaylog"
           />
         </div>
         <h1 className="text-2xl font-bold text-center text-white">Login</h1>
