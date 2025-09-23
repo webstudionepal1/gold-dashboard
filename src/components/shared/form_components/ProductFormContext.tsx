@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState, useCallback } from "react";
 // Product Variant Interface - Stock fields removed as they're not needed
 export interface ProductVariant {
   sku?: string;
+  name?: string;
   price: number;
   wt: number;
   unit: "grams" | "kg" | "pieces" | "carats";
@@ -47,6 +48,7 @@ export interface ProductFormData {
   dimension: number;
   gender?: "male" | "female" | "unisex";
   makingCharges: number;
+  makingChargesType: "fixed" | "per";
 
   // Wastage
   wastage?: {
@@ -155,7 +157,7 @@ const defaultFormData: ProductFormData = {
   dimension: 0,
   gender: undefined,
   makingCharges: 0,
-
+  makingChargesType: "fixed",
   // Wastage
   wastage: undefined,
 

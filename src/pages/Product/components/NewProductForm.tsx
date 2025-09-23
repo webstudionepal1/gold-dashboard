@@ -153,8 +153,7 @@ const NewProductForm: React.FC = () => {
         formDataObj.append("length", formData.length.toString());
       if (formData.dimension)
         formDataObj.append("dimension", formData.dimension.toString());
-      if (formData.makingCharges)
-        formDataObj.append("makingCharges", formData.makingCharges.toString());
+
       if (formData.color) formDataObj.append("color", formData.color);
       if (formData.clarity) formDataObj.append("clarity", formData.clarity);
       if (formData.totalCarat)
@@ -166,6 +165,13 @@ const NewProductForm: React.FC = () => {
         );
 
       // Wastage - only for non-normal products
+      if (formData.makingCharges) {
+        formDataObj.append("makingCharges[type]", formData.makingChargesType);
+        formDataObj.append(
+          "makingCharges[value]",
+          formData.makingCharges.toString()
+        );
+      }
       if (formData.wastage) {
         formDataObj.append("wastage[type]", formData.wastage.type);
         formDataObj.append("wastage[value]", formData.wastage.value.toString());
@@ -178,6 +184,7 @@ const NewProductForm: React.FC = () => {
 
       // Only add weight and unit for non-normal products
       if (formData.productType !== "normal") {
+        formDataObj.append(`variant[${index}][name]`, get(variant, "name", ""));
         if (variant.wt !== undefined && variant.wt > 0) {
           formDataObj.append(`variant[${index}][wt]`, variant.wt.toString());
         }
