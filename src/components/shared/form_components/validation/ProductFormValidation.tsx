@@ -524,29 +524,6 @@ export const conditionalProductFormSchema = z
   )
   .refine(
     (data) => {
-      // For gold, silver, or diamond products: require length and dimension
-      if (
-        data.productType === "gold" ||
-        data.productType === "silver" ||
-        data.productType === "diamond"
-      ) {
-        return !!(
-          data.length &&
-          data.length > 0 &&
-          data.dimension &&
-          data.dimension > 0
-        );
-      }
-      return true;
-    },
-    {
-      message:
-        "Length and dimension are required for gold, silver, and diamond products",
-      path: ["length"],
-    }
-  )
-  .refine(
-    (data) => {
       // For gold, silver, or diamond products: require making charges
       if (
         data.productType === "gold" ||
@@ -574,23 +551,6 @@ export const conditionalProductFormSchema = z
     {
       message: "Clarity is required for diamond products",
       path: ["clarity"],
-    }
-  )
-  .refine(
-    (data) => {
-      // For gold, silver, or diamond products: require color
-      if (
-        data.productType === "gold" ||
-        data.productType === "silver" ||
-        data.productType === "diamond"
-      ) {
-        return !!(data.color && data.color.trim() !== "");
-      }
-      return true;
-    },
-    {
-      message: "Color is required for gold, silver, and diamond products",
-      path: ["color"],
     }
   )
   .refine(
