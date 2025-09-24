@@ -311,6 +311,7 @@ const CompactFormContent: React.FC<{
     // This is handled by ProductMediaPage now
   };
   console.log("errors", formik.errors);
+  console.log('initialvalues', initialData)
 
   return (
     <div className="min-h-screen bg-gray-50 relative">

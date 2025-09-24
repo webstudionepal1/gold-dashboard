@@ -66,7 +66,7 @@ const NewProductForm: React.FC = () => {
           unit: "grams" as "grams" | "kg" | "pieces" | "carats",
           isActive: true,
         },
-      ]),
+      ]).map((item) => ({ ...item, price: item.price ?? 0 })),
 
       // Stones and Occasions
       stones: get(product, "stones", []).map(
@@ -310,6 +310,7 @@ const NewProductForm: React.FC = () => {
     );
   }
 
+  console.log("getinitialData", getInitialData());
   return (
     <CompactProductForm
       isLoading={createPending || isPending}
