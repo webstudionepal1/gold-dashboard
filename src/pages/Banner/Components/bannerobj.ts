@@ -28,12 +28,15 @@ export const generateBannerFormDefaultValue = (
       description: "",
       category: "",
       subCategory: "",
-      // Price
       priority: 0,
-      image: null, // Null for new form, single file
-      mobImage: null, // Null for new form, single file
-      video: null, // Null for new form, single file
-      videoThumbnail: null, // Null for new form, single file
+      image: null,
+      existingImage: null, // add this
+      mobImage: null,
+      existingMobImage: null, // add this
+      video: null,
+      existingVideo: null, // add this
+      videoThumbnail: null,
+      existingVideoThumbnail: null, // add this
       locations: [],
     };
   } else {
@@ -43,14 +46,23 @@ export const generateBannerFormDefaultValue = (
       category: get(editData, "category", ""),
       subCategory: get(editData, "subCategory", ""),
       priority: get(editData, "priority", 0),
-      image: null, // Null for edit, new file will be uploaded
-      existingImage: get(editData, "image[0]"),
-      mobImage: null, // Null for edit, new file will be uploaded
-      existingMobImage: get(editData, "mobImage[0]"),
-      video: null, // Null for edit, new file will be uploaded
-      existingVideo: get(editData, "video[0]"),
-      videoThumbnail: null, // Null for edit, new file will be uploaded
-      existingVideoThumbnail: get(editData, "videoThumbnail[0]"),
+
+      // Main Web Image
+      image: null,
+      existingImage: get(editData, "image[0]", null),
+
+      // Mobile Image
+      mobImage: null,
+      existingMobImage: get(editData, "mobImage[0]", null),
+
+      // Video
+      video: null,
+      existingVideo: get(editData, "video[0]", null),
+
+      // Video Thumbnail
+      videoThumbnail: null,
+      existingVideoThumbnail: get(editData, "videoThumbnail[0]", null),
+
       locations: get(editData, "locations", []),
     };
   }

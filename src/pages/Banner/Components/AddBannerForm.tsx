@@ -22,6 +22,7 @@ import {
 import { cleanObject } from "../../../utils/cleanObject";
 import { bannerStore } from "./bannerStore";
 import { generateBannerFormDefaultValue } from "./bannerobj";
+import ImageDropzoneCrop from "@/components/shared/ImageDropzoneCrop";
 
 const AddBannerSchema = z
   .object({
@@ -364,21 +365,18 @@ const AddBannerForm = () => {
               <form.Field name="image">
                 {(field) => (
                   <div>
-                    <MultiImageUploader
-                      multiple={false}
-                      form={form}
-                      label=""
-                      value={field.state.value}
-                      existingFileField="existingImage"
-                      accept={{
-                        "image/*": [".png", ".jpg", ".jpeg", ".svg"],
-                      }}
-                      existingFile={form.getFieldValue("existingImage")}
-                      onChange={(file) => {
-                        field.handleChange(file);
-                        // When a new image is selected, clear the existing image
-                        if (file) {
-                          form.setFieldValue("existingImage", undefined);
+                    <ImageDropzoneCrop
+                      existing={
+                        form.getFieldValue("existingImage") || undefined
+                      }
+                      aspect={15 / 4}
+                      onChange={(fileOrFiles) => {
+                        const file = Array.isArray(fileOrFiles)
+                          ? fileOrFiles[0]
+                          : fileOrFiles;
+                        field.handleChange(file instanceof File ? file : null);
+                        if (file instanceof File) {
+                          form.setFieldValue("existingImage", null);
                         }
                       }}
                     />
@@ -396,21 +394,18 @@ const AddBannerForm = () => {
               <form.Field name="mobImage">
                 {(field) => (
                   <div>
-                    <MultiImageUploader
-                      multiple={false}
-                      form={form}
-                      label=""
-                      value={field.state.value}
-                      existingFileField="existingMobImage"
-                      accept={{
-                        "image/*": [".png", ".jpg", ".jpeg", ".svg"],
-                      }}
-                      existingFile={form.getFieldValue("existingMobImage")}
-                      onChange={(file) => {
-                        field.handleChange(file);
-                        // When a new image is selected, clear the existing image
-                        if (file) {
-                          form.setFieldValue("existingMobImage", undefined);
+                    <ImageDropzoneCrop
+                      existing={
+                        form.getFieldValue("existingMobImage") || undefined
+                      }
+                      aspect={16 / 9}
+                      onChange={(fileOrFiles) => {
+                        const file = Array.isArray(fileOrFiles)
+                          ? fileOrFiles[0]
+                          : fileOrFiles;
+                        field.handleChange(file instanceof File ? file : null);
+                        if (file instanceof File) {
+                          form.setFieldValue("existingMobImage", null);
                         }
                       }}
                     />
