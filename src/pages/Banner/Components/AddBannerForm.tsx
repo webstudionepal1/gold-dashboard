@@ -160,6 +160,7 @@ const AddBannerForm = () => {
     },
   });
 
+  console.log('form.state.value', form.state.values)
   const FieldError = ({
     field,
   }: {

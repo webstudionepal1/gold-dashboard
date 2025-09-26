@@ -49,11 +49,23 @@ export const generateBannerFormDefaultValue = (
 
       // Main Web Image
       image: null,
-      existingImage: get(editData, "image[0]", null),
+      existingImage: get(editData, "image[0]", null)
+        ? `${import.meta.env.VITE_API_IMAGE_BASE_URL}${get(
+            editData,
+            "image[0]",
+            null
+          )}`
+        : null,
 
       // Mobile Image
       mobImage: null,
-      existingMobImage: get(editData, "mobImage[0]", null),
+      existingMobImage: get(editData, "mobImage[0]", null)
+        ? `${import.meta.env.VITE_API_IMAGE_BASE_URL}${get(
+            editData,
+            "mobImage[0]",
+            null
+          )}`
+        : null,
 
       // Video
       video: null,

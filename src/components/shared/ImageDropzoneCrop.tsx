@@ -38,7 +38,7 @@ export const getCroppedImg = (
     image.onerror = () => reject("Failed to load image");
   });
 };
-     
+
 interface ImageDropzoneCropProps {
   multiple?: boolean;
   aspect?: number;
@@ -84,7 +84,7 @@ const ImageDropzoneCrop: React.FC<ImageDropzoneCropProps> = ({
     multiple,
   });
 
-  const handleCropComplete = useCallback((_, croppedAreaPixels: any) => {
+  const handleCropComplete = useCallback((_: any, croppedAreaPixels: any) => {
     setCroppedAreaPixels(croppedAreaPixels);
   }, []);
 
