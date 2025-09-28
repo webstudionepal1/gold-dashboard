@@ -11,9 +11,8 @@ import { BasicProductInformationPage } from "./product-form-pages/BasicProductIn
 import { ProductSpecificationsPage } from "./product-form-pages/ProductSpecificationsPage";
 import { ProductVariantsPage } from "./product-form-pages/ProductVariantsPage";
 import { ProductStonesOccasionsPage } from "./product-form-pages/ProductStonesOccasionsPage";
-import { ProductMediaPage } from "./product-form-pages/ProductMediaPage";
+import ProductMediaPage from "./product-form-pages/ProductMediaPage";
 import { ProductSEOMarketingPage } from "./product-form-pages/ProductSEOMarketingPage";
-
 
 // Define the steps for the stepper
 const FORM_STEPS: StepperStep[] = [
