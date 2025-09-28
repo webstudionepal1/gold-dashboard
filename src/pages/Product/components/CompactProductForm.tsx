@@ -24,7 +24,8 @@ import {
 import { mainProductFormSchema } from "../../../components/shared/form_components/validation/ProductFormValidation";
 import { Form, FormikProvider, useFormik } from "formik";
 import { DropdownTagField } from "@/components/shared/form_components/DropdownTags";
-import { ProductMediaPage } from "../../../components/shared/form_components/product-form-pages/ProductMediaPage";
+import ProductMediaPage from "../../../components/shared/form_components/product-form-pages/ProductMediaPage";
+import ImageDropzoneCrop from "@/components/shared/ImageDropzoneCrop";
 
 // Default Form Data
 const defaultFormData: ProductFormData = {
@@ -310,8 +311,6 @@ const CompactFormContent: React.FC<{
   const removeImage = (index: number) => {
     // This is handled by ProductMediaPage now
   };
-  console.log("errors", formik.errors);
-  console.log('initialvalues', initialData)
 
   return (
     <div className="min-h-screen bg-gray-50 relative">
@@ -1074,20 +1073,32 @@ const CompactFormContent: React.FC<{
             )}
 
             {/* Product Images - Show for all product types */}
-            <FormSection title="Product Images" icon="material-symbols:image">
-              <ProductMediaPage
-                selectedImages={selectedImages}
-                setSelectedImages={setSelectedImages}
-                dragActive={dragActive}
-                setDragActive={setDragActive}
-                handleDrag={handleDrag}
-                handleDrop={handleDrop}
-                handleFileInputChange={handleFileInputChange}
-                removeImage={removeImage}
-                formik={formik}
-                isEdit={isEdit}
-                isLoading={isLoading}
-              />
+            <FormSection
+              title="Product Images && Videos"
+              icon="material-symbols:image"
+            >
+              <div className="flex flex-col gap-y-2">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <Icon
+                      icon="material-symbols:photo-library"
+                      className="w-5 h-5 text-customorange"
+                    />
+                    Product Images
+                  </h3>
+                  <ImageDropzoneCrop
+                    onChange={(filesOrUrls) =>
+                      formik.setFieldValue("images", filesOrUrls)
+                    }
+                    aspect={4 / 5}
+                    multiple
+                    existing={(formik.values.images || []) as any}
+                  />
+                </div>
+
+                <ProductMediaPage
+                />
+              </div>
             </FormSection>
 
             {/* Tags - Required for all product types */}

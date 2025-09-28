@@ -208,12 +208,14 @@ const ImageDropzoneCrop: React.FC<ImageDropzoneCropProps> = ({
 
             <div className="flex justify-end mt-4 space-x-3">
               <button
+                type="button"
                 onClick={() => setCurrentImage(null)}
                 className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition"
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={handleCropSave}
                 className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
               >
@@ -243,6 +245,7 @@ const ImageDropzoneCrop: React.FC<ImageDropzoneCropProps> = ({
                 className="w-full h-full object-cover"
               />
               <button
+                type="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleRemoveImage(idx);

@@ -55,7 +55,10 @@ const NewProductForm: React.FC = () => {
         | "female"
         | "unisex"
         | undefined,
-      makingCharges: get(product, "makingCharges", 0),
+      makingCharges: get(product, "makingCharges.value", 0),
+      makingChargesType: get(product, "makingCharges.type", "fixed") as
+        | "fixed"
+        | "per",
 
       wastage: get(product, "wastage"), // Will be set by user
 
@@ -92,9 +95,10 @@ const NewProductForm: React.FC = () => {
           price: item.value,
         })
       ),
-      existingImages: get(product, "images", []),
       // Media
-      images: [],
+      images: get(product, "images", []).map(
+        (item) => `${import.meta.env.VITE_API_IMAGE_BASE_URL}${item}`
+      ),
       video: null,
       existingVideo: get(product, "video", null),
 
@@ -107,31 +111,6 @@ const NewProductForm: React.FC = () => {
       isFeatured: get(product, "isFeatured", false),
     };
   };
-
-  // Handle form submission
-  const handleFormSubmit = async (formData: ProductFormData) => {
-    try {
-      // Transform form data to API format
-      const apiData = transformFormDataToAPI(formData);
-
-      if (isEdit && id) {
-        await updateProductMutation({
-          id,
-          body: apiData,
-        });
-      } else {
-        await createProductMutation(apiData);
-      }
-
-      // Navigate back to products list on success
-      navigate("/product/product-list");
-    } catch (error) {
-      console.error("Error saving product:", error);
-      // Handle error (show toast, etc.)
-    }
-  };
-
-  // Transform form data to API format
   const transformFormDataToAPI = (formData: ProductFormData) => {
     const formDataObj = new FormData();
 
@@ -242,38 +221,19 @@ const NewProductForm: React.FC = () => {
         formDataObj.append("isFeatured", formData.isFeatured.toString());
     }
 
-    // Handle images - All product types can have images
-    if (formData.images && Array.isArray(formData.images)) {
-      // For updates, new images replace old ones
-      // For new products, just add the images
-      if (isEdit) {
-        // When updating, only send new images (Files)
-        // Existing images that weren't removed will be preserved on the server
-        const newImages = formData.images.filter(
-          (image) => image instanceof File
-        );
-        newImages.forEach((image: File) => {
-          formDataObj.append(`images`, image);
-        });
-
-        // If there are no new images but existing images were removed,
-        // we need to indicate that images should be cleared
-        if (
-          newImages.length === 0 &&
-          formData.existingImages &&
-          formData.existingImages.length === 0
-        ) {
-          formDataObj.append(`clearImages`, "true");
-        }
+    console.log("formiDAaa", formData.images);
+    formData.images.forEach((img, idx) => {
+      if (img instanceof File) {
+        formDataObj.append("images", img); // new files
       } else {
-        // For new products, send all images
-        formData.images.forEach((image: File | string) => {
-          if (image instanceof File) {
-            formDataObj.append(`images`, image);
-          }
-        });
+        const baseUrl = import.meta.env.VITE_API_IMAGE_BASE_URL;
+        const relativePath = img.startsWith(baseUrl)
+          ? img.replace(baseUrl, "")
+          : img;
+
+        formDataObj.append(`existingImages[${idx}]`, relativePath);
       }
-    }
+    });
 
     // Handle video - All product types can have videos
     if (formData.video) {
@@ -292,6 +252,31 @@ const NewProductForm: React.FC = () => {
 
     return formDataObj;
   };
+  // Handle form submission
+  const handleFormSubmit = async (formData: ProductFormData) => {
+    try {
+      // Transform form data to API format
+      const apiData = transformFormDataToAPI(formData);
+
+      if (isEdit && id) {
+        await updateProductMutation({
+          id,
+          body: apiData,
+        });
+      } else {
+        await createProductMutation(apiData);
+      }
+
+      // Navigate back to products list on success
+      navigate("/product/product-list");
+    } catch (error) {
+      console.error("Error saving product:", error);
+      // Handle error (show toast, etc.)
+    }
+  };
+
+  // Transform form data to API format
+
 
   // Handle form cancellation
   const handleFormCancel = () => {
