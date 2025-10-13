@@ -32,7 +32,6 @@ export interface ProductFormData {
   description: string;
   productType?: "normal" | "diamond" | "gold" | "silver";
   category: string;
-  subCategory: string;
   existingImages?: string[];
 
   // Page 2: Product Specifications
@@ -138,7 +137,6 @@ const defaultFormData: ProductFormData = {
   description: "",
   productType: "gold",
   category: "",
-  subCategory: "",
 
   // Page 2: Product Specifications
   length: 0,

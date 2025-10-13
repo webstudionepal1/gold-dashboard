@@ -4,6 +4,7 @@ import { useGetCollectionByIdQuery } from '../../../server/api/collectionHooks';
 import Breadcrumbs from '../../../components/shared/Breadcrumb';
 import { format } from 'date-fns';
 import SafeImage from '../../../components/ui/SafeImage';
+import { getSafeProductCount } from '@/utils/numberUtils';
 
 const CollectionDetails = () => {
   const navigate = useNavigate();
@@ -134,7 +135,7 @@ const CollectionDetails = () => {
                       />
                       <span className="text-gray-500">Products:</span>
                       <span className="font-medium text-gray-700">
-                        {collection.totalProducts || 0}
+                        {getSafeProductCount(collection.totalProducts)}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">

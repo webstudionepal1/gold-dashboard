@@ -42,7 +42,6 @@ const NewProductForm: React.FC = () => {
       productType: get(product, 'productType', 'gold'),
       dimension: get(product, 'dimension', 0),
       category: get(product, 'category._id', ''),
-      subCategory: get(product, 'subCategory._id', ''),
       tags: get(product, 'tags', []),
 
       // Specifications
@@ -143,8 +142,6 @@ const NewProductForm: React.FC = () => {
     // Only add these fields if product type is not 'normal'
     if (formData.productType !== 'normal') {
       if (formData.category) formDataObj.append('category', formData.category);
-      if (formData.subCategory)
-        formDataObj.append('subCategory', formData.subCategory);
       if (formData.gender) formDataObj.append('gender', formData.gender);
 
       // Specifications - only for non-normal products

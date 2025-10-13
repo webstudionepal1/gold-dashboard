@@ -279,7 +279,7 @@ const ProductForm = () => {
                     )}
                   </form.Field>
 
-                  <form.Field name="subCategory">
+                  {/* <form.Field name="subCategory">
                     {(field) => (
                       <div>
                         <DropdownField
@@ -298,7 +298,7 @@ const ProductForm = () => {
                         )}
                       </div>
                     )}
-                  </form.Field>
+                  </form.Field> */}
                 </div>
               </div>
             </div>

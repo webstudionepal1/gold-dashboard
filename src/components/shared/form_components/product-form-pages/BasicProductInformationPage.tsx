@@ -267,7 +267,9 @@ export const BasicProductInformationPage: React.FC = () => {
               ))}
             </div>
 
-            {/* Sub-Category */}
+            {/*
+            Sub-Category - hidden. To re-enable, uncomment the block below.
+
             <div className="space-y-2">
               <DropdownField
                 label="Product Sub-Category"
@@ -298,6 +300,8 @@ export const BasicProductInformationPage: React.FC = () => {
                 </p>
               ))}
             </div>
+
+            */}
           </div>
         </div>
 
