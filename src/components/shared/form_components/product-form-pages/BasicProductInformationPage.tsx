@@ -251,7 +251,7 @@ export const BasicProductInformationPage: React.FC = () => {
                 value={formData.category}
                 onChange={(e) => {
                   const value = e.target.value;
-                  updateFormData({ category: value, subCategory: "" }); // Reset subcategory when category changes
+                  updateFormData({ category: value }); // Update category
                   validateCategory(value);
                 }}
                 onBlur={(e) => validateCategory(e.target.value)}
