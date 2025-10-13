@@ -1,16 +1,3 @@
-/**
- * CompactProductForm - A single-page product form with modern UI using Formik
- *
- * DRY Principles Applied:
- * 1. FormSection component - Reusable section wrapper with consistent styling
- * 2. FieldGroup component - Responsive grid layout for form fields
- * 3. ErrorDisplay component - Consistent error message display
- * 4. Validation using Zod schema with Formik
- * 5. Shared form components - InputField, DropdownField, TextareaField
- * 6. Consistent styling patterns using Tailwind CSS classes
- * 7. Reusable event handlers for form updates
- */
-
 import React, { useState } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { ProductFormData } from "../../../components/shared/form_components/ProductFormContext";
@@ -418,19 +405,19 @@ const CompactFormContent: React.FC<{
                     <div>
                       <DropdownField
                         label="Sub Category"
-                        required
+                        // required
                         options={[...subCategoryOptions]}
                         value={formik.values.subCategory}
                         onChange={(e) => {
                           formik.setFieldValue("subCategory", e.target.value);
                         }}
                       />
-                      {formik.errors.subCategory &&
+                      {/* {formik.errors.subCategory &&
                         formik.touched.subCategory && (
                           <ErrorDisplay
                             errors={[formik.errors.subCategory as string]}
                           />
-                        )}
+                        )} */}
                     </div>
 
                     <div>
