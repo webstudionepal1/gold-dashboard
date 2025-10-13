@@ -87,13 +87,13 @@ export const PurchaseDetailsCard: React.FC<PropDetails> = ({
             <div className="flex justify-between">
               <span className="text-gray-600">Total Return Amount:</span>
               <span className="font-semibold">
-                ₹{(data as IFetchPurchaseReturn).totalReturnAmount || 0}
+                Rs.{(data as IFetchPurchaseReturn).totalReturnAmount || 0}
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Refund Amount:</span>
               <span className="font-semibold">
-                ₹{(data as IFetchPurchaseReturn).refundAmount || 0}
+                Rs.{(data as IFetchPurchaseReturn).refundAmount || 0}
               </span>
             </div>
           </div>
@@ -113,7 +113,7 @@ export const PurchaseDetailsCard: React.FC<PropDetails> = ({
             <div className="flex justify-between">
               <span className="text-gray-600">Total Amount:</span>
               <span className="font-semibold">
-                ₹{rows.reduce((acc, item) => acc + (item.total || 0), 0)}
+                Rs.{rows.reduce((acc, item) => acc + (item.total || 0), 0)}
               </span>
             </div>
           </div>
