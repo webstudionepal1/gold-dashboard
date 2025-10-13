@@ -130,6 +130,7 @@ const GiftsAdminPanel: React.FC = () => {
       ),
       pricing: (() => {
         const calculatedPrices = calculateGiftPrices(gift);
+        console.log(calculatedPrices, "aa ");
         return (
           <div>
             {calculatedPrices.hasValidProducts ? (
@@ -191,7 +192,8 @@ const GiftsAdminPanel: React.FC = () => {
       <Header text="Gifts & Packages Management">
         <button
           onClick={handleCreateGift}
-          className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-sm text-white px-4 py-2 flex rounded-lg transition-colors duration-200">
+          className="bg-[#DF8D28] hover:bg-[#DF8D28]/90 text-sm text-white px-4 py-2 flex rounded-lg transition-colors duration-200"
+        >
           <Icon icon="ic:outline-add" fontSize={18} />
           Create Gift
         </button>
@@ -231,7 +233,8 @@ const GiftsAdminPanel: React.FC = () => {
                 <div className="relative">
                   <label
                     htmlFor="type-filter"
-                    className="block text-xs font-medium text-gray-700 mb-1">
+                    className="block text-xs font-medium text-gray-700 mb-1"
+                  >
                     Type
                   </label>
                   <select
@@ -242,7 +245,8 @@ const GiftsAdminPanel: React.FC = () => {
                         e.target.value as "all" | "gift" | "package"
                       )
                     }
-                    className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm min-w-[120px]">
+                    className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm min-w-[120px]"
+                  >
                     <option value="all">All Types</option>
                     <option value="gift">Gifts</option>
                     <option value="package">Packages</option>
@@ -253,14 +257,16 @@ const GiftsAdminPanel: React.FC = () => {
                 <div className="relative">
                   <label
                     htmlFor="occasion-filter"
-                    className="block text-xs font-medium text-gray-700 mb-1">
+                    className="block text-xs font-medium text-gray-700 mb-1"
+                  >
                     Occasion
                   </label>
                   <select
                     id="occasion-filter"
                     value={selectedOccasion}
                     onChange={(e) => setSelectedOccasion(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm min-w-[120px]">
+                    className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm min-w-[120px]"
+                  >
                     <option value="all">All Occasions</option>
                     {occassion.map((occasion) => (
                       <option key={occasion} value={occasion}>
@@ -274,14 +280,16 @@ const GiftsAdminPanel: React.FC = () => {
                 <div className="relative">
                   <label
                     htmlFor="settype-filter"
-                    className="block text-xs font-medium text-gray-700 mb-1">
+                    className="block text-xs font-medium text-gray-700 mb-1"
+                  >
                     Set Type
                   </label>
                   <select
                     id="settype-filter"
                     value={selectedSetType}
                     onChange={(e) => setSelectedSetType(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm min-w-[140px]">
+                    className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm min-w-[140px]"
+                  >
                     <option value="all">All Set Types</option>
                     <option value="necklace_set">Necklace Set</option>
                     <option value="bridal_set">Bridal Set</option>
@@ -317,7 +325,8 @@ const GiftsAdminPanel: React.FC = () => {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         title="Create New Gift"
-        size="lg">
+        size="lg"
+      >
         <GiftForm
           onSuccess={() => {
             setIsCreateModalOpen(false);
@@ -333,7 +342,8 @@ const GiftsAdminPanel: React.FC = () => {
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         title="Edit Gift"
-        size="lg">
+        size="lg"
+      >
         {selectedGift && (
           <GiftForm
             gift={selectedGift}
@@ -352,7 +362,8 @@ const GiftsAdminPanel: React.FC = () => {
         isOpen={isDetailsModalOpen}
         onClose={() => setIsDetailsModalOpen(false)}
         title="Gift Details"
-        size="lg">
+        size="lg"
+      >
         {selectedGift && (
           <GiftDetailsModal
             gift={selectedGift}

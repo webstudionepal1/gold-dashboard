@@ -211,11 +211,11 @@ export const calculateGiftPrices = (gift: IFetchGift): GiftPriceCalculation => {
  * @returns Formatted price string
  */
 export const formatPrice = (price: number): string => {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
+  const formatted = new Intl.NumberFormat("en-IN", {
     minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   }).format(price);
+  return `Rs. ${formatted}`;
 };
 
 /**

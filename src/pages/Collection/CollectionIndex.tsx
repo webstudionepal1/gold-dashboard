@@ -9,7 +9,6 @@ import {
 } from "../../server/api/collectionHooks";
 import MasterTable from "../../components/shared/MasterTable";
 import Header from "../../components/shared/table_heading/Header";
-import { get } from "lodash";
 import SafeImage from "../../components/ui/SafeImage";
 
 // Filter and sort options for collections
@@ -101,13 +100,16 @@ const CollectionIndex: React.FC = () => {
         ),
       },
       {
-        key: "totalProducts",
+        key: "selectedProduct",
         title: "Products",
         width: "8%",
-        render: (value: number) => (
-          <span className="text-sm font-medium">{value || 0}</span>
+        render: (_: any, row: IFetchCollection) => (
+          <span className="text-sm font-medium">
+            {row.selectedProduct?.length || 0}
+          </span>
         ),
       },
+
       {
         key: "materialType",
         title: "Material",
