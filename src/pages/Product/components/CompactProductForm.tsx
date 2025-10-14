@@ -4,10 +4,7 @@ import { ProductFormData } from "../../../components/shared/form_components/Prod
 import { InputField } from "../../../components/shared/form_components/InputField";
 import { DropdownField } from "../../../components/shared/form_components/Dropdown";
 import { TextareaField } from "../../../components/shared/form_components/TextArea";
-import {
-  useGetAllProductCategoriesQuery,
-  useGetAllProductSubCategoriesQuery,
-} from "../../../server/api/productHooks";
+import { useGetAllProductCategoriesQuery } from "../../../server/api/productHooks";
 import { mainProductFormSchema } from "../../../components/shared/form_components/validation/ProductFormValidation";
 import { Form, FormikProvider, useFormik } from "formik";
 import { DropdownTagField } from "@/components/shared/form_components/DropdownTags";
@@ -21,7 +18,6 @@ const defaultFormData: ProductFormData = {
   description: "",
   productType: "gold",
   category: "",
-  subCategory: "",
   existingImages: [],
 
   // Product Specifications
@@ -182,19 +178,10 @@ const CompactFormContent: React.FC<{
 
   // API hooks
   const { data: categories } = useGetAllProductCategoriesQuery();
-  const { data: subCategories } = useGetAllProductSubCategoriesQuery(
-    {
-      category: formik.values.category,
-    },
-    { enabled: !!formik.values.category }
-  );
 
   // Transform data for dropdowns
   const categoryOptions =
     categories?.map((cat: any) => ({ value: cat._id, label: cat.name })) || [];
-  const subCategoryOptions =
-    subCategories?.map((sub: any) => ({ value: sub._id, label: sub.name })) ||
-    [];
 
   // Helper functions for form updates
   const updateVariant = (index: number, field: string, value: any) => {
@@ -400,24 +387,6 @@ const CompactFormContent: React.FC<{
                           errors={[formik.errors.category as string]}
                         />
                       )}
-                    </div>
-
-                    <div>
-                      <DropdownField
-                        label="Sub Category"
-                        // required
-                        options={[...subCategoryOptions]}
-                        value={formik.values.subCategory}
-                        onChange={(e) => {
-                          formik.setFieldValue("subCategory", e.target.value);
-                        }}
-                      />
-                      {/* {formik.errors.subCategory &&
-                        formik.touched.subCategory && (
-                          <ErrorDisplay
-                            errors={[formik.errors.subCategory as string]}
-                          />
-                        )} */}
                     </div>
 
                     <div>

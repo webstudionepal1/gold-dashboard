@@ -2,6 +2,7 @@ import React from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { IFetchCategory } from "@/server/api/productHooks";
 import { get } from "lodash";
+import { getSafeProductCount } from "@/utils/numberUtils";
 
 interface ViewProductCategoryProps {
   isOpen: boolean;
@@ -59,7 +60,7 @@ const ViewProductCategory: React.FC<ViewProductCategoryProps> = ({
               Total Products
             </h3>
             <p className="text-lg text-gray-800">
-              {get(viewData, "totalProducts", 0)}
+              {getSafeProductCount(get(viewData, "totalProducts"))}
             </p>
           </div>
 

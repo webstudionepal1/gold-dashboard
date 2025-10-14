@@ -35,7 +35,6 @@ export const basicProductInformationSchema = z.object({
     required_error: 'Product type is required',
   }),
   category: z.string().optional(),
-  subCategory: z.string().optional(),
 });
 
 // Page 2: Product Specifications Schema
@@ -369,7 +368,6 @@ export const conditionalProductFormSchema = z
 
     // Fields that are required for specific product types
     category: z.string().optional(),
-    subCategory: z.string().optional(),
     length: z.number().min(0, 'Length cannot be negative').optional(),
     dimension: z.number().min(0, 'Dimension cannot be negative').optional(),
     makingCharges: z
@@ -471,24 +469,6 @@ export const conditionalProductFormSchema = z
     {
       message: 'Category is required for gold, silver, and diamond products',
       path: ['category'],
-    }
-  )
-  .refine(
-    (data) => {
-      // For gold, silver, or diamond products: require subCategory
-      if (
-        data.productType === 'gold' ||
-        data.productType === 'silver' ||
-        data.productType === 'diamond'
-      ) {
-        return !!(data.subCategory && data.subCategory.trim() !== '');
-      }
-      return true;
-    },
-    {
-      message:
-        'Sub-category is required for gold, silver, and diamond products',
-      path: ['subCategory'],
     }
   )
   .refine(

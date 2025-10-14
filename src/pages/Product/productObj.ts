@@ -28,7 +28,6 @@ export interface IProductFormValues {
   slug?: string;
   description: string;
   category: string;
-  subCategory?: string;
   variant: ProductVariant[];
   length: number;
   claspType?: string;
@@ -64,7 +63,6 @@ export const productFormSchema = z
     name: z.string().min(1, 'Name is required'),
     description: z.string().min(1, 'Description is required'),
     category: z.string().min(1, 'Category is required'),
-    subCategory: z.string().optional(),
 
     // Price - Fixed validation
     variant: z
@@ -134,7 +132,6 @@ export const generateProductDefaultValue = (state: string, editData?: any) => {
       name: '',
       description: '',
       category: '',
-      subCategory: '',
       variant: [{ price: 0, wt: 0, unit: 'gm' }],
       length: 0,
       claspType: '',
@@ -152,7 +149,6 @@ export const generateProductDefaultValue = (state: string, editData?: any) => {
       name: get(editData, 'name', ''),
       description: get(editData, 'description', ''),
       category: get(editData, 'category._id', ''),
-      subCategory: get(editData, 'subCategory._id', ''),
       variant: get(editData, 'variant', [{ price: 0, wt: 0, unit: 'gm' }]),
       length: get(editData, 'length', 0),
       claspType: (() => {
@@ -187,7 +183,6 @@ export const productListColumns = [
   { title: 'Image', key: 'image' },
   { title: 'Product', key: 'product' },
   { title: 'Category', key: 'categ' },
-  { title: 'Sub Category', key: 'subCate' },
   // { title: "Price", key: "price" },
   // { title: "Stock", key: "stock" },
   // { title: "Sold", key: "sold" },

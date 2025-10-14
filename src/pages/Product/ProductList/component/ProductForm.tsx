@@ -117,9 +117,6 @@ const ProductForm = () => {
         formData.append('description', value.description);
         formData.append('category', value.category);
 
-        if (value.subCategory && value.subCategory.trim() !== '') {
-          formData.append('subCategory', value.subCategory);
-        }
 
         value.variant.forEach((v, index: number) => {
           formData.append(`variant[${index}][price]`, String(v.price));
@@ -265,8 +262,7 @@ const ProductForm = () => {
                           value={field.state.value}
                           onChange={(e) => {
                             field.handleChange(e.target.value);
-                            // Reset subcategory when category changes
-                            form.setFieldValue('subCategory', '');
+                            // Category changed
                           }}
                         />
                         <FieldError field={field} />
@@ -279,7 +275,7 @@ const ProductForm = () => {
                     )}
                   </form.Field>
 
-                  <form.Field name="subCategory">
+                  {/* <form.Field name="subCategory">
                     {(field) => (
                       <div>
                         <DropdownField
@@ -298,7 +294,7 @@ const ProductForm = () => {
                         )}
                       </div>
                     )}
-                  </form.Field>
+                  </form.Field> */}
                 </div>
               </div>
             </div>
