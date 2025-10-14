@@ -1,25 +1,10 @@
-/**
- * CompactProductForm - A single-page product form with modern UI using Formik
- *
- * DRY Principles Applied:
- * 1. FormSection component - Reusable section wrapper with consistent styling
- * 2. FieldGroup component - Responsive grid layout for form fields
- * 3. ErrorDisplay component - Consistent error message display
- * 4. Validation using Zod schema with Formik
- * 5. Shared form components - InputField, DropdownField, TextareaField
- * 6. Consistent styling patterns using Tailwind CSS classes
- * 7. Reusable event handlers for form updates
- */
-
 import React, { useState } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { ProductFormData } from "../../../components/shared/form_components/ProductFormContext";
 import { InputField } from "../../../components/shared/form_components/InputField";
 import { DropdownField } from "../../../components/shared/form_components/Dropdown";
 import { TextareaField } from "../../../components/shared/form_components/TextArea";
-import {
-  useGetAllProductCategoriesQuery,
-} from "../../../server/api/productHooks";
+import { useGetAllProductCategoriesQuery } from "../../../server/api/productHooks";
 import { mainProductFormSchema } from "../../../components/shared/form_components/validation/ProductFormValidation";
 import { Form, FormikProvider, useFormik } from "formik";
 import { DropdownTagField } from "@/components/shared/form_components/DropdownTags";
@@ -404,7 +389,6 @@ const CompactFormContent: React.FC<{
                         />
                       )}
                     </div>
-
 
                     <div>
                       <DropdownField

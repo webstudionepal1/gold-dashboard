@@ -39,7 +39,7 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
     totalDiscountedPrice: 0,
     savings: 0,
     hasValidProducts: false,
-    productBreakdown: []
+    productBreakdown: [],
   };
 
   // Handle image modal
@@ -91,7 +91,8 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
             <div
               className={`p-3 rounded-xl ${
                 gift.type === "gift" ? "bg-purple-100" : "bg-blue-100"
-              }`}>
+              }`}
+            >
               {gift.type === "gift" ? (
                 <Icon
                   icon="material-symbols:card-giftcard"
@@ -114,7 +115,8 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
                     gift?.isActive
                       ? "bg-green-100 text-green-700"
                       : "bg-gray-100 text-gray-700"
-                  }`}>
+                  }`}
+                >
                   {gift?.isActive ? "✓ Active" : "⚠ Inactive"}
                 </span>
                 <span className="px-3 py-1 bg-white rounded-full text-sm font-medium text-gray-700 capitalize">
@@ -130,7 +132,8 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
           </div>
           <button
             onClick={onEdit}
-            className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl">
+            className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+          >
             <Icon icon="material-symbols:edit" className="w-5 h-5" />
             <span className="font-medium">Edit Gift</span>
           </button>
@@ -286,7 +289,8 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
                     : (gift?.priority || 0) >= 5
                     ? "bg-yellow-100 text-yellow-700"
                     : "bg-green-100 text-green-700"
-                }`}>
+                }`}
+              >
                 {gift?.priority || "Not set"}
               </span>
             </div>
@@ -332,7 +336,8 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
               {gift?.tags?.map((tag, index) => (
                 <span
                   key={index}
-                  className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 text-sm font-medium rounded-lg border border-blue-200 hover:shadow-md transition-shadow">
+                  className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 text-sm font-medium rounded-lg border border-blue-200 hover:shadow-md transition-shadow"
+                >
                   <Icon icon="material-symbols:tag" className="w-4 h-4 mr-2" />
                   {tag}
                 </span>
@@ -403,210 +408,223 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
               </div>
             </div>
           )}
-          {gift.products?.filter(giftProduct => giftProduct && giftProduct.product).map((giftProduct, index) => (
-            <div
-              key={index}
-              className="border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow bg-gradient-to-r from-gray-50 to-white">
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex-1">
-                  <h4 className="font-semibold text-gray-900">
-                    {giftProduct.product?.name || "Unknown Product"}
-                  </h4>
-                  <p className="text-sm text-gray-600 mt-1">
-                    {giftProduct.product?.description || "No description available"}
-                  </p>
-                  <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
-                    <span>Category: {giftProduct.product?.category?.name || "N/A"}</span>
-                    <span>
-                      Subcategory: {giftProduct.product?.subCategory?.name || "N/A"}
-                    </span>
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        giftProduct.product.isActive &&
+          {gift.products
+            ?.filter((giftProduct) => giftProduct && giftProduct.product)
+            .map((giftProduct, index) => (
+              <div
+                key={index}
+                className="border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow bg-gradient-to-r from-gray-50 to-white"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-gray-900">
+                      {giftProduct.product?.name || "Unknown Product"}
+                    </h4>
+                    <p className="text-sm text-gray-600 mt-1">
+                      {giftProduct.product?.description ||
+                        "No description available"}
+                    </p>
+                    <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
+                      <span>
+                        Category: {giftProduct.product?.category?.name || "N/A"}
+                      </span>
+                      <span>
+                        Subcategory:{" "}
+                        {giftProduct.product?.subCategory?.name || "N/A"}
+                      </span>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          giftProduct.product.isActive &&
+                          giftProduct.product.variant?.[0]?.price
+                            ? "bg-green-100 text-green-700"
+                            : "bg-red-100 text-red-700"
+                        }`}
+                      >
+                        {giftProduct.product.isActive &&
                         giftProduct.product.variant?.[0]?.price
-                          ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-700"
-                      }`}>
-                      {giftProduct.product.isActive &&
-                      giftProduct.product.variant?.[0]?.price
-                        ? "✓ Priced"
-                        : "⚠ No Price"}
-                    </span>
-                  </div>
-                </div>
-                <div className="text-right ml-4">
-                  <div className="text-lg font-semibold text-gray-900">
-                    {formatPrice(giftProduct.product.variant[0]?.price || 0)}
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    Qty: {giftProduct.quantity}
-                  </div>
-                  <div className="text-sm font-medium text-green-600 mt-1">
-                    Total:{" "}
-                    {formatPrice(
-                      (giftProduct.product.variant[0]?.price || 0) *
-                        giftProduct.quantity
-                    )}
-                  </div>
-                  {giftProduct.isOptional && (
-                    <span className="inline-block px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-md mt-1">
-                      Optional
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Product Details */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                <div>
-                  <span className="text-gray-600">Weight:</span>
-                  <span className="ml-1 font-medium">
-                    {giftProduct?.product?.variant[0]?.wt || 0}{" "}
-                    {giftProduct?.product?.variant[0]?.unit || "grams"}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-gray-600">Making Charges:</span>
-                  <span className="ml-1 font-medium">
-                    {formatPrice(giftProduct?.product?.makingCharges || 0)}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-gray-600">Color:</span>
-                  <span className="ml-1 font-medium capitalize">
-                    {giftProduct?.product?.color || "N/A"}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-gray-600">Clarity:</span>
-                  <span className="ml-1 font-medium">
-                    {giftProduct?.product?.clarity || "N/A"}
-                  </span>
-                </div>
-              </div>
-
-              {/* Price Breakdown for this product */}
-              {calculatedPrices.productBreakdown[index]?.status ===
-                "calculated" && (
-                <div className="mt-3 pt-3 border-t border-gray-100 bg-blue-50 rounded-lg p-3">
-                  <h5 className="text-sm font-medium text-blue-800 mb-2">
-                    Price Breakdown:
-                  </h5>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
-                    <div className="flex justify-between">
-                      <span className="text-blue-600">Base Price:</span>
-                      <span className="font-medium">
-                        {formatPrice(
-                          calculatedPrices.productBreakdown[index].basePrice
-                        )}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-blue-600">Making:</span>
-                      <span className="font-medium">
-                        {formatPrice(
-                          calculatedPrices.productBreakdown[index].makingCharges
-                        )}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-blue-600">Wastage:</span>
-                      <span className="font-medium">
-                        {formatPrice(
-                          calculatedPrices.productBreakdown[index].wastageCost
-                        )}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-blue-600">Stones:</span>
-                      <span className="font-medium">
-                        {formatPrice(
-                          calculatedPrices.productBreakdown[index].stonesCost
-                        )}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-blue-600">Others:</span>
-                      <span className="font-medium">
-                        {formatPrice(
-                          calculatedPrices.productBreakdown[index].othersCost
-                        )}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-blue-600">Per Unit:</span>
-                      <span className="font-medium font-semibold">
-                        {formatPrice(
-                          calculatedPrices.productBreakdown[index].pricePerUnit
-                        )}
+                          ? "✓ Priced"
+                          : "⚠ No Price"}
                       </span>
                     </div>
                   </div>
-                </div>
-              )}
-
-              {/* Alternative Products */}
-              {giftProduct.alternativeProducts &&
-                giftProduct.alternativeProducts.length > 0 && (
-                  <div className="mt-3 pt-3 border-t border-gray-100">
-                    <h5 className="text-sm font-medium text-gray-700 mb-2">
-                      Alternative Products:
-                    </h5>
-                    <div className="space-y-2">
-                      {giftProduct.alternativeProducts
-                        .filter(altProduct => altProduct && altProduct.name)
-                        .map((altProduct, altIndex) => (
-                          <div
-                            key={altIndex}
-                            className="flex items-center justify-between text-sm bg-gray-50 rounded p-2">
-                            <span className="font-medium">
-                              {altProduct?.name || "Unknown Product"}
-                            </span>
-                            <span className="text-gray-600">
-                              {formatPrice(altProduct?.variant?.[0]?.price || 0)}
-                            </span>
-                          </div>
-                        ))}
+                  <div className="text-right ml-4">
+                    <div className="text-lg font-semibold text-gray-900">
+                      {formatPrice(giftProduct.product.variant[0]?.price || 0)}
                     </div>
-                  </div>
-                )}
-
-              {/* Product Images */}
-              {giftProduct.product?.images &&
-                giftProduct.product.images.length > 0 && (
-                  <div className="mt-3 pt-3 border-t border-gray-100">
-                    <h5 className="text-sm font-medium text-gray-700 mb-2">
-                      Product Images:
-                    </h5>
-                    <div className="flex space-x-2 overflow-x-auto">
-                      {giftProduct.product.images
-                        .slice(0, 3)
-                        .map((image, imgIndex) => (
-                          <img
-                            key={imgIndex}
-                            src={import.meta.env.VITE_API_IMAGE_BASE_URL.toString().concat(
-                              image
-                            )}
-                            alt={`${giftProduct?.product?.name || "Product"} ${
-                              imgIndex + 1
-                            }`}
-                            className="w-16 h-16 object-cover rounded border border-gray-200 flex-shrink-0"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.src = "/no-image.png";
-                            }}
-                          />
-                        ))}
-                      {giftProduct.product.images.length > 3 && (
-                        <div className="w-16 h-16 bg-gray-100 rounded border border-gray-200 flex items-center justify-center text-xs text-gray-500 flex-shrink-0">
-                          +{giftProduct?.product?.images?.length - 3}
-                        </div>
+                    <div className="text-sm text-gray-500">
+                      Qty: {giftProduct.quantity}
+                    </div>
+                    <div className="text-sm font-medium text-green-600 mt-1">
+                      Total:{" "}
+                      {formatPrice(
+                        (giftProduct.product.variant[0]?.price || 0) *
+                          giftProduct.quantity
                       )}
                     </div>
+                    {giftProduct.isOptional && (
+                      <span className="inline-block px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-md mt-1">
+                        Optional
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Product Details */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div>
+                    <span className="text-gray-600">Weight:</span>
+                    <span className="ml-1 font-medium">
+                      {giftProduct?.product?.variant[0]?.wt || 0}{" "}
+                      {giftProduct?.product?.variant[0]?.unit || "grams"}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Making Charges:</span>
+                    <span className="ml-1 font-medium">
+                      {formatPrice(giftProduct?.product?.makingCharges || 0)}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Color:</span>
+                    <span className="ml-1 font-medium capitalize">
+                      {giftProduct?.product?.color || "N/A"}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Clarity:</span>
+                    <span className="ml-1 font-medium">
+                      {giftProduct?.product?.clarity || "N/A"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Price Breakdown for this product */}
+                {calculatedPrices.productBreakdown[index]?.status ===
+                  "calculated" && (
+                  <div className="mt-3 pt-3 border-t border-gray-100 bg-blue-50 rounded-lg p-3">
+                    <h5 className="text-sm font-medium text-blue-800 mb-2">
+                      Price Breakdown:
+                    </h5>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+                      <div className="flex justify-between">
+                        <span className="text-blue-600">Base Price:</span>
+                        <span className="font-medium">
+                          {formatPrice(
+                            calculatedPrices.productBreakdown[index].basePrice
+                          )}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-blue-600">Making:</span>
+                        <span className="font-medium">
+                          {formatPrice(
+                            calculatedPrices.productBreakdown[index]
+                              .makingCharges
+                          )}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-blue-600">Wastage:</span>
+                        <span className="font-medium">
+                          {formatPrice(
+                            calculatedPrices.productBreakdown[index].wastageCost
+                          )}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-blue-600">Stones:</span>
+                        <span className="font-medium">
+                          {formatPrice(
+                            calculatedPrices.productBreakdown[index].stonesCost
+                          )}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-blue-600">Others:</span>
+                        <span className="font-medium">
+                          {formatPrice(
+                            calculatedPrices.productBreakdown[index].othersCost
+                          )}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-blue-600">Per Unit:</span>
+                        <span className=" font-semibold">
+                          {formatPrice(
+                            calculatedPrices.productBreakdown[index]
+                              .pricePerUnit
+                          )}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 )}
-            </div>
-          ))}
+
+                {/* Alternative Products */}
+                {giftProduct.alternativeProducts &&
+                  giftProduct.alternativeProducts.length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-gray-100">
+                      <h5 className="text-sm font-medium text-gray-700 mb-2">
+                        Alternative Products:
+                      </h5>
+                      <div className="space-y-2">
+                        {giftProduct.alternativeProducts
+                          .filter((altProduct) => altProduct && altProduct.name)
+                          .map((altProduct, altIndex) => (
+                            <div
+                              key={altIndex}
+                              className="flex items-center justify-between text-sm bg-gray-50 rounded p-2"
+                            >
+                              <span className="font-medium">
+                                {altProduct?.name || "Unknown Product"}
+                              </span>
+                              <span className="text-gray-600">
+                                {formatPrice(
+                                  altProduct?.variant?.[0]?.price || 0
+                                )}
+                              </span>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+
+                {/* Product Images */}
+                {giftProduct.product?.images &&
+                  giftProduct.product.images.length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-gray-100">
+                      <h5 className="text-sm font-medium text-gray-700 mb-2">
+                        Product Images:
+                      </h5>
+                      <div className="flex space-x-2 overflow-x-auto">
+                        {giftProduct.product.images
+                          .slice(0, 3)
+                          .map((image, imgIndex) => (
+                            <img
+                              key={imgIndex}
+                              src={import.meta.env.VITE_API_IMAGE_BASE_URL.toString().concat(
+                                image
+                              )}
+                              alt={`${
+                                giftProduct?.product?.name || "Product"
+                              } ${imgIndex + 1}`}
+                              className="w-16 h-16 object-cover rounded border border-gray-200 flex-shrink-0"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.src = "/no-image.png";
+                              }}
+                            />
+                          ))}
+                        {giftProduct.product.images.length > 3 && (
+                          <div className="w-16 h-16 bg-gray-100 rounded border border-gray-200 flex items-center justify-center text-xs text-gray-500 flex-shrink-0">
+                            +{giftProduct?.product?.images?.length - 3}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+              </div>
+            ))}
         </div>
       </div>
 
@@ -630,7 +648,8 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
               <div
                 key={index}
                 className="relative aspect-square overflow-hidden rounded-lg group cursor-pointer"
-                onClick={() => openImageModal(index)}>
+                onClick={() => openImageModal(index)}
+              >
                 <img
                   src={import.meta.env.VITE_API_IMAGE_BASE_URL.toString().concat(
                     image
@@ -658,12 +677,14 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
       <div className="flex items-center justify-end space-x-4 pt-8 border-t border-gray-200">
         <button
           onClick={onClose}
-          className="px-6 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-200 font-medium">
+          className="px-6 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-200 font-medium"
+        >
           Close
         </button>
         <button
           onClick={onEdit}
-          className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl font-medium">
+          className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl font-medium"
+        >
           Edit Gift
         </button>
       </div>
@@ -675,7 +696,8 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
             {/* Close Button */}
             <button
               onClick={closeImageModal}
-              className="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all duration-200 backdrop-blur-sm">
+              className="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all duration-200 backdrop-blur-sm"
+            >
               <Icon icon="material-symbols:close" className="w-6 h-6" />
             </button>
 
@@ -690,7 +712,8 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
                         : gift.images!.length - 1;
                     setSelectedImageIndex(newIndex);
                   }}
-                  className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-200 backdrop-blur-sm">
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-200 backdrop-blur-sm"
+                >
                   <Icon
                     icon="material-symbols:chevron-left"
                     className="w-6 h-6"
@@ -704,7 +727,8 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
                         : 0;
                     setSelectedImageIndex(newIndex);
                   }}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-200 backdrop-blur-sm">
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-200 backdrop-blur-sm"
+                >
                   <Icon
                     icon="material-symbols:chevron-right"
                     className="w-6 h-6"
@@ -741,7 +765,8 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
                       index === selectedImageIndex
                         ? "border-white shadow-lg"
                         : "border-transparent hover:border-gray-300"
-                    }`}>
+                    }`}
+                  >
                     <SafeImage
                       src={image}
                       alt={`Thumbnail ${index + 1}`}
