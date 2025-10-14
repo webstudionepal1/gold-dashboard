@@ -545,8 +545,8 @@ const CompactFormContent: React.FC<{
                   </div>
                 </FieldGroup>
 
-                {/* Wastage Section */}
-                <div className="mt-4 pt-4 border-t border-gray-200">
+                {/* Wastage Section - Commented out */}
+                {/* <div className="mt-4 pt-4 border-t border-gray-200">
                   <h4 className="text-sm font-medium text-gray-900 mb-3">
                     Wastage
                   </h4>
@@ -597,7 +597,7 @@ const CompactFormContent: React.FC<{
                   {formik.errors.wastage && formik.touched.wastage && (
                     <ErrorDisplay errors={[formik.errors.wastage as string]} />
                   )}
-                </div>
+                </div> */}
               </FormSection>
             )}
 

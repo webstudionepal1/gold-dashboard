@@ -477,19 +477,19 @@ export const conditionalProductFormSchema = z
       path: ['category'],
     }
   )
-  .refine(
-    (data) => {
-      // For gold or silver products: require wastage
-      if (data.productType === 'gold' || data.productType === 'silver') {
-        return !!data.wastage;
-      }
-      return true;
-    },
-    {
-      message: 'Wastage is required for gold and silver products',
-      path: ['wastage'],
-    }
-  )
+  // .refine(
+  //   (data) => {
+  //     // For gold or silver products: require wastage
+  //     if (data.productType === 'gold' || data.productType === 'silver') {
+  //       return !!data.wastage;
+  //     }
+  //     return true;
+  //   },
+  //   {
+  //     message: 'Wastage is required for gold and silver products',
+  //     path: ['wastage'],
+  //   }
+  // )
   .refine(
     (data) => {
       // For gold, silver, or diamond products: require totalCarat

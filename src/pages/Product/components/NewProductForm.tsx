@@ -164,11 +164,11 @@ const NewProductForm: React.FC = () => {
           formData.rhodoumFinishes.toString()
         );
 
-      // Wastage - only for non-normal products
-      if (formData.wastage) {
-        formDataObj.append('wastage[type]', formData.wastage.type);
-        formDataObj.append('wastage[value]', formData.wastage.value.toString());
-      }
+      // Wastage - only for non-normal products (commented out)
+      // if (formData.wastage) {
+      //   formDataObj.append('wastage[type]', formData.wastage.type);
+      //   formDataObj.append('wastage[value]', formData.wastage.value.toString());
+      // }
     }
 
     // Variants - Only send fields that are actually used in the form
