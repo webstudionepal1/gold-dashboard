@@ -55,15 +55,18 @@ const CollectionIndex: React.FC = () => {
           <div className="flex items-center gap-3">
             <SafeImage
               src={
-                row.bannerImage
-                  ? `${
-                      import.meta.env.VITE_API_IMAGE_BASE_URL
-                    }${row.bannerImage.toString()}`
+                row?.bannerImage
+                  ? `${import.meta.env.VITE_API_IMAGE_BASE_URL}${
+                      row.bannerImage
+                    }`
+                  : row?.images?.[0]
+                  ? `${import.meta.env.VITE_API_IMAGE_BASE_URL}${row.images[0]}`
                   : "/no-image.png"
               }
-              alt={row.name}
+              alt={row?.name || "Collection Image"}
               className="w-10 h-10 rounded-lg object-cover"
             />
+
             <div>
               <p className="font-medium text-gray-900">{value}</p>
               <p className="text-sm text-gray-500">{row.slug}</p>
