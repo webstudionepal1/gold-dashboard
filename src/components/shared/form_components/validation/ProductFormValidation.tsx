@@ -39,7 +39,7 @@ export const basicProductInformationSchema = z.object({
 
 // Page 2: Product Specifications Schema
 export const productSpecificationsSchema = z.object({
-  length: z.number().min(0, 'Length cannot be negative'),
+  length: z.number().min(0, 'Length cannot be negative').optional(),
   claspType: z.string().optional(),
   rhodoumFinishes: z.boolean(),
   shape: z.string().min(1, 'Shape is required'),
@@ -47,8 +47,9 @@ export const productSpecificationsSchema = z.object({
   totalCarat: z.number().min(0, 'Total carat cannot be negative').optional(),
   color: z.string().optional(),
   clarity: z.string().min(1, 'Clarity is required'),
-  dimension: z.number().min(0, 'Dimension cannot be negative'),
-  makingCharges: z.number().min(0, 'Making charges cannot be negative'),
+  dimension: z.number().min(0, 'Dimension cannot be negative').optional(),
+  // makingCharges: z.number().min(0, 'Making charges cannot be negative'),
+  makingChargesPercentage: z.number().min(0, 'Making charges percentage cannot be negative').max(100, 'Making charges percentage cannot exceed 100%'),
 });
 
 // Product Variant Schema - Stock fields removed as they're not needed
@@ -290,7 +291,7 @@ export const getStepFields = (step: number, productType?: string): string[] => {
       if (productType === 'normal') {
         return [];
       }
-      return ['length', 'dimension', 'makingCharges', 'color', 'totalCarat'];
+      return ['makingChargesPercentage', 'color', 'totalCarat'];
     case 3:
       return ['variants'];
     case 4:
@@ -370,9 +371,14 @@ export const conditionalProductFormSchema = z
     category: z.string().optional(),
     length: z.number().min(0, 'Length cannot be negative').optional(),
     dimension: z.number().min(0, 'Dimension cannot be negative').optional(),
-    makingCharges: z
+    // makingCharges: z
+    //   .number()
+    //   .min(0, 'Making charges cannot be negative')
+    //   .optional(),
+    makingChargesPercentage: z
       .number()
-      .min(0, 'Making charges cannot be negative')
+      .min(0, 'Making charges percentage cannot be negative')
+      .max(100, 'Making charges percentage cannot exceed 100%')
       .optional(),
     color: z.string().optional(),
     clarity: z.string().optional(),
@@ -501,45 +507,45 @@ export const conditionalProductFormSchema = z
       path: ['totalCarat'],
     }
   )
+  // .refine(
+  //   (data) => {
+  //     // For gold, silver, or diamond products: require length and dimension
+  //     if (
+  //       data.productType === 'gold' ||
+  //       data.productType === 'silver' ||
+  //       data.productType === 'diamond'
+  //     ) {
+  //       return !!(
+  //         data.length &&
+  //         data.length > 0 &&
+  //         data.dimension &&
+  //         data.dimension > 0
+  //       );
+  //     }
+  //     return true;
+  //   },
+  //   {
+  //     message:
+  //       'Length and dimension are required for gold, silver, and diamond products',
+  //     path: ['length'],
+  //   }
+  // )
   .refine(
     (data) => {
-      // For gold, silver, or diamond products: require length and dimension
+      // For gold, silver, or diamond products: require making charges percentage
       if (
         data.productType === 'gold' ||
         data.productType === 'silver' ||
         data.productType === 'diamond'
       ) {
-        return !!(
-          data.length &&
-          data.length > 0 &&
-          data.dimension &&
-          data.dimension > 0
-        );
+        return !!(data.makingChargesPercentage && data.makingChargesPercentage >= 0);
       }
       return true;
     },
     {
       message:
-        'Length and dimension are required for gold, silver, and diamond products',
-      path: ['length'],
-    }
-  )
-  .refine(
-    (data) => {
-      // For gold, silver, or diamond products: require making charges
-      if (
-        data.productType === 'gold' ||
-        data.productType === 'silver' ||
-        data.productType === 'diamond'
-      ) {
-        return !!(data.makingCharges && data.makingCharges >= 0);
-      }
-      return true;
-    },
-    {
-      message:
-        'Making charges are required for gold, silver, and diamond products',
-      path: ['makingCharges'],
+        'Making charges percentage is required for gold, silver, and diamond products',
+      path: ['makingChargesPercentage'],
     }
   )
   .refine(

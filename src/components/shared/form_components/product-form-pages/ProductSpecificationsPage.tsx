@@ -130,9 +130,13 @@ export const ProductSpecificationsPage: React.FC = () => {
   const validateMakingCharges = (value: number) => {
     const errors: string[] = [];
     if (value < 0) {
-      errors.push('Making charges cannot be negative');
+      errors.push('Making charges percentage cannot be negative');
     }
-    updateValidation('makingCharges', errors.length === 0, errors);
+    if (value > 100) {
+      errors.push('Making charges percentage cannot exceed 100%');
+    }
+    // updateValidation('makingCharges', errors.length === 0, errors);
+    updateValidation('makingChargesPercentage', errors.length === 0, errors);
   };
 
   const validateTotalCarat = (value: number) => {
@@ -434,22 +438,23 @@ export const ProductSpecificationsPage: React.FC = () => {
             {/* Making Charges */}
             <div className="space-y-2">
               <InputField
-                label="Making Charges"
+                label="Making Charges (%)"
                 type="number"
                 step="0.01"
                 placeholder="0.00"
-                numberValue={formData.makingCharges || 0}
+                numberValue={formData.makingChargesPercentage || 0}
                 onNumberChange={(value) => {
-                  updateFormData({ makingCharges: value });
+                  updateFormData({ makingChargesPercentage: value });
                   validateMakingCharges(value);
                 }}
                 allowNegative={false}
                 clearZeroOnFocus={true}
+                max={100}
               />
               <p className="text-sm text-gray-500">
-                Additional charges for craftsmanship
+                Additional charges for craftsmanship (percentage)
               </p>
-              {validationState.makingCharges?.errors.map((error, index) => (
+              {validationState.makingChargesPercentage?.errors.map((error, index) => (
                 <p
                   key={index}
                   className="text-red-500 text-sm flex items-center gap-1"

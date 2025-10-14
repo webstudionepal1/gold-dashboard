@@ -76,14 +76,14 @@ export const productFormSchema = z
       .min(1, 'At least one variant is required'),
 
     // Product Specification
-    length: z.number().min(0.01, 'Length must be greater than 0'),
+    length: z.number().min(0.01, 'Length must be greater than 0').optional(),
     claspType: z.string().optional(),
     rhodoumFinishes: z.boolean(),
 
     // Material Information
     shape: z.string().min(1, 'Shape is required'),
     clarity: z.string().min(1, 'Clarity is required'),
-    dimension: z.number().min(0.01, 'Dimension must be greater than 0'),
+    dimension: z.number().min(0.01, 'Dimension must be greater than 0').optional(),
 
     // Image - Fixed field name
     images: z.instanceof(File).nullable(),

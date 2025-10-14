@@ -45,7 +45,8 @@ export interface ProductFormData {
   clarity: string;
   dimension: number;
   gender?: "male" | "female" | "unisex";
-  makingCharges: number;
+  // makingCharges: number;
+  makingChargesPercentage: number;
 
   // Wastage
   wastage?: {
@@ -149,7 +150,8 @@ const defaultFormData: ProductFormData = {
   clarity: "",
   dimension: 0,
   gender: undefined,
-  makingCharges: 0,
+  // makingCharges: 0,
+  makingChargesPercentage: 0,
 
   // Wastage
   wastage: undefined,

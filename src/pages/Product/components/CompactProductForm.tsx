@@ -46,7 +46,8 @@ const defaultFormData: ProductFormData = {
   clarity: "",
   dimension: 0,
   gender: undefined,
-  makingCharges: 0,
+  // makingCharges: 0,
+  makingChargesPercentage: 0,
 
   // Wastage
   wastage: undefined,
@@ -483,16 +484,17 @@ const CompactFormContent: React.FC<{
 
                   <div>
                     <InputField
-                      label="Making Charges"
+                      label="Making Charges (%)"
                       type="number"
                       step="0.01"
                       placeholder="0.00"
-                      numberValue={formik.values.makingCharges || 0}
+                      numberValue={formik.values.makingChargesPercentage || 0}
                       onNumberChange={(value) =>
-                        formik.setFieldValue("makingCharges", value)
+                        formik.setFieldValue("makingChargesPercentage", value)
                       }
                       allowNegative={false}
                       clearZeroOnFocus
+                      max={100}
                     />
                   </div>
 

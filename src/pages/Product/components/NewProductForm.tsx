@@ -55,7 +55,8 @@ const NewProductForm: React.FC = () => {
         | 'female'
         | 'unisex'
         | undefined,
-      makingCharges: Number(get(product, 'makingCharges', 0)),
+      // makingCharges: Number(get(product, 'makingCharges', 0)),
+      makingChargesPercentage: Number(get(product, 'makingChargesPercentage', 0)),
 
       wastage: get(product, 'wastage'), // Will be set by user
 
@@ -149,8 +150,10 @@ const NewProductForm: React.FC = () => {
         formDataObj.append('length', formData.length.toString());
       if (formData.dimension)
         formDataObj.append('dimension', formData.dimension.toString());
-      if (formData.makingCharges)
-        formDataObj.append('makingCharges', formData.makingCharges.toString());
+      // if (formData.makingCharges)
+      //   formDataObj.append('makingCharges', formData.makingCharges.toString());
+      if (formData.makingChargesPercentage)
+        formDataObj.append('makingChargesPercentage', formData.makingChargesPercentage.toString());
       if (formData.color) formDataObj.append('color', formData.color);
       if (formData.clarity) formDataObj.append('clarity', formData.clarity);
       if (formData.totalCarat)
