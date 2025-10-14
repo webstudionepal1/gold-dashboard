@@ -55,14 +55,14 @@ const ViewProductCategory: React.FC<ViewProductCategoryProps> = ({
             </p>
           </div>
 
-          <div className="bg-gray-50 p-4 rounded-lg">
+          {/* <div className="bg-gray-50 p-4 rounded-lg">
             <h3 className="text-sm font-semibold text-gray-600">
               Total Products
             </h3>
             <p className="text-lg text-gray-800">
               {getSafeProductCount(get(viewData, "totalProducts"))}
             </p>
-          </div>
+          </div> */}
 
           <img
             src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${get(
