@@ -55,7 +55,7 @@ const ViewProductSubCategory: React.FC<ViewProductCategoryProps> = ({
                 : "No description available"}
             </p>
           </div>
-
+          {/* 
           <div className="bg-gray-50 p-4 rounded-lg">
             <h3 className="text-sm font-semibold text-gray-600">
               Total Products
@@ -63,7 +63,7 @@ const ViewProductSubCategory: React.FC<ViewProductCategoryProps> = ({
             <p className="text-lg text-gray-800">
               {get(viewData, "totalProducts", 0)}
             </p>
-          </div>
+          </div> */}
 
           {/* {viewData.subCategory && viewData.subCategory.length > 0 && (
             <div className="bg-gray-50 p-4 rounded-lg">

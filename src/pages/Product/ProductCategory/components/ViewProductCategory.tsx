@@ -54,14 +54,14 @@ const ViewProductCategory: React.FC<ViewProductCategoryProps> = ({
             </p>
           </div>
 
-          <div className="bg-gray-50 p-4 rounded-lg">
+          {/* <div className="bg-gray-50 p-4 rounded-lg">
             <h3 className="text-sm font-semibold text-gray-600">
               Total Products
             </h3>
             <p className="text-lg text-gray-800">
               {get(viewData, "totalProducts", 0)}
             </p>
-          </div>
+          </div> */}
 
           {/* {viewData.subCategory && viewData.subCategory.length > 0 && (
             <div className="bg-gray-50 p-4 rounded-lg">
