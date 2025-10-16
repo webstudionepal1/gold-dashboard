@@ -1077,7 +1077,7 @@ const CompactFormContent: React.FC<{
               title="Product Images & Videos"
               icon="material-symbols:image"
             >
-              <div className="flex flex-col gap-y-2">
+              <div className="grid grid-cols-2 gap-2 justify-between gap-y-2">
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                     <Icon

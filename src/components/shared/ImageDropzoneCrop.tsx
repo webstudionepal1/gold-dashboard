@@ -161,7 +161,7 @@ const ImageDropzoneCrop: React.FC<ImageDropzoneCropProps> = ({
       {/* Dropzone */}
       <div
         {...getRootProps()}
-        className={`w-full p-8 border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer transition-all
+        className={`w-full p-8 border-2 h-24 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer transition-all
           ${
             isDragActive
               ? "border-blue-500 bg-blue-50 shadow-lg"
@@ -203,7 +203,7 @@ const ImageDropzoneCrop: React.FC<ImageDropzoneCropProps> = ({
               step={0.01}
               value={zoom}
               onChange={(e) => setZoom(Number(e.target.value))}
-              className="mt-3 w-full"
+              className="mt-3 w-full "
             />
 
             <div className="flex justify-end mt-4 space-x-3">
