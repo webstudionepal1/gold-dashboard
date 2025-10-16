@@ -1074,7 +1074,7 @@ const CompactFormContent: React.FC<{
 
             {/* Product Images - Show for all product types */}
             <FormSection
-              title="Product Images && Videos"
+              title="Product Images & Videos"
               icon="material-symbols:image"
             >
               <div className="flex flex-col gap-y-2">
