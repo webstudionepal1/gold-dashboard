@@ -92,7 +92,6 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
     get(product, "clarity");
 
   // For normal products, show simplified view
-  console.log("reiew", review);
   if (isNormalProduct) {
     return (
       <div className="space-y-3 col-span-2">
@@ -152,7 +151,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
   // Build specifications conditionally
   const specifications: { [key: string]: string } = {
     "Making Charges": get(product, "makingCharges", 0)
-      ? `Rs ${(get(product, "makingCharges", 0) || 0).toLocaleString()}`
+      ? `Rs ${(get(product, "makingCharges.value", 0) || 0).toLocaleString()}`
       : "Rs 0",
     "Rhodoum Finishes": get(product, "rhodoumFinishes", false) ? "Yes" : "No",
   };
@@ -227,7 +226,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
                 <span
                   className={`px-2 py-1 text-xs font-medium rounded-full ${
                     get(product, "isActive", true)
-                      ? "bg-green-100 text-green-800"
+                      ? "bg-green text-white"
                       : "bg-red-100 text-red-800"
                   }`}
                 >
@@ -277,7 +276,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
             Array.isArray(product.tags) &&
             product.tags.length > 0 && (
               <div className="flex flex-wrap gap-1">
-                {product.tags.slice(0, 4).map((tag, index) => (
+                {product.tags.slice(0, 10).map((tag, index) => (
                   <span
                     key={index}
                     className="px-2 py-1 text-xs font-medium text-blue-700 bg-blue-50 rounded-full"
@@ -288,11 +287,11 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
                       : "tag"}
                   </span>
                 ))}
-                {product.tags.length > 4 && (
+                {/* {product.tags.length > 4 && (
                   <span className="px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-full">
                     +{product.tags.length - 4}
                   </span>
-                )}
+                )} */}
               </div>
             )}
 
@@ -347,7 +346,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
                         <span
                           className={`px-2 py-1 text-xs font-medium rounded-full ${
                             get(item, "isActive", true)
-                              ? "bg-green text-green-800"
+                              ? "bg-green text-white"
                               : "bg-gray-100 text-gray-800"
                           }`}
                         >
@@ -464,7 +463,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
       )}
 
       {/* Compact Information Sections */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-1 gap-3">
         <DropdownSection
           title="Basic Information"
           data={basicInfo}
