@@ -134,7 +134,8 @@ const ProductList: React.FC = () => {
                   <div className="bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
                     <div
                       className="h-48 bg-gray-100 flex items-center justify-center"
-                      style={{ width: "500px" }}>
+                      style={{ width: "500px" }}
+                    >
                       <span className="text-gray-400 text-sm">
                         No image available
                       </span>
@@ -189,8 +190,14 @@ const ProductList: React.FC = () => {
           </div>
         ),
         product: get(product, "name", ""),
-        categ: product.productType !== "normal" ? get(product, "category.name", "-") : "-",
-        subCate: product.productType !== "normal" ? get(product, "subCategory.name", "-") : "-",
+        categ:
+          product.productType !== "normal"
+            ? get(product, "category.name", "-")
+            : "-",
+        subCate:
+          product.productType !== "normal"
+            ? get(product, "subCategory.name", "-")
+            : "-",
         price: get(product, "price", 0),
         stock: get(product, "variant[0].remainingStock", 0),
         sold: get(product, "variant[0].usedStock", 0),
@@ -200,7 +207,8 @@ const ProductList: React.FC = () => {
               get(product, "isActive", true)
                 ? "bg-green-100 text-green-800"
                 : "bg-red-100 text-red-800"
-            }`}>
+            }`}
+          >
             {get(product, "isActive", true) ? "Active" : "Inactive"}
           </span>
         ),
