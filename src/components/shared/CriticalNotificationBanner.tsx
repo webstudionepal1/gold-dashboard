@@ -131,7 +131,8 @@ const CriticalNotificationBanner: React.FC<CriticalNotificationBannerProps> = ({
               exit={{ opacity: 0, x: 300, scale: 0.8 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
               className={`${config.bgColor} ${config.textColor} rounded-lg shadow-lg border-l-4 ${config.borderColor} cursor-pointer hover:shadow-xl transition-shadow duration-200`}
-              onClick={() => handleClick(notification)}>
+              onClick={() => handleClick(notification)}
+            >
               <div className="p-4">
                 <div className="flex items-start justify-between">
                   <div className="flex items-start space-x-3 flex-1">
@@ -156,14 +157,15 @@ const CriticalNotificationBanner: React.FC<CriticalNotificationBannerProps> = ({
                             notification.priority === "critical"
                               ? "bg-red-800 text-red-100"
                               : "bg-black bg-opacity-20 text-white"
-                          }`}>
+                          }`}
+                        >
                           {notification.priority.toUpperCase()}
                         </span>
 
                         {/* Additional metadata */}
                         {notification.metadata?.amount && (
                           <span className="text-xs opacity-75">
-                            ₹{notification.metadata.amount.toLocaleString()}
+                            Rs. {notification.metadata.amount.toLocaleString()}
                           </span>
                         )}
                       </div>
@@ -173,7 +175,8 @@ const CriticalNotificationBanner: React.FC<CriticalNotificationBannerProps> = ({
                   <button
                     onClick={(e) => handleDismiss(notification.id, e)}
                     className="ml-2 p-1 hover:bg-black hover:bg-opacity-20 rounded-full transition-colors duration-150 flex-shrink-0"
-                    aria-label="Dismiss notification">
+                    aria-label="Dismiss notification"
+                  >
                     <X className="w-4 h-4" />
                   </button>
                 </div>
@@ -203,7 +206,8 @@ const CriticalNotificationBanner: React.FC<CriticalNotificationBannerProps> = ({
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="text-center">
+          className="text-center"
+        >
           <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-600 text-white">
             +
             {notifications.filter(

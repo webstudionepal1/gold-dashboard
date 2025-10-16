@@ -1,15 +1,27 @@
-import React, { useState } from 'react';
-import { Bell, X, Check, CheckCheck, Filter, AlertTriangle, AlertCircle, Info } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import useCriticalNotifications from '../../hooks/useCriticalNotifications';
-import { CriticalNotification } from './CriticalNotificationBanner';
+import React, { useState } from "react";
+import {
+  Bell,
+  X,
+  Check,
+  CheckCheck,
+  Filter,
+  AlertTriangle,
+  AlertCircle,
+  Info,
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import useCriticalNotifications from "../../hooks/useCriticalNotifications";
+import { CriticalNotification } from "./CriticalNotificationBanner";
 
 interface NotificationCenterProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const NotificationCenter: React.FC<NotificationCenterProps> = ({ isOpen, onClose }) => {
+const NotificationCenter: React.FC<NotificationCenterProps> = ({
+  isOpen,
+  onClose,
+}) => {
   const {
     notifications,
     unreadCount,
@@ -17,21 +29,21 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ isOpen, onClose
     markAsRead,
     markAllAsRead,
     getNotificationsByPriority,
-    getNotificationStats
+    getNotificationStats,
   } = useCriticalNotifications();
 
-  const [selectedFilter, setSelectedFilter] = useState<string>('all');
-  const [selectedPriority, setSelectedPriority] = useState<string>('all');
+  const [selectedFilter, setSelectedFilter] = useState<string>("all");
+  const [selectedPriority, setSelectedPriority] = useState<string>("all");
 
   const stats = getNotificationStats();
 
   const getPriorityIcon = (priority: string) => {
     switch (priority) {
-      case 'critical':
+      case "critical":
         return <AlertTriangle className="w-4 h-4 text-red-500" />;
-      case 'high':
+      case "high":
         return <AlertCircle className="w-4 h-4 text-orange-500" />;
-      case 'medium':
+      case "medium":
         return <Info className="w-4 h-4 text-yellow-500" />;
       default:
         return <Info className="w-4 h-4 text-blue-500" />;
@@ -40,32 +52,38 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ isOpen, onClose
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'critical':
-        return 'border-l-red-500 bg-red-50';
-      case 'high':
-        return 'border-l-orange-500 bg-orange-50';
-      case 'medium':
-        return 'border-l-yellow-500 bg-yellow-50';
+      case "critical":
+        return "border-l-red-500 bg-red-50";
+      case "high":
+        return "border-l-orange-500 bg-orange-50";
+      case "medium":
+        return "border-l-yellow-500 bg-yellow-50";
       default:
-        return 'border-l-blue-500 bg-blue-50';
+        return "border-l-blue-500 bg-blue-50";
     }
   };
 
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp);
     const now = new Date();
-    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+    const diffInMinutes = Math.floor(
+      (now.getTime() - date.getTime()) / (1000 * 60)
+    );
 
-    if (diffInMinutes < 1) return 'Just now';
+    if (diffInMinutes < 1) return "Just now";
     if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
     if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
     return date.toLocaleDateString();
   };
 
-  const filteredNotifications = notifications.filter(notification => {
-    if (selectedFilter === 'unread' && notification.isRead) return false;
-    if (selectedFilter === 'read' && !notification.isRead) return false;
-    if (selectedPriority !== 'all' && notification.priority !== selectedPriority) return false;
+  const filteredNotifications = notifications.filter((notification) => {
+    if (selectedFilter === "unread" && notification.isRead) return false;
+    if (selectedFilter === "read" && !notification.isRead) return false;
+    if (
+      selectedPriority !== "all" &&
+      notification.priority !== selectedPriority
+    )
+      return false;
     return true;
   });
 
@@ -86,10 +104,10 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ isOpen, onClose
       onClick={onClose}
     >
       <motion.div
-        initial={{ x: '100%' }}
+        initial={{ x: "100%" }}
         animate={{ x: 0 }}
-        exit={{ x: '100%' }}
-        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+        exit={{ x: "100%" }}
+        transition={{ type: "spring", damping: 25, stiffness: 200 }}
         className="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
@@ -98,7 +116,9 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ isOpen, onClose
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Bell className="w-5 h-5 text-gray-600" />
-              <h2 className="text-lg font-semibold text-gray-900">Notifications</h2>
+              <h2 className="text-lg font-semibold text-gray-900">
+                Notifications
+              </h2>
               {unreadCount > 0 && (
                 <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
                   {unreadCount}
@@ -124,7 +144,9 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ isOpen, onClose
               <div className="text-gray-500">High</div>
             </div>
             <div className="text-center">
-              <div className="font-semibold text-yellow-600">{stats.medium}</div>
+              <div className="font-semibold text-yellow-600">
+                {stats.medium}
+              </div>
               <div className="text-gray-500">Medium</div>
             </div>
             <div className="text-center">
@@ -139,37 +161,37 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ isOpen, onClose
           <div className="flex items-center justify-between">
             <div className="flex space-x-2">
               <button
-                onClick={() => setSelectedFilter('all')}
+                onClick={() => setSelectedFilter("all")}
                 className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                  selectedFilter === 'all'
-                    ? 'bg-blue-100 text-blue-800'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  selectedFilter === "all"
+                    ? "bg-blue-100 text-blue-800"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
               >
                 All
               </button>
               <button
-                onClick={() => setSelectedFilter('unread')}
+                onClick={() => setSelectedFilter("unread")}
                 className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                  selectedFilter === 'unread'
-                    ? 'bg-blue-100 text-blue-800'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  selectedFilter === "unread"
+                    ? "bg-blue-100 text-blue-800"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
               >
                 Unread
               </button>
               <button
-                onClick={() => setSelectedFilter('read')}
+                onClick={() => setSelectedFilter("read")}
                 className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                  selectedFilter === 'read'
-                    ? 'bg-blue-100 text-blue-800'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  selectedFilter === "read"
+                    ? "bg-blue-100 text-blue-800"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
               >
                 Read
               </button>
             </div>
-            
+
             {unreadCount > 0 && (
               <button
                 onClick={markAllAsRead}
@@ -209,9 +231,9 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ isOpen, onClose
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, x: -100 }}
-                  className={`border-l-4 p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors ${
-                    getPriorityColor(notification.priority)
-                  } ${!notification.isRead ? 'bg-blue-50' : ''}`}
+                  className={`border-l-4 p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors ${getPriorityColor(
+                    notification.priority
+                  )} ${!notification.isRead ? "bg-blue-50" : ""}`}
                   onClick={() => handleNotificationClick(notification)}
                 >
                   <div className="flex items-start justify-between">
@@ -219,7 +241,13 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ isOpen, onClose
                       {getPriorityIcon(notification.priority)}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-1">
-                          <h4 className={`text-sm font-medium ${!notification.isRead ? 'text-gray-900' : 'text-gray-600'}`}>
+                          <h4
+                            className={`text-sm font-medium ${
+                              !notification.isRead
+                                ? "text-gray-900"
+                                : "text-gray-600"
+                            }`}
+                          >
                             {notification.title}
                           </h4>
                           <span className="text-xs text-gray-500 ml-2">
@@ -229,33 +257,36 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ isOpen, onClose
                         <p className="text-sm text-gray-600 leading-relaxed">
                           {notification.message}
                         </p>
-                        
+
                         {notification.metadata?.amount && (
                           <div className="mt-2 text-xs text-gray-500">
-                            Amount: ₹{notification.metadata.amount.toLocaleString()}
+                            Amount: Rs.{" "}
+                            {notification.metadata.amount.toLocaleString()}
                           </div>
                         )}
-                        
+
                         <div className="mt-2 flex items-center justify-between">
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                            notification.priority === 'critical' 
-                              ? 'bg-red-100 text-red-800'
-                              : notification.priority === 'high'
-                              ? 'bg-orange-100 text-orange-800'
-                              : notification.priority === 'medium'
-                              ? 'bg-yellow-100 text-yellow-800'
-                              : 'bg-blue-100 text-blue-800'
-                          }`}>
+                          <span
+                            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                              notification.priority === "critical"
+                                ? "bg-red-100 text-red-800"
+                                : notification.priority === "high"
+                                ? "bg-orange-100 text-orange-800"
+                                : notification.priority === "medium"
+                                ? "bg-yellow-100 text-yellow-800"
+                                : "bg-blue-100 text-blue-800"
+                            }`}
+                          >
                             {notification.priority.toUpperCase()}
                           </span>
-                          
+
                           {!notification.isRead && (
                             <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                           )}
                         </div>
                       </div>
                     </div>
-                    
+
                     <button
                       onClick={(e) => {
                         e.stopPropagation();

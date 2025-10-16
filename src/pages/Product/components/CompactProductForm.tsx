@@ -668,7 +668,7 @@ const CompactFormContent: React.FC<{
                               </h4>
                               <p className="text-xs text-gray-500">
                                 {variant.price > 0
-                                  ? `₹${variant.price}`
+                                  ? `Rs. ${variant.price}`
                                   : "No price"}
                                 {formik.values.productType !== "normal" &&
                                   variant.wt > 0 &&
@@ -1096,8 +1096,7 @@ const CompactFormContent: React.FC<{
                   />
                 </div>
 
-                <ProductMediaPage
-                />
+                <ProductMediaPage />
               </div>
             </FormSection>
 

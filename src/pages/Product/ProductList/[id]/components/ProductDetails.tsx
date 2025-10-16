@@ -131,7 +131,8 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
             {/* Inline Price Display */}
             {get(product, "variant[0].price") && (
               <div className="bg-green-50 text-green-800 px-3 py-2 rounded-lg font-bold">
-                ₹{(get(product, "variant[0].price", 0) || 0).toLocaleString()}
+                Rs.{" "}
+                {(get(product, "variant[0].price", 0) || 0).toLocaleString()}
               </div>
             )}
           </div>
@@ -333,7 +334,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="bg-amber-100 text-amber-800 px-3 py-1 rounded-lg text-base font-bold">
-                          ₹{item?.price?.toLocaleString() || 0}
+                          Rs. {item?.price?.toLocaleString() || 0}
                         </div>
                         <div className="text-sm font-semibold text-gray-900">
                           {item?.wt || 0}{" "}
@@ -401,7 +402,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
                       </span>
                     </span>
                     <span className="font-medium text-green-600">
-                      ₹{stone.price || "N/A"}
+                      Rs. {stone.price || "N/A"}
                     </span>
                   </div>
                 </div>
@@ -435,7 +436,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
                       {charge.name || "Unnamed Charge"}
                     </span>
                     <span className="font-bold text-green-600 text-sm">
-                      ₹{(charge.value || 0).toLocaleString()}
+                      Rs. {(charge.value || 0).toLocaleString()}
                     </span>
                   </div>
                 </div>
@@ -447,7 +448,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
                   Total Additional Charges:
                 </span>
                 <span className="font-bold text-base text-green-600">
-                  ₹
+                  Rs.
                   {otherCharges
                     .reduce(
                       (sum: number, charge: OtherCharge) =>
