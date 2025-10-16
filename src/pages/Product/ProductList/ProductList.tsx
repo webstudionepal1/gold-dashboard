@@ -6,6 +6,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import MasterTable from "../../../components/shared/MasterTable";
 import Header from "../../../components/shared/table_heading/Header";
+import { ScrollableModal } from "../../../components/shared/ScrollableModal";
 import {
   type IFetchProduct,
   type IParams,
@@ -23,6 +24,13 @@ const ProductList: React.FC = () => {
     page: 1,
     limit: 10,
   });
+
+  // Video modal state (SAME AS BANNER)
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const [selectedVideo, setSelectedVideo] = useState<{
+    url: string | null;
+    title: string | null;
+  }>({ url: null, title: null });
 
   const {
     data: productsList,
@@ -62,6 +70,39 @@ const ProductList: React.FC = () => {
   const { mutate: deleteProduct } = useDeleteProductsMutation();
   const { mutate: updateProduct } = useUpdateProductsMutation();
   const navigate = useNavigate();
+
+  // VIDEO CLICK HANDLER (SAME AS BANNER)
+  const handleVideoClick = (videoUrl: string, title: string) => {
+    console.log("Video clicked:", { videoUrl, title });
+    setSelectedVideo({ url: videoUrl, title });
+    setIsVideoModalOpen(true);
+  };
+
+  // VIDEO STREAM TEST (SAME AS BANNER)
+  const testVideoStream = async (videoPath: string) => {
+    try {
+      const cleanPath = videoPath.startsWith("/ridisidi/")
+        ? videoPath.substring("/ridisidi/".length)
+        : videoPath.startsWith("/")
+        ? videoPath.substring(1)
+        : videoPath;
+
+      const baseUrl =
+        import.meta.env.VITE_API_LOCAL_URL ||
+        "http://localhost:8080/api/v1/en/";
+      const testUrl = `${baseUrl}video/test/${cleanPath}`;
+      console.log("Testing video stream:", testUrl);
+
+      const response = await fetch(testUrl);
+      const result = await response.json();
+      console.log("Video test result:", result);
+
+      return result.success;
+    } catch (error) {
+      console.error("Video test error:", error);
+      return false;
+    }
+  };
 
   // Pagination handlers
   const handlePageChange = useCallback((page: number, pageSize: number) => {
@@ -186,11 +227,26 @@ const ProductList: React.FC = () => {
                   return (
                     <video
                       src={videoStreamUrl}
-                      className="w-full h-full rounded-sm object-cover aspect-square transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:rounded-md"
+                      width={48}
+                      height={48}
+                      className="w-full h-full rounded-sm object-cover aspect-square  duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:rounded-md cursor-pointer hover:opacity-80 transition-opacity"
                       preload="metadata"
                       muted
-                      onError={(e) => {
+                      onClick={() =>
+                        handleVideoClick(videoStreamUrl, product.name || "")
+                      }
+                      onError={async (e) => {
                         console.error("Video loading error:", e);
+                        console.log("Video URL:", videoStreamUrl);
+                        console.log("Original item:", videoPath);
+
+                        // Test if video exists
+                        const exists = await testVideoStream(videoPath);
+                        if (!exists) {
+                          console.error(
+                            "Video file does not exist or is not accessible"
+                          );
+                        }
                       }}
                     />
                   );
@@ -232,8 +288,7 @@ const ProductList: React.FC = () => {
     }
   );
 
-  // Note: You'll need to fetch categories from your API
-  // For now, using placeholder data - replace with actual category data
+  // Filter config
   const filterConfig = [
     {
       key: "category",
@@ -253,7 +308,6 @@ const ProductList: React.FC = () => {
       ],
     },
   ];
-  // </CHANGE>
 
   return (
     <div className="">
@@ -265,6 +319,7 @@ const ProductList: React.FC = () => {
           </button>
         </Link>
       </Header>
+
       <div className="p-4 bg-white border-2 rounded-lg">
         <MasterTable
           columns={productListColumns}
@@ -286,6 +341,37 @@ const ProductList: React.FC = () => {
           onFilterChange={handleFilterChange}
         />
       </div>
+
+      {/* VIDEO MODAL (EXACTLY LIKE BANNER) */}
+      {isVideoModalOpen && selectedVideo.url && (
+        <ScrollableModal
+          classname="w-[50%] max-w-xl"
+          onClose={() => setIsVideoModalOpen(false)}
+        >
+          <div className="bg-white rounded-lg shadow-lg">
+            <div className="flex items-center justify-between p-2 border-b border-gray-200">
+              <h2 className="text-lg font-bold text-gray-800">
+                {selectedVideo.title || "Product Video"}
+              </h2>
+              <button
+                onClick={() => setIsVideoModalOpen(false)}
+                className="hover:text-red-600 rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-100 transition-colors"
+                title="Close"
+              >
+                <Icon icon="material-symbols:close" width="16" height="16" />
+              </button>
+            </div>
+            <div className="p-4 flex justify-center">
+              <video
+                src={selectedVideo.url}
+                controls
+                className="max-w-full max-h-[70vh] rounded-md shadow-md"
+                preload="metadata"
+              />
+            </div>
+          </div>
+        </ScrollableModal>
+      )}
     </div>
   );
 };
