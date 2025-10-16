@@ -95,12 +95,14 @@ export const ProductImage: React.FC<ProductImageProps> = ({
             <>
               <button
                 onClick={prevImage}
-                className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-gray-700 p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm">
+                className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-gray-700 p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm"
+              >
                 <Icon icon="mdi:chevron-left" className="w-6 h-6" />
               </button>
               <button
                 onClick={nextImage}
-                className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-gray-700 p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm">
+                className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-gray-700 p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm"
+              >
                 <Icon icon="mdi:chevron-right" className="w-6 h-6" />
               </button>
             </>
@@ -109,7 +111,8 @@ export const ProductImage: React.FC<ProductImageProps> = ({
           {/* Zoom Button */}
           <button
             onClick={() => setIsZoomed(!isZoomed)}
-            className="absolute top-4 right-4 z-10 bg-white/80 hover:bg-white text-gray-700 p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm">
+            className="absolute top-4 right-4 z-10 bg-white/80 hover:bg-white text-gray-700 p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm"
+          >
             <Icon
               icon={isZoomed ? "mdi:magnify-minus" : "mdi:magnify-plus"}
               className="w-5 h-5"
@@ -127,11 +130,12 @@ export const ProductImage: React.FC<ProductImageProps> = ({
           <div
             className={`relative overflow-hidden transition-all aspect-square duration-500 ${
               isZoomed ? "cursor-zoom-out" : "cursor-zoom-in"
-            }`}>
+            }`}
+          >
             <img
               src={images[selectedImage]}
               alt={`Product image ${selectedImage + 1}`}
-              className={`w-full h-auto object-cover object-center transition-all duration-500 ${
+              className={`w-full h-auto object-contain object-center transition-all duration-500 ${
                 isZoomed ? "scale-150" : "scale-100 hover:scale-105"
               } ${isLoading ? "opacity-0" : "opacity-100"}`}
               onLoad={handleImageLoad}
@@ -160,7 +164,8 @@ export const ProductImage: React.FC<ProductImageProps> = ({
                     index === selectedImage
                       ? "ring-2 ring-amber-500 ring-offset-2 shadow-lg scale-105"
                       : "hover:ring-2 hover:ring-gray-300 hover:ring-offset-1 hover:scale-102"
-                  }`}>
+                  }`}
+                >
                   <img
                     src={item}
                     alt={`Thumbnail ${index + 1}`}
