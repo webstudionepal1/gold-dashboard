@@ -1,3 +1,5 @@
+"use client";
+
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { get } from "lodash";
 import React, { useCallback, useMemo, useState } from "react";
@@ -5,9 +7,10 @@ import { Link, useNavigate } from "react-router-dom";
 import MasterTable from "../../../components/shared/MasterTable";
 import Header from "../../../components/shared/table_heading/Header";
 import {
-  IFetchProduct,
-  IParams,
+  type IFetchProduct,
+  type IParams,
   useDeleteProductsMutation,
+  useGetAllProductCategoriesQuery,
   useGetAllProductsQuery,
   useUpdateProductsMutation,
 } from "../../../server/api/productHooks";
@@ -26,6 +29,14 @@ const ProductList: React.FC = () => {
     isSuccess,
     isLoading,
   } = useGetAllProductsQuery(paginationParams);
+
+  const { data: categories } = useGetAllProductCategoriesQuery();
+
+  const categoryOptions = categories?.map((category) => ({
+    label: category.name || "Unnamed Category",
+    value: category._id || "0",
+  }));
+
   const productsData = useMemo(
     () => (isSuccess && productsList?.products ? productsList.products : []),
     [isSuccess, productsList]
@@ -56,7 +67,7 @@ const ProductList: React.FC = () => {
   const handlePageChange = useCallback((page: number, pageSize: number) => {
     setPaginationParams((prev) => ({
       ...prev,
-      page: page + 1, // MasterTable uses 0-based indexing, API uses 1-based
+      page: page + 1,
       limit: pageSize,
     }));
   }, []);
@@ -64,8 +75,18 @@ const ProductList: React.FC = () => {
   const handleSearch = useCallback((searchTerm: string) => {
     setPaginationParams((prev) => ({
       ...prev,
-      page: 1, // Reset to first page when searching
+      page: 1,
       search: searchTerm || undefined,
+    }));
+  }, []);
+
+  const handleFilterChange = useCallback((filters: any) => {
+    setPaginationParams((prev) => ({
+      ...prev,
+      page: 1,
+      category: filters.category || undefined,
+      isActive: filters.status || undefined,
+      limit: paginationData?.limit || 50,
     }));
   }, []);
 
@@ -81,6 +102,7 @@ const ProductList: React.FC = () => {
   const viewAction = useCallback((row: IFetchProduct) => {
     navigate(`/product/details/${row._id}`);
   }, []);
+
   const onEdit = useCallback((row: IFetchProduct) => {
     updateProductState(row);
     navigate(`/product/edit/${row._id}`);
@@ -88,7 +110,6 @@ const ProductList: React.FC = () => {
 
   const tableData = productsData.map(
     (product: IFetchProduct, index: number) => {
-      // Calculate serial number based on current page and limit
       const currentPage = paginationData?.currentPage || 1;
       const limit = paginationData?.limit || 10;
       const serialNumber = (currentPage - 1) * limit + index + 1;
@@ -96,7 +117,6 @@ const ProductList: React.FC = () => {
       return {
         ...product,
         sn: serialNumber,
-
         image: (
           <div className="size-12 text-center group cursor-pointer relative">
             {product.images && product.images.length > 0 ? (
@@ -108,7 +128,6 @@ const ProductList: React.FC = () => {
                   alt="product image"
                   className="w-full h-full rounded-sm object-cover aspect-square transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:rounded-md"
                 />
-                {/* Large preview on hover */}
                 <div className="fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[100] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
                   <div className="bg-transparent rounded-lg overflow-hidden">
                     <img
@@ -129,7 +148,6 @@ const ProductList: React.FC = () => {
                   alt="product image"
                   className="w-full h-full rounded-sm object-cover aspect-square transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:rounded-md opacity-60"
                 />
-                {/* No image preview */}
                 <div className="fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[100] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
                   <div className="bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
                     <div
@@ -153,7 +171,6 @@ const ProductList: React.FC = () => {
           <div className="size-12 text-center group cursor-pointer relative">
             {product.video && product.video.length > 0 ? (
               <>
-                {/* Clean the video path for streaming */}
                 {(() => {
                   const videoPath = product.video[0];
                   const cleanVideoPath = videoPath.startsWith("/ridisidi/")
@@ -161,7 +178,6 @@ const ProductList: React.FC = () => {
                     : videoPath.startsWith("/")
                     ? videoPath.substring(1)
                     : videoPath;
-
                   const baseUrl =
                     import.meta.env.VITE_API_LOCAL_URL ||
                     "http://localhost:8080/api/v1/en/";
@@ -216,6 +232,29 @@ const ProductList: React.FC = () => {
     }
   );
 
+  // Note: You'll need to fetch categories from your API
+  // For now, using placeholder data - replace with actual category data
+  const filterConfig = [
+    {
+      key: "category",
+      label: "Category",
+      type: "select" as const,
+      placeholder: "All Categories",
+      options: categoryOptions || [],
+    },
+    {
+      key: "status",
+      label: "Status",
+      type: "select" as const,
+      placeholder: "All Status",
+      options: [
+        { label: "Active", value: "true" },
+        { label: "Inactive", value: "false" },
+      ],
+    },
+  ];
+  // </CHANGE>
+
   return (
     <div className="">
       <Header text="Products">
@@ -243,6 +282,8 @@ const ProductList: React.FC = () => {
           onPageChange={handlePageChange}
           onSearch={handleSearch}
           entriesPerPage={paginationData?.limit || 10}
+          filterConfig={filterConfig}
+          onFilterChange={handleFilterChange}
         />
       </div>
     </div>

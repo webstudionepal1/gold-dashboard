@@ -1,11 +1,8 @@
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  ReactNode,
-  memo,
-} from "react";
-import { debounce } from "lodash"; // Make sure this import is included
+"use client";
+
+import type React from "react";
+import { useState, useEffect, useCallback, type ReactNode, memo } from "react";
+import { debounce } from "lodash";
 import clsx from "clsx";
 import TableAction from "./_table/TableAction";
 
@@ -19,6 +16,23 @@ interface Column {
 
 interface Row {
   id?: string | number;
+  [key: string]: any;
+}
+
+interface FilterOption {
+  label: string;
+  value: string | number;
+}
+
+interface FilterConfig {
+  key: string;
+  label: string;
+  type: "select" | "date" | "dateRange" | "text";
+  options?: FilterOption[];
+  placeholder?: string;
+}
+
+interface FilterValues {
   [key: string]: any;
 }
 
@@ -46,6 +60,8 @@ interface MasterTableProps {
   emptyStateMessage?: string;
   printAction?: (row: any) => void;
   mainClassName?: string;
+  filterConfig?: FilterConfig[];
+  onFilterChange?: (filters: FilterValues) => void;
 }
 
 const MasterTable: React.FC<MasterTableProps> = memo(
@@ -72,6 +88,8 @@ const MasterTable: React.FC<MasterTableProps> = memo(
     printAction,
     mainClassName,
     emptyStateMessage = "No data available",
+    filterConfig = [],
+    onFilterChange,
   }) => {
     // State
     const [globalFilter, setGlobalFilter] = useState<string>("");
@@ -83,12 +101,12 @@ const MasterTable: React.FC<MasterTableProps> = memo(
     );
     const [showDeleteConfirm, setShowDeleteConfirm] = useState<boolean>(false);
     const [isSmallScreen, setIsSmallScreen] = useState<boolean>(false);
+    const [filterValues, setFilterValues] = useState<FilterValues>({});
 
     // Create a debounced search function only once
     const debouncedSearch = useCallback(
       debounce((value: string) => {
         setGlobalFilter(value);
-
         if (apiPagination && onSearch) {
           onSearch(value);
         }
@@ -99,22 +117,17 @@ const MasterTable: React.FC<MasterTableProps> = memo(
     // Check screen size on mount and when window resizes
     useEffect(() => {
       const checkScreenSize = () => {
-        setIsSmallScreen(window.innerWidth < 768); // 768px is typical md breakpoint
+        setIsSmallScreen(window.innerWidth < 768);
       };
 
-      // Initial check
       checkScreenSize();
-
-      // Add event listener for window resize
       window.addEventListener("resize", checkScreenSize);
 
-      // Cleanup
       return () => window.removeEventListener("resize", checkScreenSize);
     }, []);
 
     // Initialize filtered rows when rows change
     useEffect(() => {
-      // Only update the filteredRows if there's no search term or if using API pagination
       if (!globalFilter || apiPagination) {
         setFilteredRows(rows);
       }
@@ -122,7 +135,6 @@ const MasterTable: React.FC<MasterTableProps> = memo(
 
     // Filter rows when search term changes (for client-side filtering)
     useEffect(() => {
-      // Skip this effect for API pagination since filtering happens server-side
       if (apiPagination) {
         return;
       }
@@ -143,7 +155,7 @@ const MasterTable: React.FC<MasterTableProps> = memo(
       });
 
       setFilteredRows(filtered);
-      setPageIndex(0); // Reset to first page when filter changes
+      setPageIndex(0);
     }, [globalFilter, rows, columns, apiPagination]);
 
     // Calculate total pages based on pagination type
@@ -154,7 +166,6 @@ const MasterTable: React.FC<MasterTableProps> = memo(
     // Handle page change
     const handlePageChange = (newPage: number) => {
       setPageIndex(newPage);
-
       if (apiPagination && onPageChange) {
         onPageChange(newPage, pageSize);
       }
@@ -165,6 +176,28 @@ const MasterTable: React.FC<MasterTableProps> = memo(
       debouncedSearch(e.target.value);
     };
 
+    const handleFilterChange = (key: string, value: any) => {
+      const newFilters = { ...filterValues, [key]: value };
+      setFilterValues(newFilters);
+
+      if (onFilterChange) {
+        onFilterChange(newFilters);
+      }
+    };
+
+    const handleClearFilters = () => {
+      setFilterValues({});
+      if (onFilterChange) {
+        onFilterChange({});
+      }
+    };
+
+    const getActiveFilterCount = () => {
+      return Object.values(filterValues).filter(
+        (value) => value !== "" && value !== null && value !== undefined
+      ).length;
+    };
+
     // Calculate pagination for client-side pagination
     const start = pageIndex * pageSize;
     const end = Math.min(
@@ -172,9 +205,8 @@ const MasterTable: React.FC<MasterTableProps> = memo(
       apiPagination ? totalItems : filteredRows.length
     );
 
-    // Get current page data (only for client-side pagination)
     const currentPageRows = apiPagination
-      ? rows // For API pagination, we use the rows directly as they should already be the current page
+      ? rows
       : filteredRows.slice(start, end);
 
     // Reset page index when total pages change
@@ -187,10 +219,8 @@ const MasterTable: React.FC<MasterTableProps> = memo(
     // Selection handlers
     const toggleSelectAll = () => {
       if (selectedRows.size === currentPageRows.length) {
-        // If all are selected, clear selection
         setSelectedRows(new Set());
       } else {
-        // Otherwise select all current page rows
         const newSelected = new Set<string | number>();
         currentPageRows.forEach((row) => {
           if (row.id !== undefined) {
@@ -219,14 +249,12 @@ const MasterTable: React.FC<MasterTableProps> = memo(
       }
     };
 
-    // Check if all current page rows are selected
     const isAllSelected =
       currentPageRows.length > 0 &&
       currentPageRows.every(
         (row) => row.id !== undefined && selectedRows.has(row.id)
       );
 
-    // Check if some (but not all) rows are selected
     const isSomeSelected = selectedRows.size > 0 && !isAllSelected;
 
     // Function to generate pagination buttons
@@ -234,30 +262,23 @@ const MasterTable: React.FC<MasterTableProps> = memo(
       const visiblePages = isSmallScreen ? 3 : 5;
       const buttons = [];
 
-      // Determine the range of page buttons to show
       let startPage = 0;
       let endPage = Math.max(1, totalPages) - 1;
 
       if (totalPages > visiblePages) {
-        // Calculate start and end pages to keep the current page centered when possible
         const halfVisible = Math.floor(visiblePages / 2);
-
         if (pageIndex <= halfVisible) {
-          // Near the start
           startPage = 0;
           endPage = visiblePages - 1;
         } else if (pageIndex >= totalPages - halfVisible - 1) {
-          // Near the end
           startPage = totalPages - visiblePages;
           endPage = totalPages - 1;
         } else {
-          // In the middle
           startPage = pageIndex - halfVisible;
           endPage = pageIndex + halfVisible;
         }
       }
 
-      // Generate the page buttons
       for (let i = startPage; i <= endPage; i++) {
         buttons.push(
           <button
@@ -281,11 +302,10 @@ const MasterTable: React.FC<MasterTableProps> = memo(
       <div className={clsx("p-4 bg-white rounded-md", mainClassName)}>
         <div className="flex flex-col justify-between gap-3 pb-4 md:flex-row md:items-center">
           {tabsOptions && tabsOptions}
-
           <div
             className={clsx(
-              "flex items-center gap-2",
-              tabsOptions ? "md:justify-end  w-fit" : "justify-between ",
+              "flex items-center gap-2 flex-wrap",
+              tabsOptions ? "md:justify-end w-fit" : "justify-start ",
               (filterSection || canSearch) && "w-full"
             )}
           >
@@ -312,6 +332,68 @@ const MasterTable: React.FC<MasterTableProps> = memo(
                   </svg>
                 </div>
               </div>
+            )}
+
+            {filterConfig && filterConfig.length > 0 && (
+              <>
+                {filterConfig.map((filter) => (
+                  <div key={filter.key} className="relative">
+                    {filter.type === "select" && (
+                      <select
+                        value={filterValues[filter.key] || ""}
+                        onChange={(e) =>
+                          handleFilterChange(filter.key, e.target.value)
+                        }
+                        className="px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white min-w-[150px]"
+                      >
+                        <option value="">
+                          {filter.placeholder || `All ${filter.label}`}
+                        </option>
+                        {filter.options?.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+
+                    {filter.type === "text" && (
+                      <input
+                        type="text"
+                        value={filterValues[filter.key] || ""}
+                        onChange={(e) =>
+                          handleFilterChange(filter.key, e.target.value)
+                        }
+                        placeholder={filter.placeholder || filter.label}
+                        className="px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 min-w-[150px]"
+                      />
+                    )}
+
+                    {filter.type === "date" && (
+                      <input
+                        type="date"
+                        value={filterValues[filter.key] || ""}
+                        onChange={(e) =>
+                          handleFilterChange(filter.key, e.target.value)
+                        }
+                        className="px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    )}
+                  </div>
+                ))}
+
+                {Object.values(filterValues).some(
+                  (v) => v !== "" && v !== null && v !== undefined
+                ) && (
+                  <button
+                    onClick={handleClearFilters}
+                    className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 hover:bg-gray-100 rounded-md transition-colors"
+                    title="Clear filters"
+                  >
+                    Clear
+                  </button>
+                )}
+              </>
             )}
 
             <div className="flex items-center gap-2">
@@ -341,6 +423,7 @@ const MasterTable: React.FC<MasterTableProps> = memo(
             </div>
           </div>
         </div>
+
         <div className="w-full overflow-hidden border rounded-lg shadow-sm">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
@@ -367,7 +450,7 @@ const MasterTable: React.FC<MasterTableProps> = memo(
                     <th
                       key={column.key}
                       className={clsx(
-                        "px-6 py-3 text-xs font-medium tracking-wider  text-center bg-gray-50 text-gray-500 uppercase"
+                        "px-6 py-3 text-xs font-medium tracking-wider text-center bg-gray-50 text-gray-500 uppercase"
                       )}
                       style={{ width: column.width }}
                     >
@@ -377,7 +460,7 @@ const MasterTable: React.FC<MasterTableProps> = memo(
                   {showAction && (
                     <th
                       className={clsx(
-                        "px-6 py-3 text-xs font-medium tracking-wider  text-center bg-gray-50 text-gray-500 uppercase"
+                        "px-6 py-3 text-xs font-medium tracking-wider text-center bg-gray-50 text-gray-500 uppercase"
                       )}
                     >
                       Action
@@ -504,7 +587,6 @@ const MasterTable: React.FC<MasterTableProps> = memo(
                     </svg>
                   </button>
 
-                  {/* Page number buttons with optimized calculation */}
                   {getPaginationButtons()}
 
                   <button
@@ -547,14 +629,12 @@ const MasterTable: React.FC<MasterTableProps> = memo(
                 >
                   <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
                 </div>
-
                 <span
                   className="hidden sm:inline-block sm:align-middle sm:h-screen"
                   aria-hidden="true"
                 >
                   &#8203;
                 </span>
-
                 <div className="inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                   <div className="px-4 pt-5 pb-4 bg-white sm:p-6 sm:pb-4">
                     <div className="sm:flex sm:items-start">
