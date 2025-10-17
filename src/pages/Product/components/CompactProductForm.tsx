@@ -556,7 +556,12 @@ const CompactFormContent: React.FC<{
                         options={[
                           { value: "24k", label: "24 Karat" },
                           { value: "22k", label: "22 Karat" },
+                          { value: "21k", label: "21 Karat" },
+                          { value: "20k", label: "20 Karat" },
                           { value: "18k", label: "18 Karat" },
+                          { value: "16k", label: "16 Karat" },
+                          { value: "14k", label: "14 Karat" },
+                          { value: "10k", label: "10 Karat" },
                         ]}
                         value={(formik.values.karat as string) || ""}
                         onChange={(e) =>
@@ -688,7 +693,7 @@ const CompactFormContent: React.FC<{
                               </h4>
                               <p className="text-xs text-gray-500">
                                 {variant.price > 0
-                                  ? `Rs. ${variant.price}`
+                                  ? `Rs. ${variant.price.toFixed(2)}`
                                   : "No price"}
                                 {formik.values.productType !== "normal" &&
                                   variant.wt > 0 &&
