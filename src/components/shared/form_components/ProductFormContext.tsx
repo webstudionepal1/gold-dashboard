@@ -17,6 +17,7 @@ export interface ProductStone {
   weight: number; // in carats
   price: number;
   color: string;
+  karat?: string;
 }
 
 // Other Charge Interface
@@ -31,6 +32,7 @@ export interface ProductFormData {
   name: string;
   slug?: string;
   description: string;
+  karat?: "24k" | "22k" | "21k" | "20k" | "18k" | "16k" | "14k" | "10k" | "";
   productType?: "normal" | "diamond" | "gold" | "silver";
   category: string;
   subCategory: string;
