@@ -199,6 +199,7 @@ export const productListColumns = [
   { title: "Product Name", key: "product" },
   { title: "Product Type", key: "productType" },
   { title: "Category", key: "categ" },
+  { title: "Visible As", key: "visibleAs" },
   // { title: "Sub Category", key: "subCate" },
   // { title: "Price", key: "price" },
   // { title: "Stock", key: "stock" },
