@@ -1,5 +1,3 @@
-"use client";
-
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { get } from "lodash";
 import React, { useCallback, useMemo, useState } from "react";
@@ -127,6 +125,7 @@ const ProductList: React.FC = () => {
       page: 1,
       category: filters.category || undefined,
       isActive: filters.status || undefined,
+      productType: filters.productType || undefined,
       limit: paginationData?.limit || 50,
     }));
   }, []);
@@ -305,6 +304,18 @@ const ProductList: React.FC = () => {
       options: [
         { label: "Active", value: "true" },
         { label: "Inactive", value: "false" },
+      ],
+    },
+    {
+      key: "productType",
+      label: "Product Type",
+      type: "select" as const,
+      placeholder: "All Products",
+      options: [
+        { label: "Gold", value: "gold" },
+        { label: "Silver", value: "silver" },
+        { label: "Diamond", value: "diamond" },
+        // { label: "Normal", value: "normal" },
       ],
     },
   ];

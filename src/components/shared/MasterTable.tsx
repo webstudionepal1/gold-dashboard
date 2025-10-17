@@ -516,7 +516,7 @@ const MasterTable: React.FC<MasterTableProps> = memo(
                       {columns.map((column) => (
                         <td
                           key={column.key}
-                          className="px-6 py-4 text-sm text-center whitespace-nowrap"
+                          className="px-6 py-4 text-sm text-center whitespace-nowrap capitalize"
                         >
                           {column.render ? (
                             column.render(row[column.key], row)

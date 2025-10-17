@@ -80,7 +80,7 @@ export const productFormSchema = z
       .min(1, "At least one variant is required"),
 
     // Product Specification
-    length: z.number().min(0.01, "Length must be greater than 0"),
+    length: z.number().min(0.01, "Length must be greater than 0").optional(),
     claspType: z.string().optional(),
     rhodoumFinishes: z.boolean(),
 
@@ -197,6 +197,7 @@ export const productListColumns = [
   { title: "Image", key: "image" },
   { title: "Video", key: "video" },
   { title: "Product", key: "product" },
+  { title: "Product Type", key: "productType" },
   { title: "Category", key: "categ" },
   { title: "Sub Category", key: "subCate" },
   // { title: "Price", key: "price" },
