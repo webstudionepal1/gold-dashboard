@@ -1,6 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '../utils/ApiGateway';
-import { toast } from 'react-toastify';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "../utils/ApiGateway";
+import { toast } from "react-toastify";
 
 export interface IContact {
   _id: string;
@@ -35,7 +35,7 @@ export interface IParams {
 
 export const useGetAllContactUsQuery = (params: IParams = {}) => {
   return useQuery({
-    queryKey: ['contact', params],
+    queryKey: ["contact", params],
     queryFn: async () => {
       const res = await apiClient.get<{
         data: IContact[];
@@ -52,7 +52,7 @@ export const useGetAllContactUsQuery = (params: IParams = {}) => {
         };
         searchQuery?: string;
         appliedFilters?: Record<string, unknown>;
-      }>('contact', {
+      }>("contact", {
         params: {
           ...params,
         },
@@ -62,21 +62,43 @@ export const useGetAllContactUsQuery = (params: IParams = {}) => {
   });
 };
 
+export const useCreateContactUsMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: ["contact"],
+    mutationFn: async (contactData: Partial<IContact>) => {
+      const res = await apiClient.post<{ data: IContact }>(
+        "contact",
+        contactData
+      );
+      return res.data.data;
+    },
+    onSuccess() {
+      toast.success("Contact Us created successfully");
+      queryClient.invalidateQueries({ queryKey: ["contact"] });
+    },
+    onError(err: any) {
+      toast.error(err?.response?.data?.message || "Error creating contact");
+    },
+  });
+};
+
 export const useDeleteContactUsMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ['contact'],
+    mutationKey: ["contact"],
     mutationFn: async (id: string) => {
       const res = await apiClient.delete(`contact/${id}`);
       return res?.data?.data;
     },
     onSuccess() {
-      toast.success('Contact Us deleted successfully');
-      queryClient.invalidateQueries({ queryKey: ['contact'] });
+      toast.success("Contact Us deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["contact"] });
     },
     onError(err: string) {
       // toast.error(err || "Error deleting products");
-      toast.error('Error deleting products');
+      toast.error("Error deleting products");
     },
   });
 };

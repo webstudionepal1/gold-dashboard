@@ -1,33 +1,34 @@
-import { DashboardPage } from '../pages/Dashboard/Dashboard';
+import { DashboardPage } from "../pages/Dashboard/Dashboard";
 
 // import PurchaseReturn from "../pages/Inventory/PurchaseManagement/PurchaseReturn";
 // import Suppliers from "../pages/Inventory/PurchaseManagement/Suppliers";
-import { NotFoundPage } from '../pages/NotFound/NotFound';
-import ProductCategory from '../pages/Product/ProductCategory/ProductCategory';
-import ProductDescription from '../pages/Product/ProductList/[id]/ProdectDescription';
-import ProductList from '../pages/Product/ProductList/ProductList';
-import Productsubcategory from '../pages/Product/ProductSubcategory/ProductSubCategory';
-import { FrontendRoutes } from './routes';
+import { NotFoundPage } from "../pages/NotFound/NotFound";
+import ProductCategory from "../pages/Product/ProductCategory/ProductCategory";
+import ProductDescription from "../pages/Product/ProductList/[id]/ProdectDescription";
+import ProductList from "../pages/Product/ProductList/ProductList";
+import Productsubcategory from "../pages/Product/ProductSubcategory/ProductSubCategory";
+import { FrontendRoutes } from "./routes";
 
-import GiftsAdminPanel from '../components/admin/GiftsAdminPanel';
-import NotificationAdminPanel from '../components/admin/NotificationAdminPanel';
-import NotificationTest from '../components/test/NotificationTest';
-import BannerIndex from '../pages/Banner/BannerIndex';
-import AddBannerForm from '../pages/Banner/Components/AddBannerForm';
-import NotificationIndex from '../pages/Notification/NotificationIndex';
+import GiftsAdminPanel from "../components/admin/GiftsAdminPanel";
+import NotificationAdminPanel from "../components/admin/NotificationAdminPanel";
+import NotificationTest from "../components/test/NotificationTest";
+import BannerIndex from "../pages/Banner/BannerIndex";
+import AddBannerForm from "../pages/Banner/Components/AddBannerForm";
+import NotificationIndex from "../pages/Notification/NotificationIndex";
 
 // import AddCustomerForm from "../pages/Customer/components/AddCustomerForm";
 
-import BlogAnalytics from '@/pages/Blog/BlogAnalytics/BlogAnalytics';
-import BlogEditor from '@/pages/Blog/BlogEditor/BlogEditor';
-import BlogList from '@/pages/Blog/BlogList/BlogList';
-import BlogView from '@/pages/Blog/BlogView/BlogView';
-import NewProductForm from '../pages/Product/components/NewProductForm';
-import ProductImageDemo from '../pages/Product/ProductImageDemo';
-import ProductForm from '../pages/Product/ProductList/component/ProductForm';
-import AttribConfig from '../pages/settings/components/AttribConfig';
-import EditProfileForm from '../pages/settings/ProfileConfig/EditProfileForm';
-import { ContactUs } from '@/pages/contact-us/ContactUs.page';
+import BlogAnalytics from "@/pages/Blog/BlogAnalytics/BlogAnalytics";
+import BlogEditor from "@/pages/Blog/BlogEditor/BlogEditor";
+import BlogList from "@/pages/Blog/BlogList/BlogList";
+import BlogView from "@/pages/Blog/BlogView/BlogView";
+import NewProductForm from "../pages/Product/components/NewProductForm";
+import ProductImageDemo from "../pages/Product/ProductImageDemo";
+import ProductForm from "../pages/Product/ProductList/component/ProductForm";
+import AttribConfig from "../pages/settings/components/AttribConfig";
+import EditProfileForm from "../pages/settings/ProfileConfig/EditProfileForm";
+import { ContactUs } from "@/pages/contact-us/ContactUs.page";
+import AddQueries from "@/pages/contact-us/components/AddQueries";
 // import BlogList from "@/pages/Blog/BlogList/BlogList";
 // import BlogEditor from "@/pages/Blog/BlogEditor/BlogEditor";
 // import BlogView from "@/pages/Blog/BlogView/BlogView";
@@ -56,11 +57,11 @@ export const routesConfig = [
   //   element: <OrderDetails />,
   // },
   {
-    path: '/attribs',
+    path: "/attribs",
     element: <AttribConfig />,
   },
   {
-    path: '/settings/profile-config',
+    path: "/settings/profile-config",
     element: <EditProfileForm />,
   },
   // {
@@ -108,11 +109,11 @@ export const routesConfig = [
     element: <NewProductForm />,
   },
   {
-    path: '/product/details/:id',
+    path: "/product/details/:id",
     element: <ProductDescription />,
   },
   {
-    path: '/product/:id',
+    path: "/product/:id",
     element: <ProductForm />,
   },
   {
@@ -124,7 +125,7 @@ export const routesConfig = [
     element: <Productsubcategory />,
   },
   {
-    path: '/product/image-demo',
+    path: "/product/image-demo",
     element: <ProductImageDemo />,
   },
 
@@ -145,7 +146,7 @@ export const routesConfig = [
     element: <BannerIndex />,
   },
   {
-    path: '/banner/:id',
+    path: "/banner/:id",
     element: <AddBannerForm />,
   },
 
@@ -166,7 +167,7 @@ export const routesConfig = [
     element: <GiftsAdminPanel />,
   },
   {
-    path: '/notification-test',
+    path: "/notification-test",
     element: <NotificationTest />,
   },
   // MyPostBusiness route commented out - will be integrated later
@@ -228,12 +229,17 @@ export const routesConfig = [
     path: FrontendRoutes.BLOGANALYTICS,
     element: <BlogAnalytics />,
   },
+
   {
     path: FrontendRoutes.CONTACTUS,
     element: <ContactUs />,
   },
   {
-    path: '*',
+    path: FrontendRoutes.ADDQUERIES,
+    element: <AddQueries />,
+  },
+  {
+    path: "*",
     element: <NotFoundPage />,
   },
 ];
