@@ -385,7 +385,7 @@ const CompactFormContent: React.FC<{
                     required
                     options={[
                       // { value: "", label: "Select Product Type" },
-                      { value: "normal", label: "Normal" },
+                      // { value: "normal", label: "Normal" },
                       { value: "gold", label: "Gold" },
                       { value: "silver", label: "Silver" },
                       { value: "diamond", label: "Diamond" },
