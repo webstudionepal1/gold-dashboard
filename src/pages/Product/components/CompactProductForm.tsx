@@ -1187,7 +1187,7 @@ const CompactFormContent: React.FC<{
                         { value: "normal", label: "Normal" },
                         { value: "featured", label: "Featured" },
                         { value: "bestSellers", label: "Best Sellers" },
-                        { value: "newArrivals", label: "New Arrivals" },
+                        // { value: "newArrivals", label: "New Arrivals" },
                         { value: "popular", label: "Popular" },
                         { value: "trending", label: "Trending" },
                       ]}
