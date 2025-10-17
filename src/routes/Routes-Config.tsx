@@ -225,10 +225,10 @@ export const routesConfig = [
     path: FrontendRoutes.BLOGDETAILS,
     element: <BlogView />,
   },
-  {
-    path: FrontendRoutes.BLOGANALYTICS,
-    element: <BlogAnalytics />,
-  },
+  // {
+  //   path: FrontendRoutes.BLOGANALYTICS,
+  //   element: <BlogAnalytics />,
+  // },
 
   {
     path: FrontendRoutes.CONTACTUS,
