@@ -40,6 +40,7 @@ const NewProductForm: React.FC = () => {
         | "diamond"
         | "gold"
         | "silver",
+      karat: get(product, "karat", ""), // Add karat
       dimension: get(product, "dimension", 0),
       category: get(product, "category._id", ""),
       subCategory: get(product, "subCategory._id", ""),
@@ -111,6 +112,8 @@ const NewProductForm: React.FC = () => {
       isFeatured: get(product, "isFeatured", false),
     };
   };
+
+  // Transform form data to API format
   const transformFormDataToAPI = (formData: ProductFormData) => {
     const formDataObj = new FormData();
 
@@ -132,7 +135,6 @@ const NewProductForm: React.FC = () => {
         formDataObj.append("length", formData.length.toString());
       if (formData.dimension)
         formDataObj.append("dimension", formData.dimension.toString());
-
       if (formData.color) formDataObj.append("color", formData.color);
       if (formData.clarity) formDataObj.append("clarity", formData.clarity);
       if (formData.totalCarat)
@@ -142,6 +144,9 @@ const NewProductForm: React.FC = () => {
           "rhodoumFinishes",
           formData.rhodoumFinishes.toString()
         );
+      if (formData.karat && formData.productType === "gold")
+        // Add karat for gold products
+        formDataObj.append("karat", formData.karat);
 
       // Wastage - only for non-normal products
       if (formData.makingCharges) {
@@ -252,11 +257,20 @@ const NewProductForm: React.FC = () => {
 
     return formDataObj;
   };
+
   // Handle form submission
   const handleFormSubmit = async (formData: ProductFormData) => {
     try {
       // Transform form data to API format
       const apiData = transformFormDataToAPI(formData);
+      console.log("Payload sent to backend:", apiData); // Debug log
+
+      // Log FormData contents
+      const formDataEntries: { [key: string]: any } = {};
+      for (const [key, value] of apiData.entries()) {
+        formDataEntries[key] = value;
+      }
+      console.log("FormData entries:", formDataEntries);
 
       if (isEdit && id) {
         await updateProductMutation({
@@ -275,9 +289,6 @@ const NewProductForm: React.FC = () => {
     }
   };
 
-  // Transform form data to API format
-
-
   // Handle form cancellation
   const handleFormCancel = () => {
     navigate("/product/product-list");
@@ -295,7 +306,7 @@ const NewProductForm: React.FC = () => {
     );
   }
 
-  console.log("getinitialData", getInitialData());
+  console.log("getInitialData", getInitialData());
   return (
     <CompactProductForm
       isLoading={createPending || isPending}

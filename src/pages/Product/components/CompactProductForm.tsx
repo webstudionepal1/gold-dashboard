@@ -35,6 +35,7 @@ const defaultFormData: ProductFormData = {
   description: "",
   productType: "gold",
   category: "",
+  karat: "",
   subCategory: "",
   existingImages: [],
 
@@ -191,6 +192,7 @@ const CompactFormContent: React.FC<{
     },
     onSubmit: (values) => {
       onSubmit(values);
+      console.log(values, "karat");
     },
   });
 
@@ -546,7 +548,25 @@ const CompactFormContent: React.FC<{
                     </div>
                   )}
 
-                  <div>
+                  {formik.values.productType === "gold" && (
+                    <div>
+                      <DropdownField
+                        label="Karat"
+                        required
+                        options={[
+                          { value: "24k", label: "24 Karat" },
+                          { value: "22k", label: "22 Karat" },
+                          { value: "18k", label: "18 Karat" },
+                        ]}
+                        value={(formik.values.karat as string) || ""}
+                        onChange={(e) =>
+                          formik.setFieldValue("karat", e.target.value)
+                        }
+                      />
+                    </div>
+                  )}
+
+                  {/* <div>
                     <InputField
                       label="Total Karat"
                       type="number"
@@ -564,7 +584,7 @@ const CompactFormContent: React.FC<{
                         errors={[formik.errors.totalCarat as string]}
                       />
                     )}
-                  </div>
+                  </div> */}
 
                   <div className="flex items-center pt-6">
                     <label className="flex items-center gap-1 text-xs font-medium text-gray-700">
