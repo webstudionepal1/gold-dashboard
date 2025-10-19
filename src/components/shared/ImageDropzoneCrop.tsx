@@ -1,265 +1,169 @@
 "use client";
 
-import React, { useState, useCallback, useEffect } from "react";
-import { useDropzone } from "react-dropzone";
-import Cropper from "react-easy-crop";
-import { X } from "lucide-react";
-export const getCroppedImg = (
-  imageSrc: string,
-  pixelCrop: any
-): Promise<File> => {
-  return new Promise((resolve, reject) => {
-    const image = new Image();
-    image.src = imageSrc;
-    image.onload = () => {
-      const canvas = document.createElement("canvas");
-      canvas.width = pixelCrop.width;
-      canvas.height = pixelCrop.height;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return reject("Could not get canvas context");
-
-      ctx.drawImage(
-        image,
-        pixelCrop.x,
-        pixelCrop.y,
-        pixelCrop.width,
-        pixelCrop.height,
-        0,
-        0,
-        pixelCrop.width,
-        pixelCrop.height
-      );
-
-      canvas.toBlob((blob) => {
-        if (!blob) return reject("Canvas is empty");
-        resolve(new File([blob], "cropped.png", { type: "image/png" }));
-      }, "image/png");
-    };
-    image.onerror = () => reject("Failed to load image");
-  });
-};
+import type React from "react";
+import { useState, useRef, useEffect } from "react";
+import { Icon } from "@iconify/react/dist/iconify.js";
+import { UploadCloud } from "lucide-react";
 
 interface ImageDropzoneCropProps {
-  multiple?: boolean;
-  aspect?: number;
-  existing?: string | string[];
   onChange: (filesOrUrls: (File | string)[]) => void;
+  aspect?: number;
+  multiple?: boolean;
+  existing?: (File | string | null | undefined)[] | string | null | undefined; // ✅ accepts all variations
 }
 
-const ImageDropzoneCrop: React.FC<ImageDropzoneCropProps> = ({
-  multiple = false,
-  aspect = 16 / 9,
-  existing,
+export default function ImageDropzoneCrop({
   onChange,
-}) => {
-  const [images, setImages] = useState<(File | string)[]>([]);
-  const [cropIndex, setCropIndex] = useState<number>(0);
-  const [filesToCrop, setFilesToCrop] = useState<File[]>([]);
-  const [currentImage, setCurrentImage] = useState<string | null>(null);
-  const [pendingFile, setPendingFile] = useState<File | null>(null);
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
+  aspect = 4 / 5,
+  multiple = false,
+  existing,
+}: ImageDropzoneCropProps) {
+  // ✅ Normalize existing to always be a clean array
+  const normalizedExisting: (File | string)[] = Array.isArray(existing)
+    ? existing.filter((e): e is File | string => !!e)
+    : existing
+    ? [existing]
+    : [];
 
-  // Initialize with existing images
+  const [dragActive, setDragActive] = useState(false);
+  const [images, setImages] = useState<(File | string)[]>(normalizedExisting);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // ✅ keep state in sync when existing changes
   useEffect(() => {
-    if (existing) {
-      if (multiple && Array.isArray(existing)) setImages(existing);
-      else if (!multiple && typeof existing === "string") setImages([existing]);
-    }
-  }, [existing, multiple]);
+    setImages(normalizedExisting);
+  }, [existing]);
 
-  // Dropzone
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    if (!acceptedFiles.length) return;
-    setFilesToCrop(acceptedFiles);
-    setCropIndex(0);
-    setPendingFile(acceptedFiles[0]);
-    setCurrentImage(URL.createObjectURL(acceptedFiles[0]));
-  }, []);
-
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-    accept: { "image/*": [] },
-    multiple,
-  });
-
-  const handleCropComplete = useCallback((_: any, croppedAreaPixels: any) => {
-    setCroppedAreaPixels(croppedAreaPixels);
-  }, []);
-
-  // Save cropped image
-  const handleCropSave = async () => {
-    if (!currentImage || !croppedAreaPixels || !pendingFile) return;
-
-    const croppedFile = await getCroppedImg(currentImage, croppedAreaPixels);
-    let updatedImages: (File | string)[] = [];
-
-    // If recropping existing File
-    if (cropIndex < images.length && images[cropIndex] instanceof File) {
-      updatedImages = [...images];
-      updatedImages[cropIndex] = croppedFile;
-    } else {
-      updatedImages = multiple ? [...images, croppedFile] : [croppedFile];
-    }
-
-    setImages(updatedImages);
-    onChange(updatedImages);
-
-    // Crop next file if multiple
-    if (filesToCrop.length && cropIndex + 1 < filesToCrop.length) {
-      const nextIndex = cropIndex + 1;
-      setCropIndex(nextIndex);
-      setPendingFile(filesToCrop[nextIndex]);
-      setCurrentImage(URL.createObjectURL(filesToCrop[nextIndex]));
-      setCrop({ x: 0, y: 0 });
-      setZoom(1);
-      setCroppedAreaPixels(null);
-    } else {
-      setCurrentImage(null);
-      setFilesToCrop([]);
-      setCropIndex(0);
-      setPendingFile(null);
-      setCroppedAreaPixels(null);
-    }
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(e.type === "dragenter" || e.type === "dragover");
   };
 
-  // Remove image
-  const handleRemoveImage = (index: number) => {
-    const updatedImages = [...images];
-    updatedImages.splice(index, 1);
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    const files = Array.from(e.dataTransfer.files).filter((f) =>
+      f.type.startsWith("image/")
+    );
+    if (files.length > 0) handleFiles(files);
+  };
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) handleFiles(Array.from(e.target.files));
+  };
+
+  const handleFiles = (newFiles: File[]) => {
+    const updatedImages = multiple ? [...images, ...newFiles] : newFiles;
     setImages(updatedImages);
     onChange(updatedImages);
   };
 
-  // Recrop image
-  const handleRecropImage = (index: number) => {
-    const img = images[index];
-    if (img instanceof File) {
-      setCropIndex(index);
-      setPendingFile(img);
-      setCurrentImage(URL.createObjectURL(img));
-    } else if (typeof img === "string") {
-      fetch(img)
-        .then((res) => res.blob())
-        .then((blob) => {
-          const file = new File([blob], "image.png", { type: blob.type });
-          const updatedImages = [...images];
-          updatedImages[index] = file;
-          setImages(updatedImages);
-          setCropIndex(index);
-          setPendingFile(file);
-          setCurrentImage(URL.createObjectURL(file));
-        });
-    }
-    setCrop({ x: 0, y: 0 });
-    setZoom(1);
+  const removeImage = (index: number) => {
+    const updatedImages = images.filter((_, i) => i !== index);
+    setImages(updatedImages);
+    onChange(updatedImages);
   };
+
+  const getImageUrl = (image: File | string): string =>
+    typeof image === "string" ? image : URL.createObjectURL(image);
+
+  const handleAddMore = () => fileInputRef.current?.click();
 
   return (
     <div className="space-y-4">
       {/* Dropzone */}
       <div
-        {...getRootProps()}
-        className={`w-full p-8 border-2 h-24 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer transition-all
-          ${
-            isDragActive
-              ? "border-blue-500 bg-blue-50 shadow-lg"
-              : "border-gray-300 bg-gray-50 hover:border-blue-400 hover:bg-blue-50"
-          }
-        `}
+        onDragEnter={handleDrag}
+        onDragLeave={handleDrag}
+        onDragOver={handleDrag}
+        onDrop={handleDrop}
+        className={`relative border-2 border-dashed h-28 rounded-lg px-8 py-4 text-center transition-colors ${
+          dragActive
+            ? "border-[#DF8D28] bg-[#DF8D28]/10"
+            : "border-gray-300 bg-gray-50 hover:border-gray-400"
+        }`}
       >
-        <input {...getInputProps()} />
-        <p className="text-gray-600 text-center text-sm">
-          {isDragActive
-            ? "Drop the images here..."
-            : multiple
-            ? "Drag & drop images here, or click to select multiple"
-            : "Drag & drop an image here, or click to select"}
-        </p>
-      </div>
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple={multiple}
+          accept="image/*"
+          onChange={handleFileInputChange}
+          className="hidden"
+        />
 
-      {/* Cropper Modal */}
-      {currentImage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white rounded-xl shadow-xl p-6 w-96 h-96 flex flex-col">
-            <div className="relative flex-1 rounded-lg overflow-hidden border">
-              <Cropper
-                image={currentImage}
-                crop={crop}
-                zoom={zoom}
-                aspect={aspect}
-                onCropChange={setCrop}
-                onZoomChange={setZoom}
-                onCropComplete={handleCropComplete}
-              />
-            </div>
+        <div
+          className="flex flex-col items-center gap-2 cursor-pointer"
+          onClick={() => fileInputRef.current?.click()}
+        >
+          <UploadCloud className="mx-auto mb-2 h-8 w-8 text-gray-400" />
 
-            {/* Zoom Slider */}
-            <input
-              type="range"
-              min={1}
-              max={3}
-              step={0.01}
-              value={zoom}
-              onChange={(e) => setZoom(Number(e.target.value))}
-              className="mt-3 w-full "
-            />
-
-            <div className="flex justify-end mt-4 space-x-3">
-              <button
-                type="button"
-                onClick={() => setCurrentImage(null)}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition"
-              >
-                Cancel
+          <div className="flex items-center gap-1">
+            <p className="text-sm font-normal text-gray-700">
+              Drag and drop images here
+            </p>
+            <p className="text-sm text-gray-600 mr-2">
+              <button type="button" className="text-gray-700 font-normal">
+                or click to browse
               </button>
-              <button
-                type="button"
-                onClick={handleCropSave}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-              >
-                Save
-              </button>
-            </div>
+            </p>
           </div>
         </div>
-      )}
+      </div>
 
-      {/* Image Preview List */}
+      {/* Preview Grid */}
       {images.length > 0 && (
-        <div className="flex flex-wrap gap-4 mt-4">
-          {images.map((img, idx) => (
-            <div
-              key={idx}
-              className="relative rounded-lg overflow-hidden border border-gray-300 cursor-pointer transform transition hover:scale-105"
-              style={{
-                aspectRatio: `${aspect}`,
-                width: "120px",
-              }}
-              onClick={() => handleRecropImage(idx)}
-            >
-              <img
-                src={img instanceof File ? URL.createObjectURL(img) : img}
-                alt={`uploaded-${idx}`}
-                className="w-full h-full object-cover"
-              />
+        <div className="space-y-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            {images.map((image, index) => (
+              <div
+                key={index}
+                className="relative group rounded-lg overflow-hidden bg-gray-100 border border-gray-200"
+                style={{ aspectRatio: aspect }}
+              >
+                <img
+                  src={getImageUrl(image) || "/placeholder.svg"}
+                  alt={`Preview ${index + 1}`}
+                  className="w-full h-full object-cover"
+                />
+
+                {/* Delete */}
+                <button
+                  type="button"
+                  onClick={() => removeImage(index)}
+                  className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                  title="Remove image"
+                >
+                  <Icon
+                    icon="material-symbols:delete"
+                    className="w-6 h-6 text-white"
+                  />
+                </button>
+
+                {/* Counter */}
+                <div className="absolute top-2 left-2 bg-black/50 text-white text-xs font-medium px-2 py-1 rounded">
+                  {index + 1}
+                </div>
+              </div>
+            ))}
+
+            {/* Add More inside grid */}
+            {multiple && (
               <button
                 type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleRemoveImage(idx);
-                }}
-                className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 shadow hover:bg-red-600 transition"
+                onClick={handleAddMore}
+                className="flex flex-col items-center justify-center rounded-lg border border-dashed border-[#DF8D28] text-[#DF8D28] hover:bg-[#DF8D28]/10 transition-colors"
+                style={{ aspectRatio: aspect }}
               >
-                <X size={14} />
+                <Icon icon="material-symbols:add" className="w-5 h-5 mb-1" />
+                <span className="text-sm font-normal">Add More</span>
               </button>
-            </div>
-          ))}
+            )}
+          </div>
         </div>
       )}
     </div>
   );
-};
-
-export default ImageDropzoneCrop;
+}

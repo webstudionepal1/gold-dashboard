@@ -1,16 +1,3 @@
-/**
- * CompactProductForm - A single-page product form with modern UI using Formik
- *
- * DRY Principles Applied:
- * 1. FormSection component - Reusable section wrapper with consistent styling
- * 2. FieldGroup component - Responsive grid layout for form fields
- * 3. ErrorDisplay component - Consistent error message display
- * 4. Validation using Zod schema with Formik
- * 5. Shared form components - InputField, DropdownField, TextareaField
- * 6. Consistent styling patterns using Tailwind CSS classes
- * 7. Reusable event handlers for form updates
- */
-
 import React, { useState } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { ProductFormData } from "../../../components/shared/form_components/ProductFormContext";
@@ -1166,28 +1153,12 @@ const CompactFormContent: React.FC<{
               >
                 <FieldGroup columns={3}>
                   <div>
-                    {/* <DropdownField
-                      label="Visible As"
-                      options={[
-                        { value: "normal", label: "Normal" },
-                        { value: "featured", label: "Featured" },
-                        { value: "bestSellers", label: "Best Sellers" },
-                        { value: "newArrivals", label: "New Arrivals" },
-                        { value: "popular", label: "Popular" },
-                        { value: "trending", label: "Trending" },
-                      ]}
-                      value={formik.values.visibleAs}
-                      onChange={(e) =>
-                        formik.setFieldValue("visibleAs", e.target.value)
-                      }
-                    /> */}
                     <DropdownTagField
                       required
                       options={[
                         { value: "normal", label: "Normal" },
                         { value: "featured", label: "Featured" },
                         { value: "bestSellers", label: "Best Sellers" },
-                        // { value: "newArrivals", label: "New Arrivals" },
                         { value: "popular", label: "Popular" },
                         { value: "trending", label: "Trending" },
                       ]}
@@ -1284,7 +1255,6 @@ const CompactFormContent: React.FC<{
   );
 };
 
-// Main Component with Provider
 interface CompactProductFormProps {
   isLoading: boolean;
   onSubmit: (data: ProductFormData) => void;

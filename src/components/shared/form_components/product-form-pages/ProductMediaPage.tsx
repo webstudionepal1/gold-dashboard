@@ -60,7 +60,7 @@ export default function CompactProductVideoSection() {
           <div
             onDrop={handleDrop}
             onDragOver={handleDragOver}
-            className="border-2 border-dashed h-24 border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-primary transition"
+            className="border-2 border-dashed h-28 border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-primary transition"
             onClick={() => videoInputRef.current?.click()}
           >
             <UploadCloud className="mx-auto mb-2 h-8 w-8 text-gray-400" />
