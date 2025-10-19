@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { UploadCloud } from "lucide-react";
 
@@ -9,48 +9,49 @@ interface ImageDropzoneCropProps {
   onChange: (filesOrUrls: (File | string)[]) => void;
   aspect?: number;
   multiple?: boolean;
-  existing?: (File | string)[];
+  existing?: (File | string | null | undefined)[] | string | null | undefined; // ✅ accepts all variations
 }
 
 export default function ImageDropzoneCrop({
   onChange,
   aspect = 4 / 5,
   multiple = false,
-  existing = [],
+  existing,
 }: ImageDropzoneCropProps) {
+  // ✅ Normalize existing to always be a clean array
+  const normalizedExisting: (File | string)[] = Array.isArray(existing)
+    ? existing.filter((e): e is File | string => !!e)
+    : existing
+    ? [existing]
+    : [];
+
   const [dragActive, setDragActive] = useState(false);
-  const [images, setImages] = useState<(File | string)[]>(existing || []);
+  const [images, setImages] = useState<(File | string)[]>(normalizedExisting);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // ✅ keep state in sync when existing changes
+  useEffect(() => {
+    setImages(normalizedExisting);
+  }, [existing]);
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
+    setDragActive(e.type === "dragenter" || e.type === "dragover");
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-
-    const files = Array.from(e.dataTransfer.files).filter((file) =>
-      file.type.startsWith("image/")
+    const files = Array.from(e.dataTransfer.files).filter((f) =>
+      f.type.startsWith("image/")
     );
-
-    if (files.length > 0) {
-      handleFiles(files);
-    }
+    if (files.length > 0) handleFiles(files);
   };
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const files = Array.from(e.target.files);
-      handleFiles(files);
-    }
+    if (e.target.files) handleFiles(Array.from(e.target.files));
   };
 
   const handleFiles = (newFiles: File[]) => {
@@ -65,20 +66,14 @@ export default function ImageDropzoneCrop({
     onChange(updatedImages);
   };
 
-  const getImageUrl = (image: File | string): string => {
-    if (typeof image === "string") {
-      return image;
-    }
-    return URL.createObjectURL(image);
-  };
+  const getImageUrl = (image: File | string): string =>
+    typeof image === "string" ? image : URL.createObjectURL(image);
 
-  const handleAddMore = () => {
-    fileInputRef.current?.click();
-  };
+  const handleAddMore = () => fileInputRef.current?.click();
 
   return (
     <div className="space-y-4">
-      {/* Dropzone Area */}
+      {/* Dropzone */}
       <div
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
@@ -109,11 +104,8 @@ export default function ImageDropzoneCrop({
             <p className="text-sm font-normal text-gray-700">
               Drag and drop images here
             </p>
-            <p className="text-xs text-gray-600 mr-2">
-              <button
-                type="button"
-                className="text-[#DF8D28] hover:underline font-medium"
-              >
+            <p className="text-sm text-gray-600 mr-2">
+              <button type="button" className="text-gray-700 font-normal">
                 or click to browse
               </button>
             </p>
@@ -121,7 +113,7 @@ export default function ImageDropzoneCrop({
         </div>
       </div>
 
-      {/* Image Preview Grid */}
+      {/* Preview Grid */}
       {images.length > 0 && (
         <div className="space-y-3">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
@@ -137,7 +129,7 @@ export default function ImageDropzoneCrop({
                   className="w-full h-full object-cover"
                 />
 
-                {/* Delete Button */}
+                {/* Delete */}
                 <button
                   type="button"
                   onClick={() => removeImage(index)}
@@ -150,14 +142,14 @@ export default function ImageDropzoneCrop({
                   />
                 </button>
 
-                {/* Image Counter */}
+                {/* Counter */}
                 <div className="absolute top-2 left-2 bg-black/50 text-white text-xs font-medium px-2 py-1 rounded">
                   {index + 1}
                 </div>
               </div>
             ))}
 
-            {/* Add More Button inside grid */}
+            {/* Add More inside grid */}
             {multiple && (
               <button
                 type="button"
@@ -170,11 +162,6 @@ export default function ImageDropzoneCrop({
               </button>
             )}
           </div>
-
-          {/* Image Count */}
-          {/* <p className="text-xs text-gray-600 text-center">
-            {images.length} image{images.length !== 1 ? "s" : ""} selected
-          </p> */}
         </div>
       )}
     </div>

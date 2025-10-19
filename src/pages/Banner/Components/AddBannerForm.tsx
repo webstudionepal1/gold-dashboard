@@ -160,7 +160,7 @@ const AddBannerForm = () => {
     },
   });
 
-  console.log('form.state.value', form.state.values)
+  console.log("form.state.value", form.state.values);
   const FieldError = ({
     field,
   }: {
@@ -218,7 +218,7 @@ const AddBannerForm = () => {
         <Breadcrumbs />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 lg:space-y-0 lg:space-x-4 space-x-0 space-y-4 ">
+      <div className="grid grid-cols-1 lg:grid-cols-5 lg:space-y-0 lg:space-x-4 space-x-0 space-y-4 ">
         <div className="bg-[#ffffff] col-span-3 border-[#eeeeee] border-2 shadow-lg rounded-xl w-full">
           <form
             id="banner-form"
@@ -355,7 +355,7 @@ const AddBannerForm = () => {
           </form>
         </div>
 
-        <div className="grid gap-2">
+        <div className="grid gap-2 col-span-2">
           <div className="bg-[#ffffff] border-[#eeeeee] border-2 shadow-lg rounded-xl w-full">
             <div className="mx-6 my-4">
               <div>
