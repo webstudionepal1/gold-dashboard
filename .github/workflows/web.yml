@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     
     steps:
       - name: Checkout repository
@@ -16,7 +16,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "23"
           cache: "npm"
        
       - name: Build Web Application
@@ -41,10 +41,10 @@ jobs:
           VPS_USER: ${{ secrets.VPS_USER }}
         run: |
           # Copy web bundle using SSH key
-          scp -P 72 dist-web.tar.gz $VPS_USER@$VPS_HOST:/tmp/
+          scp dist-web.tar.gz $VPS_USER@$VPS_HOST:/tmp/
           
           # SSH into the VPS and extract the bundle
-          ssh -p 72 $VPS_USER@$VPS_HOST << 'EOF'
+          ssh $VPS_USER@$VPS_HOST << 'EOF'
             # Create and extract web files
             mkdir -p "/home/nabin/ridhisiddhiadmin"
             tar -xzf /tmp/dist-web.tar.gz -C "/home/nabin/ridhisiddhiadmin"
