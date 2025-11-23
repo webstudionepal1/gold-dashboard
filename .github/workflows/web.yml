@@ -5,7 +5,7 @@ on:
       - main
 jobs:
   build-and-deploy:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -13,7 +13,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '23'
           cache: 'npm'
           
       - name: Clear npm cache
@@ -24,13 +24,9 @@ jobs:
         
       - name: Build Web Application
         env:
-          NODE_OPTIONS: "--max_old_space_size=4096"
           GENERATE_SOURCEMAP: false
           NODE_ENV: production
         run: |
-          # Node.js 20 specific fixes
-          unset NODE_OPTIONS
-          export NODE_OPTIONS="--max_old_space_size=4096"
           npm run build
           
       - name: Create Web Production Bundle
@@ -52,6 +48,7 @@ jobs:
           VPS_USER: ${{ secrets.VPS_USER }}
         run: |
           # Copy web bundle using SSH key
+          //port ssh = 72
           scp -P 72 dist-web.tar.gz $VPS_USER@$VPS_HOST:/tmp/
           
           # SSH into the VPS and extract the bundle
