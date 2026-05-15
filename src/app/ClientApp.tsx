@@ -4,17 +4,15 @@ import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import App from "@/App";
-import { LoginPage } from "@/pages/auth/LoginPage";
+import { LoginPage } from "@/screens/auth/LoginPage";
 import { ProtectedLayout } from "@/routes/ProtectedAppRoutes";
 import { PublicLayout } from "@/routes/PublicLayout";
 import { routesConfig } from "@/routes/Routes-Config";
 import { initializeAuth } from "@/hooks/useAuth";
 
 const renderRoutes = (routes: typeof routesConfig) =>
-  routes.map(({ path, element, children }) => (
-    <Route key={path} path={path} element={element}>
-      {children && renderRoutes(children as typeof routesConfig)}
-    </Route>
+  routes.map(({ path, element }) => (
+    <Route key={path} path={path} element={element} />
   ));
 
 export default function ClientApp() {

@@ -1,7 +1,7 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { FrontendRoutes } from "./routes";
-import { LoginPage } from "../pages/auth/LoginPage";
+import { LoginPage } from "../screens/auth/LoginPage";
 export const ProtectedLoginPage = () => {
   const { data: authData } = useAuth();
   if (authData) {

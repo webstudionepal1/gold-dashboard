@@ -45,7 +45,7 @@ export async function handleBlogList(req: NextRequest) {
       where,
       skip,
       take: limit,
-      orderBy: { createdAt: sortOrder },
+      orderBy: { createdAt: sortOrder === "asc" ? "asc" : "desc" },
       include: { author: true },
     }),
     prisma.blog.count({ where }),

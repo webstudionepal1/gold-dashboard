@@ -1,48 +1,48 @@
-import { DashboardPage } from "../pages/Dashboard/Dashboard";
+import { DashboardPage } from "../screens/Dashboard/Dashboard";
 
-// import PurchaseReturn from "../pages/Inventory/PurchaseManagement/PurchaseReturn";
-// import Suppliers from "../pages/Inventory/PurchaseManagement/Suppliers";
-import { NotFoundPage } from "../pages/NotFound/NotFound";
-import ProductCategory from "../pages/Product/ProductCategory/ProductCategory";
-import ProductDescription from "../pages/Product/ProductList/[id]/ProdectDescription";
-import ProductList from "../pages/Product/ProductList/ProductList";
-import Productsubcategory from "../pages/Product/ProductSubcategory/ProductSubCategory";
+// import PurchaseReturn from "../screens/Inventory/PurchaseManagement/PurchaseReturn";
+// import Suppliers from "../screens/Inventory/PurchaseManagement/Suppliers";
+import { NotFoundPage } from "../screens/NotFound/NotFound";
+import ProductCategory from "../screens/Product/ProductCategory/ProductCategory";
+import ProductDescription from "../screens/Product/ProductList/[id]/ProdectDescription";
+import ProductList from "../screens/Product/ProductList/ProductList";
+import Productsubcategory from "../screens/Product/ProductSubcategory/ProductSubCategory";
 import { FrontendRoutes } from "./routes";
 
 import GiftsAdminPanel from "../components/admin/GiftsAdminPanel";
-import GiftFormPage from "../pages/Gifts/GiftFormPage";
+import GiftFormPage from "../screens/Gifts/GiftFormPage";
 import NotificationAdminPanel from "../components/admin/NotificationAdminPanel";
 import NotificationTest from "../components/test/NotificationTest";
-import BannerIndex from "../pages/Banner/BannerIndex";
-import AddBannerForm from "../pages/Banner/Components/AddBannerForm";
-import NotificationIndex from "../pages/Notification/NotificationIndex";
+import BannerIndex from "../screens/Banner/BannerIndex";
+import AddBannerForm from "../screens/Banner/Components/AddBannerForm";
+import NotificationIndex from "../screens/Notification/NotificationIndex";
 
-// import AddCustomerForm from "../pages/Customer/components/AddCustomerForm";
+// import AddCustomerForm from "../screens/Customer/components/AddCustomerForm";
 
-import BlogAnalytics from "@/pages/Blog/BlogAnalytics/BlogAnalytics";
-import BlogEditor from "@/pages/Blog/BlogEditor/BlogEditor";
-import BlogList from "@/pages/Blog/BlogList/BlogList";
-import BlogView from "@/pages/Blog/BlogView/BlogView";
-import NewProductForm from "../pages/Product/components/NewProductForm";
-import ProductImageDemo from "../pages/Product/ProductImageDemo";
-import ProductForm from "../pages/Product/ProductList/component/ProductForm";
-import AttribConfig from "../pages/settings/components/AttribConfig";
-import EditProfileForm from "../pages/settings/ProfileConfig/EditProfileForm";
-import { ContactUs } from "@/pages/contact-us/ContactUs.page";
-import AddQueries from "@/pages/contact-us/components/AddQueries";
-import OrderIndex from "../pages/OrderManagement/Order/OrderIndex";
-import OrderDetails from "../pages/OrderManagement/Order/OrderDetails";
-import AddOrderForm from "../pages/OrderManagement/Order/components/AddOrderPage";
-import AssignedOrders from "../pages/OrderManagement/AssignedOrder/AssignedOrder";
-import ConfirmedOrder from "../pages/OrderManagement/ConfirmedOrder/ConfirmedOrder";
-import CancelledOrder from "../pages/OrderManagement/CancelledOrder/CancelledOrder";
-import CompletedOrder from "../pages/OrderManagement/CompletedOrder/CompletedOrder";
-import Transaction from "../pages/transaction/Transaction";
-import VerifyCashPayment from "../pages/transaction/VerifyCashPayment";
-// import BlogList from "@/pages/Blog/BlogList/BlogList";
-// import BlogEditor from "@/pages/Blog/BlogEditor/BlogEditor";
-// import BlogView from "@/pages/Blog/BlogView/BlogView";
-// import BlogAnalytics from "@/pages/Blog/BlogAnalytics/BlogAnalytics";
+import BlogAnalytics from "@/screens/Blog/BlogAnalytics/BlogAnalytics";
+import BlogEditor from "@/screens/Blog/BlogEditor/BlogEditor";
+import BlogList from "@/screens/Blog/BlogList/BlogList";
+import BlogView from "@/screens/Blog/BlogView/BlogView";
+import NewProductForm from "../screens/Product/components/NewProductForm";
+import ProductImageDemo from "../screens/Product/ProductImageDemo";
+import ProductForm from "../screens/Product/ProductList/component/ProductForm";
+import AttribConfig from "../screens/settings/components/AttribConfig";
+import EditProfileForm from "../screens/settings/ProfileConfig/EditProfileForm";
+import { ContactUs } from "@/screens/contact-us/ContactUs.page";
+import AddQueries from "@/screens/contact-us/components/AddQueries";
+import OrderIndex from "../screens/OrderManagement/Order/OrderIndex";
+import OrderDetails from "../screens/OrderManagement/Order/OrderDetails";
+import AddOrderForm from "../screens/OrderManagement/Order/components/AddOrderPage";
+import AssignedOrders from "../screens/OrderManagement/AssignedOrder/AssignedOrder";
+import ConfirmedOrder from "../screens/OrderManagement/ConfirmedOrder/ConfirmedOrder";
+import CancelledOrder from "../screens/OrderManagement/CancelledOrder/CancelledOrder";
+import CompletedOrder from "../screens/OrderManagement/CompletedOrder/CompletedOrder";
+import Transaction from "../screens/transaction/Transaction";
+import VerifyCashPayment from "../screens/transaction/VerifyCashPayment";
+// import BlogList from "@/screens/Blog/BlogList/BlogList";
+// import BlogEditor from "@/screens/Blog/BlogEditor/BlogEditor";
+// import BlogView from "@/screens/Blog/BlogView/BlogView";
+// import BlogAnalytics from "@/screens/Blog/BlogAnalytics/BlogAnalytics";
 
 export const routesConfig = [
   {
