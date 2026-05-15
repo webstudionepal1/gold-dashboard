@@ -1,6 +1,7 @@
 import type React from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { resolveMediaUrl } from '@/utils/media';
 
 interface SingleFileProps {
   multiple: false;
@@ -141,9 +142,7 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
     return false;
   };
 
-  const getFileUrl = (file: string) => {
-    return `${import.meta.env.VITE_API_IMAGE_BASE_URL}${file}`;
-  };
+  const getFileUrl = (file: string) => resolveMediaUrl(file);
 
   const renderFilePreview = (
     file: File | string,
@@ -159,7 +158,7 @@ const MultiImageUploader: React.FC<UniversalFileUploaderProps> = (props) => {
       if (file.includes('http')) {
         previewUrl = file;
       } else {
-        previewUrl = `${import.meta.env.VITE_API_IMAGE_BASE_URL}${file}`;
+        previewUrl = resolveMediaUrl(file);
       }
     }
 

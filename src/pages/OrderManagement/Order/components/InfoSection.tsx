@@ -44,9 +44,9 @@ const InfoSection: React.FC<InfoSectionProps> = ({
         {info.map((item) => (
           <div key={item.id} className="flex items-center justify-between">
             <p className="text-sm min-w-[150px]">{item.title}</p>
-            <p className="text-sm">
-              {item.value || item.Note || item.date || item.reason}
-            </p>
+            <div className="text-sm text-right">
+              {item.value ?? item.Note ?? item.date ?? item.reason}
+            </div>
           </div>
         ))}
       </div>

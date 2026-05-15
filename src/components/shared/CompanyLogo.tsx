@@ -1,6 +1,7 @@
 import React from "react";
 import clsx from "clsx";
 import { useGetMainCompanyQuery } from "../../server/api/companyHooks";
+import { resolveMediaUrl } from "../../utils/media";
 
 interface CompanyLogoProps {
   className?: string;
@@ -28,9 +29,7 @@ const CompanyLogo: React.FC<CompanyLogoProps> = ({
       if (logoPath.startsWith("http")) {
         return logoPath;
       }
-      //get the url from the env
-      const backendUrl = import.meta.env.VITE_API_LOCAL_URL;
-      return `${backendUrl}${logoPath}`;
+      return resolveMediaUrl(logoPath);
     }
     return fallbackSrc;
   };

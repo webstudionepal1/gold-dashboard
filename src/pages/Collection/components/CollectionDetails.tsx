@@ -4,6 +4,7 @@ import { useGetCollectionByIdQuery } from "../../../server/api/collectionHooks";
 import Breadcrumbs from "../../../components/shared/Breadcrumb";
 import { format } from "date-fns";
 import SafeImage from "../../../components/ui/SafeImage";
+import { resolveMediaUrl } from "../../../utils/media";
 
 const CollectionDetails = () => {
   const navigate = useNavigate();
@@ -60,9 +61,9 @@ const CollectionDetails = () => {
                 {collection.bannerImage && (
                   <div className="relative">
                     <SafeImage
-                      src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${
+                      src={resolveMediaUrl(
                         collection.bannerImage || `/no-image.png`
-                      }`}
+                      )}
                       alt={collection.name}
                       className="w-20 h-20 rounded-xl object-cover shadow-md"
                     />

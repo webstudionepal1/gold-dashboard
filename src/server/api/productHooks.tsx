@@ -183,10 +183,17 @@ export const useGetAllProductsForGiftsQuery = (params: IParams = {}) => {
   return useQuery({
     queryKey: ["products-for-gifts", params],
     queryFn: async () => {
-      const res = await apiClient.get<{ data: IFetchProduct[] }>("product", {
-        params,
+      const res = await apiClient.get<{
+        data: IFetchProduct[] | { products: IFetchProduct[] };
+      }>("product", {
+        params: { limit: 500, ...params },
       });
-      return res?.data?.data || [];
+      const data = res?.data?.data;
+      if (Array.isArray(data)) return data;
+      if (data && typeof data === "object" && Array.isArray(data.products)) {
+        return data.products;
+      }
+      return [];
     },
   });
 };
@@ -209,7 +216,7 @@ export const useGetProductByIdQuery = (
     queryKey: ["products", id],
     queryFn: async () => {
       const res = await apiClient.get<{ data: IFetchProduct }>(`product/${id}`);
-      return res?.data;
+      return res?.data?.data;
     },
     enabled: !!id && options?.enabled !== false,
   });
@@ -230,6 +237,7 @@ export const useCreateProductsMutation = () => {
     onSuccess() {
       toast.success("Product created successfully");
       queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["products-for-gifts"] });
     },
     onError(err: unknown) {
       handleMutationError(err, "Error creating products");

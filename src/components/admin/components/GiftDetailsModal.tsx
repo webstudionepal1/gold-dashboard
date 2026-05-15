@@ -7,6 +7,12 @@ import {
   formatPrice,
   getGiftPricingSummary,
 } from "../../../utils/giftPriceCalculator";
+import { resolveMediaUrl } from "../../../utils/media";
+import {
+  getGiftProductDisplayName,
+  getGiftProductVariants,
+  resolveRelationName,
+} from "@/lib/gift-products";
 
 interface GiftDetailsModalProps {
   gift: IFetchGift;
@@ -399,24 +405,43 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
               <div className="flex items-start justify-between mb-2">
                 <div className="flex-1">
                   <h4 className="font-semibold text-gray-900 text-sm">
-                    {giftProduct.product.name}
+                    {getGiftProductDisplayName(giftProduct.product)}
                   </h4>
                   <p className="text-xs text-gray-600 mt-0.5">
-                    {giftProduct.product.description}
+                    {typeof giftProduct.product === "object" &&
+                    giftProduct.product?.description
+                      ? String(giftProduct.product.description)
+                      : "—"}
                   </p>
                   <div className="flex items-center space-x-3 mt-1 text-xs text-gray-500 flex-wrap">
-                    <span>Cat: {giftProduct.product.category.name}</span>
-                    <span>Sub: {giftProduct.product.subCategory.name}</span>
+                    <span>
+                      Cat:{" "}
+                      {resolveRelationName(
+                        typeof giftProduct.product === "object"
+                          ? giftProduct.product?.category
+                          : null
+                      )}
+                    </span>
+                    <span>
+                      Sub:{" "}
+                      {resolveRelationName(
+                        typeof giftProduct.product === "object"
+                          ? giftProduct.product?.subCategory
+                          : null
+                      )}
+                    </span>
                     <span
                       className={`px-1.5 py-0.5 rounded-full text-xs font-medium ${
-                        giftProduct.product.isActive &&
-                        giftProduct.product.variant?.[0]?.price
+                        typeof giftProduct.product === "object" &&
+                        giftProduct.product?.isActive !== false &&
+                        getGiftProductVariants(giftProduct.product)[0]?.price
                           ? "bg-green-100 text-green-700"
                           : "bg-red-100 text-red-700"
                       }`}
                     >
-                      {giftProduct.product.isActive &&
-                      giftProduct.product.variant?.[0]?.price
+                      {typeof giftProduct.product === "object" &&
+                      giftProduct.product?.isActive !== false &&
+                      getGiftProductVariants(giftProduct.product)[0]?.price
                         ? "Priced"
                         : "No Price"}
                     </span>
@@ -424,7 +449,9 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
                 </div>
                 <div className="text-right ml-3">
                   <div className="text-sm font-semibold text-gray-900">
-                    {formatPrice(giftProduct.product.variant[0]?.price || 0)}
+                    {formatPrice(
+                      getGiftProductVariants(giftProduct.product)[0]?.price || 0
+                    )}
                   </div>
                   <div className="text-xs text-gray-500">
                     Qty: {giftProduct.quantity}
@@ -432,8 +459,8 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
                   <div className="text-xs font-medium text-green-600 mt-0.5">
                     Total:{" "}
                     {formatPrice(
-                      (giftProduct.product.variant[0]?.price || 0) *
-                        giftProduct.quantity
+                      (getGiftProductVariants(giftProduct.product)[0]?.price ||
+                        0) * giftProduct.quantity
                     )}
                   </div>
                   {giftProduct.isOptional && (
@@ -449,8 +476,8 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
                 <div>
                   <span className="text-gray-600">Weight:</span>
                   <span className="ml-1 font-medium">
-                    {giftProduct?.product?.variant[0]?.wt || 0}{" "}
-                    {giftProduct?.product?.variant[0]?.unit || "g"}
+                    {getGiftProductVariants(giftProduct.product)[0]?.wt || 0}{" "}
+                    {getGiftProductVariants(giftProduct.product)[0]?.unit || "g"}
                   </span>
                 </div>
                 <div>
@@ -551,7 +578,9 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
                               {altProduct.name}
                             </span>
                             <span className="text-gray-600">
-                              {formatPrice(altProduct.variant[0]?.price || 0)}
+                              {formatPrice(
+                                getGiftProductVariants(altProduct)[0]?.price || 0
+                              )}
                             </span>
                           </div>
                         )
@@ -561,7 +590,8 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
                 )}
 
               {/* Product Images */}
-              {giftProduct.product.images &&
+              {typeof giftProduct.product === "object" &&
+                Array.isArray(giftProduct.product?.images) &&
                 giftProduct.product.images.length > 0 && (
                   <div className="mt-2 pt-2 border-t border-gray-100">
                     <h5 className="text-xs font-medium text-gray-700 mb-1.5">
@@ -573,10 +603,8 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
                         .map((image, imgIndex) => (
                           <img
                             key={imgIndex}
-                            src={import.meta.env.VITE_API_IMAGE_BASE_URL.toString().concat(
-                              image
-                            )}
-                            alt={`${giftProduct?.product?.name} ${
+                            src={resolveMediaUrl(image)}
+                            alt={`${getGiftProductDisplayName(giftProduct.product)} ${
                               imgIndex + 1
                             }`}
                             className="w-12 h-12 object-cover rounded border border-gray-200 flex-shrink-0"
@@ -586,9 +614,12 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
                             }}
                           />
                         ))}
-                      {giftProduct.product.images.length > 3 && (
+                      {(giftProduct.product as { images: string[] }).images
+                        .length > 3 && (
                         <div className="w-12 h-12 bg-gray-100 rounded border border-gray-200 flex items-center justify-center text-xs text-gray-500 flex-shrink-0">
-                          +{giftProduct?.product?.images?.length - 3}
+                          +
+                          {(giftProduct.product as { images: string[] }).images
+                            .length - 3}
                         </div>
                       )}
                     </div>
@@ -622,9 +653,7 @@ const GiftDetailsModal: React.FC<GiftDetailsModalProps> = ({
                 onClick={() => openImageModal(index)}
               >
                 <img
-                  src={import.meta.env.VITE_API_IMAGE_BASE_URL.toString().concat(
-                    image
-                  )}
+                  src={resolveMediaUrl(image)}
                   alt={`${gift.name} ${index + 1}`}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />

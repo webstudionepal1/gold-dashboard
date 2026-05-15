@@ -2,6 +2,7 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import { IFetchReview } from "../../../../../server/api/reviewHooks";
 import { IFetchProduct } from "../../../../../server/api/productHooks";
 import { memo, useState } from "react";
+import { resolveMediaUrl } from "@/utils/media";
 
 interface ReviewsSectionProps {
   reviews: IFetchReview[];
@@ -243,7 +244,7 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = memo(({
                         {review.images.slice(0, 3).map((item: string, imgIndex: number) => (
                           <div key={imgIndex} className="relative">
                             <img
-                              src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${item}`}
+                              src={resolveMediaUrl(item)}
                               alt={`Review image ${imgIndex + 1}`}
                               className="w-16 h-16 rounded-lg object-cover border border-gray-200 hover:scale-105 transition-transform duration-200 cursor-pointer"
                             />

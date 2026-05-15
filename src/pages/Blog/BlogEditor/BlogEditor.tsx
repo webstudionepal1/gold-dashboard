@@ -1,10 +1,16 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import dynamic from "next/dynamic";
 import { useNavigate, useParams } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
 import "./BlogEditor.css";
+
+const QuillEditor = dynamic(() => import("./QuillEditor"), {
+  ssr: false,
+  loading: () => (
+    <div className="min-h-[280px] bg-gray-50 animate-pulse rounded border border-gray-200" />
+  ),
+});
 import { Icon } from "@iconify/react/dist/iconify.js";
 
 import { Button } from "../../../components/ui/button";
@@ -606,8 +612,7 @@ const BlogEditor: React.FC = () => {
                   </h3>
                 </div>
                 <div className="border border-gray-300 rounded overflow-hidden max-w-full">
-                  <ReactQuill
-                    theme="snow"
+                  <QuillEditor
                     value={formik.values.content}
                     onChange={(content) => {
                       formik.setFieldValue("content", content);
@@ -616,10 +621,7 @@ const BlogEditor: React.FC = () => {
                     modules={quillModules}
                     formats={quillFormats}
                     placeholder="Write your blog content here..."
-                    style={{
-                      minHeight: "280px",
-                      maxWidth: "100%",
-                    }}
+                    minHeight={280}
                   />
                 </div>
                 {formik.touched.content && formik.errors.content && (

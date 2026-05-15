@@ -12,6 +12,7 @@ import {
 } from '../../../server/api/productHooks';
 import { occasionColumns } from '../productObj';
 import AddProductOccasion from './components/AddProductOccasion';
+import { resolveMediaUrl } from '../../../utils/media';
 
 interface IEditModal {
   state: boolean;
@@ -56,9 +57,9 @@ const ProductOccasion: React.FC = () => {
             totalProducts: get(item, 'totalProducts', 0),
             image: get(item, 'image', '') ? (
               <img
-                src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${
+                src={resolveMediaUrl(
                   item.image.length > 0 ? item.image[0] : '/no-image.png'
-                }`}
+                )}
                 alt={item.name}
                 className="w-12 h-12 mx-auto object-cover rounded"
               />

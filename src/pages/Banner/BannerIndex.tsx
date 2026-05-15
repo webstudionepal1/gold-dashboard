@@ -11,6 +11,8 @@ import {
   useGetAllBannerQuery,
 } from "../../server/api/bannerHook";
 import { updateBannerState } from "./Components/bannerStore";
+import { resolveMediaUrl } from "../../utils/media";
+import { getApiBaseUrl } from "../../utils/apiBase";
 
 // Location labels mapping for better display
 const LOCATION_LABELS: Record<string, string> = {
@@ -118,10 +120,7 @@ const BannerIndex: React.FC = () => {
         ? videoPath.substring(1)
         : videoPath;
 
-      const baseUrl =
-        import.meta.env.VITE_API_LOCAL_URL ||
-        "http://localhost:8080/api/v1/en/";
-      const testUrl = `${baseUrl}video/test/${cleanPath}`;
+      const testUrl = `${getApiBaseUrl()}video/test/${cleanPath}`;
       console.log("Testing video stream:", testUrl);
 
       const response = await fetch(testUrl);
@@ -240,13 +239,13 @@ const BannerIndex: React.FC = () => {
             {banner.image.map((item, index) => (
               <img
                 key={index}
-                src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${item}`}
+                src={resolveMediaUrl(item)}
                 width={120}
                 className="rounded-lg object-contain object-center  cursor-pointer hover:opacity-80 transition-opacity"
                 alt={banner.title}
                 onClick={() =>
                   handleImageClick(
-                    `${import.meta.env.VITE_API_IMAGE_BASE_URL}${item}`,
+                    resolveMediaUrl(item),
                     "web"
                   )
                 }
@@ -270,8 +269,7 @@ const BannerIndex: React.FC = () => {
 
               // Ensure we have the correct API base URL
               const baseUrl =
-                import.meta.env.VITE_API_LOCAL_URL ||
-                "http://localhost:8080/api/v1/en/";
+                getApiBaseUrl();
               const videoStreamUrl = `${baseUrl}video/stream/${cleanVideoPath}`;
 
               return (

@@ -5,6 +5,7 @@ import { FrontendRoutes } from "../../../routes/routes";
 import { useGetSupplierByIdQuery } from "../../../server/api/supplierHooks";
 import ContactCard from "../components/ContactCard";
 import SupplierCard from "../components/SupplierDetailCard";
+import { resolveMediaUrl } from "../../../utils/media";
 
 const SupplierDetail = () => {
   let { id } = useParams();
@@ -68,9 +69,7 @@ const SupplierDetail = () => {
           <SupplierCard
             image={
               supplierData && supplierData?.logo.length > 0
-                ? `${import.meta.env.VITE_API_IMAGE_BASE_URL}${
-                    supplierData?.logo[0]
-                  }`
+                ? resolveMediaUrl(supplierData?.logo[0])
                 : "https://via.placeholder.com/150"
             }
             title={get(supplierData, "name", "-")}

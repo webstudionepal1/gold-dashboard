@@ -19,9 +19,7 @@ const OrderIndex = () => {
     data: orders,
     isSuccess,
     isLoading,
-  } = useGetAllOrdersQuery({
-    orderStatus: "pending",
-  });
+  } = useGetAllOrdersQuery({});
 
   const orderList = useMemo(
     () => (isSuccess ? orders : []),

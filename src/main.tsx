@@ -8,7 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 import App from "./App.tsx";
 import ErrorBoundary from "./components/ui/ErrorHandler.tsx";
 import "./index.css";
-import { LoginPage } from "./pages/index.ts";
+import { LoginPage } from "./pages/auth/LoginPage";
 import { ProtectedLayout } from "./routes/ProtectedAppRoutes.tsx";
 import { PublicLayout } from "./routes/PublicLayout.tsx";
 import { routesConfig } from "./routes/Routes-Config.tsx";

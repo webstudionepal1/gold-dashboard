@@ -9,6 +9,7 @@ import { ReviewsSection } from "./components/ReviewSection";
 import { useGetAllReviews } from "../../../../server/api/reviewHooks";
 import Header from "../../../../components/shared/table_heading/Header";
 import get from "lodash/get";
+import { resolveMediaUrl } from "../../../../utils/media";
 const ProductDescription: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { data: product, isLoading, error } = useGetProductById(id ?? "");
@@ -23,8 +24,8 @@ const ProductDescription: React.FC = () => {
     );
   if (!product) return <div className="text-center">Product not found.</div>;
 
-  const images = (product.images || []).map(
-    (item) => `${import.meta.env.VITE_API_IMAGE_BASE_URL}${item}`
+  const images = (product.images || []).map((item: string) =>
+    resolveMediaUrl(item)
   );
   return (
     <div>

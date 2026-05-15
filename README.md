@@ -1,54 +1,84 @@
-# React + TypeScript + Vite
+# Panchakanya Gold Dashboard (Next.js + Prisma)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Admin dashboard for Panchakanya Jewellers. Runs fully locally with **Next.js App Router**, **PostgreSQL**, and **Prisma** — no external API required.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Next.js 15** — frontend + API routes
+- **Prisma** — ORM + migrations
+- **PostgreSQL** — database (local or hosted)
+- **Local uploads** — files stored in `public/uploads/`
 
-## Expanding the ESLint configuration
+## Quick start
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 1. PostgreSQL
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+Install PostgreSQL locally and create a database, or use a hosted instance. Set `DATABASE_URL` in `.env` (see `.env.example`).
+
+### 2. Configure environment
+
+Copy `.env.example` to `.env` and set your connection string.
+
+### 3. Install & migrate
+
+```bash
+npm install
+npm run db:migrate
+npm run db:seed
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 4. Run dev server
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+```bash
+npm run dev
 ```
+
+Open [http://localhost:3000](http://localhost:3000)
+
+**Default login:** `admin@panchakanya.com` / `admin12345`
+
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start Next.js dev server (port 3000) |
+| `npm run build` | Production build |
+| `npm run db:migrate` | Create/apply Prisma migrations |
+| `npm run db:seed` | Seed admin user + sample data |
+| `npm run db:studio` | Open Prisma Studio |
+
+## API
+
+All former external API calls now hit internal routes:
+
+```
+/api/v1/en/<resource>
+```
+
+Examples: `login`, `product`, `category`, `banner`, `blog`, `gift`, `contact`, `company`, `dashboard`, `order`, etc.
+
+File uploads:
+
+```
+POST /api/v1/en/enhanced-upload/single
+```
+
+Files are saved under `public/uploads/<documentType>/` and served at `/uploads/...`.
+
+## Project structure
+
+```
+prisma/schema.prisma   # Database models
+src/app/               # Next.js App Router
+src/app/api/v1/en/     # REST API (replaces external backend)
+src/lib/api/           # API handlers + router
+src/pages/             # Feature pages (used via client router)
+src/components/        # UI components
+public/uploads/        # Local file storage
+```
+
+## Notes
+
+- UI still uses React Router inside a client shell (`ClientApp`) for minimal migration friction. Routes can be moved to Next.js file-based routing incrementally.
+- Firebase push notifications remain optional client-side; backend push is stored in `PushNotification` table.
+- Socket.io chunked uploads are simplified to direct local uploads for local development.

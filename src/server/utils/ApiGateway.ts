@@ -1,8 +1,8 @@
 import axios from "axios";
 import Cookies from "js-cookie";
-// Configure base URL from environment variables
-export const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}`;
-// export const API_BASE_URL = `${import.meta.env.VITE_API_LOCAL_URL}`;
+// Local Next.js API (no external backend)
+export const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "/api/v1/en/";
 
 // Create an axios instance
 export const apiClient = axios.create({
@@ -27,16 +27,16 @@ apiClient.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
-    // Cancel any previous request to the same endpoint
-    if (config.url && controllers.has(config.url)) {
-      controllers.get(config.url)?.abort();
-      controllers.delete(config.url);
+    // Only dedupe/cancel in-flight GET requests (avoid aborting POST create)
+    if (config.method?.toUpperCase() === "GET" && config.url) {
+      if (controllers.has(config.url)) {
+        controllers.get(config.url)?.abort();
+        controllers.delete(config.url);
+      }
+      const controller = new AbortController();
+      config.signal = controller.signal;
+      controllers.set(config.url, controller);
     }
-
-    // Create a new AbortController and attach signal to request
-    const controller = new AbortController();
-    config.signal = controller.signal;
-    if (config.url) controllers.set(config.url, controller);
 
     return config;
   },
@@ -63,9 +63,9 @@ apiClient.interceptors.response.use(
       // window.location.href = `/login`;
     }
 
-    // If request was canceled, do not show error
+    // Let React Query retry when a duplicate GET aborts the previous request
     if (axios.isCancel(error)) {
-      return Promise.resolve({ canceled: true });
+      return Promise.reject(error);
     }
 
     // // Format error message

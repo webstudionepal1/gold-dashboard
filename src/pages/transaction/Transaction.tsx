@@ -10,11 +10,33 @@ import {
   transactionTabOption
 } from "../transaction/transactionObj";
 
-import { format } from "date-fns";
+import { format, isValid, parseISO } from "date-fns";
 import { map } from "lodash";
 import { useGetTransactionsQuery } from "../../server/api/transactionHooks";
 
 import { SearchFilterSort } from "../../components/global/SearchFilterSort";
+import { getOrderDetailsPath } from "@/lib/order-api";
+
+function formatDisplayDate(
+  value: string | Date | null | undefined,
+  fallback = "—"
+): string {
+  if (value == null || value === "") return fallback;
+  const date = value instanceof Date ? value : parseISO(String(value));
+  if (!isValid(date)) return fallback;
+  return format(date, "dd MMM yyyy");
+}
+
+function formatPaymentStatus(status: string | undefined): string {
+  const s = (status || "pending").toLowerCase();
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function toSortableTime(value: string | undefined): number {
+  if (!value) return 0;
+  const date = parseISO(value);
+  return isValid(date) ? date.getTime() : 0;
+}
 
 interface FilterState {
   searchQuery: string;
@@ -97,15 +119,15 @@ const Transaction = () => {
         case "date_asc":
           result.sort(
             (a, b) =>
-              new Date(a.paymentDate).getTime() -
-              new Date(b.paymentDate).getTime()
+              toSortableTime(a.paymentDate || a.orderDate) -
+              toSortableTime(b.paymentDate || b.orderDate)
           );
           break;
         case "date_desc":
           result.sort(
             (a, b) =>
-              new Date(b.paymentDate).getTime() -
-              new Date(a.paymentDate).getTime()
+              toSortableTime(b.paymentDate || b.orderDate) -
+              toSortableTime(a.paymentDate || a.orderDate)
           );
           break;
         case "amount_asc":
@@ -150,14 +172,12 @@ const Transaction = () => {
         filteredTransactions.filter((item) => item.paymentMethod === "cash"),
         (item) => ({
           ...item,
-          orderDate: format(new Date(item.orderDate), "dd MMM yyyy"),
-          paymentDate: format(new Date(item.paymentDate), "dd MMM yyyy"),
-          totalAmount: `Rs. ${item.totalAmount.toLocaleString()}`,
-          payment: `Rs. ${item.payment.toLocaleString()}`,
-          remainingPayment: `Rs. ${item.remainingPayment.toLocaleString()}`,
-          paymentStatus:
-            item.paymentStatus.charAt(0).toUpperCase() +
-            item.paymentStatus.slice(1),
+          orderDate: formatDisplayDate(item.orderDate),
+          paymentDate: formatDisplayDate(item.paymentDate || item.orderDate),
+          totalAmount: `Rs. ${(item.totalAmount ?? 0).toLocaleString()}`,
+          payment: `Rs. ${(item.payment ?? 0).toLocaleString()}`,
+          remainingPayment: `Rs. ${(item.remainingPayment ?? 0).toLocaleString()}`,
+          paymentStatus: formatPaymentStatus(item.paymentStatus),
         })
       ),
     }),
@@ -213,14 +233,12 @@ const Transaction = () => {
           return {
             ...item,
             paymentMethodFormatted,
-            orderDate: format(new Date(item.orderDate), "dd MMM yyyy"),
-            paymentDate: format(new Date(item.paymentDate), "dd MMM yyyy"),
-            totalAmount: `Rs. ${item.totalAmount.toLocaleString()}`,
-            payment: `Rs. ${item.payment.toLocaleString()}`,
-            remainingPayment: `Rs. ${item.remainingPayment.toLocaleString()}`,
-            paymentStatus:
-              item.paymentStatus.charAt(0).toUpperCase() +
-              item.paymentStatus.slice(1),
+            orderDate: formatDisplayDate(item.orderDate),
+            paymentDate: formatDisplayDate(item.paymentDate || item.orderDate),
+            totalAmount: `Rs. ${(item.totalAmount ?? 0).toLocaleString()}`,
+            payment: `Rs. ${(item.payment ?? 0).toLocaleString()}`,
+            remainingPayment: `Rs. ${(item.remainingPayment ?? 0).toLocaleString()}`,
+            paymentStatus: formatPaymentStatus(item.paymentStatus),
           };
         }
       ),
@@ -341,7 +359,10 @@ const Transaction = () => {
         columns={tableDataObj[selectedTab].columns}
         emptyStateMessage="No transactions found for the selected period. Try changing the date range."
         showAction={true}
-        viewAction={(id) => navigate(`/order/${id}`)}
+        viewAction={(row) => {
+          if (!row.orderId) return;
+          navigate(getOrderDetailsPath(row.orderId, row.orderStatus));
+        }}
       />
       {/* {modal.of === "expenses" && (
         <ScrollableModal onClose={closeModal} classname="w-[35rem]">

@@ -88,7 +88,12 @@ export const calculateGiftPrices = (gift: IFetchGift): GiftPriceCalculation => {
       return;
     }
 
-    if (!product.variant || product.variant.length === 0) {
+    const variants =
+      product.variant?.length
+        ? product.variant
+        : (product as { variants?: typeof product.variant }).variants;
+
+    if (!variants || variants.length === 0) {
       productBreakdown.push({
         productId: product._id,
         productName: product.name,
@@ -108,7 +113,7 @@ export const calculateGiftPrices = (gift: IFetchGift): GiftPriceCalculation => {
     }
 
     const activeVariant =
-      product.variant.find((v) => v.isActive) || product.variant[0];
+      variants.find((v) => v.isActive) || variants[0];
     if (!activeVariant || !activeVariant.price) {
       productBreakdown.push({
         productId: product._id,

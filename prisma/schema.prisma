@@ -1,0 +1,525 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  STAFF
+  CUSTOMER
+}
+
+enum BlogStatus {
+  draft
+  published
+  archived
+}
+
+enum GiftType {
+  gift
+  package
+}
+
+enum PricingType {
+  fixed
+  calculated
+  discounted
+}
+
+enum OrderStatus {
+  pending
+  confirmed
+  assigned
+  completed
+  cancelled
+}
+
+enum PaymentStatus {
+  pending
+  paid
+  partial
+  failed
+  refunded
+}
+
+enum ContactStatus {
+  open
+  in_progress
+  resolved
+  closed
+}
+
+enum ContactPriority {
+  low
+  medium
+  high
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  name          String
+  phone         String?
+  role          UserRole  @default(STAFF)
+  image         String?
+  isActive      Boolean   @default(true)
+  isVerified    Boolean   @default(false)
+  addresses     Json      @default("[]")
+  metadata      Json      @default("{}")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  blogs         Blog[]
+  contacts      Contact[] @relation("ContactAssignee")
+  respondedContacts Contact[] @relation("ContactResponder")
+  orders        Order[]
+  reviews       Review[]
+  pushTokens    PushNotification[]
+}
+
+model Category {
+  id            String        @id @default(cuid())
+  name          String
+  description   String?
+  image         String?
+  isActive      Boolean       @default(true)
+  subCategories SubCategory[]
+  products      Product[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model SubCategory {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  image       String?
+  isActive    Boolean   @default(true)
+  categoryId  String
+  category    Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model ClaspType {
+  id        String    @id @default(cuid())
+  name      String
+  images    String[]  @default([])
+  isActive  Boolean   @default(true)
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Stone {
+  id            String   @id @default(cuid())
+  name          String
+  type          String?
+  color         String?
+  clarity       String?
+  cut           String?
+  shape         String?
+  carat         Float?
+  pricePerCarat Float?
+  totalPrice    Float?
+  certification String?
+  description   String?
+  images        String[] @default([])
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Occasion {
+  id            String   @id @default(cuid())
+  name          String
+  slug          String   @unique
+  description   String?
+  image         String?
+  video         String?
+  videoThumbnail String?
+  totalProducts Int      @default(0)
+  isActive      Boolean  @default(true)
+  metadata      Json     @default("{}")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Product {
+  id               String           @id @default(cuid())
+  name             String
+  slug             String           @unique
+  description      String?
+  categoryId       String?
+  category         Category?        @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  subCategoryId    String?
+  subCategory      SubCategory?     @relation(fields: [subCategoryId], references: [id], onDelete: SetNull)
+  claspTypeId      String?
+  claspType        ClaspType?       @relation(fields: [claspTypeId], references: [id], onDelete: SetNull)
+  makingCharges    Float            @default(0)
+  length           Float?
+  rhodoumFinishes  Boolean          @default(false)
+  shape            String?
+  quantity         Int              @default(0)
+  totalCarat       Float?
+  color            String?
+  clarity          String?
+  dimension        Float?
+  tags             String[]         @default([])
+  visibleAs        String           @default("public")
+  images           String[]         @default([])
+  video            String?
+  videoThumbnail   String?
+  averageRating    Float            @default(0)
+  numberOfReviews  Int              @default(0)
+  isActive         Boolean          @default(true)
+  isFeatured       Boolean          @default(false)
+  wastage          Json?
+  stones           Json             @default("[]")
+  others           Json             @default("[]")
+  metadata         Json             @default("{}")
+  variants         ProductVariant[]
+  orderItems       OrderItem[]
+  reviews          Review[]
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+}
+
+model ProductVariant {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sku       String   @unique
+  price     Float
+  wt        Float    @default(0)
+  unit      String   @default("gm")
+  costPrice Float?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Banner {
+  id              String   @id @default(cuid())
+  title           String?
+  description     String?
+  image           String[] @default([])
+  mobImage        String[] @default([])
+  video           String[] @default([])
+  videoThumbnail  String[] @default([])
+  category        String?
+  subCategory     String?
+  priority        Int      @default(0)
+  locations       String[] @default([])
+  type            String?
+  status          String   @default("active")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Blog {
+  id            String     @id @default(cuid())
+  title         String
+  slug          String     @unique
+  content       String
+  excerpt       String?
+  authorId      String
+  author        User       @relation(fields: [authorId], references: [id])
+  tags          String[]   @default([])
+  categories    String[]   @default([])
+  featuredImage String?
+  images        String[]   @default([])
+  video         String?
+  status        BlogStatus @default(draft)
+  publishedAt   DateTime?
+  readTime      Int?
+  views         Int        @default(0)
+  likes         Int        @default(0)
+  isActive      Boolean    @default(true)
+  isFeatured    Boolean    @default(false)
+  metadata      Json       @default("{}")
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+model Gift {
+  id                   String      @id @default(cuid())
+  name                 String
+  slug                 String      @unique
+  description          String?
+  type                 GiftType    @default(gift)
+  products             Json        @default("[]")
+  pricingType          PricingType @default(fixed)
+  fixedPrice           Float?
+  discountPercentage   Float?
+  discountAmount       Float?
+  category             String?
+  setCategory          String?
+  occasion             String?
+  tags                 String[]    @default([])
+  setType              String?
+  complementaryProducts Json       @default("[]")
+  setTheme             String?
+  metalType            String?
+  stoneType            String?
+  stock                Int         @default(0)
+  isActive             Boolean     @default(true)
+  images               String[]    @default([])
+  featuredImage        String?
+  visibleAs            String      @default("public")
+  metadata             Json        @default("{}")
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+}
+
+model Collection {
+  id              String   @id @default(cuid())
+  name            String
+  slug            String   @unique
+  description     String?
+  shortDescription String?
+  totalProducts   Int      @default(0)
+  isActive        Boolean  @default(true)
+  isFeatured      Boolean  @default(false)
+  sortOrder       Int      @default(0)
+  collectionType  String   @default("custom")
+  collectionMode  String   @default("manual")
+  conditions      Json?
+  images          String[] @default([])
+  bannerImage     String?
+  video           String?
+  materialType    String?
+  gemstoneType    String?
+  styleCategory   String?
+  priceRange      Json?
+  isLimitedEdition Boolean @default(false)
+  availableFrom   DateTime?
+  availableUntil  DateTime?
+  metadata        Json     @default("{}")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Company {
+  id             String   @id @default(cuid())
+  name           String
+  companyName    String?
+  ownerNo        String?
+  address        String?
+  email          String?
+  phone          String?
+  description    String?
+  registrationNo String?
+  city           String?
+  zipCode        String?
+  openDay        String?
+  openTime       String?
+  closeTime      String?
+  paymentMode    String?
+  bankName       String?
+  accountNo      String?
+  accountHolder  String?
+  branch         String?
+  logo           String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Contact {
+  id              String          @id @default(cuid())
+  name            String
+  email           String
+  subject         String
+  description     String
+  status          ContactStatus   @default(open)
+  priority        ContactPriority @default(medium)
+  assignedToId    String?
+  assignedTo      User?           @relation("ContactAssignee", fields: [assignedToId], references: [id])
+  responseMessage String?
+  respondedAt     DateTime?
+  respondedById   String?
+  respondedBy     User?           @relation("ContactResponder", fields: [respondedById], references: [id])
+  attachments     String[]        @default([])
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+model Order {
+  id                 String        @id @default(cuid())
+  orderNumber        String?       @unique
+  customerId         String?
+  customer           User?         @relation(fields: [customerId], references: [id])
+  shippingAddress    Json
+  billingAddress     Json
+  billDetails        Json
+  orderTimeline      Json          @default("{}")
+  transactionDetails Json?
+  orderStatus        OrderStatus   @default(pending)
+  paymentStatus      PaymentStatus @default(pending)
+  deliveryStatus     String        @default("pending")
+  totalAmount        Float         @default(0)
+  items              OrderItem[]
+  transactions       Transaction[]
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+}
+
+model OrderItem {
+  id              String  @id @default(cuid())
+  orderId         String
+  order           Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId       String?
+  product         Product? @relation(fields: [productId], references: [id])
+  selectedVariant Json
+  quantity        Int     @default(1)
+}
+
+model Transaction {
+  id              String   @id @default(cuid())
+  transactionId   String   @unique
+  orderId         String?
+  order           Order?   @relation(fields: [orderId], references: [id])
+  orderDate       DateTime @default(now())
+  totalAmount     Float
+  paymentMethod   String?
+  payment         Float    @default(0)
+  remainingPayment Float   @default(0)
+  image           String?
+  customerName    String?
+  metadata        Json     @default("{}")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Supplier {
+  id           String   @id @default(cuid())
+  name         String
+  email        String?
+  phone        String?
+  address      Json?
+  businessInfo Json?
+  logo         String?
+  products     Json     @default("[]")
+  isActive     Boolean  @default(true)
+  purchases    Purchase[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Purchase {
+  id         String   @id @default(cuid())
+  billNo     String?
+  supplierId String?
+  supplier   Supplier? @relation(fields: [supplierId], references: [id])
+  items      Json     @default("[]")
+  products   Json     @default("[]")
+  amounts    Json     @default("{}")
+  metadata   Json     @default("{}")
+  returns    PurchaseReturn[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model PurchaseReturn {
+  id         String   @id @default(cuid())
+  purchaseId String
+  purchase   Purchase @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
+  items      Json     @default("[]")
+  refund     Json     @default("{}")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model RawItem {
+  id          String   @id @default(cuid())
+  name        String
+  stock       Float    @default(0)
+  minStock    Float    @default(0)
+  unit        String   @default("gm")
+  metadata    Json     @default("{}")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ExpenseCategory {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  expenses    Expense[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Expense {
+  id         String           @id @default(cuid())
+  categoryId String?
+  category   ExpenseCategory? @relation(fields: [categoryId], references: [id])
+  title      String?
+  amount     Float
+  date       DateTime         @default(now())
+  images     String[]         @default([])
+  metadata   Json             @default("{}")
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+}
+
+model CashFlow {
+  id              String   @id @default(cuid())
+  transactionType String
+  amount          Float
+  paymentMethod   String?
+  reference       String?
+  description     String?
+  metadata        Json     @default("{}")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  rating     Int
+  reviewText String?
+  images     String[] @default([])
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model PushNotification {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  token     String
+  title     String?
+  body      String?
+  data      Json?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MetalPrice {
+  id        String   @id @default(cuid())
+  gold      Json
+  silver    Json
+  isLatest  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model PriceConfig {
+  id        String   @id @default(cuid())
+  name      String
+  config    Json     @default("{}")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

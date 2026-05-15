@@ -187,7 +187,8 @@ const VideoUploader: React.FC<VideoUploaderProps> = ({
       : videoPath;
 
     const baseUrl =
-      import.meta.env.VITE_API_LOCAL_URL || "http://localhost:8080/api/v1/en/";
+      (typeof process !== "undefined" && process.env.NEXT_PUBLIC_API_BASE_URL) ||
+        "/api/v1/en/";
     return `${baseUrl}video/stream/${cleanVideoPath}`;
   }, [existingFile]);
 

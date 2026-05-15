@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Plus, X, Search } from "lucide-react";
@@ -12,7 +12,11 @@ import FileDropInput from "../../shared/form_components/FileDropInput";
 import { InputField } from "../../shared/form_components/InputField";
 import { TextareaField } from "../../shared/form_components/TextArea";
 import { DropdownField } from "../../shared/form_components/Dropdown";
-// Removed uploadFiles import as we're now using FormData directly
+import {
+  mapGiftProductsToForm,
+  mapGiftToFormData,
+  GiftFormValues,
+} from "@/utils/giftForm";
 
 interface GiftFormProps {
   gift?: IFetchGift;
@@ -113,54 +117,47 @@ const giftValidationSchema = Yup.object({
   priority: Yup.number().min(1, "Priority must be at least 1"),
 });
 
-// Form data interface
-interface GiftFormData {
-  name: string;
-  description: string;
-  type: "gift" | "package";
-  pricingType: "fixed" | "calculated" | "discounted";
-  fixedPrice: number;
-  discountPercentage: number;
-  discountAmount: number;
-  category: string;
-  setCategory: string;
-  occasion: string;
-  setType:
-    | "necklace_set"
-    | "bridal_set"
-    | "earring_set"
-    | "bracelet_set"
-    | "ring_set"
-    | "custom"
-    | "";
-  setTheme: string;
-  metalType: string;
-  stoneType: string;
-  tags: string;
-  isActive: boolean;
-  isAvailable: boolean;
-  stockType: "unlimited" | "limited" | "based_on_products";
-  totalStock: number;
-  featuredImage: string;
-  slug: string;
-  visibleAs: string;
-  weight: number;
-  isCustomizable: boolean;
-  allowPartialPurchase: boolean;
-  minimumOrderQuantity: number;
-  maximumOrderQuantity: number;
-  priority: number;
-}
-const GiftForm: React.FC<GiftFormProps> = ({ gift, onCancel, products }) => {
+type GiftFormData = GiftFormValues;
+
+const defaultFormValues: GiftFormData = {
+  name: "",
+  description: "",
+  type: "gift",
+  pricingType: "calculated",
+  fixedPrice: 0,
+  discountPercentage: 0,
+  discountAmount: 0,
+  category: "",
+  setCategory: "",
+  occasion: "",
+  setType: "",
+  setTheme: "",
+  metalType: "",
+  stoneType: "",
+  tags: "",
+  isActive: true,
+  isAvailable: true,
+  stockType: "unlimited",
+  totalStock: 0,
+  featuredImage: "",
+  slug: "",
+  visibleAs: "",
+  weight: 0,
+  isCustomizable: false,
+  allowPartialPurchase: false,
+  minimumOrderQuantity: 1,
+  maximumOrderQuantity: 100,
+  priority: 1,
+};
+
+const GiftForm: React.FC<GiftFormProps> = ({
+  gift,
+  onSuccess,
+  onCancel,
+  products,
+}) => {
   const [selectedProducts, setSelectedProducts] = useState<GiftProductForm[]>(
-    gift?.products?.map((p) => ({
-      product: p.product._id,
-      quantity: p.quantity,
-      isOptional: p.isOptional,
-      alternativeProducts: p.alternativeProducts?.map((alt) => alt._id) || [],
-    })) || [
-      { product: "", quantity: 1, isOptional: false, alternativeProducts: [] },
-    ]
+    () => mapGiftProductsToForm(gift?.products)
   );
   const [productSearch, setProductSearch] = useState("");
   const [showProductDropdown, setShowProductDropdown] = useState<number | null>(
@@ -169,56 +166,27 @@ const GiftForm: React.FC<GiftFormProps> = ({ gift, onCancel, products }) => {
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
-  // Initialize existing images when editing
   useEffect(() => {
-    if (gift?.images) {
-      // For editing mode, we'll show existing images in the FileDropInput
-      // The component will handle displaying them
+    if (gift) {
+      setSelectedProducts(mapGiftProductsToForm(gift.products));
     }
   }, [gift]);
 
   const createGiftMutation = useCreateGiftMutation();
   const updateGiftMutation = useUpdateGiftMutation();
 
-  const filteredProducts = products.filter((product) =>
+  const productList = Array.isArray(products)
+    ? products
+    : (products as { products?: IFetchProduct[] })?.products ?? [];
+
+  const filteredProducts = productList.filter((product) =>
     product.name.toLowerCase().includes(productSearch.toLowerCase())
   );
 
-  // Initial values for Formik
-  const initialValues: GiftFormData = {
-    name: gift?.name || "",
-    description: gift?.description || "",
-    type: gift?.type || "gift",
-    pricingType: gift?.pricingType || "calculated",
-    fixedPrice: gift?.fixedPrice || 0,
-    discountPercentage: gift?.discountPercentage || 0,
-    discountAmount: gift?.discountAmount || 0,
-    category: gift?.category || "",
-    setCategory: gift?.setCategory || "",
-    occasion: gift?.occasion || "",
-    setType: gift?.setType || "",
-    setTheme: gift?.setTheme || "",
-    metalType: gift?.metalType || "",
-    stoneType: gift?.stoneType || "",
-    tags: gift?.tags?.join(", ") || "",
-    isActive: gift?.isActive ?? true,
-    isAvailable: gift?.isAvailable ?? true,
-    stockType: gift?.stockType || "unlimited",
-    totalStock: gift?.totalStock || 0,
-    featuredImage: gift?.featuredImage || "",
-    slug: gift?.slug || "",
-    visibleAs: Array.isArray(gift?.visibleAs)
-      ? gift?.visibleAs.length > 0
-        ? gift?.visibleAs[0]
-        : ""
-      : gift?.visibleAs || "",
-    weight: gift?.weight || 0,
-    isCustomizable: gift?.isCustomizable ?? false,
-    allowPartialPurchase: gift?.allowPartialPurchase ?? false,
-    minimumOrderQuantity: gift?.minimumOrderQuantity || 1,
-    maximumOrderQuantity: gift?.maximumOrderQuantity || 100,
-    priority: gift?.priority || 1,
-  };
+  const initialValues = useMemo(
+    () => (gift ? mapGiftToFormData(gift) : defaultFormValues),
+    [gift]
+  );
 
   // Formik form
   const formik = useFormik({
@@ -341,7 +309,7 @@ const GiftForm: React.FC<GiftFormProps> = ({ gift, onCancel, products }) => {
         } else {
           await createGiftMutation.mutateAsync(formData);
         }
-        onCancel();
+        onSuccess();
       } catch (error) {
         console.error("Error saving gift:", error);
       } finally {
@@ -391,7 +359,7 @@ const GiftForm: React.FC<GiftFormProps> = ({ gift, onCancel, products }) => {
   };
 
   const getProductName = (productId: string) => {
-    const product = products.find((p) => p._id === productId);
+    const product = productList.find((p) => p._id === productId);
     return product?.name || "Unknown Product";
   };
 

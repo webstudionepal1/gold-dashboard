@@ -1,17 +1,17 @@
 import React, { useState, useMemo } from "react";
-import { Plus, Search } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Search } from "lucide-react";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { toast } from "react-toastify";
 import {
   useGetAllGiftsQuery,
   useDeleteGiftMutation,
   IFetchGift,
   IParams,
 } from "../../server/api/giftHooks";
-import { useGetAllProductsForGiftsQuery } from "../../server/api/productHooks";
 import { ScrollableModal } from "../shared/ScrollableModal";
-import GiftForm, { occassion } from "./components/GiftForm";
+import { occassion } from "./components/GiftForm";
 import GiftDetailsModal from "./components/GiftDetailsModal";
+import { FrontendRoutes } from "../../routes/routes";
 import MasterTable from "../shared/MasterTable";
 import Header from "../shared/table_heading/Header";
 
@@ -19,15 +19,13 @@ import { giftColumns, GiftTableRow } from "./giftObj";
 import { calculateGiftPrices, formatPrice } from "../../utils/giftPriceCalculator";
 
 const GiftsAdminPanel: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<"gifts" | "packages">("gifts");
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState<"all" | "gift" | "package">(
     "all"
   );
   const [selectedOccasion, setSelectedOccasion] = useState<string>("all");
   const [selectedSetType, setSelectedSetType] = useState<string>("all");
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedGift, setSelectedGift] = useState<IFetchGift | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -69,7 +67,6 @@ const GiftsAdminPanel: React.FC = () => {
     isLoading,
     error,
   } = useGetAllGiftsQuery(queryParams);
-  const { data: productsData } = useGetAllProductsForGiftsQuery();
   const deleteGiftMutation = useDeleteGiftMutation();
 
   const gifts = Array.isArray(giftsData?.data)
@@ -80,13 +77,11 @@ const GiftsAdminPanel: React.FC = () => {
     : giftsData?.data?.pagination;
 
   const handleCreateGift = () => {
-    setSelectedGift(null);
-    setIsCreateModalOpen(true);
+    navigate(FrontendRoutes.ADDGIFT);
   };
 
   const handleEditGift = (gift: IFetchGift) => {
-    setSelectedGift(gift);
-    setIsEditModalOpen(true);
+    navigate(FrontendRoutes.EDITGIFT.replace(":id", gift._id));
   };
 
   const handleViewGift = (gift: IFetchGift) => {
@@ -319,43 +314,6 @@ const GiftsAdminPanel: React.FC = () => {
           </div>
         )}
       </div>
-
-      {/* Create Gift Modal */}
-      <ScrollableModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        title="Create New Gift"
-        size="lg"
-      >
-        <GiftForm
-          onSuccess={() => {
-            setIsCreateModalOpen(false);
-            toast.success("Gift created successfully!");
-          }}
-          onCancel={() => setIsCreateModalOpen(false)}
-          products={productsData || []}
-        />
-      </ScrollableModal>
-
-      {/* Edit Gift Modal */}
-      <ScrollableModal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        title="Edit Gift"
-        size="lg"
-      >
-        {selectedGift && (
-          <GiftForm
-            gift={selectedGift}
-            onSuccess={() => {
-              setIsEditModalOpen(false);
-              toast.success("Gift updated successfully!");
-            }}
-            onCancel={() => setIsEditModalOpen(false)}
-            products={productsData || []}
-          />
-        )}
-      </ScrollableModal>
 
       {/* Gift Details Modal */}
       <ScrollableModal

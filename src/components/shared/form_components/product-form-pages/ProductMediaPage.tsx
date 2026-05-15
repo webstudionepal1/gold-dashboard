@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { useFormikContext } from "formik";
 import { UploadCloud, X } from "lucide-react";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { resolveMediaUrl } from "@/utils/media";
 
 interface ProductFormData {
   video: File | null;
@@ -42,8 +43,7 @@ export default function CompactProductVideoSection() {
   };
 
   const existingVideoUrl =
-    values.existingVideo &&
-    `${import.meta.env.VITE_API_IMAGE_BASE_URL}${values.existingVideo}`;
+    values.existingVideo && resolveMediaUrl(values.existingVideo);
 
   return (
     <div>

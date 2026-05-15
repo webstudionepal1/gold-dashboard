@@ -14,6 +14,7 @@ import {
   useGetAllBlogsQuery,
 } from "../../../server/api/blogHooks";
 import { FrontendRoutes } from "../../../routes/routes";
+import { resolveMediaUrl } from "../../../utils/media";
 
 const BlogView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -277,9 +278,7 @@ const BlogView: React.FC = () => {
             {blog.featuredImage && (
               <figure className="aspect-[16/9] rounded-lg overflow-hidden">
                 <img
-                  src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${
-                    blog.featuredImage
-                  }`}
+                  src={resolveMediaUrl(blog.featuredImage)}
                   alt={blog.title}
                   className="w-full h-full object-cover"
                 />
@@ -354,9 +353,7 @@ const BlogView: React.FC = () => {
                         onClick={() => openImageModal(index)}
                       >
                         <img
-                          src={`${
-                            import.meta.env.VITE_API_IMAGE_BASE_URL
-                          }${image}`}
+                          src={resolveMediaUrl(image)}
                           alt={`Image ${index + 1}`}
                           className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
                         />
@@ -483,9 +480,7 @@ const BlogView: React.FC = () => {
                       {relatedBlog.featuredImage && (
                         <div className="aspect-[4/3] overflow-hidden">
                           <img
-                            src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${
-                              relatedBlog.featuredImage
-                            }`}
+                            src={resolveMediaUrl(relatedBlog.featuredImage)}
                             alt={relatedBlog.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                           />
@@ -526,9 +521,7 @@ const BlogView: React.FC = () => {
                 <Icon icon="material-symbols:close" className="w-6 h-6" />
               </button>
               <img
-                src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${
-                  blog.images[selectedImageIndex]
-                }`}
+                src={resolveMediaUrl(blog.images[selectedImageIndex])}
                 alt={`Image ${selectedImageIndex + 1}`}
                 className="max-w-full max-h-full object-contain"
               />

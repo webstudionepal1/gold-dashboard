@@ -175,7 +175,8 @@ export const StepperObj: Record<string, number> = {
   pending: 0,
   confirmed: 1,
   assigned: 2,
-  delivered: 3,
+  completed: 3,
+  delivered: 3, // legacy alias
   cancelled: -1, // Special case for cancelled orders
 };
 

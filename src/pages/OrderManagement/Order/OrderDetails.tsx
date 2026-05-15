@@ -125,7 +125,9 @@ const createPaymentStatusBadge = (
   paymentStatus: string
 ) => {
   if (isOrderCancelled) {
-    return <div className={CANCELLED_STYLES.badge}>Cancelled</div>;
+    return (
+      <span className={`inline-block ${CANCELLED_STYLES.badge}`}>Cancelled</span>
+    );
   }
 
   const isPaid = paymentStatus === "paid";
@@ -133,7 +135,11 @@ const createPaymentStatusBadge = (
     ? "text-white bg-green text-sm rounded-full py-1 px-4"
     : "text-white bg-red text-sm rounded-full py-1 px-4";
 
-  return <div className={badgeClass}>{paymentStatus}</div>;
+  return (
+    <span className={`inline-block capitalize ${badgeClass}`}>
+      {paymentStatus}
+    </span>
+  );
 };
 
 // Component for cancelled order banner
@@ -568,8 +574,8 @@ const OrderDetails: React.FC = () => {
               {page === "assigned-order-details" && (
                 <button
                   onClick={() =>
-                    handleOrderStatusUpdate("delivered", {
-                      paymentStaus: "paid",
+                    handleOrderStatusUpdate("completed", {
+                      paymentStatus: "paid",
                     })
                   }
                   disabled={isPending}

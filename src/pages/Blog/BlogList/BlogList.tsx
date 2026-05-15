@@ -16,6 +16,7 @@ import {
 } from '../../../server/api/blogHooks';
 import { IBlog, IBlogSearchParams } from '../../../types/blog.types';
 import { FrontendRoutes } from '../../../routes/routes';
+import { resolveMediaUrl } from '../../../utils/media';
 
 const BlogList: React.FC = () => {
   const navigate = useNavigate();
@@ -144,9 +145,7 @@ const BlogList: React.FC = () => {
       <div className="aspect-[2/1] w-full overflow-hidden bg-gray-100">
         {blog.featuredImage ? (
           <img
-            src={String(import.meta.env.VITE_API_IMAGE_BASE_URL).concat(
-              blog.featuredImage
-            )}
+            src={resolveMediaUrl(blog.featuredImage)}
             alt={blog.title}
             className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-200"
           />

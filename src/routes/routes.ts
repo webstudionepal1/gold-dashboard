@@ -33,6 +33,8 @@ export const FrontendRoutes = {
   MYPOSTBUSINESS: "/my-post-business",
 
   GIFTS: "/gifts",
+  ADDGIFT: "/gifts/add",
+  EDITGIFT: "/gifts/edit/:id",
 
   TRANSACTION: "/transaction",
   VERIFY_CASH: "/transaction/verify-cash-payment",

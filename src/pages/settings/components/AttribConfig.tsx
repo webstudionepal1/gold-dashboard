@@ -13,6 +13,7 @@ import { ITable } from "../../PurchaseManagement/purchaseObj";
 import Header from "../../../components/shared/table_heading/Header";
 import ClaspModel from "./ClaspModel";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { resolveMediaUrl } from "../../../utils/media";
 
 interface IModalProps {
   of: string;
@@ -62,9 +63,7 @@ const AttribConfig = () => {
             {item.images ? (
               item.images.length > 0 && (
                 <img
-                  src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${
-                    item.images[0]
-                  }`}
+                  src={resolveMediaUrl(item.images[0])}
                   alt="hello"
                   className="size-8 mx-auto"
                 />

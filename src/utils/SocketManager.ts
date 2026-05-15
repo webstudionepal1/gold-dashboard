@@ -87,7 +87,7 @@ class SocketManager {
   private createConnection(): Promise<Socket> {
     return new Promise((resolve, reject) => {
       const socket = io(
-        import.meta.env.VITE_API_LOCAL_URL || "http://localhost:8080",
+        typeof window !== "undefined" ? window.location.origin : "http://localhost:3000",
         {
           transports: ["websocket", "polling"],
           timeout: 20000,

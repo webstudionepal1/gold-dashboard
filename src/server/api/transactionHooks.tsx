@@ -13,6 +13,7 @@ export interface ITransaction {
   orderDate: string;
   customerName: string;
   customerPhone: string;
+  orderStatus?: string;
   image?: string;
 }
 

@@ -14,6 +14,8 @@ import {
   useUpdateProductsMutation,
 } from "../../../server/api/productHooks";
 import { updateProductState } from "../../../store/productStore";
+import { resolveMediaUrl } from "../../../utils/media";
+import { getApiBaseUrl } from "../../../utils/apiBase";
 import { productListColumns } from "../productObj";
 
 const ProductList: React.FC = () => {
@@ -85,10 +87,7 @@ const ProductList: React.FC = () => {
         ? videoPath.substring(1)
         : videoPath;
 
-      const baseUrl =
-        import.meta.env.VITE_API_LOCAL_URL ||
-        "http://localhost:8080/api/v1/en/";
-      const testUrl = `${baseUrl}video/test/${cleanPath}`;
+      const testUrl = `${getApiBaseUrl()}video/test/${cleanPath}`;
       console.log("Testing video stream:", testUrl);
 
       const response = await fetch(testUrl);
@@ -162,18 +161,14 @@ const ProductList: React.FC = () => {
             {product.images && product.images.length > 0 ? (
               <>
                 <img
-                  src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${
-                    product.images[0]
-                  }`}
+                  src={resolveMediaUrl(product.images[0])}
                   alt="product image"
                   className="w-full h-full rounded-sm object-cover aspect-square transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:rounded-md"
                 />
                 <div className="fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[100] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
                   <div className="bg-transparent rounded-lg overflow-hidden">
                     <img
-                      src={`${import.meta.env.VITE_API_IMAGE_BASE_URL}${
-                        product.images[0]
-                      }`}
+                      src={resolveMediaUrl(product.images[0])}
                       alt="product image preview"
                       className="h-48 object-contain"
                       style={{ width: "500px" }}
@@ -218,10 +213,11 @@ const ProductList: React.FC = () => {
                     : videoPath.startsWith("/")
                     ? videoPath.substring(1)
                     : videoPath;
-                  const baseUrl =
-                    import.meta.env.VITE_API_LOCAL_URL ||
-                    "http://localhost:8080/api/v1/en/";
-                  const videoStreamUrl = `${baseUrl}video/stream/${cleanVideoPath}`;
+                  const videoStreamUrl = resolveMediaUrl(
+                    videoPath.startsWith("/uploads")
+                      ? videoPath
+                      : `/uploads/${cleanVideoPath}`
+                  );
 
                   return (
                     <video

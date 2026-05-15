@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Icon } from "@iconify/react";
 import { IFetchProduct } from "@/server/api/productHooks";
+import { resolveMediaUrl } from "@/utils/media";
 
 interface ProductVideoProps {
   product?: IFetchProduct;
@@ -25,17 +26,7 @@ export const ProductVideo: React.FC<ProductVideoProps> = ({ product }) => {
     );
   }
 
-  const getVideoUrl = (videoPath: string) => {
-    const cleanPath = videoPath.startsWith("/ridisidi/")
-      ? videoPath.substring("/ridisidi/".length)
-      : videoPath.startsWith("/")
-      ? videoPath.substring(1)
-      : videoPath;
-
-    const baseUrl =
-      import.meta.env.VITE_API_LOCAL_URL || "http://localhost:8080/api/v1/en/";
-    return `${baseUrl}video/stream/${cleanPath}`;
-  };
+  const getVideoUrl = (videoPath: string) => resolveMediaUrl(videoPath);
 
   const handleVideoChange = (index: number) => {
     setCurrentVideoIndex(index);
@@ -88,7 +79,7 @@ export const ProductVideo: React.FC<ProductVideoProps> = ({ product }) => {
             preload="metadata"
             poster={
               currentThumbnail
-                ? `${import.meta.env.VITE_API_IMAGE_BASE_URL}${currentThumbnail}`
+                ? resolveMediaUrl(currentThumbnail)
                 : undefined
             }
             onPlay={() => setIsPlaying(true)}

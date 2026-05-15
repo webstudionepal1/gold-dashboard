@@ -52,13 +52,19 @@ export const InputField = React.forwardRef<
     ref
   ) => {
     const [isFocused, setIsFocused] = useState(false);
+    const { value: valueProp, ...inputRest } = other;
+
+    const toControlledValue = (v: unknown): string | number | readonly string[] => {
+      if (v == null) return '';
+      return v as string | number | readonly string[];
+    };
 
     // Use number input logic if this is a number type and numberValue/onNumberChange are provided
     const isNumberInput =
       type === 'number' && numberValue !== undefined && onNumberChange;
 
     const numberInputProps = useClearableNumberInput(
-      numberValue || 0,
+      numberValue ?? 0,
       onNumberChange || (() => {}),
       allowNegative
     );
@@ -77,7 +83,9 @@ export const InputField = React.forwardRef<
           }
         : {
             value:
-              numberValue !== undefined ? String(numberValue) : other.value,
+              numberValue !== undefined
+                ? String(numberValue)
+                : toControlledValue(valueProp),
             onChange: onNumberChange
               ? (e: React.ChangeEvent<HTMLInputElement>) =>
                   onNumberChange(parseFloat(e.target.value) || 0)
@@ -113,7 +121,7 @@ export const InputField = React.forwardRef<
             {...inputProps}
             onBlur={(e) => {
               setIsFocused(false);
-              other.onBlur?.(e);
+              inputRest.onBlur?.(e);
             }}
             className={twMerge(
               `w-full transition-all duration-200 ease-in-out`,
@@ -143,7 +151,7 @@ export const InputField = React.forwardRef<
               inputClassName
             )}
             readOnly={readonly}
-            {...(isNumberInput ? {} : other)} // Don't spread other props if using number input
+            {...(isNumberInput ? {} : inputRest)} // value handled above; omit null from spread
           />
         </div>
 

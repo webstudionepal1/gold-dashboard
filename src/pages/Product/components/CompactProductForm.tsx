@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { toast } from "react-toastify";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { ProductFormData } from "../../../components/shared/form_components/ProductFormContext";
 import { InputField } from "../../../components/shared/form_components/InputField";
@@ -40,8 +41,9 @@ const defaultFormData: ProductFormData = {
   makingCharges: 0,
   makingChargesType: "fixed",
 
-  // Wastage
-  wastage: undefined,
+  // Wastage (required for gold/silver in validation)
+  wastage: { type: "fixed" as const, value: 0 },
+  totalCarat: 1,
 
   // Product Variants
   variants: [
@@ -90,6 +92,26 @@ interface FormSectionProps {
   icon: string;
   children: React.ReactNode;
   className?: string;
+}
+
+function getFirstFormError(errors: Record<string, unknown>): string | null {
+  for (const value of Object.values(errors)) {
+    if (typeof value === "string") return value;
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        if (typeof item === "string") return item;
+        if (item && typeof item === "object") {
+          const nested = getFirstFormError(item as Record<string, unknown>);
+          if (nested) return nested;
+        }
+      }
+    }
+    if (value && typeof value === "object") {
+      const nested = getFirstFormError(value as Record<string, unknown>);
+      if (nested) return nested;
+    }
+  }
+  return null;
 }
 
 const FormSection: React.FC<FormSectionProps> = ({
@@ -179,9 +201,27 @@ const CompactFormContent: React.FC<{
     },
     onSubmit: (values) => {
       onSubmit(values);
-      console.log(values, "karat");
     },
   });
+
+  const handleCreateClick = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const errors = await formik.validateForm();
+    if (Object.keys(errors).length > 0) {
+      const message =
+        getFirstFormError(errors as Record<string, unknown>) ||
+        "Please complete all required fields";
+      toast.error(message);
+      formik.setTouched(
+        Object.keys(formik.values).reduce(
+          (acc, key) => ({ ...acc, [key]: true }),
+          {} as Record<string, boolean>
+        )
+      );
+      return;
+    }
+    formik.handleSubmit();
+  };
 
   // Image upload state
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
@@ -345,7 +385,7 @@ const CompactFormContent: React.FC<{
 
       <FormikProvider value={formik}>
         <Form
-          onSubmit={formik.handleSubmit}
+          onSubmit={handleCreateClick}
           className="max-w-7xl mx-auto md:px-0 px-2 py-2"
         >
           <div className="space-y-4 pb-16">
@@ -357,7 +397,7 @@ const CompactFormContent: React.FC<{
                     label="Product Name"
                     placeholder="Enter product name"
                     required
-                    value={formik.values.name}
+                    value={formik.values.name ?? ""}
                     onChange={(e) => {
                       formik.setFieldValue("name", e.target.value);
                     }}
@@ -400,7 +440,7 @@ const CompactFormContent: React.FC<{
                           { value: "", label: "Select Category" },
                           ...categoryOptions,
                         ]}
-                        value={formik.values.category}
+                        value={formik.values.category ?? ""}
                         onChange={(e) => {
                           formik.setFieldValue("category", e.target.value);
                         }}
@@ -420,7 +460,7 @@ const CompactFormContent: React.FC<{
                           { value: "", label: "Select Sub Category" },
                           ...subCategoryOptions,
                         ]}
-                        value={formik.values.subCategory}
+                        value={formik.values.subCategory ?? ""}
                         onChange={(e) => {
                           formik.setFieldValue("subCategory", e.target.value);
                         }}
@@ -458,7 +498,7 @@ const CompactFormContent: React.FC<{
                   placeholder="Enter product description"
                   required
                   rows={2}
-                  value={formik.values.description}
+                  value={formik.values.description ?? ""}
                   onChange={(e) => {
                     formik.setFieldValue("description", e.target.value);
                   }}
@@ -527,7 +567,7 @@ const CompactFormContent: React.FC<{
                       <InputField
                         label="Clarity"
                         placeholder="Enter clarity"
-                        value={formik.values.clarity}
+                        value={formik.values.clarity ?? ""}
                         onChange={(e) =>
                           formik.setFieldValue("clarity", e.target.value)
                         }
@@ -722,7 +762,7 @@ const CompactFormContent: React.FC<{
                                   label="Name"
                                   type="text"
                                   placeholder="Variant Name"
-                                  value={variant.name}
+                                  value={variant.name ?? ""}
                                   onChange={(e) => {
                                     updateVariant(
                                       index,

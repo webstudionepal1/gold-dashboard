@@ -10,6 +10,7 @@ import Productsubcategory from "../pages/Product/ProductSubcategory/ProductSubCa
 import { FrontendRoutes } from "./routes";
 
 import GiftsAdminPanel from "../components/admin/GiftsAdminPanel";
+import GiftFormPage from "../pages/Gifts/GiftFormPage";
 import NotificationAdminPanel from "../components/admin/NotificationAdminPanel";
 import NotificationTest from "../components/test/NotificationTest";
 import BannerIndex from "../pages/Banner/BannerIndex";
@@ -29,6 +30,15 @@ import AttribConfig from "../pages/settings/components/AttribConfig";
 import EditProfileForm from "../pages/settings/ProfileConfig/EditProfileForm";
 import { ContactUs } from "@/pages/contact-us/ContactUs.page";
 import AddQueries from "@/pages/contact-us/components/AddQueries";
+import OrderIndex from "../pages/OrderManagement/Order/OrderIndex";
+import OrderDetails from "../pages/OrderManagement/Order/OrderDetails";
+import AddOrderForm from "../pages/OrderManagement/Order/components/AddOrderPage";
+import AssignedOrders from "../pages/OrderManagement/AssignedOrder/AssignedOrder";
+import ConfirmedOrder from "../pages/OrderManagement/ConfirmedOrder/ConfirmedOrder";
+import CancelledOrder from "../pages/OrderManagement/CancelledOrder/CancelledOrder";
+import CompletedOrder from "../pages/OrderManagement/CompletedOrder/CompletedOrder";
+import Transaction from "../pages/transaction/Transaction";
+import VerifyCashPayment from "../pages/transaction/VerifyCashPayment";
 // import BlogList from "@/pages/Blog/BlogList/BlogList";
 // import BlogEditor from "@/pages/Blog/BlogEditor/BlogEditor";
 // import BlogView from "@/pages/Blog/BlogView/BlogView";
@@ -44,18 +54,18 @@ export const routesConfig = [
     element: <DashboardPage />,
     //******<Route element={element}/> *****/
   },
-  // {
-  //   path: FrontendRoutes.ORDER,
-  //   element: <OrderIndex />,
-  // },
-  // {
-  //   path: "/order/order-details/:id",
-  //   element: <OrderDetails />,
-  // },
-  // {
-  //   path: "/order/confirmed-order-details/:id",
-  //   element: <OrderDetails />,
-  // },
+  {
+    path: FrontendRoutes.ORDER,
+    element: <OrderIndex />,
+  },
+  {
+    path: "/order/order-details/:id",
+    element: <OrderDetails />,
+  },
+  {
+    path: "/order/confirmed-order-details/:id",
+    element: <OrderDetails />,
+  },
   {
     path: "/attribs",
     element: <AttribConfig />,
@@ -64,38 +74,38 @@ export const routesConfig = [
     path: "/settings/profile-config",
     element: <EditProfileForm />,
   },
-  // {
-  //   path: "/order/assigned-order-details/:id",
-  //   element: <OrderDetails />,
-  // },
-  // {
-  //   path: "/order/completed-order-details/:id",
-  //   element: <OrderDetails />,
-  // },
-  // {
-  //   path: "/order/cancelled-order-details/:id",
-  //   element: <OrderDetails />,
-  // },
-  // {
-  //   path: FrontendRoutes.ADDORDER,
-  //   element: <AddOrderForm />,
-  // },
-  // {
-  //   path: FrontendRoutes.ASSIGNEDORDER,
-  //   element: <AssignedOrders />,
-  // },
-  // {
-  //   path: FrontendRoutes.CONFIRMEDORDER,
-  //   element: <ConfirmedOrder />,
-  // },
-  // {
-  //   path: FrontendRoutes.CANCELLEDORDER,
-  //   element: <CancelledOrder />,
-  // },
-  // {
-  //   path: FrontendRoutes.COMPLETEDORDER,
-  //   element: <CompletedOrder />,
-  // },
+  {
+    path: "/order/assigned-order-details/:id",
+    element: <OrderDetails />,
+  },
+  {
+    path: "/order/completed-order-details/:id",
+    element: <OrderDetails />,
+  },
+  {
+    path: "/order/cancelled-order-details/:id",
+    element: <OrderDetails />,
+  },
+  {
+    path: FrontendRoutes.ADDORDER,
+    element: <AddOrderForm />,
+  },
+  {
+    path: FrontendRoutes.ASSIGNEDORDER,
+    element: <AssignedOrders />,
+  },
+  {
+    path: FrontendRoutes.CONFIRMEDORDER,
+    element: <ConfirmedOrder />,
+  },
+  {
+    path: FrontendRoutes.CANCELLEDORDER,
+    element: <CancelledOrder />,
+  },
+  {
+    path: FrontendRoutes.COMPLETEDORDER,
+    element: <CompletedOrder />,
+  },
   {
     path: FrontendRoutes.PRODUCTLIST,
     element: <ProductList />,
@@ -167,6 +177,14 @@ export const routesConfig = [
     element: <GiftsAdminPanel />,
   },
   {
+    path: FrontendRoutes.ADDGIFT,
+    element: <GiftFormPage />,
+  },
+  {
+    path: FrontendRoutes.EDITGIFT,
+    element: <GiftFormPage />,
+  },
+  {
     path: "/notification-test",
     element: <NotificationTest />,
   },
@@ -176,11 +194,14 @@ export const routesConfig = [
   //   element: <MyPostBusinessIndex />,
   // },
 
-  //Transactions
-  // {
-  //   path: FrontendRoutes.VERIFY_CASH,
-  //   element: <VerifyCashPayment />,
-  // },
+  {
+    path: FrontendRoutes.TRANSACTION,
+    element: <Transaction />,
+  },
+  {
+    path: FrontendRoutes.VERIFY_CASH,
+    element: <VerifyCashPayment />,
+  },
 
   //finance and expenses
   // {
