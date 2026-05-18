@@ -207,17 +207,7 @@ const ProductList: React.FC = () => {
             {product.video && product.video.length > 0 ? (
               <>
                 {(() => {
-                  const videoPath = product.video[0];
-                  const cleanVideoPath = videoPath.startsWith("/ridisidi/")
-                    ? videoPath.substring("/ridisidi/".length)
-                    : videoPath.startsWith("/")
-                    ? videoPath.substring(1)
-                    : videoPath;
-                  const videoStreamUrl = resolveMediaUrl(
-                    videoPath.startsWith("/uploads")
-                      ? videoPath
-                      : `/uploads/${cleanVideoPath}`
-                  );
+                  const videoStreamUrl = resolveMediaUrl(product.video[0]);
 
                   return (
                     <video

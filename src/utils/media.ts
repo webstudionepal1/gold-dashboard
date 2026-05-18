@@ -1,52 +1,54 @@
-/**
- * Local media URLs — files live under public/uploads and are served at /uploads/...
- * No Vite env or external MinIO base URL.
- */
-
 const LEGACY_PREFIXES = [
   /^https?:\/\/[^/]+\//,
   /^\/ridisidi\//,
 ];
 
-/** Display URL for <img src> — always a browser path under public/ */
+/**
+ * Display URL for <img src> and media players.
+ * Supports Cloudinary HTTPS URLs and legacy local /uploads/ paths.
+ */
 export function resolveMediaUrl(path?: string | null): string {
   if (!path || path === "null" || path === "undefined") {
     return "/no-image.png";
   }
 
-  let url = String(path).trim();
+  const url = String(path).trim();
 
   if (url.startsWith("http://") || url.startsWith("https://")) {
+    if (/res\.cloudinary\.com/i.test(url)) {
+      return url;
+    }
     try {
       const parsed = new URL(url);
-      url = parsed.pathname;
+      if (parsed.hostname.includes("cloudinary.com")) {
+        return url;
+      }
+      return parsed.pathname.startsWith("/") ? parsed.pathname : `/${parsed.pathname}`;
     } catch {
       return url;
     }
   }
 
+  let local = url;
   for (const re of LEGACY_PREFIXES) {
-    url = url.replace(re, "/");
+    local = local.replace(re, "/");
   }
 
-  if (!url.startsWith("/")) {
-    url = url.startsWith("uploads/") ? `/${url}` : `/uploads/${url}`;
+  if (!local.startsWith("/")) {
+    local = local.startsWith("uploads/") ? `/${local}` : `/uploads/${local}`;
   }
 
-  return url;
+  return local;
 }
 
-/** Path to store in database (relative to public) */
+/** Value to persist in the database */
 export function toStoragePath(path: string): string {
   if (!path) return "";
-  if (path.startsWith("http://") || path.startsWith("https://")) {
-    try {
-      return new URL(path).pathname;
-    } catch {
-      return path;
-    }
+  const trimmed = path.trim();
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return trimmed;
   }
-  return resolveMediaUrl(path);
+  return resolveMediaUrl(trimmed);
 }
 
 export function resolveMediaUrls(paths?: (string | null)[]): string[] {

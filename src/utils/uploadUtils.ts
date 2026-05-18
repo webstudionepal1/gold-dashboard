@@ -5,7 +5,7 @@ const getApiBase = () =>
   "/api/v1/en/";
 
 /**
- * Upload a single file to local Next.js storage (public/uploads)
+ * Upload a single file via API (stored on Cloudinary when configured)
  */
 export const uploadFile = async (
   file: File,

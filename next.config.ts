@@ -10,7 +10,13 @@ const nextConfig: NextConfig = {
   },
   reactStrictMode: true,
   images: {
-    remotePatterns: [],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+        pathname: "/**",
+      },
+    ],
     unoptimized: true,
   },
   webpack: (config) => {

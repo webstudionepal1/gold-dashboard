@@ -67,6 +67,14 @@ export const ensureStreamingUrl = (
     return urlOrPath;
   }
 
+  // Cloudinary and other direct CDN URLs
+  if (
+    urlOrPath.startsWith("http") &&
+    /res\.cloudinary\.com/i.test(urlOrPath)
+  ) {
+    return urlOrPath;
+  }
+
   // If it's a full HTTP URL but not a streaming URL, extract the path
   if (urlOrPath.startsWith("http")) {
     try {

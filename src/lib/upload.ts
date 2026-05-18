@@ -1,18 +1,32 @@
 import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 import { randomUUID } from "crypto";
+import { isCloudinaryConfigured, uploadFileToCloudinary } from "@/lib/cloudinary";
 
 const UPLOAD_ROOT = path.join(process.cwd(), "public", "uploads");
 
+/** Save file to Cloudinary (preferred) or local public/uploads when Cloudinary is not configured. */
 export async function saveUploadedFile(
   file: File,
   documentType: string
+): Promise<string> {
+  const folder = sanitizeFolder(documentType);
+
+  if (isCloudinaryConfigured()) {
+    return uploadFileToCloudinary(file, folder);
+  }
+
+  return saveUploadedFileLocal(file, folder);
+}
+
+async function saveUploadedFileLocal(
+  file: File,
+  folder: string
 ): Promise<string> {
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
 
   const ext = path.extname(file.name) || guessExt(file.type);
-  const folder = sanitizeFolder(documentType);
   const filename = `${randomUUID()}${ext}`;
   const dir = path.join(UPLOAD_ROOT, folder);
   await mkdir(dir, { recursive: true });

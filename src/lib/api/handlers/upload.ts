@@ -12,10 +12,13 @@ export async function handleUploadSingle(req: NextRequest) {
   }
 
   const url = await saveUploadedFile(file, documentType);
-  const relativePath = url.replace(/^\//, "");
+  const path =
+    url.startsWith("http://") || url.startsWith("https://")
+      ? url
+      : url.replace(/^\//, "");
 
   return apiSuccess({
-    path: relativePath,
+    path,
     url,
   });
 }
