@@ -7,6 +7,7 @@ import ProductCategory from "../screens/Product/ProductCategory/ProductCategory"
 import ProductDescription from "../screens/Product/ProductList/[id]/ProdectDescription";
 import ProductList from "../screens/Product/ProductList/ProductList";
 import Productsubcategory from "../screens/Product/ProductSubcategory/ProductSubCategory";
+import ProductOccasion from "../screens/Product/ProductOccasion/ProductOccasion";
 import { FrontendRoutes } from "./routes";
 
 import GiftsAdminPanel from "../components/admin/GiftsAdminPanel";
@@ -122,10 +123,7 @@ export const routesConfig = [
     path: "/product/details/:id",
     element: <ProductDescription />,
   },
-  {
-    path: "/product/:id",
-    element: <ProductForm />,
-  },
+  // Static /product/* paths must come before /product/:id or "sub-category" etc. match as product ids (404 in prod).
   {
     path: FrontendRoutes.PRODUCTCATEGORY,
     element: <ProductCategory />,
@@ -135,8 +133,16 @@ export const routesConfig = [
     element: <Productsubcategory />,
   },
   {
+    path: FrontendRoutes.PRODUCTOCCASION,
+    element: <ProductOccasion />,
+  },
+  {
     path: "/product/image-demo",
     element: <ProductImageDemo />,
+  },
+  {
+    path: "/product/:id",
+    element: <ProductForm />,
   },
 
   // {
