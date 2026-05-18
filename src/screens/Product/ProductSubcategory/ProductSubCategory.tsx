@@ -19,6 +19,13 @@ interface IEditModal {
   state: boolean;
   editData?: IFetchSubCategory | null;
 }
+
+/** lodash get default only applies to undefined — null breaks .length in prod */
+function asDisplayString(value: unknown): string {
+  if (value === null || value === undefined) return "";
+  return String(value);
+}
+
 const Productsubcategory: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<IEditModal>({
     state: false,
@@ -60,20 +67,22 @@ const Productsubcategory: React.FC = () => {
   };
   const subCategoriesData = useMemo(
     () =>
-      isSuccess
-        ? subCategories?.map((item, index: number) => ({
+      isSuccess && Array.isArray(subCategories)
+        ? subCategories.map((item, index: number) => {
+            const descText = asDisplayString(get(item, "description"));
+            return {
             ...item,
             sn: index + 1,
             description: (
               <p className="truncate max-w-xl">
-                {get(item, "description", "").length > 20
-                  ? `${get(item, "description", "").slice(0, 17)}...`
-                  : get(item, "description", "") !== ""
-                  ? get(item, "description")
+                {descText.length > 20
+                  ? `${descText.slice(0, 17)}...`
+                  : descText !== ""
+                  ? descText
                   : "-"}
               </p>
             ),
-            rawDescription: get(item, "description", ""),
+            rawDescription: descText,
             totalProducts: get(item, "totalProducts", "0"),
             status: (
               <span
@@ -87,7 +96,8 @@ const Productsubcategory: React.FC = () => {
               </span>
             ),
             // category: get(item, "category._id", "-"),
-          }))
+          };
+          })
         : [],
     [isSuccess, subCategories]
   );

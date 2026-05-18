@@ -406,7 +406,8 @@ export const useGetAllProductSubCategoriesQuery = (
         "subcategory",
         { params }
       );
-      return res?.data?.data;
+      const raw = res?.data?.data;
+      return Array.isArray(raw) ? raw : [];
     },
     enabled: options.enabled,
   });
