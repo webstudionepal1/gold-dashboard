@@ -15,6 +15,13 @@ interface DashTopRightProps {
   dashboardData: DashboardData;
 }
 
+interface PriceDataItem {
+  img: string;
+  price: string | ReactNode;
+  title: string | ReactNode;
+  bgColor: string;
+}
+
 const DashTopRight = ({ dashboardData }: DashTopRightProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -90,79 +97,57 @@ const DashTopRight = ({ dashboardData }: DashTopRightProps) => {
     maintainAspectRatio: false,
   };
 
-  // Map price list data from API and add metal prices if available
-  const metalPricesData = dashboardData.metalPrices
-    ? [
-        {
-          img: PriceList1, // Gold icon
-          price: (
-            <div className="flex flex-col">
-              <div className="font-bold text-lg">
-                {formatPrice(
-                  convertGramToTola(
-                    dashboardData.metalPrices.goldPrice.pricePerGram
-                  ),
-                  dashboardData.metalPrices.goldPrice.currency || "NPR"
-                )}{" "}
-                / tola
-              </div>
-              <div className="text-sm text-gray-600">
-                {formatPrice(
-                  dashboardData.metalPrices.goldPrice.pricePerGram,
-                  dashboardData.metalPrices.goldPrice.currency || "NPR"
-                )}{" "}
-                / g
-              </div>
-            </div>
-          ),
-          title: "Gold Price (24k)",
-          bgColor: "bg-[#FCF6EA]",
-        },
-        {
-          img: PriceList1, // Silver icon
-          price: (
-            <div className="flex flex-col">
-              <div className="font-bold text-lg">
-                {formatPrice(
-                  convertGramToTola(
-                    dashboardData.metalPrices.silverPrice.pricePerGram
-                  ),
-                  dashboardData.metalPrices.silverPrice.currency || "NPR"
-                )}{" "}
-                / tola
-              </div>
-              <div className="text-sm text-gray-600">
-                {formatPrice(
-                  dashboardData.metalPrices.silverPrice.pricePerGram,
-                  dashboardData.metalPrices.silverPrice.currency || "NPR"
-                )}{" "}
-                / g
-              </div>
-            </div>
-          ),
-          title: "Silver Price",
-          bgColor: "bg-[#ECEEF2]",
-        },
-      ]
-    : [];
+  const gold = dashboardData.metalPrices?.goldPrice;
+  const silver = dashboardData.metalPrices?.silverPrice;
+  const goldPerGram = Number(gold?.pricePerGram) || 0;
+  const silverPerGram = Number(silver?.pricePerGram) || 0;
+  const currency = gold?.currency || silver?.currency || "NPR";
 
-  // Define the interface for price data items
-  interface PriceDataItem {
-    img: string;
-    price: string | ReactNode;
-    title: string | ReactNode;
-    bgColor: string;
+  const metalPricesData: PriceDataItem[] = [];
+  if (goldPerGram > 0) {
+    metalPricesData.push({
+      img: PriceList1,
+      price: (
+        <div className="flex flex-col">
+          <div className="font-bold text-lg">
+            {formatPrice(convertGramToTola(goldPerGram), currency)} / tola
+          </div>
+          <div className="text-sm text-gray-600">
+            {formatPrice(goldPerGram, currency)} / g
+          </div>
+        </div>
+      ),
+      title: "Gold Price (24k)",
+      bgColor: "bg-[#FCF6EA]",
+    });
+  }
+  if (silverPerGram > 0) {
+    metalPricesData.push({
+      img: PriceList1,
+      price: (
+        <div className="flex flex-col">
+          <div className="font-bold text-lg">
+            {formatPrice(convertGramToTola(silverPerGram), currency)} / tola
+          </div>
+          <div className="text-sm text-gray-600">
+            {formatPrice(silverPerGram, currency)} / g
+          </div>
+        </div>
+      ),
+      title: "Silver Price",
+      bgColor: "bg-[#ECEEF2]",
+    });
   }
 
-  // Only use metal prices data for the sliding display
   const todaysPriceData: PriceDataItem[] = metalPricesData;
 
   useEffect(() => {
+    if (todaysPriceData.length <= 1) return;
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % todaysPriceData.length);
     }, 2000);
 
-    return () => clearInterval(interval); // Clean up
+    return () => clearInterval(interval);
   }, [todaysPriceData.length]);
 
   // Handle the case when there are no metal prices data available
@@ -198,11 +183,15 @@ const DashTopRight = ({ dashboardData }: DashTopRightProps) => {
                 <p className="text-sm text-slate-500">Live metal prices</p>
               </div>
             </div>
-            {dashboardData.metalPrices && dashboardData.metalPrices.goldPrice && (
+            {(gold?.timestamp || dashboardData.metalPrices?.lastUpdated) && (
               <div className="flex items-center text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-lg">
                 <Icon icon="material-symbols:schedule" className="mr-1 w-3 h-3" />
                 <span>
-                  {new Date(dashboardData.metalPrices.goldPrice.timestamp).toLocaleTimeString()}
+                  {new Date(
+                    gold?.timestamp ||
+                      dashboardData.metalPrices?.lastUpdated ||
+                      Date.now()
+                  ).toLocaleTimeString()}
                 </span>
               </div>
             )}

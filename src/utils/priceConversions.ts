@@ -50,11 +50,12 @@ export const getCurrencySymbol = (currency: string): string => {
  * @returns Formatted price string
  */
 export const formatPrice = (
-  price: number,
+  price: number | null | undefined,
   currency: string = "NPR"
 ): string => {
   const symbol = getCurrencySymbol(currency);
-  return `${symbol} ${price.toLocaleString("en-IN", {
+  const safePrice = Number(price) || 0;
+  return `${symbol} ${safePrice.toLocaleString("en-IN", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;
@@ -67,9 +68,9 @@ export const formatPrice = (
  * @returns Formatted price per tola string
  */
 export const formatPricePerTola = (
-  pricePerGram: number,
+  pricePerGram: number | null | undefined,
   currency: string = "NPR"
 ): string => {
-  const pricePerTola = convertGramToTola(pricePerGram);
+  const pricePerTola = convertGramToTola(Number(pricePerGram) || 0);
   return formatPrice(pricePerTola, currency);
 };

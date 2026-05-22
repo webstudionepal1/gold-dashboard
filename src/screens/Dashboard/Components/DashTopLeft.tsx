@@ -97,7 +97,7 @@ const DashTopLeft = ({ dashboardData }: DashTopLeftProps) => {
             <div>
               <p className="text-sm font-medium text-slate-600">Total Revenue</p>
               <p className="text-xl font-bold text-slate-900">
-                Rs {dashboardData.salesMetrics?.totalRevenue?.toLocaleString() || '0'}
+                Rs {(dashboardData.salesMetrics?.totalRevenue ?? 0).toLocaleString()}
               </p>
             </div>
           </div>
@@ -111,7 +111,7 @@ const DashTopLeft = ({ dashboardData }: DashTopLeftProps) => {
             <div>
               <p className="text-sm font-medium text-slate-600">Total Orders</p>
               <p className="text-xl font-bold text-slate-900">
-                {dashboardData.salesMetrics?.totalOrders?.toLocaleString() || '0'}
+                {(dashboardData.salesMetrics?.totalOrders ?? 0).toLocaleString()}
               </p>
             </div>
           </div>

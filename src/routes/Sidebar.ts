@@ -201,16 +201,16 @@ export const SidebarConfig = {
               path: "/settings/profile-config",
               title: "Profile config",
             },
-            // {
-            //   id: 108,
-            //   path: "/settings/attribute-config",
-            //   title: "Attribute config",
-            // },
-            // {
-            //   id:109,
-            //   path: "/settings/calculator",
-            //   title: "Calculator",
-            // }
+            {
+              id: 110,
+              path: "/settings/metal-prices",
+              title: "Metal prices",
+            },
+            {
+              id: 109,
+              path: "/settings/calculator",
+              title: "Price calculator",
+            },
           ],
         },
         {

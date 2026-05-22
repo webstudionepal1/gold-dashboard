@@ -69,7 +69,7 @@ const DashBottom = ({ dashboardData }: DashBottomProps) => {
                     <td className="px-6 py-4 text-sm text-slate-600">{transaction.orderDate}</td>
                     <td className="px-6 py-4 text-right">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        Rs {transaction.totalAmount.toFixed(2)}
+                        Rs {(Number(transaction.totalAmount) || 0).toFixed(2)}
                       </span>
                     </td>
                   </tr>

@@ -275,43 +275,4 @@ export async function handleDashboard() {
   return apiSuccess(data);
 }
 
-export async function handleMetalPricesLatest() {
-  const price = await prisma.metalPrice.findFirst({
-    where: { isLatest: true },
-    orderBy: { createdAt: "desc" },
-  });
-
-  if (!price) {
-    return apiSuccess({
-      goldPrice: {
-        pricePerGram: 0,
-        pricePerOunce: 0,
-        currency: "NPR",
-        timestamp: new Date().toISOString(),
-        source: "database",
-      },
-      silverPrice: {
-        pricePerGram: 0,
-        pricePerOunce: 0,
-        currency: "NPR",
-        timestamp: new Date().toISOString(),
-        source: "database",
-      },
-    });
-  }
-
-  const gold = price.gold as MetalJson;
-  const silver = price.silver as MetalJson;
-  const goldPrice = toMetalPriceRecord(`${price.id}-gold`, gold, price.createdAt);
-  const silverPrice = toMetalPriceRecord(`${price.id}-silver`, silver, price.createdAt);
-
-  return apiSuccess({
-    goldPrice,
-    silverPrice,
-    nepali: {
-      gold: { fineGold24k: goldPrice },
-      silver: silverPrice,
-    },
-    lastUpdated: price.createdAt.toISOString(),
-  });
-}
+export { handleMetalPricesLatest } from "./metalPrice";

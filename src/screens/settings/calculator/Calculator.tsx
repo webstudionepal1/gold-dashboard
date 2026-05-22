@@ -87,8 +87,13 @@ const Calculator: React.FC = () => {
   };
   console.log("configurations", configurations);
   // Filter configurations
-  const filteredConfigurations =
-    get(configurations, "data", [])?.filter((config: PriceConfiguration) => {
+  const configList: PriceConfiguration[] = Array.isArray(configurations)
+    ? configurations
+    : Array.isArray(configurations?.data)
+      ? configurations.data
+      : [];
+
+  const filteredConfigurations = configList.filter((config: PriceConfiguration) => {
       const typeMatch =
         filterType === "all" ||
         config.type?.toLowerCase().includes(filterType?.toLowerCase());
@@ -96,7 +101,7 @@ const Calculator: React.FC = () => {
         filterTransaction === "all" ||
         config.for?.toLowerCase() === filterTransaction?.toLowerCase();
       return typeMatch && transactionMatch;
-    }) || [];
+    });
 
   if (isLoading) {
     return (
@@ -209,7 +214,7 @@ const Calculator: React.FC = () => {
             No Configurations Found
           </h3>
           <p className="text-gray-600">
-            {configurations?.length === 0
+            {configList.length === 0
               ? "No price configurations have been created yet."
               : "No configurations match your current filters."}
           </p>

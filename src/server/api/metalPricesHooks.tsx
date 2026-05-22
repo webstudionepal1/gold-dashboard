@@ -1,4 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 import { apiClient } from "../utils/ApiGateway";
 
 // Types for metal prices data
@@ -43,6 +44,8 @@ export interface MetalPricesApiResponse {
 export interface MetalPricesData {
   goldPrice: MetalPrice;
   silverPrice: MetalPrice;
+  tejabiGold22k?: MetalPrice;
+  lastUpdated?: string;
 }
 
 // Create mock data for fallback
@@ -105,19 +108,60 @@ const transformMetalPricesData = (
 
   console.log("Extracted prices:", { goldPrice, silverPrice }); // Debug log
 
-  if (!goldPrice || !silverPrice) {
+  const goldGram = Number(goldPrice?.pricePerGram) || 0;
+  const silverGram = Number(silverPrice?.pricePerGram) || 0;
+
+  if (!goldPrice || !silverPrice || goldGram <= 0 || silverGram <= 0) {
     console.warn("Missing price data, using mock data:", {
       hasGold: !!goldPrice,
       hasSilver: !!silverPrice,
+      goldGram,
+      silverGram,
       apiStructure: Object.keys(apiResponse || {}),
     });
     return createMockMetalPrices();
   }
 
+  const tejabiGold22k = apiResponse?.nepali?.gold?.tejabiGold22k;
+
   return {
     goldPrice,
     silverPrice,
+    ...(tejabiGold22k && { tejabiGold22k }),
+    lastUpdated: apiResponse?.lastUpdated,
   };
+};
+
+export interface MetalPriceFormPayload {
+  fineGold24kPerGram: number;
+  tejabiGold22kPerGram?: number;
+  silverPerGram: number;
+  currency?: string;
+}
+
+export const useCreateMetalPriceMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["metalPrices", "create"],
+    mutationFn: async (body: MetalPriceFormPayload) => {
+      const res = await apiClient.post("metal-prices", body);
+      return res?.data?.data;
+    },
+    onSuccess: () => {
+      toast.success("Metal prices saved");
+      queryClient.invalidateQueries({ queryKey: ["metalPrices"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+    },
+    onError: (err: unknown) => {
+      const message =
+        typeof err === "string"
+          ? err
+          : err instanceof Error
+            ? err.message
+            : "Failed to save metal prices";
+      toast.error(message);
+    },
+  });
 };
 
 export const useGetLatestMetalPricesQuery = () => {

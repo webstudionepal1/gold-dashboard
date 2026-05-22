@@ -1,7 +1,7 @@
 import { useFormik, FieldArray, FormikProvider, FormikErrors } from "formik";
 import * as Yup from "yup";
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { DropdownField } from "../../../components/shared/form_components/Dropdown";
 import { InputField } from "../../../components/shared/form_components/InputField";
@@ -82,6 +82,7 @@ const validationSchema = Yup.object({
 });
 
 const CalculatorIndex = () => {
+  const navigate = useNavigate();
   const { mutate, isPending: isCreating } = useCreatePriceConfiguration();
   const { mutate: updatePriceConfiguration, isPending: isUpdating } =
     useUpdatePriceConfiguration();
@@ -222,11 +223,8 @@ const CalculatorIndex = () => {
           },
           {
             onSuccess: () => {
-              console.log("Configuration updated successfully");
-              // Clear session storage after successful update
               sessionStorage.removeItem("editingConfiguration");
-              // Optionally redirect back to configurations list
-              // navigate('/settings/calculator');
+              navigate("/settings/calculator");
             },
             onError: (error) => {
               console.error("Error updating configuration:", error);
@@ -236,8 +234,8 @@ const CalculatorIndex = () => {
       } else {
         mutate(formattedData, {
           onSuccess: () => {
-            console.log("Configuration created successfully");
-            formik.resetForm(); // Reset form on successful creation
+            formik.resetForm();
+            navigate("/settings/calculator");
           },
           onError: (error) => {
             console.error("Error creating configuration:", error);

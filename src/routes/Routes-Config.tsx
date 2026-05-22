@@ -29,6 +29,9 @@ import ProductImageDemo from "../screens/Product/ProductImageDemo";
 import ProductForm from "../screens/Product/ProductList/component/ProductForm";
 import AttribConfig from "../screens/settings/components/AttribConfig";
 import EditProfileForm from "../screens/settings/ProfileConfig/EditProfileForm";
+import MetalPricesForm from "../screens/settings/MetalPrices/MetalPricesForm";
+import Calculator from "../screens/settings/calculator/Calculator";
+import CalculatorIndex from "../screens/settings/calculator/CalculatorIndex";
 import { ContactUs } from "@/screens/contact-us/ContactUs.page";
 import AddQueries from "@/screens/contact-us/components/AddQueries";
 import OrderIndex from "../screens/OrderManagement/Order/OrderIndex";
@@ -74,6 +77,22 @@ export const routesConfig = [
   {
     path: "/settings/profile-config",
     element: <EditProfileForm />,
+  },
+  {
+    path: "/settings/metal-prices",
+    element: <MetalPricesForm />,
+  },
+  {
+    path: "/settings/calculator",
+    element: <Calculator />,
+  },
+  {
+    path: "/settings/calculator/add",
+    element: <CalculatorIndex />,
+  },
+  {
+    path: "/settings/calculator/edit",
+    element: <CalculatorIndex />,
   },
   {
     path: "/order/assigned-order-details/:id",

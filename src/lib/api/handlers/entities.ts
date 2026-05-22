@@ -452,7 +452,73 @@ export async function handleReviewList() {
 }
 
 export async function handlePriceConfigList() {
-  return apiSuccess(withMongoIds(await prisma.priceConfig.findMany()));
+  const rows = await prisma.priceConfig.findMany({ orderBy: { createdAt: "desc" } });
+  const formatted = rows.map((row) => {
+    const cfg = (row.config || {}) as Record<string, unknown>;
+    return withMongoId({
+      ...cfg,
+      _id: row.id,
+      id: row.id,
+      name: row.name,
+      isActive: row.isActive,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+    });
+  });
+  return apiSuccess(formatted);
+}
+
+export async function handlePriceConfigCreate(req: NextRequest) {
+  const body = (await parseBody(req)) as Record<string, unknown>;
+  const type = String(body.type || "");
+  const forType = String(body.for || "");
+  if (!type || !forType) {
+    return apiError("type and for are required", 400);
+  }
+  const name = `${type}-${forType}`;
+  const item = await prisma.priceConfig.create({
+    data: {
+      name,
+      config: body,
+      isActive: body.isActive !== false,
+    },
+  });
+  const cfg = item.config as Record<string, unknown>;
+  return apiSuccess(
+    withMongoId({ ...cfg, _id: item.id, name: item.name, isActive: item.isActive }),
+    "Created",
+    201
+  );
+}
+
+export async function handlePriceConfigUpdate(req: NextRequest, id: string) {
+  const body = (await parseBody(req)) as Record<string, unknown>;
+  const existing = await prisma.priceConfig.findUnique({ where: { id } });
+  if (!existing) return apiError("Not found", 404);
+
+  const type = String(body.type || (existing.config as Record<string, unknown>)?.type || "");
+  const forType = String(body.for || (existing.config as Record<string, unknown>)?.for || "");
+  const name = type && forType ? `${type}-${forType}` : existing.name;
+
+  const item = await prisma.priceConfig.update({
+    where: { id },
+    data: {
+      name,
+      config: { ...(existing.config as object), ...body },
+      ...(body.isActive !== undefined && { isActive: Boolean(body.isActive) }),
+    },
+  });
+  const cfg = item.config as Record<string, unknown>;
+  return apiSuccess(withMongoId({ ...cfg, _id: item.id, name: item.name }));
+}
+
+export async function handlePriceConfigDelete(id: string) {
+  try {
+    await prisma.priceConfig.delete({ where: { id } });
+    return apiSuccess({ deleted: true });
+  } catch {
+    return apiError("Not found or could not delete", 404);
+  }
 }
 
 export async function handlePushNotificationList() {

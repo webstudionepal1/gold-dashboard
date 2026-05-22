@@ -2,7 +2,12 @@ import { NextRequest } from "next/server";
 import { getAuthUser } from "@/lib/auth";
 import { apiError } from "@/lib/api-response";
 import { handleLogin } from "./handlers/auth";
-import { handleDashboard, handleMetalPricesLatest } from "./handlers/dashboard";
+import { handleDashboard } from "./handlers/dashboard";
+import {
+  handleMetalPriceCreate,
+  handleMetalPricesLatest,
+  handleMetalPricesList,
+} from "./handlers/metalPrice";
 import {
   handleUploadComplete,
   handleUploadInitialize,
@@ -83,6 +88,9 @@ import {
   handleTransactionList,
   handleReviewList,
   handlePriceConfigList,
+  handlePriceConfigCreate,
+  handlePriceConfigUpdate,
+  handlePriceConfigDelete,
   handlePushNotificationList,
   handlePushNotificationCreate,
   handleUserList,
@@ -270,10 +278,15 @@ export async function apiRouter(
 
     case "metal-prices":
       if (id === "latest" && method === "GET") return handleMetalPricesLatest();
+      if (!id && method === "GET") return handleMetalPricesList();
+      if (!id && method === "POST") return handleMetalPriceCreate(req);
       break;
 
     case "price-config":
-      if (method === "GET") return handlePriceConfigList();
+      if (!id && method === "GET") return handlePriceConfigList();
+      if (!id && method === "POST") return handlePriceConfigCreate(req);
+      if (id && method === "PATCH") return handlePriceConfigUpdate(req, id);
+      if (id && method === "DELETE") return handlePriceConfigDelete(id);
       break;
 
     case "push-notification":
