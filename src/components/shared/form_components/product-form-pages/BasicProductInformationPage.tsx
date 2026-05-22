@@ -9,15 +9,7 @@ import {
   useGetAllProductSubCategoriesQuery,
 } from "../../../../server/api/productHooks";
 
-// Helper function to generate slug from name
-const generateSlug = (name: string): string => {
-  return name
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, "")
-    .replace(/[\s_-]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-};
+import { buildProductSlugFromFormFields } from "@/utils/productSlug";
 
 export const BasicProductInformationPage: React.FC = () => {
   const { formData, updateFormData, updateValidation, validationState } =
@@ -50,13 +42,18 @@ export const BasicProductInformationPage: React.FC = () => {
         })) || []
     : [];
 
-  // Auto-generate slug when name changes
+  // Auto-generate slug when name changes (product-name-brand-model pattern)
   useEffect(() => {
     if (formData.name && !formData.slug) {
-      const newSlug = generateSlug(formData.name);
+      const newSlug = buildProductSlugFromFormFields({
+        name: formData.name,
+        productType: formData.productType,
+        karat: formData.karat,
+        shape: formData.shape,
+      });
       updateFormData({ slug: newSlug });
     }
-  }, [formData.name, formData.slug, updateFormData]);
+  }, [formData.name, formData.slug, formData.productType, formData.karat, formData.shape, updateFormData]);
 
   // Validation functions
   const validateName = (value: string) => {
@@ -137,11 +134,19 @@ export const BasicProductInformationPage: React.FC = () => {
               validateName(value);
 
               // Auto-generate slug if it hasn't been manually edited
-              if (
-                !formData.slug ||
-                formData.slug === generateSlug(formData.name)
-              ) {
-                const newSlug = generateSlug(value);
+              const priorAutoSlug = buildProductSlugFromFormFields({
+                name: formData.name,
+                productType: formData.productType,
+                karat: formData.karat,
+                shape: formData.shape,
+              });
+              if (!formData.slug || formData.slug === priorAutoSlug) {
+                const newSlug = buildProductSlugFromFormFields({
+                  name: value,
+                  productType: formData.productType,
+                  karat: formData.karat,
+                  shape: formData.shape,
+                });
                 updateFormData({ slug: newSlug });
                 validateSlug(newSlug);
               }

@@ -27,6 +27,11 @@ apiClient.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
+    // Let the runtime set multipart boundary — manual Content-Type breaks parsing
+    if (config.data instanceof FormData) {
+      delete config.headers["Content-Type"];
+    }
+
     // Only dedupe/cancel in-flight GET requests (avoid aborting POST create)
     if (config.method?.toUpperCase() === "GET" && config.url) {
       if (controllers.has(config.url)) {

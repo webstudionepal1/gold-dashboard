@@ -11,6 +11,7 @@ import {
 import { ProductFormData } from "../../../components/shared/form_components/ProductFormContext";
 import { toStoragePath } from "../../../utils/media";
 import { mapProductToFormData } from "../../../utils/productForm";
+import { buildProductSlugFromFormFields } from "../../../utils/productSlug";
 
 const NewProductForm: React.FC = () => {
   const navigate = useNavigate();
@@ -38,6 +39,16 @@ const NewProductForm: React.FC = () => {
     const formDataObj = new FormData();
 
     formDataObj.append("name", formData.name);
+    const productSlug =
+      formData.slug?.trim() ||
+      buildProductSlugFromFormFields({
+        name: formData.name,
+        productType: formData.productType,
+        karat: formData.karat,
+        shape: formData.shape,
+        variantName: get(formData.variants, "[0].name", ""),
+      });
+    if (productSlug) formDataObj.append("slug", productSlug);
     formDataObj.append("description", formData.description);
     if (formData.productType)
       formDataObj.append("productType", formData.productType);

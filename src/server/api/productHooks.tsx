@@ -227,11 +227,7 @@ export const useCreateProductsMutation = () => {
   return useMutation({
     mutationKey: ["products"],
     mutationFn: async (body: FormData) => {
-      const res = await apiClient.post("product", body, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const res = await apiClient.post("product", body);
       return res?.data?.data;
     },
     onSuccess() {
@@ -255,11 +251,7 @@ export const useUpdateProductsMutation = () => {
       id: string | undefined;
       body: FormData;
     }) => {
-      const res = await apiClient.patch(`product/${id}`, body, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const res = await apiClient.patch(`product/${id}`, body);
       return res?.data?.data;
     },
     onMutate() {

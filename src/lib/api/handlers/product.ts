@@ -4,6 +4,7 @@ import { apiError, apiPaginated, apiSuccess } from "@/lib/api-response";
 import { buildPaginationMeta, getPagination } from "@/lib/pagination";
 import { withMongoId, withMongoIds } from "@/lib/serializers";
 import { handleGenericDelete, handleGenericGetById, parseBody, slugify } from "../crud";
+import { buildProductSlugFromFormFields } from "@/utils/productSlug";
 
 const productInclude = {
   category: true,
@@ -123,6 +124,56 @@ function buildVariantCreates(
   }));
 }
 
+async function resolveProductSlug(
+  body: Record<string, unknown>,
+  name: string
+): Promise<string> {
+  if (body.slug && String(body.slug).trim()) {
+    return slugify(String(body.slug));
+  }
+
+  let brand = body.brand ? String(body.brand) : "";
+  if (!brand) {
+    const pt = String(body.productType || "");
+    if (pt && pt !== "normal") brand = pt;
+  }
+  if (!brand) {
+    const categoryId = (body.categoryId || body.category) as string | null;
+    if (categoryId) {
+      const cat = await prisma.category.findUnique({
+        where: { id: categoryId },
+        select: { name: true },
+      });
+      if (cat?.name) brand = cat.name;
+    }
+  }
+
+  const metadata =
+    body.metadata && typeof body.metadata === "object"
+      ? (body.metadata as Record<string, unknown>)
+      : {};
+  const variantRows = getVariantRows(body);
+  const firstVariant = variantRows[0];
+  const variantName =
+    firstVariant?.name != null ? String(firstVariant.name) : "";
+
+  const slug = buildProductSlugFromFormFields({
+    name,
+    productType: body.productType ? String(body.productType) : undefined,
+    karat: body.karat
+      ? String(body.karat)
+      : metadata.karat
+        ? String(metadata.karat)
+        : undefined,
+    shape: body.shape ? String(body.shape) : undefined,
+    brand: brand || undefined,
+    model: body.model ? String(body.model) : undefined,
+    variantName: variantName || undefined,
+  });
+
+  return slug || slugify(name);
+}
+
 function normalizeProductImages(body: Record<string, unknown>): string[] {
   const uploaded = normalizeStringArray(body.images);
   const existing = body.existingImages;
@@ -140,7 +191,7 @@ export async function handleProductCreate(req: NextRequest) {
     const name = String(body.name || "");
     if (!name) return apiError("Name is required", 400);
 
-    const slug = String(body.slug || slugify(name));
+    const slug = await resolveProductSlug(body, name);
     const variantRows = getVariantRows(body);
 
     const product = await prisma.product.create({

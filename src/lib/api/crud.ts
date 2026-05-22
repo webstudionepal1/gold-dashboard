@@ -83,7 +83,14 @@ export async function handleGenericDelete(model: ModelName, id: string) {
 export async function parseBody(req: NextRequest) {
   const contentType = req.headers.get("content-type") || "";
   if (contentType.includes("multipart/form-data")) {
-    const formData = await req.formData();
+    let formData: FormData;
+    try {
+      formData = await req.formData();
+    } catch {
+      throw new Error(
+        "Could not parse upload as form data. Try again without setting Content-Type manually, or use smaller files."
+      );
+    }
     const fileFields = ["image", "images", "mobImage", "video", "videoThumbnail", "featuredImage", "logo", "file"];
     const uploads = await parseFormDataFiles(formData, fileFields);
 
