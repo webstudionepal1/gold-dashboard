@@ -79,6 +79,7 @@ export interface IFetchProduct {
   averageRating?: number;
   numberOfReviews?: number;
   variants: Array<{
+    name?: string;
     price: number;
     wt: number;
     unit: string;
@@ -98,6 +99,7 @@ export interface IFetchProduct {
   tags: string[];
   visibleAs: string;
   productType?: string;
+  karat?: string;
   images: string[];
   video?: string[];
   videoThumbnail?: string[];

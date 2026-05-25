@@ -801,7 +801,7 @@ const CompactFormContent: React.FC<{
                             </>
                           )}
 
-                          {/* <div>
+                          <div>
                             <InputField
                               label="Price"
                               type="number"
@@ -814,9 +814,7 @@ const CompactFormContent: React.FC<{
                               allowNegative={false}
                               clearZeroOnFocus
                             />
-                            {(formik.errors as any)[
-                              `variants.${index}.price`
-                            ] &&
+                            {(formik.errors as any)[`variants.${index}.price`] &&
                               formik.touched.variants?.[index]?.price && (
                                 <ErrorDisplay
                                   errors={[
@@ -826,7 +824,7 @@ const CompactFormContent: React.FC<{
                                   ]}
                                 />
                               )}
-                          </div> */}
+                          </div>
                         </FieldGroup>
 
                         <div className="mt-2 flex items-center">

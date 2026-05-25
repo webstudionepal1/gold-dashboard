@@ -30,6 +30,7 @@ function parseMakingCharges(product: Record<string, unknown>): {
   makingChargesType: "fixed" | "per";
 } {
   const mc = product.makingCharges;
+  const metadata = (product.metadata || {}) as Record<string, unknown>;
   if (mc && typeof mc === "object" && mc !== null) {
     const obj = mc as { type?: string; value?: unknown };
     return {
@@ -39,7 +40,7 @@ function parseMakingCharges(product: Record<string, unknown>): {
   }
   return {
     makingCharges: Number(mc) || 0,
-    makingChargesType: "fixed",
+    makingChargesType: metadata.makingChargesType === "per" ? "per" : "fixed",
   };
 }
 
@@ -100,6 +101,9 @@ export function mapProductToFormData(
   }
 
   const str = (v: unknown) => (v == null ? "" : String(v));
+  const existingVideo = Array.isArray(product.video)
+    ? product.video[0]
+    : product.video;
 
   return {
     name: str(product.name),
@@ -140,7 +144,10 @@ export function mapProductToFormData(
       resolveMediaUrl(String(item))
     ),
     video: null,
-    existingVideo: (product.video as string) || null,
+    existingVideo:
+      typeof existingVideo === "string" && existingVideo
+        ? existingVideo
+        : null,
     visibleAs,
     isActive: product.isActive !== false,
     isFeatured: Boolean(product.isFeatured),

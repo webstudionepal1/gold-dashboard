@@ -195,6 +195,7 @@ model ProductVariant {
   productId String
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   sku       String   @unique
+  name      String?
   price     Float
   wt        Float    @default(0)
   unit      String   @default("gm")

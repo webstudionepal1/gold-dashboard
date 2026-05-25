@@ -54,34 +54,27 @@ const NewProductForm: React.FC = () => {
       formDataObj.append("productType", formData.productType);
 
     if (formData.productType !== "normal") {
-      if (formData.category) formDataObj.append("category", formData.category);
-      if (formData.subCategory)
-        formDataObj.append("subCategory", formData.subCategory);
-      if (formData.gender) formDataObj.append("gender", formData.gender);
-
-      if (formData.length)
-        formDataObj.append("length", formData.length.toString());
-      if (formData.dimension)
-        formDataObj.append("dimension", formData.dimension.toString());
-      if (formData.color) formDataObj.append("color", formData.color);
-      if (formData.clarity) formDataObj.append("clarity", formData.clarity);
-      if (formData.totalCarat)
-        formDataObj.append("totalCarat", formData.totalCarat.toString());
-      if (formData.rhodoumFinishes)
-        formDataObj.append(
-          "rhodoumFinishes",
-          formData.rhodoumFinishes.toString()
-        );
-      if (formData.karat && formData.productType === "gold")
-        formDataObj.append("karat", formData.karat);
-
-      if (formData.makingCharges) {
-        formDataObj.append("makingCharges[type]", formData.makingChargesType);
-        formDataObj.append(
-          "makingCharges[value]",
-          formData.makingCharges.toString()
-        );
+      formDataObj.append("category", formData.category || "");
+      formDataObj.append("subCategory", formData.subCategory || "");
+      formDataObj.append("gender", formData.gender || "");
+      formDataObj.append("length", String(formData.length ?? 0));
+      formDataObj.append("dimension", String(formData.dimension ?? 0));
+      formDataObj.append("color", formData.color || "");
+      formDataObj.append("clarity", formData.clarity || "");
+      formDataObj.append("totalCarat", String(formData.totalCarat ?? 0));
+      formDataObj.append(
+        "rhodoumFinishes",
+        formData.rhodoumFinishes.toString()
+      );
+      if (formData.productType === "gold") {
+        formDataObj.append("karat", formData.karat || "");
       }
+
+      formDataObj.append("makingCharges[type]", formData.makingChargesType);
+      formDataObj.append(
+        "makingCharges[value]",
+        formData.makingCharges.toString()
+      );
       if (formData.wastage) {
         formDataObj.append("wastage[type]", formData.wastage.type);
         formDataObj.append("wastage[value]", formData.wastage.value.toString());
@@ -145,6 +138,7 @@ const NewProductForm: React.FC = () => {
         formDataObj.append("isFeatured", formData.isFeatured.toString());
     }
 
+    formDataObj.append("syncImages", "true");
     (formData.images || []).forEach((img, idx) => {
       if (img instanceof File) {
         formDataObj.append("images", img);
@@ -155,13 +149,15 @@ const NewProductForm: React.FC = () => {
 
     if (formData.video) {
       formDataObj.append("video", formData.video);
-    } else if (isEdit && formData.existingVideo) {
-      if (Array.isArray(formData.existingVideo)) {
+    } else if (isEdit) {
+      if (Array.isArray(formData.existingVideo) && formData.existingVideo.length) {
         formData.existingVideo.forEach((video, index) => {
           formDataObj.append(`existingVideo[${index}]`, video);
         });
-      } else {
+      } else if (formData.existingVideo) {
         formDataObj.append("existingVideo", formData.existingVideo as string);
+      } else {
+        formDataObj.append("existingVideo", "");
       }
     }
 

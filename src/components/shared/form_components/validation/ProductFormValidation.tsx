@@ -31,7 +31,7 @@ export const basicProductInformationSchema = z.object({
     .min(1, "Description is required")
     .max(2000, "Description cannot exceed 2000 characters")
     .trim(),
-  productType: z.enum(["normal", "gold", "silver"], {
+  productType: z.enum(["normal", "gold", "silver", "diamond"], {
     required_error: "Product type is required",
   }),
   category: z.string().optional(),

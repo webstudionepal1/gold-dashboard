@@ -16,11 +16,21 @@ const productInclude = {
 function formatProduct(p: Awaited<ReturnType<typeof fetchProduct>>) {
   if (!p) return null;
   const mapped = withMongoId(p);
+  const metadata =
+    p.metadata && typeof p.metadata === "object"
+      ? (p.metadata as Record<string, unknown>)
+      : {};
   return {
     ...mapped,
     category: p.category ? withMongoId(p.category) : p.categoryId,
     subCategory: p.subCategory ? withMongoId(p.subCategory) : p.subCategoryId,
     claspType: p.claspType ? withMongoId(p.claspType) : p.claspTypeId,
+    productType:
+      typeof metadata.productType === "string" ? metadata.productType : undefined,
+    gender: typeof metadata.gender === "string" ? metadata.gender : undefined,
+    karat: typeof metadata.karat === "string" ? metadata.karat : undefined,
+    video: p.video ? [p.video] : [],
+    videoThumbnail: p.videoThumbnail ? [p.videoThumbnail] : [],
     variant: withMongoIds(p.variants),
     variants: withMongoIds(p.variants),
   };
@@ -99,10 +109,67 @@ function normalizeVisibleAs(val: unknown): string {
   return String(val || "public");
 }
 
+function hasOwn(body: Record<string, unknown>, key: string) {
+  return Object.prototype.hasOwnProperty.call(body, key);
+}
+
 function getVariantRows(body: Record<string, unknown>): Record<string, unknown>[] {
   const raw = body.variants ?? body.variant;
   if (!Array.isArray(raw)) return [];
   return raw.filter((v) => v && typeof v === "object") as Record<string, unknown>[];
+}
+
+function normalizeProductVideo(body: Record<string, unknown>): string | null {
+  const uploaded = normalizeStringArray(body.video);
+  const existing = normalizeStringArray(body.existingVideo);
+  return uploaded[0] || existing[0] || null;
+}
+
+function buildProductMetadata(
+  body: Record<string, unknown>,
+  existingMetadata?: unknown
+) {
+  const metadata: Record<string, unknown> =
+    existingMetadata && typeof existingMetadata === "object"
+      ? { ...(existingMetadata as Record<string, unknown>) }
+      : {};
+
+  if (body.metadata && typeof body.metadata === "object") {
+    Object.assign(metadata, body.metadata as Record<string, unknown>);
+  }
+
+  if (hasOwn(body, "productType")) {
+    const value = String(body.productType || "").trim();
+    if (value) metadata.productType = value;
+    else delete metadata.productType;
+  }
+
+  if (hasOwn(body, "gender")) {
+    const value = String(body.gender || "").trim();
+    if (value) metadata.gender = value;
+    else delete metadata.gender;
+  }
+
+  if (hasOwn(body, "karat")) {
+    const value = String(body.karat || "").trim();
+    if (value) metadata.karat = value;
+    else delete metadata.karat;
+  }
+
+  if (
+    hasOwn(body, "makingCharges") &&
+    body.makingCharges &&
+    typeof body.makingCharges === "object" &&
+    "type" in body.makingCharges
+  ) {
+    const value = String(
+      (body.makingCharges as { type?: unknown }).type || ""
+    ).trim();
+    if (value) metadata.makingChargesType = value;
+    else delete metadata.makingChargesType;
+  }
+
+  return metadata;
 }
 
 function buildVariantCreates(
@@ -116,6 +183,7 @@ function buildVariantCreates(
 
   return rows.map((v, index) => ({
     sku: String(v.sku || `${slug}-v${index}-${Date.now()}`),
+    name: v.name != null && String(v.name).trim() ? String(v.name).trim() : null,
     price: Number(v.price) || 0,
     wt: Number(v.wt) || 0,
     unit: String(v.unit || "gm").replace(/^grams$/i, "gm"),
@@ -208,7 +276,8 @@ export async function handleProductCreate(req: NextRequest) {
           | null,
         makingCharges: extractMakingCharges(body),
         length: body.length != null ? Number(body.length) : null,
-        rhodoumFinishes: Boolean(body.rhodoumFinishes),
+        rhodoumFinishes:
+          body.rhodoumFinishes === true || body.rhodoumFinishes === "true",
         shape: body.shape ? String(body.shape) : null,
         quantity: Number(body.quantity) || 0,
         totalCarat: body.totalCarat != null ? Number(body.totalCarat) : null,
@@ -218,16 +287,16 @@ export async function handleProductCreate(req: NextRequest) {
         tags: normalizeTags(body.tags),
         visibleAs: normalizeVisibleAs(body.visibleAs),
         images: normalizeProductImages(body),
-        video: body.video ? String(body.video) : null,
+        video: normalizeProductVideo(body),
         videoThumbnail: body.videoThumbnail
           ? String(body.videoThumbnail)
           : null,
         isActive: body.isActive !== false && body.isActive !== "false",
-        isFeatured: Boolean(body.isFeatured),
+        isFeatured: body.isFeatured === true || body.isFeatured === "true",
         wastage: body.wastage ?? undefined,
         stones: Array.isArray(body.stones) ? body.stones : [],
         others: Array.isArray(body.others) ? body.others : [],
-        metadata: body.metadata ?? {},
+        metadata: buildProductMetadata(body),
         variants: {
           create: buildVariantCreates(variantRows, slug),
         },
@@ -282,14 +351,53 @@ export async function handleProductUpdate(req: NextRequest, id: string) {
             body.subCategory ||
             null) as string | null,
         }),
-        ...(body.images !== undefined && {
+        ...(body.length !== undefined && {
+          length: body.length != null && body.length !== "" ? Number(body.length) : null,
+        }),
+        ...(body.rhodoumFinishes !== undefined && {
+          rhodoumFinishes:
+            body.rhodoumFinishes === true || body.rhodoumFinishes === "true",
+        }),
+        ...(body.totalCarat !== undefined && {
+          totalCarat:
+            body.totalCarat != null && body.totalCarat !== ""
+              ? Number(body.totalCarat)
+              : null,
+        }),
+        ...(body.color !== undefined && {
+          color: body.color ? String(body.color) : null,
+        }),
+        ...(body.clarity !== undefined && {
+          clarity: body.clarity ? String(body.clarity) : null,
+        }),
+        ...(body.dimension !== undefined && {
+          dimension:
+            body.dimension != null && body.dimension !== ""
+              ? Number(body.dimension)
+              : null,
+        }),
+        ...((body.syncImages !== undefined ||
+          body.images !== undefined ||
+          body.existingImages !== undefined) && {
           images: normalizeProductImages(body),
+        }),
+        ...((body.video !== undefined || body.existingVideo !== undefined) && {
+          video: normalizeProductVideo(body),
         }),
         ...(body.isActive !== undefined && {
           isActive: body.isActive !== false && body.isActive !== "false",
         }),
+        ...(body.isFeatured !== undefined && {
+          isFeatured: body.isFeatured === true || body.isFeatured === "true",
+        }),
         ...(body.quantity !== undefined && {
           quantity: Number(body.quantity),
+        }),
+        ...(body.tags !== undefined && {
+          tags: normalizeTags(body.tags),
+        }),
+        ...(body.visibleAs !== undefined && {
+          visibleAs: normalizeVisibleAs(body.visibleAs),
         }),
         makingCharges: extractMakingCharges(body),
         ...(body.wastage !== undefined && { wastage: body.wastage }),
@@ -298,6 +406,13 @@ export async function handleProductUpdate(req: NextRequest, id: string) {
         }),
         ...(body.others !== undefined && {
           others: Array.isArray(body.others) ? body.others : [],
+        }),
+        ...((body.metadata !== undefined ||
+          body.productType !== undefined ||
+          body.gender !== undefined ||
+          body.karat !== undefined ||
+          body.makingCharges !== undefined) && {
+          metadata: buildProductMetadata(body, existing.metadata),
         }),
       },
       include: productInclude,
