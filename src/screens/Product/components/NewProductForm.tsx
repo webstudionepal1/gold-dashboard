@@ -13,6 +13,9 @@ import { toStoragePath } from "../../../utils/media";
 import { mapProductToFormData } from "../../../utils/productForm";
 import { buildProductSlugFromFormFields } from "../../../utils/productSlug";
 
+const PRODUCT_VIDEO_MAX_SIZE_MB = 30;
+const PRODUCT_VIDEO_MAX_SIZE_BYTES = PRODUCT_VIDEO_MAX_SIZE_MB * 1024 * 1024;
+
 const NewProductForm: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -37,6 +40,7 @@ const NewProductForm: React.FC = () => {
 
   const transformFormDataToAPI = (formData: ProductFormData) => {
     const formDataObj = new FormData();
+    formDataObj.append("documentType", "product");
 
     formDataObj.append("name", formData.name);
     const productSlug =
@@ -148,6 +152,11 @@ const NewProductForm: React.FC = () => {
     });
 
     if (formData.video) {
+      if (formData.video.size > PRODUCT_VIDEO_MAX_SIZE_BYTES) {
+        throw new Error(
+          `Product video must be ${PRODUCT_VIDEO_MAX_SIZE_MB}MB or less`
+        );
+      }
       formDataObj.append("video", formData.video);
     } else if (isEdit) {
       if (Array.isArray(formData.existingVideo) && formData.existingVideo.length) {

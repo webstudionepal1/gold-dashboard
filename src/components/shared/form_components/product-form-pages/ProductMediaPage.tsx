@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { useFormikContext } from "formik";
 import { UploadCloud, X } from "lucide-react";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { toast } from "react-toastify";
 import { resolveMediaUrl } from "@/utils/media";
 
 interface ProductFormData {
@@ -11,15 +12,32 @@ interface ProductFormData {
   existingVideo: string | null;
 }
 
+const PRODUCT_VIDEO_MAX_SIZE_MB = 30;
+const PRODUCT_VIDEO_MAX_SIZE_BYTES = PRODUCT_VIDEO_MAX_SIZE_MB * 1024 * 1024;
+
 export default function CompactProductVideoSection() {
   const { values, setFieldValue } = useFormikContext<ProductFormData>();
   const videoInputRef = useRef<HTMLInputElement | null>(null);
 
+  const validateVideoFile = (file: File) => {
+    if (!file.type.startsWith("video/")) {
+      toast.error("Please select a valid video file.");
+      return false;
+    }
+    if (file.size > PRODUCT_VIDEO_MAX_SIZE_BYTES) {
+      toast.error(`Video size must be ${PRODUCT_VIDEO_MAX_SIZE_MB}MB or less.`);
+      return false;
+    }
+    return true;
+  };
+
   const handleVideoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
+    if (file && validateVideoFile(file)) {
       setFieldValue("video", file);
       setFieldValue("existingVideo", null);
+    } else if (videoInputRef.current) {
+      videoInputRef.current.value = "";
     }
   };
 
@@ -32,7 +50,7 @@ export default function CompactProductVideoSection() {
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     const file = e.dataTransfer.files?.[0];
-    if (file && file.type.startsWith("video/")) {
+    if (file && validateVideoFile(file)) {
       setFieldValue("video", file);
       setFieldValue("existingVideo", null);
     }
@@ -66,6 +84,9 @@ export default function CompactProductVideoSection() {
             <UploadCloud className="mx-auto mb-2 h-8 w-8 text-gray-400" />
             <p className="text-sm text-gray-600">
               Drag & drop a product video here, or click to browse
+            </p>
+            <p className="text-xs text-gray-500 mt-1">
+              Max size: {PRODUCT_VIDEO_MAX_SIZE_MB}MB per video
             </p>
             <input
               type="file"

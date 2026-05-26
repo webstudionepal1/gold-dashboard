@@ -28,6 +28,9 @@ import {
 } from "../../productObj";
 import VideoUploader from "../../../../components/shared/form_components/VideoUploader";
 
+const PRODUCT_VIDEO_MAX_SIZE_MB = 30;
+const PRODUCT_VIDEO_MAX_SIZE_BYTES = PRODUCT_VIDEO_MAX_SIZE_MB * 1024 * 1024;
+
 const ProductForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -112,6 +115,7 @@ const ProductForm = () => {
     onSubmit: async ({ value }) => {
       try {
         const formData = new FormData();
+        formData.append("documentType", "product");
         const formattedData = cleanObject(value);
         // delete formattedData["image"];
         delete formattedData["existingImage"];
@@ -188,6 +192,11 @@ const ProductForm = () => {
 
         // Handle video upload
         if (value.video) {
+          if (value.video.size > PRODUCT_VIDEO_MAX_SIZE_BYTES) {
+            throw new Error(
+              `Product video must be ${PRODUCT_VIDEO_MAX_SIZE_MB}MB or less`
+            );
+          }
           // New video selected - this replaces any existing video
           formData.append("video", value.video);
         } else if (formstate !== "add" && value.existingVideo) {
@@ -969,7 +978,7 @@ const ProductForm = () => {
                     onExistingFileChange={(url) => {
                       form.setFieldValue("existingVideo", url);
                     }}
-                    maxSize={200}
+                    maxSize={30}
                   />
                 )}
               </form.Field>
