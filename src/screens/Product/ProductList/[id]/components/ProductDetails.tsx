@@ -138,7 +138,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
 
           {/* Compact Description */}
           {get(product, "description") && (
-            <p className="text-sm text-gray-600 leading-relaxed line-clamp-2">
+            <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line break-words">
               {get(product, "description")}
             </p>
           )}
@@ -264,7 +264,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
 
         {/* Compact Description */}
         {get(product, "description") && (
-          <p className="text-sm text-gray-600 leading-relaxed mb-3 line-clamp-2">
+          <p className="text-sm text-gray-600 leading-relaxed mb-3 whitespace-pre-line break-words">
             {get(product, "description")}
           </p>
         )}
