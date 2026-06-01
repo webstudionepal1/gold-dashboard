@@ -20,6 +20,13 @@ interface IEditModal {
     | (IFetchCategory & { rawDescription?: string; image?: string })
     | null;
 }
+
+/** lodash get default only applies to undefined — null breaks .length in prod */
+function asDisplayString(value: unknown): string {
+  if (value === null || value === undefined) return "";
+  return String(value);
+}
+
 const ProductCategory: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<IEditModal>({
     state: false,
@@ -46,33 +53,36 @@ const ProductCategory: React.FC = () => {
 
   const categoriesData = useMemo(
     () =>
-      isSuccess
-        ? categories?.map((item, index) => ({
-            ...item,
-            sn: index + 1,
-            rawDescription: get(item, "description", ""),
-            description: (
-              <p className=" truncate max-w-xl text-center">
-                {get(item, "description", "").length > 20
-                  ? `${get(item, "description", "").slice(0, 17)}...`
-                  : get(item, "description", "") !== ""
-                  ? get(item, "description")
-                  : "-"}
-              </p>
-            ),
-            totalProducts: get(item, "totalProducts", 0),
-            status: (
-              <span
-                className={`px-2 py-1 text-xs font-medium rounded-full ${
-                  get(item, "isActive", true)
-                    ? "bg-green-100 text-green-800"
-                    : "bg-red-100 text-red-800"
-                }`}
-              >
-                {get(item, "isActive", true) ? "Active" : "Inactive"}
-              </span>
-            ),
-          }))
+      isSuccess && Array.isArray(categories)
+        ? categories.map((item, index) => {
+            const descText = asDisplayString(get(item, "description"));
+            return {
+              ...item,
+              sn: index + 1,
+              rawDescription: descText,
+              description: (
+                <p className=" truncate max-w-xl text-center">
+                  {descText.length > 20
+                    ? `${descText.slice(0, 17)}...`
+                    : descText !== ""
+                    ? descText
+                    : "-"}
+                </p>
+              ),
+              totalProducts: get(item, "totalProducts", 0),
+              status: (
+                <span
+                  className={`px-2 py-1 text-xs font-medium rounded-full ${
+                    get(item, "isActive", true)
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-red-800"
+                  }`}
+                >
+                  {get(item, "isActive", true) ? "Active" : "Inactive"}
+                </span>
+              ),
+            };
+          })
         : [],
     [isSuccess, categories]
   );
