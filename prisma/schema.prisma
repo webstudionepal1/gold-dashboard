@@ -509,11 +509,25 @@ model PushNotification {
 }
 
 model MetalPrice {
-  id        String   @id @default(cuid())
-  gold      Json
-  silver    Json
-  isLatest  Boolean  @default(true)
-  createdAt DateTime @default(now())
+  id               String   @id @default(cuid())
+  /**
+   * Legacy fields kept for backward compatibility.
+   * `gold` and `silver` store per-gram/per-ounce numbers used across dashboard + pricing.
+   */
+  gold             Json
+  silver           Json
+
+  /**
+   * New base inputs (client enters per tola for 99.9%).
+   * These enable auto-calculation for different purities/carat values.
+   */
+  baseGold999PerTola   Float
+  baseSilverPerTola    Float
+  tolaGrams            Float   @default(11.664)
+  purityConfig         Json    @default("{\"24\":99.9,\"22\":91.6,\"18\":75,\"14\":58.3,\"10\":41.7}")
+
+  isLatest          Boolean  @default(true)
+  createdAt         DateTime @default(now())
 }
 
 model PriceConfig {

@@ -183,7 +183,7 @@ export const ProductSpecificationsPage: React.FC = () => {
             {/* Length */}
             <div className="space-y-2">
               <InputField
-                label="Length (mm)"
+                label="Length (inch)"
                 type="number"
                 step="0.1"
                 placeholder="0.0"
@@ -209,7 +209,7 @@ export const ProductSpecificationsPage: React.FC = () => {
             {/* Dimension */}
             <div className="space-y-2">
               <InputField
-                label="Width/Diameter (mm)"
+                label="Width/Diameter (inch)"
                 type="number"
                 step="0.1"
                 placeholder="0.0"
@@ -499,7 +499,7 @@ export const ProductSpecificationsPage: React.FC = () => {
           <div className="space-y-2 text-sm text-gray-600">
             <p>
               • <strong>Dimensions:</strong> Provide accurate measurements in
-              millimeters for consistency
+              inches for consistency
             </p>
             <p>
               • <strong>Shape:</strong> Choose the most appropriate shape that

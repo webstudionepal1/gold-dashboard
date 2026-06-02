@@ -46,6 +46,12 @@ export interface MetalPricesData {
   silverPrice: MetalPrice;
   tejabiGold22k?: MetalPrice;
   lastUpdated?: string;
+  config?: {
+    baseGold999PerTola: number;
+    baseSilverPerTola: number;
+    tolaGrams: number;
+    purityConfig: Record<string, number>;
+  };
 }
 
 // Create mock data for fallback
@@ -129,13 +135,22 @@ const transformMetalPricesData = (
     silverPrice,
     ...(tejabiGold22k && { tejabiGold22k }),
     lastUpdated: apiResponse?.lastUpdated,
+    ...(apiResponse?.config && { config: apiResponse.config }),
   };
 };
 
 export interface MetalPriceFormPayload {
-  fineGold24kPerGram: number;
+  // New preferred inputs
+  baseGold999PerTola: number;
+  baseSilverPerTola: number;
+  purityConfig?: Record<string, number>;
+  tolaGrams?: number;
+
+  // Backward compatibility (older UI / callers)
+  fineGold24kPerGram?: number;
   tejabiGold22kPerGram?: number;
-  silverPerGram: number;
+  silverPerGram?: number;
+
   currency?: string;
 }
 

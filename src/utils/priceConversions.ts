@@ -2,8 +2,8 @@
  * Utility functions for price conversions
  */
 
-// 1 tola = 11.6638 grams (standard conversion)
-export const GRAMS_PER_TOLA = 11.6638;
+// 1 tola = 11.664 grams (matches Nepali bullion calculations)
+export const GRAMS_PER_TOLA = 11.664;
 
 /**
  * Convert price per gram to price per tola

@@ -4,6 +4,8 @@ import {
 } from "@/components/shared/form_components/ProductFormContext";
 import { resolveMediaUrl } from "@/utils/media";
 
+const MM_PER_INCH = 25.4;
+
 function mapVariantUnit(unit?: string): ProductVariant["unit"] {
   const u = String(unit || "").toLowerCase();
   if (u === "gm" || u === "gram" || u === "grams") return "grams";
@@ -118,7 +120,8 @@ export function mapProductToFormData(
       product.subCategory,
       String(product.subCategoryId || "")
     ),
-    length: Number(product.length) || 0,
+    // Stored in DB as mm, show in UI as inches
+    length: (Number(product.length) || 0) / MM_PER_INCH,
     claspType: resolveRelationId(
       product.claspType,
       String(product.claspTypeId || "")
@@ -129,7 +132,8 @@ export function mapProductToFormData(
     totalCarat: product.totalCarat == null ? 0 : Number(product.totalCarat) || 0,
     color: str(product.color),
     clarity: str(product.clarity),
-    dimension: Number(product.dimension) || 0,
+    // Stored in DB as mm, show in UI as inches
+    dimension: (Number(product.dimension) || 0) / MM_PER_INCH,
     gender: (metadata.gender || product.gender || "male") as ProductFormData["gender"],
     makingCharges,
     makingChargesType,

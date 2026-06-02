@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 const TROY_OZ_GRAMS = 31.1034768;
+const GRAMS_PER_TOLA = 11.664;
 
 function toMetalJson(perGram: number, currency = "NPR") {
   return {
@@ -41,24 +42,45 @@ async function main() {
     orderBy: { createdAt: "desc" },
   });
 
+  // Seed base inputs as "per tola" like Nepali bullion rates.
+  const baseGold999PerTola = 311000; // 99.9%
+  const baseSilverPerTola = 5350;
+  const purityConfig = { "24": 99.9, "22": 91.6, "18": 75, "14": 58.3, "10": 41.7 };
+
+  const fineGoldPerGram = baseGold999PerTola / GRAMS_PER_TOLA;
+  const silverPerGram = baseSilverPerTola / GRAMS_PER_TOLA;
+  const tejabi22PerGram = (baseGold999PerTola * (purityConfig["22"] / 99.9)) / GRAMS_PER_TOLA;
+
   const gold = {
-    ...toMetalJson(11250),
-    tejabiGold22k: toMetalJson(10350),
+    ...toMetalJson(fineGoldPerGram),
+    tejabiGold22k: toMetalJson(tejabi22PerGram),
   };
-  const silver = toMetalJson(145);
+  const silver = toMetalJson(silverPerGram);
 
   if (latestMetalPrice) {
     await prisma.metalPrice.update({
       where: { id: latestMetalPrice.id },
-      data: { gold, silver, isLatest: true },
+      data: {
+        gold,
+        silver,
+        baseGold999PerTola,
+        baseSilverPerTola,
+        tolaGrams: GRAMS_PER_TOLA,
+        purityConfig,
+        isLatest: true,
+      } as any,
     });
   } else {
     await prisma.metalPrice.create({
       data: {
         gold,
         silver,
+        baseGold999PerTola,
+        baseSilverPerTola,
+        tolaGrams: GRAMS_PER_TOLA,
+        purityConfig,
         isLatest: true,
-      },
+      } as any,
     });
   }
 

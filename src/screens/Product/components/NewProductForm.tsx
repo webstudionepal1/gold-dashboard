@@ -15,6 +15,7 @@ import { buildProductSlugFromFormFields } from "../../../utils/productSlug";
 
 const PRODUCT_VIDEO_MAX_SIZE_MB = 30;
 const PRODUCT_VIDEO_MAX_SIZE_BYTES = PRODUCT_VIDEO_MAX_SIZE_MB * 1024 * 1024;
+const MM_PER_INCH = 25.4;
 
 const NewProductForm: React.FC = () => {
   const navigate = useNavigate();
@@ -61,8 +62,15 @@ const NewProductForm: React.FC = () => {
       formDataObj.append("category", formData.category || "");
       formDataObj.append("subCategory", formData.subCategory || "");
       formDataObj.append("gender", formData.gender || "");
-      formDataObj.append("length", String(formData.length ?? 0));
-      formDataObj.append("dimension", String(formData.dimension ?? 0));
+      // UI uses inches, DB stores mm
+      formDataObj.append(
+        "length",
+        String((Number(formData.length ?? 0) || 0) * MM_PER_INCH)
+      );
+      formDataObj.append(
+        "dimension",
+        String((Number(formData.dimension ?? 0) || 0) * MM_PER_INCH)
+      );
       formDataObj.append("color", formData.color || "");
       formDataObj.append("clarity", formData.clarity || "");
       formDataObj.append("totalCarat", String(formData.totalCarat ?? 0));

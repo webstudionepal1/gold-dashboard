@@ -65,7 +65,7 @@ const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
           : get(editData, 'description', '')
         : '',
       image: null,
-      existingImage: editData ? get(editData, 'images[0]', '') : '',
+      existingImage: editData ? get(editData, 'image', '') : '',
     } as ICategoryValue,
     validators: {
       onChange: schema,
@@ -83,12 +83,14 @@ const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
 
       // Handle new image upload
       if (value.image) {
-        formData.append('images', value.image);
+        // Backend expects `image` for Category (single image)
+        formData.append('image', value.image);
       }
 
       // Handle existing image in edit mode (only if not removed)
       if (editData && value.existingImage) {
-        formData.append('existingImages', value.existingImage);
+        // Keep previous image if user didn't upload a new one
+        formData.append('image', value.existingImage);
       }
 
       if (editData) {
@@ -179,6 +181,9 @@ const AddProductCategory = ({ modalRef, editData, closeModal }: propTypes) => {
                 <label className="block mb-1 text-sm font-medium text-gray-700">
                   Category Image
                 </label>
+                <p className="text-xs text-gray-500 mb-2">
+                  Recommended: square image (1:1), at least 800×800 (ideal 1200×1200), JPG/PNG/WEBP.
+                </p>
                 <MultiImageUploader
                   multiple={false}
                   form={form}

@@ -522,7 +522,7 @@ const CompactFormContent: React.FC<{
                 <FieldGroup columns={3}>
                   <div>
                     <InputField
-                      label="Length (mm)"
+                      label="Length (inch)"
                       type="number"
                       step="0.1"
                       placeholder="0.0"
@@ -537,7 +537,7 @@ const CompactFormContent: React.FC<{
 
                   <div>
                     <InputField
-                      label="Width/Diameter (mm)"
+                      label="Width/Diameter (inch)"
                       type="number"
                       step="0.1"
                       placeholder="0.0"

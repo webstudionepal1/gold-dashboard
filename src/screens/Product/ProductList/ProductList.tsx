@@ -17,6 +17,7 @@ import { updateProductState } from "../../../store/productStore";
 import { resolveMediaUrl } from "../../../utils/media";
 import { getApiBaseUrl } from "../../../utils/apiBase";
 import { productListColumns } from "../productObj";
+import VisibleAsCell from "./component/VisibleAsCell";
 
 const ProductList: React.FC = () => {
   // State for pagination parameters
@@ -66,6 +67,8 @@ const ProductList: React.FC = () => {
     }
     return null;
   }, [productsList?.pagination]);
+
+  const [savingVisibility, setSavingVisibility] = useState<string | null>(null);
 
   const { mutate: deleteProduct } = useDeleteProductsMutation();
   const { mutate: updateProduct } = useUpdateProductsMutation();
@@ -136,6 +139,16 @@ const ProductList: React.FC = () => {
       id: productId,
       body: formData,
     });
+  };
+
+  const handleVisibilityChange = (productId: string, newValue: string) => {
+    setSavingVisibility(productId);
+    const formData = new FormData();
+    formData.append("visibleAs", newValue);
+    updateProduct(
+      { id: productId, body: formData },
+      { onSettled: () => setSavingVisibility(null) }
+    );
   };
 
   const viewAction = useCallback((row: IFetchProduct) => {
@@ -256,6 +269,14 @@ const ProductList: React.FC = () => {
             ? get(product, "subCategory.name", "-")
             : "-",
         price: get(product, "price", 0),
+        visibleAs: (
+          <VisibleAsCell
+            productId={product._id}
+            visibleAs={product.visibleAs}
+            onSave={handleVisibilityChange}
+            saving={savingVisibility === product._id}
+          />
+        ),
         stock: get(product, "variant[0].remainingStock", 0),
         sold: get(product, "variant[0].usedStock", 0),
         status: (

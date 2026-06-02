@@ -4,6 +4,8 @@ import { IFetchProduct } from "../../../../../server/api/productHooks";
 import { DropdownSection } from "./DropDownSection";
 import { ReviewsSection } from "./ReviewSection";
 
+const MM_PER_INCH = 25.4;
+
 // Type for product variant
 interface ProductVariant {
   price: number;
@@ -158,12 +160,14 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
 
   // Add length if available
   if (get(product, "length", 0)) {
-    specifications["Length"] = `${get(product, "length", 0) || 0} mm`;
+    const mm = Number(get(product, "length", 0) || 0);
+    specifications["Length"] = `${(mm / MM_PER_INCH).toFixed(2)} in`;
   }
 
   // Add dimension if available
   if (get(product, "dimension", 0)) {
-    specifications["Dimension"] = `${get(product, "dimension", 0) || 0} mm`;
+    const mm = Number(get(product, "dimension", 0) || 0);
+    specifications["Dimension"] = `${(mm / MM_PER_INCH).toFixed(2)} in`;
   }
 
   // Add clasp type only for jewelry items (not for loose stones/gems)
