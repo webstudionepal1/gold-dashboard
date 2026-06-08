@@ -489,7 +489,15 @@ export async function handleCategoryDelete(id: string) {
 // SubCategory
 export async function handleSubCategoryList() {
   const items = await prisma.subCategory.findMany({ include: { category: true } });
-  return apiSuccess(withMongoIds(items));
+  const formatted = items.map((item) => {
+    const mapped = withMongoId(item);
+    return {
+      ...mapped,
+      categoryId: item.categoryId,
+      category: item.category ? withMongoId(item.category) : item.categoryId,
+    };
+  });
+  return apiSuccess(formatted);
 }
 
 export async function handleSubCategoryCreate(req: NextRequest) {
@@ -508,11 +516,17 @@ export async function handleSubCategoryCreate(req: NextRequest) {
 
 export async function handleSubCategoryUpdate(req: NextRequest, id: string) {
   const body = await parseBody(req);
+  const categoryId = body.categoryId ?? body.category;
+
   const item = await prisma.subCategory.update({
     where: { id },
     data: {
-      ...(body.name && { name: String(body.name) }),
-      ...(body.categoryId && { categoryId: String(body.categoryId) }),
+      ...(body.name !== undefined && { name: String(body.name) }),
+      ...(categoryId && { categoryId: String(categoryId) }),
+      ...(body.description !== undefined && {
+        description: body.description ? String(body.description) : null,
+      }),
+      ...(body.isActive !== undefined && { isActive: Boolean(body.isActive) }),
     },
   });
   return apiSuccess(withMongoId(item));
@@ -551,6 +565,103 @@ export async function handleClaspUpdate(req: NextRequest, id: string) {
 
 export async function handleClaspDelete(id: string) {
   return handleGenericDelete("claspType", id);
+}
+
+export async function handleProductTypeList() {
+  const items = await prisma.productType.findMany({
+    where: { isActive: true },
+    orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+  });
+  return apiSuccess(withMongoIds(items));
+}
+
+export async function handleProductTypeCreate(req: NextRequest) {
+  const body = await parseBody(req);
+  const name = String(body.name || "").trim();
+  if (!name) return apiError("Name is required", 400);
+
+  const slug = String(body.slug || slugify(name)).trim();
+  const item = await prisma.productType.create({
+    data: {
+      name,
+      slug,
+      description: body.description ? String(body.description) : null,
+      sortOrder: body.sortOrder != null ? Number(body.sortOrder) : 0,
+      isActive: body.isActive !== false,
+    },
+  });
+  return apiSuccess(withMongoId(item), "Created", 201);
+}
+
+export async function handleProductTypeUpdate(req: NextRequest, id: string) {
+  const body = await parseBody(req);
+  const item = await prisma.productType.update({
+    where: { id },
+    data: {
+      ...(body.name && { name: String(body.name) }),
+      ...(body.slug && { slug: String(body.slug) }),
+      ...(body.description !== undefined && {
+        description: body.description ? String(body.description) : null,
+      }),
+      ...(body.sortOrder != null && { sortOrder: Number(body.sortOrder) }),
+      ...(body.isActive !== undefined && { isActive: Boolean(body.isActive) }),
+    },
+  });
+  return apiSuccess(withMongoId(item));
+}
+
+export async function handleProductTypeDelete(id: string) {
+  return handleGenericDelete("productType", id);
+}
+
+export async function handleMetalTypeList(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const activeOnly = searchParams.get("activeOnly") === "true";
+
+  const items = await prisma.metalType.findMany({
+    where: activeOnly ? { isActive: true } : undefined,
+    orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+  });
+  return apiSuccess(withMongoIds(items));
+}
+
+export async function handleMetalTypeCreate(req: NextRequest) {
+  const body = await parseBody(req);
+  const name = String(body.name || "").trim();
+  if (!name) return apiError("Name is required", 400);
+
+  const slug = String(body.slug || slugify(name)).trim();
+  const item = await prisma.metalType.create({
+    data: {
+      name,
+      slug,
+      description: body.description ? String(body.description) : null,
+      sortOrder: body.sortOrder != null ? Number(body.sortOrder) : 0,
+      isActive: body.isActive !== false,
+    },
+  });
+  return apiSuccess(withMongoId(item), "Created", 201);
+}
+
+export async function handleMetalTypeUpdate(req: NextRequest, id: string) {
+  const body = await parseBody(req);
+  const item = await prisma.metalType.update({
+    where: { id },
+    data: {
+      ...(body.name && { name: String(body.name) }),
+      ...(body.slug && { slug: String(body.slug) }),
+      ...(body.description !== undefined && {
+        description: body.description ? String(body.description) : null,
+      }),
+      ...(body.sortOrder != null && { sortOrder: Number(body.sortOrder) }),
+      ...(body.isActive !== undefined && { isActive: Boolean(body.isActive) }),
+    },
+  });
+  return apiSuccess(withMongoId(item));
+}
+
+export async function handleMetalTypeDelete(id: string) {
+  return handleGenericDelete("metalType", id);
 }
 
 export async function handleStoneList() {

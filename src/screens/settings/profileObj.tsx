@@ -7,6 +7,14 @@ export const attributeObj = [
     label: "Clasp Type",
     value: "clasp-type",
   },
+  {
+    label: "Metal Type",
+    value: "metal-type",
+  },
+  {
+    label: "Metal Prices",
+    value: "metal-prices",
+  },
 ];
 
 export const claspsColumn = [
@@ -24,6 +32,14 @@ export const claspsColumn = [
     key: "status",
     title: "Status",
   },
+];
+
+export const metalTypeColumns = [
+  { key: "sn", title: "S.N" },
+  { key: "name", title: "Metal Type" },
+  { key: "slug", title: "Slug" },
+  { key: "sortOrder", title: "Sort Order" },
+  { key: "status", title: "Status" },
 ];
 
 const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;

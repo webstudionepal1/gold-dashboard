@@ -33,6 +33,14 @@ import {
   handleClaspCreate,
   handleClaspUpdate,
   handleClaspDelete,
+  handleProductTypeList,
+  handleProductTypeCreate,
+  handleProductTypeUpdate,
+  handleProductTypeDelete,
+  handleMetalTypeList,
+  handleMetalTypeCreate,
+  handleMetalTypeUpdate,
+  handleMetalTypeDelete,
   handleStoneList,
   handleStoneCreate,
   handleStoneUpdate,
@@ -168,6 +176,20 @@ export async function apiRouter(
       if (!id && method === "POST") return handleClaspCreate(req);
       if (id && method === "PATCH") return handleClaspUpdate(req, id);
       if (id && method === "DELETE") return handleClaspDelete(id);
+      break;
+
+    case "producttype":
+      if (!id && method === "GET") return handleProductTypeList();
+      if (!id && method === "POST") return handleProductTypeCreate(req);
+      if (id && method === "PATCH") return handleProductTypeUpdate(req, id);
+      if (id && method === "DELETE") return handleProductTypeDelete(id);
+      break;
+
+    case "metaltype":
+      if (!id && method === "GET") return handleMetalTypeList(req);
+      if (!id && method === "POST") return handleMetalTypeCreate(req);
+      if (id && method === "PATCH") return handleMetalTypeUpdate(req, id);
+      if (id && method === "DELETE") return handleMetalTypeDelete(id);
       break;
 
     case "stone":

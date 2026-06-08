@@ -17,12 +17,14 @@ export interface IBaseProductSubCategory {
   description?: string;
   totalProducts?: number;
   isActive?: boolean;
-  category?: string;
+  category?: string | IFetchCategory;
+  categoryId?: string;
 }
 export interface IFetchSubCategory extends IBaseProductSubCategory {
   _id: string;
   name: string;
-  category: string;
+  category: string | IFetchCategory;
+  rawDescription?: string;
 }
 
 export interface IProductCategory {
@@ -125,6 +127,24 @@ export interface IFetchClasps {
   name: string;
   images?: string[];
   _id: string;
+  isActive: boolean;
+}
+
+export interface IFetchProductType {
+  _id: string;
+  name: string;
+  slug: string;
+  description?: string | null;
+  sortOrder: number;
+  isActive: boolean;
+}
+
+export interface IFetchMetalType {
+  _id: string;
+  name: string;
+  slug: string;
+  description?: string | null;
+  sortOrder: number;
   isActive: boolean;
 }
 
@@ -549,6 +569,96 @@ export const useDeleteProductClaspsMutation = () => {
     onError(err: string) {
       // toast.error(err || "Error deleting product clasp");
       toast.error("Error deleting product clasp");
+    },
+  });
+};
+
+export const useGetAllProductTypesQuery = (params: IParams = {}) => {
+  return useQuery({
+    queryKey: ["producttype"],
+    queryFn: async () => {
+      const res = await apiClient.get<{ data: IFetchProductType[] }>(
+        "producttype",
+        { params }
+      );
+      return res?.data?.data;
+    },
+  });
+};
+
+export const useGetAllMetalTypesQuery = (
+  params: IParams & { activeOnly?: boolean } = {}
+) => {
+  return useQuery({
+    queryKey: ["metaltype", params.activeOnly ? "active" : "all"],
+    queryFn: async () => {
+      const res = await apiClient.get<{ data: IFetchMetalType[] }>("metaltype", {
+        params: {
+          ...params,
+          ...(params.activeOnly ? { activeOnly: "true" } : {}),
+        },
+      });
+      return res?.data?.data;
+    },
+  });
+};
+
+export const useCreateMetalTypeMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["metaltype"],
+    mutationFn: async (body: Record<string, unknown>) => {
+      const res = await apiClient.post("metaltype", body);
+      return res?.data?.data;
+    },
+    onSuccess() {
+      toast.success("Metal type created successfully");
+      queryClient.invalidateQueries({ queryKey: ["metaltype"] });
+    },
+    onError() {
+      toast.error("Error creating metal type");
+    },
+  });
+};
+
+export const useUpdateMetalTypeMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["metaltype"],
+    mutationFn: async ({
+      id,
+      body,
+    }: {
+      id: string;
+      body: Record<string, unknown>;
+    }) => {
+      const res = await apiClient.patch(`metaltype/${id}`, body);
+      return res?.data?.data;
+    },
+    onSuccess() {
+      toast.success("Metal type updated successfully");
+      queryClient.invalidateQueries({ queryKey: ["metaltype"] });
+    },
+    onError() {
+      toast.error("Error updating metal type");
+    },
+  });
+};
+
+export const useDeleteMetalTypeMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["metaltype"],
+    mutationFn: async (id: string) => {
+      const res = await apiClient.delete(`metaltype/${id}`);
+      return res?.data?.data;
+    },
+    onSuccess() {
+      toast.success("Metal type deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["metaltype"] });
+    },
+    onError() {
+      toast.error("Error deleting metal type");
     },
   });
 };

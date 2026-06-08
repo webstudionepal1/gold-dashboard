@@ -10,6 +10,7 @@ import {
   useCreateMetalPriceMutation,
   useGetLatestMetalPricesQuery,
 } from "../../../server/api/metalPricesHooks";
+import MetalPriceHistoryTable from "./MetalPriceHistoryTable";
 import {
   GRAMS_PER_TOLA,
   formatPrice,
@@ -140,7 +141,7 @@ const MetalPricesForm: React.FC = () => {
       />
       <Header text="Metal Prices" />
 
-      <div className="max-w-3xl mx-auto px-4 pb-10">
+      <div className="max-w-5xl mx-auto px-4 pb-10 space-y-6">
         <form
           onSubmit={formik.handleSubmit}
           className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 space-y-6"
@@ -318,6 +319,8 @@ const MetalPricesForm: React.FC = () => {
             </Button>
           </div>
         </form>
+
+        <MetalPriceHistoryTable title="All Saved Metal Price Records" />
       </div>
     </div>
   );

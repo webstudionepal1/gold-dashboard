@@ -31,6 +31,8 @@ async function main() {
   await prisma.subCategory.deleteMany();
   await prisma.category.deleteMany();
   await prisma.claspType.deleteMany();
+  await prisma.productType.deleteMany();
+  await prisma.metalType.deleteMany();
   await prisma.stone.deleteMany();
   await prisma.occasion.deleteMany();
   await prisma.metalPrice.deleteMany();

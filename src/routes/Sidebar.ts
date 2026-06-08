@@ -198,17 +198,22 @@ export const SidebarConfig = {
           children: [
             {
               id: 107,
-              path: "/settings/profile-config",
+              path: FrontendRoutes.PROFILECONFIG,
               title: "Profile config",
             },
             {
+              id: 108,
+              path: FrontendRoutes.ATTRIBUTECONFIG,
+              title: "Attribute Config",
+            },
+            {
               id: 110,
-              path: "/settings/metal-prices",
+              path: FrontendRoutes.METALPRICES,
               title: "Metal prices",
             },
             {
               id: 109,
-              path: "/settings/calculator",
+              path: FrontendRoutes.CALCULATOR,
               title: "Price calculator",
             },
           ],

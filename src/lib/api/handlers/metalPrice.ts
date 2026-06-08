@@ -137,9 +137,28 @@ export async function handleMetalPricesLatest() {
 export async function handleMetalPricesList() {
   const items = await prisma.metalPrice.findMany({
     orderBy: { createdAt: "desc" },
-    take: 50,
+    take: 100,
   });
-  return apiSuccess(withMongoIds(items));
+
+  const formatted = items.map((price) => {
+    const gold = price.gold as MetalJson;
+    const silver = price.silver as MetalJson;
+    return withMongoId({
+      _id: price.id,
+      id: price.id,
+      baseGold999PerTola: Number(price.baseGold999PerTola ?? 0),
+      baseSilverPerTola: Number(price.baseSilverPerTola ?? 0),
+      tolaGrams: Number(price.tolaGrams ?? DEFAULT_TOLA_GRAMS),
+      purityConfig: parsePurityConfig(price.purityConfig),
+      goldPerGram: Number(gold?.perGram ?? 0),
+      silverPerGram: Number(silver?.perGram ?? 0),
+      currency: gold?.currency || silver?.currency || "NPR",
+      isLatest: price.isLatest,
+      createdAt: price.createdAt.toISOString(),
+    });
+  });
+
+  return apiSuccess(formatted);
 }
 
 export async function handleMetalPriceCreate(req: NextRequest) {

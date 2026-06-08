@@ -1,20 +1,9 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { DropdownField } from "../Dropdown";
 import { InputField } from "../InputField";
 import { useMultiPageForm } from "../MultiPageFormContext";
-
-// Options for dropdowns
-const materialTypeOptions = [
-  { value: "", label: "Select Material Type" },
-  { value: "gold", label: "Gold" },
-  { value: "silver", label: "Silver" },
-  { value: "platinum", label: "Platinum" },
-  { value: "rose_gold", label: "Rose Gold" },
-  { value: "white_gold", label: "White Gold" },
-  { value: "mixed", label: "Mixed Materials" },
-  { value: "other", label: "Other" },
-];
+import { useGetAllMetalTypesQuery } from "../../../../server/api/productHooks";
 
 const gemstoneTypeOptions = [
   { value: "", label: "Select Gemstone Type" },
@@ -42,6 +31,22 @@ const styleCategoryOptions = [
 
 export const CollectionPropertiesPage: React.FC = () => {
   const { formData, updateFormData } = useMultiPageForm();
+  const { data: metalTypes } = useGetAllMetalTypesQuery({ activeOnly: true });
+
+  const materialTypeOptions = useMemo(
+    () => [
+      { value: "", label: "Select Material Type" },
+      ...(metalTypes?.map((type) => ({
+        value: type.slug,
+        label: type.name,
+      })) || [
+        { value: "gold", label: "Gold" },
+        { value: "silver", label: "Silver" },
+        { value: "platinum", label: "Platinum" },
+      ]),
+    ],
+    [metalTypes]
+  );
 
   return (
     <div className="space-y-6">

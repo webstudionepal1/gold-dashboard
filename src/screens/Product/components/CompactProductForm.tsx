@@ -8,6 +8,7 @@ import { TextareaField } from "../../../components/shared/form_components/TextAr
 import {
   useGetAllProductCategoriesQuery,
   useGetAllProductSubCategoriesQuery,
+  useGetAllProductTypesQuery,
 } from "../../../server/api/productHooks";
 import { mainProductFormSchema } from "../../../components/shared/form_components/validation/ProductFormValidation";
 import { Form, FormikProvider, useFormik } from "formik";
@@ -229,6 +230,7 @@ const CompactFormContent: React.FC<{
 
   // API hooks
   const { data: categories } = useGetAllProductCategoriesQuery();
+  const { data: productTypes } = useGetAllProductTypesQuery();
   const { data: subCategories } = useGetAllProductSubCategoriesQuery(
     {
       category: formik.values.category,
@@ -239,6 +241,13 @@ const CompactFormContent: React.FC<{
   // Transform data for dropdowns
   const categoryOptions =
     categories?.map((cat: any) => ({ value: cat._id, label: cat.name })) || [];
+  const productTypeOptions =
+    productTypes?.map((type) => ({ value: type.slug, label: type.name })) || [
+      { value: "gold", label: "Gold" },
+      { value: "silver", label: "Silver" },
+      { value: "diamond", label: "Diamond" },
+      { value: "astral_gems", label: "Astral Gems" },
+    ];
   const subCategoryOptions =
     subCategories?.map((sub: any) => ({ value: sub._id, label: sub.name })) ||
     [];
@@ -410,13 +419,7 @@ const CompactFormContent: React.FC<{
                   <DropdownField
                     label="Product Type"
                     required
-                    options={[
-                      // { value: "", label: "Select Product Type" },
-                      // { value: "normal", label: "Normal" },
-                      { value: "gold", label: "Gold" },
-                      { value: "silver", label: "Silver" },
-                      { value: "diamond", label: "Diamond" },
-                    ]}
+                    options={productTypeOptions}
                     value={formik.values.productType || ""}
                     onChange={(e) => {
                       formik.setFieldValue("productType", e.target.value);
@@ -562,7 +565,8 @@ const CompactFormContent: React.FC<{
                   </div>
 
                   {/* Show clarity only for diamond products */}
-                  {formik.values.productType === "diamond" && (
+                  {(formik.values.productType === "diamond" ||
+                    formik.values.productType === "astral_gems") && (
                     <div>
                       <InputField
                         label="Clarity"

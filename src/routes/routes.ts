@@ -48,6 +48,7 @@ export const FrontendRoutes = {
 
   SETTINGS: "/settings",
   PROFILECONFIG: "/settings/profile-config",
+  ATTRIBUTECONFIG: "/settings/attribute-config",
   METALPRICES: "/settings/metal-prices",
   CALCULATOR: "/settings/calculator",
   CALCULATORADD: "/settings/calculator/add",

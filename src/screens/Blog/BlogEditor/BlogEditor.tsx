@@ -318,24 +318,35 @@ const BlogEditor: React.FC = () => {
     []
   );
 
-  const quillFormats = [
-    "header",
-    "bold",
-    "italic",
-    "underline",
-    "strike",
-    "color",
-    "background",
-    "list",
-    "bullet",
-    "indent",
-    "align",
-    "link",
-    "image",
-    "video",
-    "blockquote",
-    "code-block",
-  ];
+  const quillFormats = useMemo(
+    () => [
+      "header",
+      "bold",
+      "italic",
+      "underline",
+      "strike",
+      "color",
+      "background",
+      "list",
+      "bullet",
+      "indent",
+      "align",
+      "link",
+      "image",
+      "video",
+      "blockquote",
+      "code-block",
+    ],
+    []
+  );
+
+  const handleContentChange = useCallback(
+    (content: string) => {
+      formik.setFieldValue("content", content);
+      formik.validateField("content");
+    },
+    [formik]
+  );
 
   // Helper functions
   const addTag = useCallback(() => {
@@ -614,10 +625,7 @@ const BlogEditor: React.FC = () => {
                 <div className="border border-gray-300 rounded overflow-hidden max-w-full">
                   <QuillEditor
                     value={formik.values.content}
-                    onChange={(content) => {
-                      formik.setFieldValue("content", content);
-                      formik.validateField("content");
-                    }}
+                    onChange={handleContentChange}
                     modules={quillModules}
                     formats={quillFormats}
                     placeholder="Write your blog content here..."

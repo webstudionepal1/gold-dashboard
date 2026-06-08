@@ -10,6 +10,7 @@ import {
   type IParams,
   useDeleteProductsMutation,
   useGetAllProductCategoriesQuery,
+  useGetAllProductTypesQuery,
   useGetAllProductsQuery,
   useUpdateProductsMutation,
 } from "../../../server/api/productHooks";
@@ -40,11 +41,23 @@ const ProductList: React.FC = () => {
   } = useGetAllProductsQuery(paginationParams);
 
   const { data: categories } = useGetAllProductCategoriesQuery();
+  const { data: productTypes } = useGetAllProductTypesQuery();
 
   const categoryOptions = categories?.map((category) => ({
     label: category.name || "Unnamed Category",
     value: category._id || "0",
   }));
+
+  const productTypeOptions =
+    productTypes?.map((type) => ({
+      label: type.name,
+      value: type.slug,
+    })) || [
+      { label: "Gold", value: "gold" },
+      { label: "Silver", value: "silver" },
+      { label: "Diamond", value: "diamond" },
+      { label: "Astral Gems", value: "astral_gems" },
+    ];
 
   const productsData = useMemo(
     () => (isSuccess && productsList?.products ? productsList.products : []),
@@ -318,12 +331,7 @@ const ProductList: React.FC = () => {
       label: "Product Type",
       type: "select" as const,
       placeholder: "All Products",
-      options: [
-        { label: "Gold", value: "gold" },
-        { label: "Silver", value: "silver" },
-        { label: "Diamond", value: "diamond" },
-        // { label: "Normal", value: "normal" },
-      ],
+      options: productTypeOptions,
     },
   ];
 

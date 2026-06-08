@@ -154,6 +154,31 @@ export interface MetalPriceFormPayload {
   currency?: string;
 }
 
+export interface MetalPriceHistoryRecord {
+  _id: string;
+  baseGold999PerTola: number;
+  baseSilverPerTola: number;
+  tolaGrams: number;
+  goldPerGram: number;
+  silverPerGram: number;
+  currency: string;
+  isLatest: boolean;
+  createdAt: string;
+  purityConfig?: Record<string, number>;
+}
+
+export const useGetAllMetalPricesQuery = () => {
+  return useQuery<MetalPriceHistoryRecord[]>({
+    queryKey: ["metalPrices", "history"],
+    queryFn: async () => {
+      const res = await apiClient.get<{ data: MetalPriceHistoryRecord[] }>(
+        "metal-prices"
+      );
+      return res?.data?.data ?? [];
+    },
+  });
+};
+
 export const useCreateMetalPriceMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -165,6 +190,7 @@ export const useCreateMetalPriceMutation = () => {
     onSuccess: () => {
       toast.success("Metal prices saved");
       queryClient.invalidateQueries({ queryKey: ["metalPrices"] });
+      queryClient.invalidateQueries({ queryKey: ["metalPrices", "history"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
     },
     onError: (err: unknown) => {

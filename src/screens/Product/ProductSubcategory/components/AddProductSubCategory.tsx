@@ -28,12 +28,24 @@ interface ISubCategorForm {
   category: string;
   description?: string;
 }
+
+function resolveCategoryId(
+  category: IFetchSubCategory["category"] | undefined,
+  categoryId?: string
+): string {
+  if (typeof category === "string") return category;
+  if (category && typeof category === "object") {
+    if ("_id" in category && category._id) return String(category._id);
+    if ("id" in category && category.id) return String(category.id);
+  }
+  return categoryId ? String(categoryId) : "";
+}
+
 export const AddProductSubCategory = ({
   modalRef,
   closeModal,
   editData,
 }: propTypes) => {
-  console.log(editData, 'editData');
   const { data: categories, isSuccess: categorySuccess } =
     useGetAllProductCategoriesQuery();
   const { mutate: createSubCategory, isSuccess } =
@@ -51,8 +63,11 @@ export const AddProductSubCategory = ({
   const form = useForm({
     defaultValues: {
       name: editData ? get(editData, "name", "") : "",
-      category: editData ? get(editData, "category", "") : "",
-      description: editData ? get(editData, "rawDescription", "") : "",
+      category: resolveCategoryId(editData?.category, editData?.categoryId),
+      description: editData
+        ? get(editData, "rawDescription", "") ||
+          get(editData, "description", "")
+        : "",
     } as ISubCategorForm,
     validators: {
       onSubmit: validationSchema,
@@ -62,6 +77,26 @@ export const AddProductSubCategory = ({
       else createSubCategory(value);
     },
   });
+
+  useEffect(() => {
+    if (editData) {
+      form.setFieldValue("name", editData.name || "");
+      form.setFieldValue(
+        "category",
+        resolveCategoryId(editData.category, editData.categoryId)
+      );
+      form.setFieldValue(
+        "description",
+        editData.rawDescription ||
+          (typeof editData.description === "string"
+            ? editData.description
+            : "")
+      );
+    } else {
+      form.reset();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editData?._id, categorySuccess]);
   useEffect(() => {
     if (isSuccess || isUpdateSuccess) {
       form.reset();
@@ -136,7 +171,7 @@ export const AddProductSubCategory = ({
         </div>
         <div className="flex justify-between gap-3 mt-6">
           <button
-            type="submit"
+            type="button"
             onClick={closeModal}
             className="px-4 py-2 text-sm font-medium text-gray-700 transition-colors duration-200 border border-gray-300 rounded-md hover:bg-gray-50"
           >

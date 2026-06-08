@@ -71,6 +71,10 @@ export const routesConfig = [
     element: <OrderDetails />,
   },
   {
+    path: FrontendRoutes.ATTRIBUTECONFIG,
+    element: <AttribConfig />,
+  },
+  {
     path: "/attribs",
     element: <AttribConfig />,
   },

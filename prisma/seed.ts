@@ -84,11 +84,57 @@ async function main() {
     });
   }
 
-  console.log("Seed complete (admin + dummy metal prices).");
+  const productTypes = [
+    { name: "Gold", slug: "gold", sortOrder: 1 },
+    { name: "Silver", slug: "silver", sortOrder: 2 },
+    { name: "Diamond", slug: "diamond", sortOrder: 3 },
+    { name: "Astral Gems", slug: "astral_gems", sortOrder: 4 },
+  ];
+
+  for (const productType of productTypes) {
+    await prisma.productType.upsert({
+      where: { slug: productType.slug },
+      update: {
+        name: productType.name,
+        sortOrder: productType.sortOrder,
+        isActive: true,
+      },
+      create: {
+        ...productType,
+        isActive: true,
+      },
+    });
+  }
+
+  const metalTypes = [
+    { name: "Gold", slug: "gold", sortOrder: 1 },
+    { name: "Silver", slug: "silver", sortOrder: 2 },
+    { name: "Platinum", slug: "platinum", sortOrder: 3 },
+    { name: "Rose Gold", slug: "rose_gold", sortOrder: 4 },
+  ];
+
+  for (const metalType of metalTypes) {
+    await prisma.metalType.upsert({
+      where: { slug: metalType.slug },
+      update: {
+        name: metalType.name,
+        sortOrder: metalType.sortOrder,
+        isActive: true,
+      },
+      create: {
+        ...metalType,
+        isActive: true,
+      },
+    });
+  }
+
+  console.log("Seed complete (admin + metal prices + product types + metal types).");
   console.log("  Login:", admin.email, "/", adminPassword);
   console.log("  Gold 24k:", gold.perGram, "NPR/g");
   console.log("  Gold 22k (tejabi):", gold.tejabiGold22k.perGram, "NPR/g");
   console.log("  Silver:", silver.perGram, "NPR/g");
+  console.log("  Product types:", productTypes.map((pt) => pt.name).join(", "));
+  console.log("  Metal types:", metalTypes.map((mt) => mt.name).join(", "));
   console.log("  To remove old demo data: npm run db:clear-dummy");
 }
 
