@@ -31,7 +31,7 @@ export const basicProductInformationSchema = z.object({
     .min(1, "Description is required")
     .max(2000, "Description cannot exceed 2000 characters")
     .trim(),
-  productType: z.enum(["normal", "gold", "silver", "diamond", "astral_gems"], {
+  productType: z.enum(["normal", "gold", "silver", "diamond", "stone_gems"], {
     required_error: "Product type is required",
   }),
   category: z.string().optional(),
@@ -361,7 +361,7 @@ export const conditionalProductFormSchema = z
       .min(1, "Product name is required")
       .max(200, "Product name cannot exceed 200 characters")
       .trim(),
-    productType: z.enum(["normal", "gold", "silver", "diamond", "astral_gems"], {
+    productType: z.enum(["normal", "gold", "silver", "diamond", "stone_gems"], {
       required_error: "Product type is required",
     }),
     description: z
@@ -464,7 +464,7 @@ export const conditionalProductFormSchema = z
         data.productType === "gold" ||
         data.productType === "silver" ||
         data.productType === "diamond" ||
-        data.productType === "astral_gems"
+        data.productType === "stone_gems"
       ) {
         return !!(data.category && data.category.trim() !== "");
       }
@@ -482,7 +482,7 @@ export const conditionalProductFormSchema = z
         data.productType === "gold" ||
         data.productType === "silver" ||
         data.productType === "diamond" ||
-        data.productType === "astral_gems"
+        data.productType === "stone_gems"
       ) {
         return !!(data.subCategory && data.subCategory.trim() !== "");
       }
@@ -514,7 +514,7 @@ export const conditionalProductFormSchema = z
         data.productType === "gold" ||
         data.productType === "silver" ||
         data.productType === "diamond" ||
-        data.productType === "astral_gems"
+        data.productType === "stone_gems"
       ) {
         return !!(data.totalCarat && data.totalCarat > 0);
       }
@@ -532,7 +532,7 @@ export const conditionalProductFormSchema = z
         data.productType === "gold" ||
         data.productType === "silver" ||
         data.productType === "diamond" ||
-        data.productType === "astral_gems"
+        data.productType === "stone_gems"
       ) {
         return !!(data.makingCharges && data.makingCharges >= 0);
       }
@@ -547,13 +547,13 @@ export const conditionalProductFormSchema = z
   .refine(
     (data) => {
       // For diamond products: require clarity
-      if (data.productType === "diamond" || data.productType === "astral_gems") {
+      if (data.productType === "diamond" || data.productType === "stone_gems") {
         return !!(data.clarity && data.clarity.trim() !== "");
       }
       return true;
     },
     {
-      message: "Clarity is required for diamond and astral gem products",
+      message: "Clarity is required for diamond and stone/gem products",
       path: ["clarity"],
     }
   )

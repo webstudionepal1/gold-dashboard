@@ -246,7 +246,7 @@ const CompactFormContent: React.FC<{
       { value: "gold", label: "Gold" },
       { value: "silver", label: "Silver" },
       { value: "diamond", label: "Diamond" },
-      { value: "astral_gems", label: "Astral Gems" },
+      { value: "stone_gems", label: "Stone/Gems" },
     ];
   const subCategoryOptions =
     subCategories?.map((sub: any) => ({ value: sub._id, label: sub.name })) ||
@@ -566,7 +566,7 @@ const CompactFormContent: React.FC<{
 
                   {/* Show clarity only for diamond products */}
                   {(formik.values.productType === "diamond" ||
-                    formik.values.productType === "astral_gems") && (
+                    formik.values.productType === "stone_gems") && (
                     <div>
                       <InputField
                         label="Clarity"

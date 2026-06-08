@@ -56,7 +56,7 @@ const ProductList: React.FC = () => {
       { label: "Gold", value: "gold" },
       { label: "Silver", value: "silver" },
       { label: "Diamond", value: "diamond" },
-      { label: "Astral Gems", value: "astral_gems" },
+      { label: "Stone/Gems", value: "stone_gems" },
     ];
 
   const productsData = useMemo(

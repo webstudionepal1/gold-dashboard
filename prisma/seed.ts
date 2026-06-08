@@ -88,7 +88,7 @@ async function main() {
     { name: "Gold", slug: "gold", sortOrder: 1 },
     { name: "Silver", slug: "silver", sortOrder: 2 },
     { name: "Diamond", slug: "diamond", sortOrder: 3 },
-    { name: "Astral Gems", slug: "astral_gems", sortOrder: 4 },
+    { name: "Stone/Gems", slug: "stone_gems", sortOrder: 4 },
   ];
 
   for (const productType of productTypes) {
@@ -105,6 +105,11 @@ async function main() {
       },
     });
   }
+
+  await prisma.productType.updateMany({
+    where: { slug: "astral_gems" },
+    data: { isActive: false },
+  });
 
   const metalTypes = [
     { name: "Gold", slug: "gold", sortOrder: 1 },

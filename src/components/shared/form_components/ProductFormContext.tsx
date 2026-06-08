@@ -33,7 +33,7 @@ export interface ProductFormData {
   slug?: string;
   description: string;
   karat?: "24k" | "22k" | "21k" | "20k" | "18k" | "16k" | "14k" | "10k" | "";
-  productType?: "normal" | "diamond" | "gold" | "silver" | "astral_gems";
+  productType?: "normal" | "diamond" | "gold" | "silver" | "stone_gems";
   category: string;
   subCategory: string;
   existingImages?: string[];
