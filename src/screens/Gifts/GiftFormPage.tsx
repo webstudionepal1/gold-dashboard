@@ -33,9 +33,6 @@ const GiftFormPage: React.FC = () => {
   const handleBack = () => navigate(FrontendRoutes.GIFTS);
 
   const handleSuccess = () => {
-    toast.success(
-      isEdit ? "Gift updated successfully!" : "Gift created successfully!"
-    );
     navigate(FrontendRoutes.GIFTS);
   };
 

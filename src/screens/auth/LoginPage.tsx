@@ -120,7 +120,7 @@ export const LoginPage = () => {
                 Submitting...
               </span>
             ) : (
-              "Sign In"
+              "Login"
             )}
           </button>
         </form>

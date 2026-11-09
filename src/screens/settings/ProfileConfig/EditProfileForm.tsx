@@ -12,7 +12,7 @@ import {
   useUpdateCompanyDetailsMutation,
 } from '../../../server/api/companyHooks';
 import { FieldError } from '../../auth/LoginPage';
-import { generateProfileValue, IProfileValue } from '../profileObj';
+import { generateProfileValue, IProfileValue, shopProfileSchema } from '../profileObj';
 import { get } from 'lodash';
 
 const defaultValues = {
@@ -56,6 +56,9 @@ const EditProfileForm = () => {
 
   const form = useForm({
     defaultValues: generateProfileValue(companyData) as IProfileValue,
+    validators: {
+      onSubmit: shopProfileSchema,
+    },
     onSubmit: async ({ value }: { value: any }) => {
       const obj = [
         'companyName',
@@ -328,12 +331,15 @@ const EditProfileForm = () => {
                   <div className="w-1/2">
                     <DropdownField
                       label="Payment Method"
+                      firstInput="Select Payment Method"
                       options={[
                         { value: 'cash', label: 'Cash' },
                         { value: 'online', label: 'Online' },
+                        { value: 'card', label: 'Card' },
+                        { value: 'bank_transfer', label: 'Bank Transfer' },
                       ]}
                       required
-                      value={field.state.value}
+                      value={field.state.value || ""}
                       onChange={(e) => field.handleChange(e.target.value)}
                       inputClassname="w-full"
                     />

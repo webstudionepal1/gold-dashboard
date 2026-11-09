@@ -24,11 +24,11 @@ const validationSchema = Yup.object({
     .required("Silver (per tola) is required")
     .positive("Must be greater than 0"),
   tolaGrams: Yup.number().required().positive(),
-  purity24: Yup.number().required().positive(),
-  purity22: Yup.number().required().positive(),
-  purity18: Yup.number().required().positive(),
-  purity14: Yup.number().required().positive(),
-  purity10: Yup.number().required().positive(),
+  purity24: Yup.number().required("Purity % is required").positive("Must be greater than 0").max(100, "Purity percentage cannot exceed 100%"),
+  purity22: Yup.number().required("Purity % is required").positive("Must be greater than 0").max(100, "Purity percentage cannot exceed 100%"),
+  purity18: Yup.number().required("Purity % is required").positive("Must be greater than 0").max(100, "Purity percentage cannot exceed 100%"),
+  purity14: Yup.number().required("Purity % is required").positive("Must be greater than 0").max(100, "Purity percentage cannot exceed 100%"),
+  purity10: Yup.number().required("Purity % is required").positive("Must be greater than 0").max(100, "Purity percentage cannot exceed 100%"),
   currency: Yup.string().required(),
 });
 
@@ -230,6 +230,7 @@ const MetalPricesForm: React.FC = () => {
                 value={formik.values.purity24}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
+                error={formik.touched.purity24 ? (formik.errors.purity24 as string) : undefined}
               />
               <InputField
                 label="22K purity %"
@@ -239,6 +240,7 @@ const MetalPricesForm: React.FC = () => {
                 value={formik.values.purity22}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
+                error={formik.touched.purity22 ? (formik.errors.purity22 as string) : undefined}
               />
               <InputField
                 label="18K purity %"
@@ -248,6 +250,7 @@ const MetalPricesForm: React.FC = () => {
                 value={formik.values.purity18}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
+                error={formik.touched.purity18 ? (formik.errors.purity18 as string) : undefined}
               />
               <InputField
                 label="14K purity %"
@@ -257,6 +260,7 @@ const MetalPricesForm: React.FC = () => {
                 value={formik.values.purity14}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
+                error={formik.touched.purity14 ? (formik.errors.purity14 as string) : undefined}
               />
               <InputField
                 label="10K purity %"
@@ -266,6 +270,7 @@ const MetalPricesForm: React.FC = () => {
                 value={formik.values.purity10}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
+                error={formik.touched.purity10 ? (formik.errors.purity10 as string) : undefined}
               />
             </div>
 

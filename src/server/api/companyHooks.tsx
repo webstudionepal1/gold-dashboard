@@ -76,11 +76,7 @@ export const useCreateCompanyDetailsMutation = () => {
   return useMutation({
     mutationKey: ['company'],
     mutationFn: async ({ body }: { body: FormData }) => {
-      const res = await apiClient.post(`company`, body, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const res = await apiClient.post(`company`, body);
       return res?.data?.data;
     },
     onSuccess() {
@@ -88,7 +84,7 @@ export const useCreateCompanyDetailsMutation = () => {
       queryClient.invalidateQueries({ queryKey: ['company'] });
     },
     onError(err: string) {
-      toast.success(err || 'Error Creating Details');
+      toast.error(err || 'Error Creating Details');
     },
   });
 };
@@ -98,11 +94,7 @@ export const useUpdateCompanyDetailsMutation = () => {
   return useMutation({
     mutationKey: ['company'],
     mutationFn: async ({ id, body }: IUpdateProps) => {
-      const res = await apiClient.patch(`company/${id}`, body, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const res = await apiClient.patch(`company/${id}`, body);
       return res?.data?.data;
     },
     onSuccess() {
@@ -110,7 +102,7 @@ export const useUpdateCompanyDetailsMutation = () => {
       queryClient.invalidateQueries({ queryKey: ['company'] });
     },
     onError(err: string) {
-      toast.success(err || 'Error Updating Details');
+      toast.error(err || 'Error Updating Details');
     },
   });
 };

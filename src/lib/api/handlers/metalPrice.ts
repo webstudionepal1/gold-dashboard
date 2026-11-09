@@ -169,6 +169,12 @@ export async function handleMetalPriceCreate(req: NextRequest) {
     const tolaGrams = Number(body.tolaGrams ?? DEFAULT_TOLA_GRAMS) || DEFAULT_TOLA_GRAMS;
     const purityConfig = parsePurityConfig(body.purityConfig);
 
+    for (const [k, val] of Object.entries(purityConfig)) {
+      if (Number(val) > 100) {
+        return apiError(`Purity percentage for ${k}K cannot exceed 100%`, 400);
+      }
+    }
+
     // New preferred inputs (per tola, 99.9 / fine gold base).
     const baseGold999PerTola = Number(
       body.baseGold999PerTola ?? body.fineGold999PerTola ?? body.fineGoldPerTola

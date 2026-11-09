@@ -47,14 +47,54 @@ export async function handleProductList(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const { page, limit, skip, search, sortOrder } = getPagination(searchParams);
 
-  const where = search
-    ? {
-        OR: [
-          { name: { contains: search, mode: "insensitive" as const } },
-          { slug: { contains: search, mode: "insensitive" as const } },
-        ],
-      }
-    : {};
+  const categoryParam = searchParams.get("category");
+  const statusParam = searchParams.get("status") ?? searchParams.get("isActive");
+  const productTypeParam = searchParams.get("productType");
+
+  const andConditions: any[] = [];
+
+  const trimmedSearch = (search || "").trim();
+  if (trimmedSearch) {
+    andConditions.push({
+      OR: [
+        { name: { contains: trimmedSearch, mode: "insensitive" } },
+        { slug: { contains: trimmedSearch, mode: "insensitive" } },
+        { description: { contains: trimmedSearch, mode: "insensitive" } },
+        { category: { name: { contains: trimmedSearch, mode: "insensitive" } } },
+        { subCategory: { name: { contains: trimmedSearch, mode: "insensitive" } } },
+        { tags: { has: trimmedSearch } },
+      ],
+    });
+  }
+
+  if (categoryParam && categoryParam !== "all" && categoryParam !== "0") {
+    andConditions.push({
+      OR: [
+        { categoryId: categoryParam },
+        { category: { id: categoryParam } },
+        { category: { name: { equals: categoryParam, mode: "insensitive" } } },
+        { category: { slug: categoryParam } },
+      ],
+    });
+  }
+
+  if (statusParam !== null && statusParam !== undefined && statusParam !== "" && statusParam !== "all") {
+    const isActiveVal = statusParam === "true" || statusParam === true || statusParam === "active";
+    andConditions.push({ isActive: isActiveVal });
+  }
+
+  if (productTypeParam && productTypeParam !== "all" && productTypeParam !== "") {
+    const pt = productTypeParam.toLowerCase();
+    andConditions.push({
+      OR: [
+        { metadata: { path: ["productType"], equals: pt } },
+        { metadata: { path: ["productType"], equals: productTypeParam } },
+        { metadata: { path: ["productType"], equals: pt.charAt(0).toUpperCase() + pt.slice(1) } },
+      ],
+    });
+  }
+
+  const where = andConditions.length > 0 ? { AND: andConditions } : {};
 
   const [products, totalCount] = await Promise.all([
     prisma.product.findMany({
@@ -502,11 +542,27 @@ export async function handleSubCategoryList() {
 
 export async function handleSubCategoryCreate(req: NextRequest) {
   const body = await parseBody(req);
+  const name = String(body.name || "").trim();
+  const categoryId = String(body.categoryId || body.category || "");
+
+  if (!name) return apiError("Name is required", 400);
+  if (!categoryId) return apiError("Category is required", 400);
+
+  const existing = await prisma.subCategory.findFirst({
+    where: {
+      categoryId,
+      name: { equals: name, mode: "insensitive" },
+    },
+  });
+  if (existing) {
+    return apiError("A subcategory with this name already exists in this category", 409);
+  }
+
   const item = await prisma.subCategory.create({
     data: {
-      name: String(body.name),
+      name,
       description: body.description ? String(body.description) : null,
-      categoryId: String(body.categoryId || body.category),
+      categoryId,
       image: body.image ? String(body.image) : null,
       isActive: body.isActive !== false,
     },

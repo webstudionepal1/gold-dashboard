@@ -91,7 +91,7 @@ export async function parseBody(req: NextRequest) {
         "Could not parse upload as form data. Try again without setting Content-Type manually, or use smaller files."
       );
     }
-    const fileFields = ["image", "images", "mobImage", "video", "videoThumbnail", "featuredImage", "logo", "file"];
+    const fileFields = ["image", "images", "mobImage", "video", "videoThumbnail", "featuredImage", "logo", "file", "qr"];
     const uploads = await parseFormDataFiles(formData, fileFields);
 
     const flat: Record<string, unknown> = { ...uploads };

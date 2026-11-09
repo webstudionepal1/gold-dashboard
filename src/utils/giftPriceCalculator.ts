@@ -31,6 +31,20 @@ export interface ProductPriceBreakdown {
  * @returns GiftPriceCalculation object with detailed pricing breakdown
  */
 export const calculateGiftPrices = (gift: IFetchGift): GiftPriceCalculation => {
+  const fixedPriceNum = Number(gift.fixedPrice || 0);
+  if ((gift.pricingType === "fixed" || (!gift.products || gift.products.length === 0)) && fixedPriceNum > 0) {
+    const discountPercentage = gift.discountPercentage || 0;
+    const totalOriginalPrice = fixedPriceNum;
+    const totalDiscountedPrice = totalOriginalPrice * (1 - discountPercentage / 100);
+    return {
+      totalOriginalPrice,
+      totalDiscountedPrice,
+      savings: totalOriginalPrice - totalDiscountedPrice,
+      hasValidProducts: true,
+      productBreakdown: [],
+    };
+  }
+
   if (!gift.products || gift.products.length === 0) {
     return {
       totalOriginalPrice: 0,
@@ -42,7 +56,7 @@ export const calculateGiftPrices = (gift: IFetchGift): GiftPriceCalculation => {
     };
   }
 
-  let totalOriginalPrice = 0;
+  let totalOriginalPrice = fixedPriceNum > 0 && gift.pricingType === "fixed" ? fixedPriceNum : 0;
   let hasValidProducts = false;
   const productBreakdown: ProductPriceBreakdown[] = [];
 

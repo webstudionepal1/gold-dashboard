@@ -534,7 +534,12 @@ export const conditionalProductFormSchema = z
         data.productType === "diamond" ||
         data.productType === "stone_gems"
       ) {
-        return !!(data.makingCharges && data.makingCharges >= 0);
+        return (
+          data.makingCharges !== undefined &&
+          data.makingCharges !== null &&
+          !isNaN(Number(data.makingCharges)) &&
+          Number(data.makingCharges) >= 0
+        );
       }
       return true;
     },

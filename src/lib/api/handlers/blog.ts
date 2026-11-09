@@ -106,6 +106,9 @@ export async function handleBlogUpdate(req: NextRequest, id: string) {
       ...(body.content && { content: String(body.content) }),
       ...(body.status && { status: body.status as "draft" | "published" | "archived" }),
       ...(body.isFeatured !== undefined && { isFeatured: Boolean(body.isFeatured) }),
+      ...(body.isActive !== undefined && {
+        isActive: body.isActive === true || body.isActive === "true" || body.isActive === 1 || body.isActive === "1",
+      }),
     },
     include: { author: true },
   });

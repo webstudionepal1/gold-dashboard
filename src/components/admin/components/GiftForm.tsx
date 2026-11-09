@@ -216,7 +216,7 @@ const GiftForm: React.FC<GiftFormProps> = ({
         );
 
         // Append optional fields only if they have values
-        if (values.fixedPrice)
+        if (values.fixedPrice !== undefined && values.fixedPrice !== null && values.fixedPrice !== "")
           formData.append("fixedPrice", values.fixedPrice.toString());
         if (values.discountPercentage)
           formData.append(
@@ -656,19 +656,27 @@ const GiftForm: React.FC<GiftFormProps> = ({
       {/* Additional Settings */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          {/* <InputField
-            label="Discount Percentage"
+          <InputField
+            label="Package Price / Fixed Price (Rs)"
             type="number"
             min="0"
-            max="100"
             step="0.01"
-            placeholder="0"
-            value={formik.values.discountPercentage}
-            onChange={formik.handleChange}
+            placeholder="0.00"
+            numberValue={formik.values.fixedPrice}
             onBlur={formik.handleBlur}
-            name="discountPercentage"
-            error={getFieldError("discountPercentage")}
-          /> */}
+            allowNegative={false}
+            name="fixedPrice"
+            error={getFieldError("fixedPrice")}
+            onNumberChange={(value) => {
+              formik.setFieldValue("fixedPrice", value);
+              if (value > 0) {
+                formik.setFieldValue("pricingType", "fixed");
+              }
+            }}
+            clearZeroOnFocus
+          />
+        </div>
+        <div>
           <InputField
             label="Discount Percentage"
             type="number"

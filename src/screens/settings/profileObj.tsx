@@ -44,6 +44,57 @@ export const metalTypeColumns = [
 
 const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
+export const shopProfileSchema = z
+  .object({
+    companyName: z.string().min(1, "Shop Name is required"),
+    name: z.string().min(1, "Owner Name is required"),
+    phone: z
+      .string()
+      .min(1, "Phone Number is required")
+      .regex(
+        /^[+]?[\d\s-]{7,15}$/,
+        "Invalid phone number format. Must contain only digits and minimum 7 digits"
+      ),
+    email: z.string().min(1, "Email is required").email("Invalid email format"),
+    registrationNo: z.string().optional(),
+    address: z.string().optional(),
+    city: z.string().optional(),
+    country: z.string().optional(),
+    zipCode: z
+      .string()
+      .optional()
+      .refine(
+        (val) => !val || /^\d{3,10}$/.test(val.trim()),
+        "Zip code must contain only numbers"
+      ),
+    openDay: z.string().optional(),
+    openTime: z.string().optional(),
+    closeTime: z.string().optional(),
+    paymentMode: z.string().optional(),
+    bankName: z.string().optional(),
+    accountNo: z
+      .string()
+      .optional()
+      .refine(
+        (val) => !val || /^\d+$/.test(val.trim()),
+        "Bank account number must contain only numbers"
+      ),
+    accountHolder: z.string().optional(),
+    branch: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.openTime && data.closeTime) {
+        return data.closeTime > data.openTime;
+      }
+      return true;
+    },
+    {
+      message: "Closing time must be later than opening time",
+      path: ["closeTime"],
+    }
+  );
+
 // export const editCustomerSchema = z.object({
 //   shop_name: z.string().min(1, "Shop Name is required"),
 //   owner_name: z.string().min(1, "Owner Name is required"),

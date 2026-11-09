@@ -153,7 +153,7 @@ const DashTopLeft = ({ dashboardData }: DashTopLeftProps) => {
             </div>
 
             <Link
-              to="#"
+              to={FrontendRoutes.PRODUCTLIST}
               className="inline-flex items-center px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-medium transition-colors duration-200 shadow-md hover:shadow-lg">
               <span>Learn More</span>
               <Icon icon="material-symbols:arrow-forward" className="ml-2 w-4 h-4" />

@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState, useEffect, useCallback, type ReactNode, memo } from "react";
+import { useState, useEffect, useCallback, useMemo, type ReactNode, memo } from "react";
 import { debounce } from "lodash";
 import clsx from "clsx";
 import TableAction from "./_table/TableAction";
@@ -95,7 +95,6 @@ const MasterTable: React.FC<MasterTableProps> = memo(
     const [globalFilter, setGlobalFilter] = useState<string>("");
     const [pageIndex, setPageIndex] = useState<number>(0);
     const [pageSize] = useState<number>(entriesPerPage);
-    const [filteredRows, setFilteredRows] = useState<Row[]>(rows);
     const [selectedRows, setSelectedRows] = useState<Set<string | number>>(
       new Set()
     );
@@ -126,37 +125,58 @@ const MasterTable: React.FC<MasterTableProps> = memo(
       return () => window.removeEventListener("resize", checkScreenSize);
     }, []);
 
-    // Initialize filtered rows when rows change
+    // Reset page index when filter or search changes
     useEffect(() => {
-      if (!globalFilter || apiPagination) {
-        setFilteredRows(rows);
-      }
-    }, [rows, globalFilter, apiPagination]);
-
-    // Filter rows when search term changes (for client-side filtering)
-    useEffect(() => {
-      if (apiPagination) {
-        return;
-      }
-
-      if (!globalFilter) {
-        setFilteredRows(rows);
-        return;
-      }
-
-      const filtered = rows.filter((row) => {
-        return columns.some((column) => {
-          const value = row[column.key];
-          return (
-            value &&
-            String(value).toLowerCase().includes(globalFilter.toLowerCase())
-          );
-        });
-      });
-
-      setFilteredRows(filtered);
       setPageIndex(0);
-    }, [globalFilter, rows, columns, apiPagination]);
+    }, [globalFilter, filterValues]);
+
+    // Derive filtered rows cleanly with useMemo (handles ATT-07 & all client-side filtering)
+    const filteredRows = useMemo(() => {
+      if (apiPagination) {
+        return rows;
+      }
+
+      let result = rows;
+
+      // Apply filterConfig dropdown filters
+      if (filterConfig && filterConfig.length > 0) {
+        result = result.filter((row) => {
+          return Object.entries(filterValues).every(([key, filterVal]) => {
+            if (!filterVal || filterVal === "all") return true;
+            const rowVal = row[key];
+            if (rowVal === undefined || rowVal === null) return true;
+            return String(rowVal).toLowerCase() === String(filterVal).toLowerCase();
+          });
+        });
+      }
+
+      const q = globalFilter.trim().toLowerCase();
+      if (!q) {
+        return result;
+      }
+
+      return result.filter((row) => {
+        // First check visible columns
+        const inColumns = columns.some((col) => {
+          const val = row[col.key];
+          if (val == null) return false;
+          if (typeof val === "string" || typeof val === "number" || typeof val === "boolean") {
+            return String(val).toLowerCase().includes(q);
+          }
+          return false;
+        });
+        if (inColumns) return true;
+
+        // Also check row data properties (e.g. name, title, description, slug)
+        for (const [k, val] of Object.entries(row)) {
+          if (k.startsWith("_") || k === "photo" || k === "image" || k === "status" || k === "action") continue;
+          if (typeof val === "string" || typeof val === "number") {
+            if (String(val).toLowerCase().includes(q)) return true;
+          }
+        }
+        return false;
+      });
+    }, [apiPagination, globalFilter, rows, columns, filterConfig, filterValues]);
 
     // Calculate total pages based on pagination type
     const totalPages = apiPagination

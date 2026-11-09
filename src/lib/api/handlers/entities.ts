@@ -77,9 +77,37 @@ export async function handleBannerDelete(id: string) {
 export async function handleGiftList(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const { page, limit, skip, search } = getPagination(searchParams);
-  const where = search
-    ? { name: { contains: search, mode: "insensitive" as const } }
-    : {};
+  const typeParam = searchParams.get("type");
+  const occasionParam = searchParams.get("occasion");
+  const setTypeParam = searchParams.get("setType");
+
+  const andConditions: any[] = [];
+
+  const trimmedSearch = (search || "").trim();
+  if (trimmedSearch) {
+    andConditions.push({
+      OR: [
+        { name: { contains: trimmedSearch, mode: "insensitive" } },
+        { description: { contains: trimmedSearch, mode: "insensitive" } },
+        { slug: { contains: trimmedSearch, mode: "insensitive" } },
+        { tags: { has: trimmedSearch } },
+      ],
+    });
+  }
+
+  if (typeParam && typeParam !== "all") {
+    andConditions.push({ type: typeParam as "gift" | "package" });
+  }
+
+  if (occasionParam && occasionParam !== "all") {
+    andConditions.push({ occasion: { equals: occasionParam, mode: "insensitive" } });
+  }
+
+  if (setTypeParam && setTypeParam !== "all") {
+    andConditions.push({ setType: setTypeParam });
+  }
+
+  const where = andConditions.length > 0 ? { AND: andConditions } : {};
 
   const [items, total] = await Promise.all([
     prisma.gift.findMany({ where, skip, take: limit, orderBy: { createdAt: "desc" } }),
@@ -192,6 +220,27 @@ export async function handleCompanyList() {
 
 export async function handleCompanyCreate(req: NextRequest) {
   const body = await parseBody(req);
+  const existing = await prisma.company.findFirst();
+  const allowed = [
+    "name", "companyName", "ownerNo", "address", "email", "phone",
+    "description", "registrationNo", "city", "zipCode", "openDay",
+    "openTime", "closeTime", "paymentMode", "bankName", "accountNo",
+    "accountHolder", "branch", "logo"
+  ];
+  if (existing) {
+    const data: Record<string, any> = {};
+    for (const k of allowed) {
+      if (body[k] !== undefined) {
+        data[k] = body[k] === "" ? null : String(body[k]);
+      }
+    }
+    const item = await prisma.company.update({
+      where: { id: existing.id },
+      data,
+    });
+    return apiSuccess(withMongoId(item), "Shop profile updated successfully");
+  }
+
   const item = await prisma.company.create({
     data: {
       name: String(body.name || body.companyName || "Company"),
@@ -215,20 +264,28 @@ export async function handleCompanyCreate(req: NextRequest) {
       logo: body.logo ? String(body.logo) : null,
     },
   });
-  return apiSuccess(withMongoId(item), "Created", 201);
+  return apiSuccess(withMongoId(item), "Shop profile created successfully", 201);
 }
 
 export async function handleCompanyUpdate(req: NextRequest, id: string) {
   const body = await parseBody(req);
+  const allowed = [
+    "name", "companyName", "ownerNo", "address", "email", "phone",
+    "description", "registrationNo", "city", "zipCode", "openDay",
+    "openTime", "closeTime", "paymentMode", "bankName", "accountNo",
+    "accountHolder", "branch", "logo"
+  ];
+  const data: Record<string, any> = {};
+  for (const k of allowed) {
+    if (body[k] !== undefined) {
+      data[k] = body[k] === "" ? null : String(body[k]);
+    }
+  }
   const item = await prisma.company.update({
     where: { id },
-    data: Object.fromEntries(
-      Object.entries(body).filter(([k]) =>
-        ["name", "email", "phone", "address", "companyName", "bankName"].includes(k)
-      )
-    ),
+    data,
   });
-  return apiSuccess(withMongoId(item));
+  return apiSuccess(withMongoId(item), "Shop profile updated successfully");
 }
 
 // Order
