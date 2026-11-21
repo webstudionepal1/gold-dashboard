@@ -45,13 +45,18 @@ export function getTokenFromRequest(req: NextRequest): string | null {
 }
 
 export async function getAuthUser(req: NextRequest) {
-  const token = getTokenFromRequest(req);
-  if (!token) return null;
-  const payload = verifyToken(token);
-  if (!payload) return null;
-  const user = await prisma.user.findUnique({ where: { id: payload.sub } });
-  if (!user || !user.isActive) return null;
-  return user;
+  try {
+    const token = getTokenFromRequest(req);
+    if (!token) return null;
+    const payload = verifyToken(token);
+    if (!payload) return null;
+    const user = await prisma.user.findUnique({ where: { id: payload.sub } });
+    if (!user || !user.isActive) return null;
+    return user;
+  } catch (error) {
+    console.error("getAuthUser error:", error);
+    return null;
+  }
 }
 
 export async function setAuthCookie(token: string) {
